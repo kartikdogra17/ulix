@@ -18,6 +18,7 @@ import {
   NOW, makeDailySeries, makeDocs, makeExceptions, makeModalSplit, makeShipments, makeVehicles,
 } from './generate'
 import { NODE_BY_CODE } from './seed'
+import { planLane } from '../routes'
 
 const sleep = (ms: number) => new Promise((res) => setTimeout(res, ms))
 /** Simulated gateway latency so loading states are real, not theatre. */
@@ -407,6 +408,17 @@ export class MockAdapter implements DataAdapter {
       .filter((s) => s.status !== 'planned')
       .map(({ id, lat, lon, status, origin, destination, progress, delayMins }) =>
         ({ id, lat, lon, status, origin, destination, progress, delayMins }))
+  }
+
+  /* ── Lane planning ─────────────────────────────────────────── */
+
+  async planLane(
+    origin: string, destination: string,
+    opts: { weightKg: number; departAt: Date; vehicleClass: string },
+  ) {
+    // Several source systems answer here, so the wait is deliberately longer.
+    await sleep(latency() * 2.2)
+    return planLane(origin, destination, opts)
   }
 
   /* ── API gateway console ───────────────────────────────────── */

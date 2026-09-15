@@ -128,6 +128,7 @@ same picture at entity level, including a per-system coverage table.
 | Route | What it does |
 |---|---|
 | `/` **Control tower** | Value at risk, unassigned and overdue counts, the working decisions queue (assign / snooze / close with an outcome), desk load, risk-coloured live map, what is driving risk, lane reliability, source-system health |
+| `/plan` **Lane planner** | Plan a corridor before booking it: black spots you will cross, municipal no-entry windows against your projected arrival, toll and own-account cost, energy stops, and the road/rail/sea/air trade-off on time, cost and carbon |
 | `/shipments` **Consignments** | Filterable register; drawer opens on risk score and data confidence, then cross-system signals with recommended actions, a per-system coverage table, leg-by-leg journey, event chain attributed to its source system, and documents |
 | `/fleet` **Fleet** | VAHAN registration and statutory validity, SARATHI licence checks, FASTag crossings and balance, utilisation and detention analytics |
 | `/compliance` **Documents** | e-Way Bills, GST invoices, customs filings and vehicle papers, triaged by mismatch / expired / expiring / pending, with the specific discrepancy named |
@@ -143,6 +144,29 @@ the FASTag tab says exactly that.
 
 ---
 
+## Planning, not just tracking
+
+Tracking answers "where is it". The five planning-side API families answer "should we
+move it this way at all" — and none of the tracking screens touch them:
+
+| Dataset | What the planner does with it |
+|---|---|
+| `NOENTRY/01` | Checks the projected arrival against municipal goods-vehicle windows |
+| `BLACKSPOT/01` | Lists accident-prone locations on the corridor, by state and road |
+| `TOLL/01` | Prices every plaza on the lane for the selected vehicle class |
+| `CARBON/01–04` | Emissions per mode — rail, road, air, sea — for the actual payload |
+| `EVYATRA/01`, `MOPNG/01` | Fuel and charging spaced for a loaded run |
+
+The no-entry check is the one worth the build. A truck arriving 20:02 into a city closed
+09:00–21:00 is not late — it is **stopped at the boundary**. No tracking feed shows that;
+it only falls out of joining an ETA to a restriction table. The planner also says which
+fix is cheaper: holding 58 minutes beats re-timing dispatch by eleven hours, and it
+recommends accordingly rather than always suggesting an earlier departure.
+
+Cost is modelled honestly: an **own-account stack** (fuel, driver, toll, upkeep) compared
+against the **market freight rate**, rather than listing a ₹/tonne-km rate beside fuel —
+which would count the diesel twice.
+
 ## Architecture
 
 ```
@@ -155,8 +179,10 @@ src/
       catalogue.ts      GENERATED — 95 endpoints from the official documents
       envelope.ts       Response envelope, unwrap/isNotFound, error types
       client.ts         UlipClient — login, bearer, retry, regex validation
+    routes.ts           Lane planning — safety, restrictions, cost, modal trade-off
+    cases.ts            Case model: owner, status, outcome, audit trail
     mock/               Deterministic simulated world + gateway
-  components/           Shell, NetworkMap, UI primitives
+  components/           Shell, NetworkMap, charts, case UI, primitives
   pages/                One file per module (lazily loaded)
   state/                Session, theme, PWA install
 server/

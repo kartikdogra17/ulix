@@ -16,6 +16,8 @@ export interface MapMarker {
   id: string; lat: number; lon: number
   tone: 'ok' | 'warn' | 'bad' | 'info' | 'brand'
   label?: string; pulse?: boolean; r?: number
+  /** Glyph instead of a dot — hazards and stops read better as shapes. */
+  glyph?: 'dot' | 'hazard' | 'toll' | 'fuel' | 'ev'
 }
 
 const TONE_VAR = {
@@ -25,6 +27,43 @@ const TONE_VAR = {
 
 const MODE_DASH: Record<Mode, string> = {
   road: '', rail: '10 5', sea: '2 6', air: '16 8',
+}
+
+const MODE_STROKE: Record<Mode, string> = {
+  road: 'var(--c-brand)', rail: 'var(--c-accent)',
+  sea: 'var(--c-info)', air: 'var(--c-warn)',
+}
+
+/** Small glyphs drawn in map space, so they scale with the viewBox. */
+function Glyph({ kind, x, y, colour }: {
+  kind: NonNullable<MapMarker['glyph']>; x: number; y: number; colour: string
+}) {
+  if (kind === 'hazard') {
+    return (
+      <g transform={`translate(${x} ${y})`}>
+        <path d="M0 -5.4 L4.8 3.2 L-4.8 3.2 Z" fill={colour} stroke="var(--c-bg)" strokeWidth="1" />
+        <rect x="-0.55" y="-2.6" width="1.1" height="3.4" rx="0.5" fill="var(--c-bg)" />
+        <circle cx="0" cy="1.7" r="0.62" fill="var(--c-bg)" />
+      </g>
+    )
+  }
+  if (kind === 'toll') {
+    return (
+      <g transform={`translate(${x} ${y})`}>
+        <rect x="-4" y="-4" width="8" height="8" rx="1.4" fill={colour} stroke="var(--c-bg)" strokeWidth="1" />
+        <path d="M-1.8 -1.8 H1.8 M-1.8 0 H1.8 M-1.8 1.8 H1.8" stroke="var(--c-bg)" strokeWidth="0.9" strokeLinecap="round" />
+      </g>
+    )
+  }
+  // fuel / ev
+  return (
+    <g transform={`translate(${x} ${y})`}>
+      <circle r="4.2" fill={colour} stroke="var(--c-bg)" strokeWidth="1" />
+      {kind === 'ev'
+        ? <path d="M0.9 -2.4 L-1.5 0.4 H0.1 L-0.7 2.5 L1.7 -0.4 H0.1 Z" fill="var(--c-bg)" />
+        : <path d="M-1.3 -2.2 h2.1 v4.4 h-2.1 z M1.2 -1.1 h1 v2.2" fill="none" stroke="var(--c-bg)" strokeWidth="0.85" strokeLinejoin="round" />}
+    </g>
+  )
 }
 
 /** Gentle arc between two points so overlapping lanes stay readable. */
@@ -60,14 +99,19 @@ export function NetworkMap({
       <svg viewBox={`0 0 ${W} ${H}`} className="h-full w-full" role="img"
         aria-label="Logistics network map of India showing nodes and active lanes">
         <defs>
-          <radialGradient id="mapGlow" cx="50%" cy="45%" r="62%">
-            <stop offset="0%" stopColor="var(--c-accent)" stopOpacity="0.09" />
+          <radialGradient id="mapGlow" cx="48%" cy="42%" r="64%">
+            <stop offset="0%" stopColor="var(--c-accent)" stopOpacity="0.10" />
+            <stop offset="55%" stopColor="var(--c-brand)" stopOpacity="0.045" />
             <stop offset="100%" stopColor="var(--c-accent)" stopOpacity="0" />
           </radialGradient>
+          <filter id="laneGlow" x="-20%" y="-20%" width="140%" height="140%">
+            <feGaussianBlur stdDeviation="3" result="b" />
+            <feMerge><feMergeNode in="b" /><feMergeNode in="SourceGraphic" /></feMerge>
+          </filter>
         </defs>
 
         <rect width={W} height={H} fill="url(#mapGlow)" />
-        <g stroke="var(--c-grid)" strokeWidth="1" opacity="0.7">
+        <g stroke="var(--c-grid)" strokeWidth="1" opacity="0.55">
           {grid.map((l, i) => <line key={i} {...l} />)}
         </g>
 
@@ -77,12 +121,18 @@ export function NetworkMap({
             const a = NODE_BY_CODE[r.from], b = NODE_BY_CODE[r.to]
             if (!a || !b) return null
             const dPath = arc(px(a.lon), py(a.lat), px(b.lon), py(b.lat))
+            const colour = MODE_STROKE[r.mode]
             return (
               <g key={i}>
-                <path d={dPath} stroke="var(--c-line)" strokeWidth={r.active ? 2.4 : 1.4} opacity={r.active ? 0.9 : 0.45} />
+                <path d={dPath} stroke="var(--c-line)" strokeWidth={r.active ? 3 : 1.4}
+                  opacity={r.active ? 0.85 : 0.4} />
                 {r.active && (
-                  <path d={dPath} stroke="var(--c-brand)" strokeWidth="2" opacity="0.95"
-                    strokeDasharray={MODE_DASH[r.mode] || '5 9'} className="route-flow" />
+                  <>
+                    <path d={dPath} stroke={colour} strokeWidth="2.2" opacity="0.32"
+                      filter="url(#laneGlow)" />
+                    <path d={dPath} stroke={colour} strokeWidth="2" opacity="0.95"
+                      strokeDasharray={MODE_DASH[r.mode] || '5 9'} className="route-flow" />
+                  </>
                 )}
               </g>
             )
@@ -125,9 +175,15 @@ export function NetworkMap({
                   fill={TONE_VAR[m.tone]} className="ping-ring"
                   style={{ transformBox: 'fill-box', transformOrigin: 'center' }} />
               )}
-              <circle cx={px(m.lon)} cy={py(m.lat)} r={(m.r ?? 4) + 2.5}
-                fill="var(--c-bg)" opacity="0.75" />
-              <circle cx={px(m.lon)} cy={py(m.lat)} r={m.r ?? 4} fill={TONE_VAR[m.tone]} />
+              {m.glyph && m.glyph !== 'dot' ? (
+                <Glyph kind={m.glyph} x={px(m.lon)} y={py(m.lat)} colour={TONE_VAR[m.tone]} />
+              ) : (
+                <>
+                  <circle cx={px(m.lon)} cy={py(m.lat)} r={(m.r ?? 4) + 2.5}
+                    fill="var(--c-bg)" opacity="0.75" />
+                  <circle cx={px(m.lon)} cy={py(m.lat)} r={m.r ?? 4} fill={TONE_VAR[m.tone]} />
+                </>
+              )}
             </g>
           ))}
         </g>

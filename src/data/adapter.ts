@@ -6,6 +6,7 @@ import type { CatalogueEntry } from './mock/gateway'
 import type { UlipEnvelope } from './ulip/envelope'
 import type { Coverage, Signal } from './fusion'
 import type { Case, CaseStatus, Resolution } from './cases'
+import type { LanePlan } from './routes'
 
 export interface Page<T> { rows: T[]; total: number }
 
@@ -133,6 +134,14 @@ export interface DataAdapter {
 
   dashboard(): Promise<Dashboard>
   liveMap(): Promise<Array<Pick<Shipment, 'id' | 'lat' | 'lon' | 'status' | 'origin' | 'destination' | 'progress' | 'delayMins'>>>
+
+  /**
+   * Plan a lane before it is booked — safety, restrictions, cost and the
+   * modal trade-off, from the catalogue's planning-side datasets.
+   */
+  planLane(origin: string, destination: string, opts: {
+    weightKg: number; departAt: Date; vehicleClass: string
+  }): Promise<LanePlan>
 
   apiCatalogue(): Promise<CatalogueEntry[]>
   apiLogs(): Promise<ApiCall[]>

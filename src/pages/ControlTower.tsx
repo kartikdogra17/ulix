@@ -11,6 +11,7 @@ import { NetworkMap, type MapMarker } from '../components/NetworkMap'
 import {
   Badge, Button, Card, CardHead, Meter, Mono, Skeleton, TableSkeleton, Td, Th,
 } from '../components/ui'
+import { Donut, Radial, Sparkline } from '../components/charts'
 import {
   Avatar, CaseDrawer, QuickActions, SEV_TONE, Sources, StatusChip, currentMemberId,
 } from '../components/cases'
@@ -37,17 +38,21 @@ const KIND_LABEL: Record<string, string> = {
   eta_slip: 'Schedule slip',
 }
 
-function Kpi({ label, value, sub, icon: Icon, tone = 'neutral', loading, accent }: {
+const SPARK_TONE = { ok: 'ok', warn: 'warn', bad: 'bad', neutral: 'muted' } as const
+
+function Kpi({ label, value, sub, icon: Icon, tone = 'neutral', loading, accent, trend }: {
   label: string; value: string; sub?: string
   icon: React.ComponentType<{ className?: string }>
   tone?: 'ok' | 'warn' | 'bad' | 'neutral'; loading?: boolean; accent?: boolean
+  /** Recent history, drawn as a sparkline under the figure. */
+  trend?: number[]
 }) {
   const ring = {
     ok: 'text-ok bg-ok-soft', warn: 'text-warn bg-warn-soft',
     bad: 'text-bad bg-bad-soft', neutral: 'text-muted bg-surface-2',
   }[tone]
   return (
-    <Card className={cn('p-3.5', accent && 'border-bad/30 bg-bad-soft/25')}>
+    <Card className={cn('relative overflow-hidden p-3.5', accent && 'border-bad/30 bg-bad-soft/25')}>
       <div className="flex items-start justify-between gap-2">
         <span className="text-[11px] font-medium uppercase tracking-wide text-faint">{label}</span>
         <span className={cn('grid size-6 shrink-0 place-items-center rounded-md', ring)}>
@@ -58,6 +63,11 @@ function Kpi({ label, value, sub, icon: Icon, tone = 'neutral', loading, accent 
         ? <Skeleton className="mt-2 h-7 w-24" />
         : <div className="tnum mt-1.5 text-[22px] font-semibold leading-tight tracking-tight">{value}</div>}
       {sub && <div className="mt-0.5 text-[11px] text-muted">{sub}</div>}
+      {trend && trend.length > 1 && (
+        <div className="-mx-3.5 -mb-3.5 mt-2">
+          <Sparkline values={trend} tone={SPARK_TONE[tone]} height={26} />
+        </div>
+      )}
     </Card>
   )
 }
@@ -189,6 +199,20 @@ export function ControlTower() {
     return rows.slice(0, 9).map((r) => ({ ...r, pct: (r.count / max) * 100 }))
   }, [allLive])
 
+  const daily = data?.daily ?? []
+  const trend = {
+    created: daily.map((d) => d.created as number),
+    delivered: daily.map((d) => d.delivered as number),
+    onTime: daily.map((d) => d.onTimePct as number),
+    delayed: daily.map((d) => d.delayed as number),
+  }
+
+  const severityMix = useMemo(() => {
+    const c = { critical: 0, high: 0, medium: 0 }
+    for (const x of allLive ?? []) c[x.signal.severity]++
+    return c
+  }, [allLive])
+
   const mine = (allLive ?? []).filter((c) => c.assignee === actor).length
   const SCOPES: Array<[NonNullable<CaseQuery['scope']>, string, number | undefined]> = [
     ['live', 'Queue', allLive?.length],
@@ -229,13 +253,17 @@ export function ControlTower() {
           tone={data?.overdueCases ? 'bad' : 'ok'}
           value={data ? num(data.overdueCases) : '—'} sub="past SLA for their severity" />
         <Kpi loading={!data} label="Closed today" icon={CheckCircle2} tone="ok"
-          value={data ? num(data.resolvedToday) : '—'} sub="resolved or dismissed" />
+          value={data ? num(data.resolvedToday) : '—'} sub="resolved or dismissed"
+          trend={trend.delivered} />
         <Kpi loading={!data} label="Active consignments" icon={Truck}
           value={data ? num(data.activeShipments) : '—'}
-          sub={data ? `${inr(data.inTransitValue)} in transit` : undefined} />
+          sub={data ? `${inr(data.inTransitValue)} in transit` : undefined}
+          trend={trend.created} />
         <Kpi loading={!data} label="On-time delivery" icon={SignalIcon}
           tone={data && data.onTimePct >= 85 ? 'ok' : 'warn'}
-          value={data ? `${data.onTimePct}%` : '—'} sub={data ? `avg delay ${data.avgDelayHrs}h` : undefined} />
+          value={data ? `${data.onTimePct}%` : '—'}
+          sub={data ? `avg delay ${data.avgDelayHrs}h` : undefined}
+          trend={trend.onTime} />
       </div>
 
       <div className="grid gap-3 xl:grid-cols-[1.45fr_1fr]">
@@ -309,6 +337,31 @@ export function ControlTower() {
           <Card>
             <CardHead title="What is driving risk"
               sub="Which cross-system checks are firing, network-wide" />
+            {allLive && (
+              <div className="flex items-center gap-4 border-b border-line-soft p-3">
+                <Donut size={78} thickness={10}
+                  centre={String(allLive.length)} centreSub="live"
+                  segments={[
+                    { label: 'critical', value: severityMix.critical, tone: 'bad' },
+                    { label: 'high', value: severityMix.high, tone: 'warn' },
+                    { label: 'medium', value: severityMix.medium, tone: 'info' },
+                  ]} />
+                <div className="min-w-0 flex-1 space-y-1">
+                  {([['critical', severityMix.critical, 'bg-bad'],
+                     ['high', severityMix.high, 'bg-warn'],
+                     ['medium', severityMix.medium, 'bg-accent']] as const).map(([k, n, dot]) => (
+                    <button key={k} onClick={() => { setSev(k as Severity); setScope('live') }}
+                      className="flex w-full items-center gap-2 text-left text-[12px] hover:text-fg">
+                      <span className={cn('size-2 shrink-0 rounded-full', dot)} />
+                      <span className="flex-1 capitalize text-muted">{k}</span>
+                      <span className="tnum font-medium">{n}</span>
+                    </button>
+                  ))}
+                </div>
+                <Radial size={52} value={data?.dataConfidence ?? 0} sublabel="conf"
+                  tone={(data?.dataConfidence ?? 0) >= 75 ? 'ok' : (data?.dataConfidence ?? 0) >= 50 ? 'warn' : 'bad'} />
+              </div>
+            )}
             <div className="space-y-2 p-3">
               {!allLive && Array.from({ length: 6 }).map((_, i) => <Skeleton key={i} className="h-5" />)}
               {mix.map((m) => (
