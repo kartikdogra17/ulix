@@ -1,34 +1,65 @@
 import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import {
-  Area, AreaChart, Bar, BarChart, CartesianGrid, Cell, ResponsiveContainer,
-  Tooltip, XAxis, YAxis,
-} from 'recharts'
-import {
-  AlertTriangle, ArrowUpRight, CheckCircle2, Clock, FileWarning,
-  Leaf, Radio, Timer, TrendingUp, Truck,
+  ArrowUpRight, CheckCircle2, ChevronRight, CircleDollarSign, Clock,
+  Gauge, Layers, ShieldAlert, Signal as SignalIcon, Timer, TrendingUp, Truck,
 } from 'lucide-react'
 import { adapter } from '../data'
 import { useAsync } from '../lib/useAsync'
-import { compact, dur, inr, num, rel, titleCase } from '../lib/format'
-import { NetworkMap, type MapMarker, type MapRoute } from '../components/NetworkMap'
-import { Badge, Button, Card, CardHead, Meter, Skeleton, TableSkeleton, Td, Th } from '../components/ui'
-import type { Exception } from '../data/types'
+import { inr, num, titleCase } from '../lib/format'
+import { NetworkMap, type MapMarker } from '../components/NetworkMap'
+import {
+  Badge, Button, Card, CardHead, Meter, Mono, Skeleton, TableSkeleton, Td, Th,
+} from '../components/ui'
+import type { Severity, Signal } from '../data/fusion'
 import { cn } from '../lib/cn'
 
-/* ── KPI tile ─────────────────────────────────────────────────── */
+const SEV_TONE: Record<Severity, 'bad' | 'warn' | 'info'> = {
+  critical: 'bad', high: 'warn', medium: 'info',
+}
 
-function Kpi({ label, value, sub, icon: Icon, tone = 'neutral', loading }: {
+const KIND_LABEL: Record<string, string> = {
+  ewb_expires_before_eta: 'e-Way Bill expiring mid-transit',
+  partb_vehicle_mismatch: 'Part-B vehicle mismatch',
+  vehicle_dark: 'No toll reads',
+  fitness_lapsed: 'Fitness lapsed',
+  insurance_lapsed: 'Insurance lapsed',
+  tag_blacklisted: 'FASTag blacklisted',
+  tag_low_balance: 'FASTag low balance',
+  dl_expired: 'Licence expired',
+  customs_hold: 'Customs hold',
+  hazmat_no_clearance: 'Hazmat without clearance',
+  reefer_breach: 'Cold-chain breach',
+  detention: 'Detention',
+  eta_slip: 'Schedule slip',
+}
+
+/** Provenance: which government systems produced this conclusion. */
+function Sources({ ids }: { ids: string[] }) {
+  return (
+    <div className="flex flex-wrap items-center gap-1">
+      <Layers className="size-3 text-faint" />
+      {ids.map((id) => (
+        <span key={id}
+          className="rounded border border-line bg-surface-2 px-1 font-mono text-[10px] leading-4 text-muted">
+          {id}
+        </span>
+      ))}
+    </div>
+  )
+}
+
+function Kpi({ label, value, sub, icon: Icon, tone = 'neutral', loading, accent }: {
   label: string; value: string; sub?: string
   icon: React.ComponentType<{ className?: string }>
-  tone?: 'ok' | 'warn' | 'bad' | 'neutral'; loading?: boolean
+  tone?: 'ok' | 'warn' | 'bad' | 'neutral'; loading?: boolean; accent?: boolean
 }) {
   const ring = {
     ok: 'text-ok bg-ok-soft', warn: 'text-warn bg-warn-soft',
     bad: 'text-bad bg-bad-soft', neutral: 'text-muted bg-surface-2',
   }[tone]
   return (
-    <Card className="p-3.5">
+    <Card className={cn('p-3.5', accent && 'border-bad/30 bg-bad-soft/25')}>
       <div className="flex items-start justify-between gap-2">
         <span className="text-[11px] font-medium uppercase tracking-wide text-faint">{label}</span>
         <span className={cn('grid size-6 shrink-0 place-items-center rounded-md', ring)}>
@@ -43,23 +74,45 @@ function Kpi({ label, value, sub, icon: Icon, tone = 'neutral', loading }: {
   )
 }
 
-const chartAxis = {
-  stroke: 'var(--c-faint)', fontSize: 10,
-  tickLine: false, axisLine: false,
-}
+/* ── The hero: a ranked queue of decisions, not a list of charts ── */
 
-function ChartTip({ active, payload, label }: any) {
-  if (!active || !payload?.length) return null
+function DecisionRow({ s }: { s: Signal }) {
+  const [open, setOpen] = useState(false)
   return (
-    <div className="rounded-lg border border-line bg-surface px-2.5 py-2 text-[11px] shadow-[var(--shadow-pop)]">
-      <div className="mb-1 font-medium">{label}</div>
-      {payload.map((p: any) => (
-        <div key={p.dataKey} className="flex items-center gap-2">
-          <span className="size-2 rounded-sm" style={{ background: p.color }} />
-          <span className="text-muted">{titleCase(String(p.dataKey))}</span>
-          <span className="tnum ml-auto font-medium">{num(p.value, 0)}</span>
+    <div className="px-3.5 py-3 transition-colors hover:bg-surface-2/40">
+      <button onClick={() => setOpen((v) => !v)} className="flex w-full items-start gap-3 text-left">
+        <Badge tone={SEV_TONE[s.severity]} dot className="mt-0.5 shrink-0">{s.severity}</Badge>
+        <div className="min-w-0 flex-1">
+          <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
+            <span className="text-[13px] font-medium">{s.title}</span>
+            <Mono className="text-faint">{s.entity}</Mono>
+          </div>
+          <p className={cn('mt-1 text-[12px] leading-relaxed text-muted', !open && 'line-clamp-1')}>
+            {s.detail}
+          </p>
+          <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1">
+            <Sources ids={s.sources} />
+            {s.hoursToAct !== null && (
+              <span className={cn('text-[10px] font-medium',
+                s.hoursToAct <= 0 ? 'text-bad' : s.hoursToAct < 12 ? 'text-warn' : 'text-faint')}>
+                <Timer className="mr-0.5 inline size-3" />
+                {s.hoursToAct <= 0 ? 'window closed' : `${Math.round(s.hoursToAct)}h to act`}
+              </span>
+            )}
+          </div>
         </div>
-      ))}
+        <div className="shrink-0 text-right">
+          <div className="tnum text-[13px] font-semibold">{inr(s.valueAtRisk)}</div>
+          <div className="text-[10px] text-faint">at risk</div>
+        </div>
+        <ChevronRight className={cn('mt-1 size-4 shrink-0 text-faint transition-transform', open && 'rotate-90')} />
+      </button>
+      {open && (
+        <div className="ml-[4.25rem] mt-2 rounded-lg border border-line bg-surface-2 px-3 py-2">
+          <div className="text-[10px] font-semibold uppercase tracking-wide text-faint">Recommended action</div>
+          <p className="mt-0.5 text-[12px] leading-relaxed">{s.action}</p>
+        </div>
+      )}
     </div>
   )
 }
@@ -67,36 +120,63 @@ function ChartTip({ active, payload, label }: any) {
 /* ── Page ─────────────────────────────────────────────────────── */
 
 export function ControlTower() {
-  const { data, loading } = useAsync(() => adapter.dashboard(), [])
+  const { data } = useAsync(() => adapter.dashboard(), [])
   const { data: live } = useAsync(() => adapter.liveMap(), [])
-  const { data: exceptions, refresh } = useAsync(() => adapter.listExceptions(), [])
-  const [acking, setAcking] = useState<string | null>(null)
+  const { data: signals } = useAsync(() => adapter.signals(), [])
+  const [sev, setSev] = useState<Severity | 'all'>('all')
+
+  const queue = useMemo(
+    () => (signals ?? []).filter((s) => sev === 'all' || s.severity === sev),
+    [signals, sev])
+
+  /** Risk per consignment, so the map shows exposure rather than mere position. */
+  const riskByEntity = useMemo(() => {
+    const m = new Map<string, Severity>()
+    for (const s of signals ?? []) {
+      const cur = m.get(s.entity)
+      if (!cur || (s.severity === 'critical') || (s.severity === 'high' && cur === 'medium')) {
+        m.set(s.entity, s.severity)
+      }
+    }
+    return m
+  }, [signals])
 
   const markers: MapMarker[] = useMemo(() =>
-    (live ?? []).slice(0, 70).map((s) => ({
-      id: s.id, lat: s.lat, lon: s.lon,
-      tone: s.status === 'exception' || s.delayMins > 600 ? 'bad'
-        : s.delayMins > 120 ? 'warn'
-        : s.status === 'delivered' ? 'ok' : 'info',
-      pulse: s.status === 'in_transit' && s.delayMins <= 120,
-      r: 3.4,
-      label: `${s.id} · ${titleCase(s.status)}${s.delayMins > 30 ? ` · ${dur(s.delayMins)} late` : ''}`,
-    })), [live])
+    (live ?? []).slice(0, 90).map((s) => {
+      const r = riskByEntity.get(s.id)
+      return {
+        id: s.id, lat: s.lat, lon: s.lon,
+        tone: r === 'critical' ? 'bad' : r === 'high' ? 'warn' : r === 'medium' ? 'info' : 'ok',
+        pulse: r === 'critical',
+        r: r ? 4.2 : 3,
+        label: `${s.id}${r ? ` · ${r} risk` : ' · clear'}`,
+      }
+    }), [live, riskByEntity])
 
-  const routes: MapRoute[] = useMemo(() =>
-    (live ?? []).slice(0, 26).map((s) => ({
-      from: s.origin, to: s.destination, mode: 'road' as const,
-      active: s.progress > 0 && s.progress < 1,
-    })), [live])
+  /** What kinds of cross-system checks are actually firing. */
+  const mix = useMemo(() => {
+    const m = new Map<string, { count: number; worst: Severity }>()
+    const rank = { critical: 0, high: 1, medium: 2 } as const
+    for (const s of signals ?? []) {
+      const cur = m.get(s.kind)
+      m.set(s.kind, {
+        count: (cur?.count ?? 0) + 1,
+        worst: !cur || rank[s.severity] < rank[cur.worst] ? s.severity : cur.worst,
+      })
+    }
+    const rows = [...m.entries()]
+      .map(([kind, v]) => ({ kind, label: KIND_LABEL[kind] ?? titleCase(kind), ...v }))
+      .sort((a, b) => b.count - a.count)
+    const max = Math.max(1, ...rows.map((r) => r.count))
+    return rows.slice(0, 9).map((r) => ({ ...r, pct: (r.count / max) * 100 }))
+  }, [signals])
 
-  const open = (exceptions ?? []).filter((e) => !e.ack)
-
-  const ack = async (e: Exception) => {
-    setAcking(e.id)
-    await adapter.acknowledgeException(e.id)
-    await refresh()
-    setAcking(null)
-  }
+  const counts = useMemo(() => ({
+    all: signals?.length ?? 0,
+    critical: (signals ?? []).filter((s) => s.severity === 'critical').length,
+    high: (signals ?? []).filter((s) => s.severity === 'high').length,
+    medium: (signals ?? []).filter((s) => s.severity === 'medium').length,
+  }), [signals])
 
   return (
     <div className="space-y-4 p-3 sm:p-4">
@@ -104,146 +184,114 @@ export function ControlTower() {
         <div>
           <h1 className="text-lg font-semibold tracking-tight">Control tower</h1>
           <p className="text-[13px] text-muted">
-            Network-wide position across road, rail, sea and air.
+            Every source system joined into one picture — what needs a decision, and why.
           </p>
         </div>
-        <Badge tone="ok" dot>Streaming · updated {rel(new Date(Date.now() - 42_000).toISOString())}</Badge>
+        {data && (
+          <div className="flex items-center gap-2 rounded-lg border border-line bg-surface px-2.5 py-1.5">
+            <Gauge className="size-3.5 text-muted" />
+            <span className="text-[11px] text-muted">Data confidence</span>
+            <Meter value={data.dataConfidence} className="w-16"
+              tone={data.dataConfidence >= 75 ? 'ok' : data.dataConfidence >= 50 ? 'warn' : 'bad'} />
+            <span className="tnum text-[12px] font-semibold">{data.dataConfidence}%</span>
+          </div>
+        )}
       </header>
 
-      {/* KPIs */}
-      <div className="grid grid-cols-2 gap-3 md:grid-cols-4 xl:grid-cols-7">
-        <Kpi loading={loading} label="Active consignments" icon={Truck}
+      <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-6">
+        <Kpi loading={!data} accent label="Value at risk" icon={CircleDollarSign} tone="bad"
+          value={data ? inr(data.valueAtRisk) : '—'}
+          sub={data ? `${data.criticalSignals} critical signals` : undefined} />
+        <Kpi loading={!data} label="Needs a decision" icon={ShieldAlert}
+          tone={counts.critical ? 'bad' : 'warn'}
+          value={num(counts.critical + counts.high)} sub="critical + high, unresolved" />
+        <Kpi loading={!data} label="Active consignments" icon={Truck}
           value={data ? num(data.activeShipments) : '—'}
           sub={data ? `${inr(data.inTransitValue)} in transit` : undefined} />
-        <Kpi loading={loading} label="On-time delivery" icon={CheckCircle2}
+        <Kpi loading={!data} label="On-time delivery" icon={CheckCircle2}
           tone={data && data.onTimePct >= 85 ? 'ok' : 'warn'}
           value={data ? `${data.onTimePct}%` : '—'} sub="rolling, delivered" />
-        <Kpi loading={loading} label="Avg delay" icon={Clock}
+        <Kpi loading={!data} label="Avg delay" icon={Clock}
           tone={data && data.avgDelayHrs > 8 ? 'bad' : 'warn'}
           value={data ? `${data.avgDelayHrs}h` : '—'} sub="on delayed legs" />
-        <Kpi loading={loading} label="Open exceptions" icon={AlertTriangle}
-          tone={open.length > 20 ? 'bad' : 'warn'}
-          value={data ? num(open.length) : '—'} sub="unacknowledged" />
-        <Kpi loading={loading} label="Fleet active" icon={Radio} tone="ok"
+        <Kpi loading={!data} label="Fleet active" icon={SignalIcon} tone="ok"
           value={data ? `${data.fleetActive}/${data.fleetTotal}` : '—'}
           sub={data ? `${data.utilisationPct}% utilisation` : undefined} />
-        <Kpi loading={loading} label="Doc compliance" icon={FileWarning}
-          tone={data && data.docCompliancePct >= 97 ? 'ok' : 'warn'}
-          value={data ? `${data.docCompliancePct}%` : '—'}
-          sub={data ? `${data.docsExpiring} expiring soon` : undefined} />
-        <Kpi loading={loading} label="CO₂e this cycle" icon={Leaf}
-          value={data ? `${compact(data.co2Tonnes)} t` : '—'} sub="IIMB factors" />
       </div>
 
-      <div className="grid gap-3 xl:grid-cols-[1.35fr_1fr]">
-        {/* Map */}
+      <div className="grid gap-3 xl:grid-cols-[1.45fr_1fr]">
+        {/* Hero — the decision queue */}
         <Card className="overflow-hidden">
           <CardHead
-            title="Live network"
-            sub={`${markers.length} consignments plotted · node positions are true coordinates`}
+            title="Decisions queue"
+            sub="Cross-system signals no single ministry API can produce, ranked by exposure"
             right={
-              <div className="flex items-center gap-2.5 text-[10px] text-muted">
-                {[['ok', 'On time'], ['warn', 'At risk'], ['bad', 'Exception']].map(([t, l]) => (
-                  <span key={t} className="flex items-center gap-1">
-                    <span className="size-2 rounded-full" style={{ background: `var(--c-${t})` }} />{l}
-                  </span>
-                ))}
+              <div className="flex gap-1">
+                {([['all', counts.all], ['critical', counts.critical], ['high', counts.high], ['medium', counts.medium]] as const)
+                  .map(([k, n]) => (
+                    <button key={k} onClick={() => setSev(k as Severity | 'all')}
+                      className={cn('rounded-md px-2 py-1 text-[11px] font-medium transition-colors',
+                        sev === k ? 'bg-surface-3 text-fg' : 'text-muted hover:text-fg')}>
+                      {k === 'all' ? 'All' : titleCase(k)} <span className="tnum text-faint">{n}</span>
+                    </button>
+                  ))}
               </div>
             }
           />
-          <NetworkMap routes={routes} markers={markers} className="h-[clamp(260px,52vw,430px)] w-full p-2" />
+          <div className="max-h-[560px] divide-y divide-line-soft overflow-y-auto">
+            {!signals && <TableSkeleton rows={6} cols={3} />}
+            {signals && !queue.length && (
+              <div className="px-4 py-14 text-center">
+                <CheckCircle2 className="mx-auto mb-2 size-6 text-ok" />
+                <p className="text-sm font-medium">Nothing at this severity</p>
+                <p className="mt-1 text-[13px] text-muted">No cross-system conflicts in the network right now.</p>
+              </div>
+            )}
+            {queue.slice(0, 40).map((s) => <DecisionRow key={s.id} s={s} />)}
+          </div>
         </Card>
 
         <div className="space-y-3">
-          {/* Volume */}
-          <Card>
-            <CardHead title="Consignment volume" sub="Created vs delivered, last 30 days" />
-            <div className="h-[168px] p-2">
-              {data ? (
-                <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart data={data.daily} margin={{ top: 6, right: 6, left: -22, bottom: 0 }}>
-                    <defs>
-                      <linearGradient id="gCreated" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0%" stopColor="var(--c-accent)" stopOpacity={0.35} />
-                        <stop offset="100%" stopColor="var(--c-accent)" stopOpacity={0.02} />
-                      </linearGradient>
-                      <linearGradient id="gDelivered" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0%" stopColor="var(--c-ok)" stopOpacity={0.3} />
-                        <stop offset="100%" stopColor="var(--c-ok)" stopOpacity={0.02} />
-                      </linearGradient>
-                    </defs>
-                    <CartesianGrid stroke="var(--c-grid)" vertical={false} />
-                    <XAxis dataKey="label" {...chartAxis} interval={6} />
-                    <YAxis {...chartAxis} width={38} />
-                    <Tooltip content={<ChartTip />} />
-                    <Area dataKey="created" stroke="var(--c-accent)" strokeWidth={1.6} fill="url(#gCreated)" />
-                    <Area dataKey="delivered" stroke="var(--c-ok)" strokeWidth={1.6} fill="url(#gDelivered)" />
-                  </AreaChart>
-                </ResponsiveContainer>
-              ) : <Skeleton className="h-full w-full" />}
-            </div>
+          <Card className="overflow-hidden">
+            <CardHead title="Live network" sub="Coloured by risk, not just position"
+              right={
+                <div className="flex items-center gap-2.5 text-[10px] text-muted">
+                  {[['ok', 'Clear'], ['warn', 'High'], ['bad', 'Critical']].map(([t, l]) => (
+                    <span key={t} className="flex items-center gap-1">
+                      <span className="size-2 rounded-full" style={{ background: `var(--c-${t})` }} />{l}
+                    </span>
+                  ))}
+                </div>
+              } />
+            <NetworkMap markers={markers} className="h-[clamp(240px,42vw,330px)] w-full p-2" />
           </Card>
 
-          {/* Modal split */}
           <Card>
-            <CardHead title="Modal split" sub="Tonne-km by mode" />
-            <div className="h-[150px] p-2">
-              {data ? (
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={data.modal} margin={{ top: 6, right: 6, left: -18, bottom: 0 }}>
-                    <CartesianGrid stroke="var(--c-grid)" vertical={false} />
-                    <XAxis dataKey="label" {...chartAxis} />
-                    <YAxis {...chartAxis} width={38} tickFormatter={(v) => compact(v as number)} />
-                    <Tooltip content={<ChartTip />} cursor={{ fill: 'var(--c-surface-2)' }} />
-                    <Bar dataKey="tonneKm" radius={[4, 4, 0, 0]}>
-                      {data.modal.map((m) => (
-                        <Cell key={m.key} fill={
-                          m.key === 'road' ? 'var(--c-brand)'
-                          : m.key === 'rail' ? 'var(--c-accent)'
-                          : m.key === 'sea' ? 'var(--c-info)' : 'var(--c-warn)'} />
-                      ))}
-                    </Bar>
-                  </BarChart>
-                </ResponsiveContainer>
-              ) : <Skeleton className="h-full w-full" />}
+            <CardHead title="What is driving risk"
+              sub="Which cross-system checks are firing, network-wide" />
+            <div className="space-y-2 p-3">
+              {!signals && Array.from({ length: 6 }).map((_, i) => <Skeleton key={i} className="h-5" />)}
+              {mix.map((m) => (
+                <button key={m.kind} onClick={() => setSev(m.worst)}
+                  className="flex w-full items-center gap-3 text-left">
+                  <span className="w-[9.75rem] shrink-0 truncate text-[12px]">{m.label}</span>
+                  <Meter value={m.pct} tone={SEV_TONE[m.worst] === 'bad' ? 'bad'
+                    : SEV_TONE[m.worst] === 'warn' ? 'warn' : 'info'} className="flex-1" />
+                  <span className="tnum w-6 shrink-0 text-right text-[12px] font-medium">{m.count}</span>
+                </button>
+              ))}
+              {signals && !mix.length && (
+                <p className="py-6 text-center text-[13px] text-muted">No signals firing.</p>
+              )}
             </div>
           </Card>
         </div>
       </div>
 
-      <div className="grid gap-3 lg:grid-cols-[1fr_1fr_0.9fr]">
-        {/* Exceptions */}
-        <Card className="lg:col-span-1">
-          <CardHead title="Exception queue" sub={`${open.length} awaiting action`}
-            right={<Link to="/shipments"><Button size="sm" variant="ghost">All <ArrowUpRight className="size-3.5" /></Button></Link>} />
-          <div className="max-h-[300px] divide-y divide-line-soft overflow-y-auto">
-            {!exceptions && <TableSkeleton rows={4} cols={2} />}
-            {open.slice(0, 12).map((e) => (
-              <div key={e.id} className="flex items-start gap-2.5 px-3.5 py-2.5">
-                <Badge tone={e.severity === 'high' ? 'bad' : e.severity === 'medium' ? 'warn' : 'neutral'}>
-                  {titleCase(e.type)}
-                </Badge>
-                <div className="min-w-0 flex-1">
-                  <div className="truncate text-[12px] font-medium">{e.entity}</div>
-                  <p className="mt-0.5 line-clamp-2 text-[11px] leading-relaxed text-muted">{e.note}</p>
-                  <div className="mt-1 text-[10px] text-faint">{rel(e.raisedAt)}</div>
-                </div>
-                <Button size="sm" variant="ghost" disabled={acking === e.id} onClick={() => ack(e)}>
-                  {acking === e.id ? '…' : 'Ack'}
-                </Button>
-              </div>
-            ))}
-            {exceptions && !open.length && (
-              <div className="px-4 py-10 text-center text-[13px] text-muted">
-                Queue clear — nothing needs attention.
-              </div>
-            )}
-          </div>
-        </Card>
-
-        {/* Lanes */}
+      <div className="grid gap-3 lg:grid-cols-2">
         <Card>
-          <CardHead title="Busiest lanes" sub="Volume, reliability and median transit" />
+          <CardHead title="Lane performance" sub="Volume, reliability and median transit"
+            right={<Link to="/shipments"><Button size="sm" variant="ghost">Consignments <ArrowUpRight className="size-3.5" /></Button></Link>} />
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead><tr className="border-b border-line-soft">
@@ -257,7 +305,8 @@ export function ControlTower() {
                     <Td className="tnum text-right">{l.count}</Td>
                     <Td className="text-right">
                       <div className="flex items-center justify-end gap-2">
-                        <Meter value={l.onTimePct} tone={l.onTimePct >= 80 ? 'ok' : l.onTimePct >= 60 ? 'warn' : 'bad'} className="w-10" />
+                        <Meter value={l.onTimePct} className="w-10"
+                          tone={l.onTimePct >= 80 ? 'ok' : l.onTimePct >= 60 ? 'warn' : 'bad'} />
                         <span className="tnum w-8 text-right text-[12px]">{l.onTimePct}%</span>
                       </div>
                     </Td>
@@ -270,15 +319,16 @@ export function ControlTower() {
           </div>
         </Card>
 
-        {/* Source health */}
         <Card>
-          <CardHead title="Source system health" sub="Per-ministry gateway reliability"
+          <CardHead title="Source system health"
+            sub="A decision is only as good as the systems behind it"
             right={<Link to="/apis"><Button size="sm" variant="ghost"><TrendingUp className="size-3.5" /></Button></Link>} />
           <div className="divide-y divide-line-soft">
             {(data?.sourceHealth ?? []).map((s) => (
               <div key={s.system} className="flex items-center gap-3 px-3.5 py-2">
                 <span className="w-20 shrink-0 truncate font-mono text-[11px]">{s.system}</span>
-                <Meter value={s.uptimePct} tone={s.uptimePct >= 98 ? 'ok' : s.uptimePct >= 95 ? 'warn' : 'bad'} className="flex-1" />
+                <Meter value={s.uptimePct} className="flex-1"
+                  tone={s.uptimePct >= 98 ? 'ok' : s.uptimePct >= 95 ? 'warn' : 'bad'} />
                 <span className="tnum w-11 text-right text-[11px] text-muted">{s.uptimePct}%</span>
                 <span className="tnum w-12 text-right text-[11px] text-faint">
                   <Timer className="mr-0.5 inline size-3" />{s.latencyMs}

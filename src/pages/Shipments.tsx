@@ -1,16 +1,17 @@
 import { useEffect, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import {
-  Filter, Package, Plane, Search, Ship, ThermometerSnowflake,
-  Train, Truck, TriangleAlert,
+  CircleAlert, Filter, Gauge, Layers, Package, Plane, Search, Ship,
+  ThermometerSnowflake, Train, Truck, TriangleAlert,
 } from 'lucide-react'
 import { adapter } from '../data'
+import type { Coverage, Severity } from '../data/fusion'
 import { useAsync, useDebounced } from '../lib/useAsync'
 import { d, dt, dur, inr, kg, num, rel } from '../lib/format'
 import { NODES, nodeName } from '../data/mock/seed'
 import { MODE_LABEL, SHIPMENT_LABEL, SHIPMENT_TONE } from '../lib/status'
 import {
-  Badge, Button, Card, Drawer, Empty, Input, KeyVal, Meter, Mono,
+  Badge, Button, Card, Drawer, Empty, Input, Meter, Mono,
   Select, Tab, TabList, Tabs, TableSkeleton, Td, Th,
 } from '../components/ui'
 import { NetworkMap } from '../components/NetworkMap'
@@ -28,18 +29,47 @@ const STATUSES: Array<ShipmentStatus | 'all'> = [
 
 /* ── Detail drawer ────────────────────────────────────────────── */
 
-function ShipmentDetail({ id, onClose }: { id: string | null; onClose: () => void }) {
-  const { data: s } = useAsync(() => (id ? adapter.getShipment(id) : Promise.resolve(null)), [id])
-  const { data: docs } = useAsync(() => (id ? adapter.docsFor(id) : Promise.resolve([])), [id])
-  const [tab, setTab] = useState('journey')
+const SEV_TONE: Record<Severity, 'bad' | 'warn' | 'info'> = {
+  critical: 'bad', high: 'warn', medium: 'info',
+}
 
-  useEffect(() => { setTab('journey') }, [id])
+const COVERAGE_TONE: Record<Coverage['state'], 'ok' | 'warn' | 'bad' | 'neutral'> = {
+  reported: 'ok', stale: 'warn', missing: 'bad',
+  not_subscribed: 'neutral', not_applicable: 'neutral',
+}
+
+const COVERAGE_LABEL: Record<Coverage['state'], string> = {
+  reported: 'Reporting', stale: 'Stale', missing: 'No data',
+  not_subscribed: 'Not subscribed', not_applicable: 'Not applicable',
+}
+
+function Sources({ ids }: { ids: string[] }) {
+  return (
+    <div className="flex flex-wrap items-center gap-1">
+      <Layers className="size-3 text-faint" />
+      {ids.map((id) => (
+        <span key={id} className="rounded border border-line bg-surface-2 px-1 font-mono text-[10px] leading-4 text-muted">
+          {id}
+        </span>
+      ))}
+    </div>
+  )
+}
+
+function ShipmentDetail({ id, onClose }: { id: string | null; onClose: () => void }) {
+  const { data: f } = useAsync(
+    () => (id ? adapter.shipment360(id) : Promise.resolve(null)), [id])
+  const [tab, setTab] = useState('overview')
+
+  useEffect(() => { setTab('overview') }, [id])
+
+  const s = f?.shipment
 
   return (
     <Drawer open={!!id} onClose={onClose}
       title={s ? s.id : 'Loading…'}
       sub={s && <span className="font-mono">{s.ulipRef}</span>}>
-      {!s ? <TableSkeleton rows={8} cols={3} /> : (
+      {!s || !f ? <TableSkeleton rows={8} cols={3} /> : (
         <div className="space-y-4 p-4">
           {/* Summary strip */}
           <div className="flex flex-wrap items-center gap-2">
@@ -50,13 +80,43 @@ function ShipmentDetail({ id, onClose }: { id: string | null; onClose: () => voi
             {s.reefer && <Badge tone="info"><ThermometerSnowflake className="size-3" />{s.tempC}°C</Badge>}
           </div>
 
+          {/* Risk + confidence, side by side — how bad, and how sure */}
+          <div className="grid gap-3 sm:grid-cols-2">
+            <Card className="p-3">
+              <div className="flex items-center justify-between text-[11px] uppercase tracking-wide text-faint">
+                <span>Risk score</span>
+                <CircleAlert className="size-3.5" />
+              </div>
+              <div className="tnum mt-1 text-[22px] font-semibold tracking-tight">{f.risk}<span className="text-sm text-faint">/100</span></div>
+              <Meter value={f.risk} className="mt-2"
+                tone={f.risk >= 60 ? 'bad' : f.risk >= 25 ? 'warn' : 'ok'} />
+              <p className="mt-1.5 text-[11px] text-muted">
+                {f.signals.length ? `${f.signals.length} cross-system signal${f.signals.length === 1 ? '' : 's'}` : 'No conflicts detected'}
+              </p>
+            </Card>
+            <Card className="p-3">
+              <div className="flex items-center justify-between text-[11px] uppercase tracking-wide text-faint">
+                <span>Data confidence</span>
+                <Gauge className="size-3.5" />
+              </div>
+              <div className="tnum mt-1 text-[22px] font-semibold tracking-tight">{f.confidence}<span className="text-sm text-faint">%</span></div>
+              <Meter value={f.confidence} className="mt-2"
+                tone={f.confidence >= 75 ? 'ok' : f.confidence >= 50 ? 'warn' : 'bad'} />
+              <p className="mt-1.5 text-[11px] text-muted">
+                {f.coverage.filter((c) => c.state === 'reported').length} of{' '}
+                {f.coverage.filter((c) => c.state !== 'not_applicable').length} relevant systems reporting
+              </p>
+            </Card>
+          </div>
+
           <div className="grid gap-3 sm:grid-cols-2">
             <Card className="p-3">
               <div className="text-[11px] uppercase tracking-wide text-faint">Route</div>
               <div className="mt-1 text-[15px] font-semibold tracking-tight">
                 {nodeName(s.origin)} → {nodeName(s.destination)}
               </div>
-              <Meter value={s.progress * 100} tone={s.status === 'delivered' ? 'ok' : s.delayMins > 180 ? 'bad' : 'brand'} className="mt-2.5" />
+              <Meter value={s.progress * 100} className="mt-2.5"
+                tone={s.status === 'delivered' ? 'ok' : s.delayMins > 180 ? 'bad' : 'brand'} />
               <div className="mt-1.5 flex justify-between text-[11px] text-muted">
                 <span>{Math.round(s.progress * 100)}% complete</span>
                 <span>ETA {dt(s.eta)}</span>
@@ -75,11 +135,73 @@ function ShipmentDetail({ id, onClose }: { id: string | null; onClose: () => voi
 
           <Tabs value={tab} onChange={setTab}>
             <TabList>
+              <Tab id="overview" count={f.signals.length}>Signals</Tab>
+              <Tab id="sources" count={f.coverage.length}>Sources</Tab>
               <Tab id="journey">Journey</Tab>
               <Tab id="events" count={s.events.length}>Events</Tab>
-              <Tab id="docs" count={docs?.length ?? 0}>Documents</Tab>
-              <Tab id="parties">Parties</Tab>
+              <Tab id="docs" count={f.docs.length}>Documents</Tab>
             </TabList>
+
+            {tab === 'overview' && (
+              <div className="mt-3 space-y-2">
+                {!f.signals.length && (
+                  <div className="rounded-xl border border-ok/25 bg-ok-soft px-4 py-8 text-center">
+                    <p className="text-[13px] font-medium text-ok">No cross-system conflicts</p>
+                    <p className="mt-1 text-[12px] text-muted">
+                      Documents, vehicle status and movement data all agree on this consignment.
+                    </p>
+                  </div>
+                )}
+                {f.signals.map((sig) => (
+                  <Card key={sig.id} className="p-3">
+                    <div className="flex items-start gap-2.5">
+                      <Badge tone={SEV_TONE[sig.severity]} dot className="mt-0.5 shrink-0">{sig.severity}</Badge>
+                      <div className="min-w-0 flex-1">
+                        <div className="text-[13px] font-medium">{sig.title}</div>
+                        <p className="mt-1 text-[12px] leading-relaxed text-muted">{sig.detail}</p>
+                        <div className="mt-2 rounded-lg border border-line bg-surface-2 px-2.5 py-1.5">
+                          <div className="text-[10px] font-semibold uppercase tracking-wide text-faint">Do next</div>
+                          <p className="mt-0.5 text-[12px]">{sig.action}</p>
+                        </div>
+                        <div className="mt-2"><Sources ids={sig.sources} /></div>
+                      </div>
+                    </div>
+                  </Card>
+                ))}
+              </div>
+            )}
+
+            {tab === 'sources' && (
+              <div className="mt-3 space-y-2">
+                <p className="text-[12px] leading-relaxed text-muted">
+                  Which government systems have contributed to this consignment's picture.
+                  Gaps here are the reason a decision may need a phone call rather than a click.
+                </p>
+                <div className="overflow-hidden rounded-xl border border-line">
+                  <table className="w-full">
+                    <thead className="bg-surface-2"><tr>
+                      <Th>System</Th><Th>Endpoint</Th><Th>Contributes</Th><Th className="text-right">State</Th>
+                    </tr></thead>
+                    <tbody className="divide-y divide-line-soft">
+                      {f.coverage.map((c) => (
+                        <tr key={c.endpoint} className={cn(
+                          (c.state === 'not_subscribed' || c.state === 'not_applicable') && 'opacity-50')}>
+                          <Td className="font-medium">{c.system}</Td>
+                          <Td><Mono className="text-muted">{c.endpoint}</Mono></Td>
+                          <Td className="text-[11px] text-muted">{c.note}</Td>
+                          <Td className="text-right">
+                            <Badge tone={COVERAGE_TONE[c.state]}>{COVERAGE_LABEL[c.state]}</Badge>
+                            {c.lastAt && c.state !== 'missing' && c.state !== 'not_applicable' && (
+                              <div className="mt-0.5 text-[10px] text-faint">{rel(c.lastAt)}</div>
+                            )}
+                          </Td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
 
             {tab === 'journey' && (
               <div className="mt-3 space-y-3">
@@ -89,7 +211,7 @@ function ShipmentDetail({ id, onClose }: { id: string | null; onClose: () => voi
                     showLabels={false}
                     highlight={[s.origin, s.destination, s.currentNode]}
                     routes={s.legs.map((l) => ({ from: l.from, to: l.to, mode: l.mode, active: l.status === 'active' }))}
-                    markers={[{ id: s.id, lat: s.lat, lon: s.lon, tone: s.delayMins > 180 ? 'bad' : 'ok', pulse: true, r: 5 }]}
+                    markers={[{ id: s.id, lat: s.lat, lon: s.lon, tone: f.risk >= 60 ? 'bad' : 'ok', pulse: true, r: 5 }]}
                   />
                 </Card>
                 {s.legs.map((l, i) => {
@@ -129,7 +251,7 @@ function ShipmentDetail({ id, onClose }: { id: string | null; onClose: () => voi
             )}
 
             {tab === 'events' && (
-              <div className="mt-3 space-y-0">
+              <div className="mt-3">
                 {[...s.events].reverse().map((e, i) => (
                   <div key={e.id} className="flex gap-3">
                     <div className="flex flex-col items-center pt-1">
@@ -159,7 +281,7 @@ function ShipmentDetail({ id, onClose }: { id: string | null; onClose: () => voi
                     <Th>Document</Th><Th>Number</Th><Th>Valid to</Th><Th className="text-right">Status</Th>
                   </tr></thead>
                   <tbody className="divide-y divide-line-soft">
-                    {(docs ?? []).map((doc) => (
+                    {f.docs.map((doc) => (
                       <tr key={doc.id}>
                         <Td className="font-medium">{doc.type.replace(/_/g, ' ')}</Td>
                         <Td><Mono>{doc.number}</Mono></Td>
@@ -170,20 +292,6 @@ function ShipmentDetail({ id, onClose }: { id: string | null; onClose: () => voi
                   </tbody>
                 </table>
               </div>
-            )}
-
-            {tab === 'parties' && (
-              <dl className="mt-3">
-                <KeyVal k="Consignor" v={s.consignor} />
-                <KeyVal k="Consignee" v={s.consignee} />
-                <KeyVal k="GSTIN" v={s.gstin} mono />
-                <KeyVal k="e-Way Bill" v={s.ewayBill} mono />
-                <KeyVal k="Created" v={dt(s.createdAt)} />
-                <KeyVal k="Promised ETA" v={dt(s.promisedEta)} />
-                <KeyVal k="Current ETA" v={dt(s.eta)} />
-                <KeyVal k="Last ping" v={rel(s.lastPingAt)} />
-                <KeyVal k="Estimated CO₂e" v={`${num(s.co2Kg)} kg`} />
-              </dl>
             )}
           </Tabs>
         </div>

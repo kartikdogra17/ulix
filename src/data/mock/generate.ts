@@ -263,22 +263,32 @@ function crossings(r: () => number, n: number): FastagCrossing[] {
   }).sort((a, b) => Date.parse(b.ts) - Date.parse(a.ts))
 }
 
-export function makeVehicles(shipments: Shipment[], count = 90): Vehicle[] {
+export function makeVehicles(shipments: Shipment[], spare = 30): Vehicle[] {
   const r = rng(77002026)
-  const roadLegs = shipments.flatMap((s) =>
-    s.legs.filter((l) => l.mode === 'road' && l.status !== 'pending').map((l) => ({ s, l })))
-  const out: Vehicle[] = []
 
-  for (let i = 0; i < count; i++) {
-    const link = i < roadLegs.length ? roadLegs[i] : null
-    // The first few vehicles carry the registrations the integration documents
-    // use in their examples, so the API console's prefilled requests resolve.
-    // Keep any leg they are attached to in sync with the override.
+  /* Every consignment with a road leg under way has a real vehicle beneath it —
+     otherwise FASTag, VAHAN and SARATHI would show "no data" for most of the
+     network and the whole cross-system picture would look hollow. Vehicles are
+     therefore generated FROM the legs, not sampled independently of them. */
+  const activeLegs = shipments
+    .filter((s) => s.status !== 'delivered' && s.status !== 'planned')
+    .flatMap((s) => s.legs
+      .filter((l) => l.mode === 'road' && l.status !== 'pending')
+      .slice(0, 1)
+      .map((l) => ({ s, l })))
+
+  const out: Vehicle[] = []
+  const total = activeLegs.length + spare
+
+  for (let i = 0; i < total; i++) {
+    const link = i < activeLegs.length ? activeLegs[i] : null
+    // The first few carry the registrations the integration documents use in
+    // their examples, so the API console's prefilled requests resolve.
     const reg = i < DOC_EXAMPLE_VRNS.length ? DOC_EXAMPLE_VRNS[i]
       : link ? link.l.conveyance : regNo(r)
     if (i < DOC_EXAMPLE_VRNS.length && link) link.l.conveyance = reg
-    const active = !!link && link.s.status !== 'delivered'
-    const p = link ? lerpNode(link.l.from, link.l.to, active ? link.s.progress : 1) : null
+
+    const p = link ? lerpNode(link.l.from, link.l.to, link.s.progress) : null
     const nd = p ?? NODE_BY_CODE[pick(r, INLAND)]
 
     const fitnessUpto = NOW + int(r, -20, 430) * DAY
@@ -291,7 +301,7 @@ export function makeVehicles(shipments: Shipment[], count = 90): Vehicle[] {
       regNo: reg,
       vehicleClass: pick(r, ['HGV — 4 Axle', 'MGV — 3 Axle', 'HGV — 6 Axle', 'LGV — 2 Axle', 'Trailer — 40ft']),
       makeModel: pick(r, MAKE_MODELS),
-      owner: pick(r, CARRIERS_ROAD),
+      owner: link ? link.l.carrier : pick(r, CARRIERS_ROAD),
       fuel: pick(r, ['Diesel', 'Diesel', 'Diesel', 'CNG', 'LNG', 'Electric'] as const),
       capacityKg: int(r, 9000, 42000),
       rcStatus: r() < 0.05 ? 'SUSPENDED' : 'ACTIVE',
@@ -313,14 +323,14 @@ export function makeVehicles(shipments: Shipment[], count = 90): Vehicle[] {
       driverScore: int(r, 58, 99),
       lat: +nd.lat.toFixed(4),
       lon: +nd.lon.toFixed(4),
-      speedKmph: active ? int(r, 0, 78) : 0,
+      speedKmph: link ? int(r, 0, 78) : 0,
       headingDeg: int(r, 0, 359),
       odometerKm: int(r, 48000, 890000),
       fuelPct: int(r, 8, 98),
       lastPingAt: iso(NOW - int(r, 1, 180) * 60_000),
-      status: !active ? pick(r, ['idle', 'loading', 'maintenance', 'offline'] as const)
+      status: !link ? pick(r, ['idle', 'loading', 'maintenance', 'offline'] as const)
         : r() < 0.15 ? 'idle' : 'moving',
-      shipmentId: active && link ? link.s.id : null,
+      shipmentId: link ? link.s.id : null,
       utilisationPct: int(r, 41, 96),
       idleHrs: float(r, 4, 68, 1),
       detentionHrs: float(r, 0.5, 26, 1),

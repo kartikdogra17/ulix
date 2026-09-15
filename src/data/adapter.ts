@@ -4,6 +4,7 @@ import type {
 } from './types'
 import type { CatalogueEntry } from './mock/gateway'
 import type { UlipEnvelope } from './ulip/envelope'
+import type { Coverage, Signal } from './fusion'
 
 export interface Page<T> { rows: T[]; total: number }
 
@@ -35,12 +36,28 @@ export interface DocQuery {
   pageSize?: number
 }
 
+/** One consignment seen through every source system at once. */
+export interface Fused360 {
+  shipment: Shipment
+  vehicle: Vehicle | null
+  docs: ComplianceDoc[]
+  signals: Signal[]
+  coverage: Coverage[]
+  risk: number
+  confidence: number
+}
+
 export interface Dashboard {
   activeShipments: number
   inTransitValue: number
   onTimePct: number
   avgDelayHrs: number
   openExceptions: number
+  /** Consignment value exposed to unresolved critical/high signals. */
+  valueAtRisk: number
+  criticalSignals: number
+  /** Mean share of relevant source systems reporting per consignment. */
+  dataConfidence: number
   fleetActive: number
   fleetTotal: number
   utilisationPct: number
@@ -79,6 +96,11 @@ export interface DataAdapter {
 
   listExceptions(): Promise<Exception[]>
   acknowledgeException(id: string): Promise<void>
+
+  /** Network-wide cross-system signals, ranked by severity then exposure. */
+  signals(): Promise<Signal[]>
+  /** Everything every subscribed system knows about one consignment. */
+  shipment360(id: string): Promise<Fused360 | null>
 
   dashboard(): Promise<Dashboard>
   liveMap(): Promise<Array<Pick<Shipment, 'id' | 'lat' | 'lon' | 'status' | 'origin' | 'destination' | 'progress' | 'delayMins'>>>

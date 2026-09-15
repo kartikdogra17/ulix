@@ -1,6 +1,9 @@
 import type {
-  DataAdapter, Dashboard, DocQuery, Page, ShipmentQuery, VehicleQuery,
+  DataAdapter, Dashboard, DocQuery, Fused360, Page, ShipmentQuery, VehicleQuery,
 } from '../adapter'
+import {
+  type Signal, confidence, coverageForShipment, riskScore, signalsForShipment,
+} from '../fusion'
 import type { ApiCall, ComplianceDoc, Exception, Shipment, Vehicle } from '../types'
 import { type CatalogueEntry, makeApiCalls, makeCatalogue } from './gateway'
 import { FASTAG_RETENTION_HOURS, ULIP_BASE } from '../ulip/catalogue'
@@ -33,6 +36,34 @@ export class MockAdapter implements DataAdapter {
   private calls: ApiCall[] = makeApiCalls(this.endpoints)
   private daily = makeDailySeries()
   private modal = makeModalSplit()
+  private signalCache: Signal[] | null = null
+
+  /** The vehicle currently under a consignment, via its active road leg. */
+  private vehicleFor(shipmentId: string) {
+    return this.vehicles.find((v) => v.shipmentId === shipmentId) ?? null
+  }
+
+  private subscribedSet() {
+    return new Set(this.endpoints.filter((e) => e.subscribed).map((e) => e.id))
+  }
+
+  private allSignals(): Signal[] {
+    if (this.signalCache) return this.signalCache
+    const byShipment = new Map<string, typeof this.docs>()
+    for (const d of this.docs) {
+      if (d.linkedKind !== 'shipment') continue
+      const list = byShipment.get(d.linkedTo) ?? []
+      list.push(d)
+      byShipment.set(d.linkedTo, list)
+    }
+    this.signalCache = this.shipments
+      .flatMap((s) => signalsForShipment(s, this.vehicleFor(s.id), byShipment.get(s.id) ?? []))
+      .sort((a, b) => {
+        const rank = { critical: 0, high: 1, medium: 2 } as const
+        return rank[a.severity] - rank[b.severity] || b.valueAtRisk - a.valueAtRisk
+      })
+    return this.signalCache
+  }
 
   /* ── Shipments ─────────────────────────────────────────────── */
 
@@ -138,6 +169,28 @@ export class MockAdapter implements DataAdapter {
     this.exceptions = this.exceptions.map((e) => (e.id === id ? { ...e, ack: true } : e))
   }
 
+  /* ── Cross-system fusion ───────────────────────────────────── */
+
+  async signals() {
+    await sleep(latency())
+    return this.allSignals()
+  }
+
+  async shipment360(id: string): Promise<Fused360 | null> {
+    await sleep(latency())
+    const shipment = this.shipments.find((s) => s.id === id || s.ulipRef === id)
+    if (!shipment) return null
+    const vehicle = this.vehicleFor(shipment.id)
+    const docs = this.docs.filter((d) => d.linkedTo === shipment.id)
+    const signals = signalsForShipment(shipment, vehicle, docs)
+    const coverage = coverageForShipment(shipment, vehicle, docs, this.subscribedSet())
+    return {
+      shipment, vehicle, docs, signals, coverage,
+      risk: riskScore(signals),
+      confidence: confidence(coverage),
+    }
+  }
+
   /* ── Dashboard ─────────────────────────────────────────────── */
 
   async dashboard(): Promise<Dashboard> {
@@ -150,6 +203,10 @@ export class MockAdapter implements DataAdapter {
     const badDocs = this.docs.filter((d) => d.status === 'expired' || d.status === 'mismatch')
     const expiring = this.docs.filter((d) => d.status === 'expiring')
     const today = this.calls.filter((c) => Date.parse(c.ts) > NOW - 86_400_000)
+    const signals = this.allSignals()
+    const subs = this.subscribedSet()
+    // Coverage is expensive per consignment; a sample is enough for a mean.
+    const sampled = active.slice(0, 40)
 
     const laneMap = new Map<string, { count: number; onTime: number; hrs: number }>()
     for (const s of this.shipments) {
@@ -188,6 +245,14 @@ export class MockAdapter implements DataAdapter {
       onTimePct: +((onTime / Math.max(1, done.length)) * 100).toFixed(1),
       avgDelayHrs: +(delayed.reduce((a, s) => a + s.delayMins, 0) / Math.max(1, delayed.length) / 60).toFixed(1),
       openExceptions: this.exceptions.filter((e) => !e.ack).length,
+      valueAtRisk: [...new Map(
+        signals.filter((g) => g.severity !== 'medium').map((g) => [g.entity, g.valueAtRisk]),
+      ).values()].reduce((a, v) => a + v, 0),
+      criticalSignals: signals.filter((g) => g.severity === 'critical').length,
+      dataConfidence: Math.round(
+        sampled.reduce((a, s) => a + confidence(
+          coverageForShipment(s, this.vehicleFor(s.id),
+            this.docs.filter((d) => d.linkedTo === s.id), subs)), 0) / Math.max(1, sampled.length)),
       fleetActive: activeVehicles.length,
       fleetTotal: this.vehicles.length,
       utilisationPct: Math.round(this.vehicles.reduce((a, v) => a + v.utilisationPct, 0) / this.vehicles.length),

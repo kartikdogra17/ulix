@@ -63,12 +63,46 @@ Two traps this shape sets, both handled in [`envelope.ts`](src/data/ulip/envelop
 
 ---
 
+## The point: cross-system fusion
+
+Calling `FASTAG/01` and `VAHAN/01` separately is not a platform — it is two API calls.
+The value is in the **joins**, and those are what the product leads with.
+
+[`src/data/fusion.ts`](src/data/fusion.ts) derives signals that no single ministry
+API can produce, and **every signal carries the endpoint codes that produced it**, so
+an operator can always see why the platform is telling them something and which
+government system to challenge if it looks wrong:
+
+| Signal | The join |
+|---|---|
+| **e-Way Bill expires before arrival** | `EWAYBILL/01` validity × `FASTAG/01`-derived ETA — the consignment will be moving on a lapsed bill, exposed under s.129 |
+| **Declared vehicle ≠ moving vehicle** | e-Way Bill Part-B × the registration actually generating toll reads × `VAHAN/01` — an un-updated Part-B, or an undeclared vehicle |
+| **Carrying vehicle is not road legal** | `VAHAN/01` fitness/insurance × the consignment under load — an enforcement stop detains the cargo, not just the truck |
+| **No toll read for N hours** | `FASTAG/01` silence on an active leg, bounded by the 72-hour retention window |
+| **Licence expired under load** | `SARATHI/01` × the active road leg |
+| **Hazmat without clearance** | cargo classification × `PESO/01` |
+| **Customs hold** | `ICEGATE/02` × `PCS/01` demurrage exposure |
+
+Two derived measures sit on top:
+
+- **Risk score** — severity-weighted, per consignment.
+- **Data confidence** — the share of *relevant* source systems actually reporting.
+  Relevance matters: a road-only truckload has no rail leg, so FOIS silence is not a
+  gap. A decision made on three systems out of four is a different decision from one
+  made on one of four, and the platform says which it is rather than implying
+  completeness it does not have.
+
+The **control tower leads with a ranked decisions queue** — what needs action, the
+consignment value exposed, hours left to act, the contributing endpoints, and the
+recommended next step — instead of a wall of charts. Opening any consignment gives the
+same picture at entity level, including a per-system coverage table.
+
 ## Modules
 
 | Route | What it does |
 |---|---|
-| `/` **Control tower** | Network KPIs, live map of every moving consignment, volume and modal-split charts, exception queue, lane reliability, per-ministry source-system health |
-| `/shipments` **Consignments** | Filterable register of multimodal consignments; drawer with leg-by-leg journey, event chain attributed to its source system, linked documents and parties |
+| `/` **Control tower** | Value at risk and the ranked decisions queue, risk-coloured live map, what is driving risk, lane reliability, per-ministry source-system health |
+| `/shipments` **Consignments** | Filterable register; drawer opens on risk score and data confidence, then cross-system signals with recommended actions, a per-system coverage table, leg-by-leg journey, event chain attributed to its source system, and documents |
 | `/fleet` **Fleet** | VAHAN registration and statutory validity, SARATHI licence checks, FASTag crossings and balance, utilisation and detention analytics |
 | `/compliance` **Documents** | e-Way Bills, GST invoices, customs filings and vehicle papers, triaged by mismatch / expired / expiring / pending, with the specific discrepancy named |
 | `/apis` **API gateway console** | The full 95-endpoint catalogue with ministry, category, parameters and regex formats; subscription state; a try-it runner returning the real envelope; request log |
