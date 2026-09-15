@@ -1,0 +1,1325 @@
+ULIP Integration Requirement Document 
+ 
+  
+                        
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+Version No.: 1.0 
+Date: 06/05/2026 
+Project Name: ULIP 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ULIP Integration Requirement Document 
+This document contains proprietary information of NLDSL. Unauthorized access, copying and replication are 
+prohibited. This document must not be copied in whole or part by any means, without the written authorization of 
+NLDSL, Noida, India. 
+ 
+ 
+ULIP Integration Requirement Document   
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 1.0 Page 2 of 24 
+ 
+ 
+ 
+ 
+Revision History 
+Version Date Author Reviewer Significant Changes 
+1.0 06/05/2026 Sudhanshu Singh Nayab Ali Baseline Version 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+  
+ULIP Integration Requirement Document   
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 1.0 Page 3 of 24 
+ 
+Table of Contents 
+ 
+Introduction ................................................................................................................................................. 4 
+1.1 Purpose .................................................................................................................................... 4 
+The Overall Description .............................................................................................................................. 4 
+1.2 Data Integration between INDIAPOST System and ULIP application ..................................... 4 
+1.3 INDIAPOST/01 ......................................................................................................................... 4 
+1.3.1 Technical Approach .................................................................................................... 5 
+1.4 INDIAPOST/02 ......................................................................................................................... 8 
+1.4.1 Technical Approach .................................................................................................... 9 
+1.5 INDIAPOST/03 ....................................................................................................................... 12 
+1.5.1 Technical Approach .................................................................................................. 12 
+1.6 INDIAPOST/04 ....................................................................................................................... 18 
+1.6.1 Technical Approach .................................................................................................. 18 
+1.7 Data Transmission & Authentication Mechanism .................................................................. 22 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ULIP Integration Requirement Document   
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 1.0 Page 4 of 24 
+ 
+Introduction 
+1.1 Purpose 
+ 
+The purpose of this document is to define and provide details for accessing API for 
+INDIAPOST system information from ULIP system. 
+This document details the following points: 
+ 
+1. Data Integration between INDIAPOST and ULIP web service : Identification of 
+operational points where data integration between INDIAPOST and ULIP web service will 
+be needed. 
+ 
+2. Technical Approach for performing Data Integration  
+ 
+The Overall Description 
+User will share information such as productCode, sourcePinCode, 
+destinationPinCode etc based on data sent by user ULIP system will call respective 
+INDIAPOST API for accessing information. 
+1.2 Data Integration between INDIAPOST System and ULIP application 
+ 
+Users will share information with the ULIP system based on data shared ULIP will 
+provide data to user. 
+ 
+1.3 INDIAPOST/01 
+ 
+This API will take the field below mentioned and connect with INDIAPOST API to get data. 
+ 
+S. 
+No. 
+Field Name Field Description Format Require
+d/Not – 
+Require
+d 
+Length 
+1 productCode 
+ 
+Enter the productCode 
+as available in 
+INDIAPOST system. 
+^[A-Z]{1,6}$ Required 6 
+2 weight 
+ 
+Enter the weight 
+as available in 
+INDIAPOST system. 
+^[0-9]{1,10}$ Required 10 
+3 sourcePinCo
+de 
+ 
+Enter the sourcePinCode 
+as available in 
+INDIAPOST system. 
+^[0-9]{6} Required 6 
+4 destinationPi
+nCode 
+ 
+Enter the 
+destinationPinCode 
+^[0-9]{6} Required 6 
+ULIP Integration Requirement Document   
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 1.0 Page 5 of 24 
+ 
+as available in 
+INDIAPOST system. 
+ 
+5 
+length 
+ 
+Enter the length 
+as available in 
+INDIAPOST system. 
+^([0-9]{1,10}(\.[0-
+9]{1,5})?|\.[0-
+9]{1,5})$ 
+Required 10 
+6 width 
+ 
+Enter the width 
+as available in 
+INDIAPOST system. 
+^([0-9]{1,10}(\.[0-
+9]{1,5})?|\.[0-
+9]{1,5})$ 
+Required 10 
+7 height 
+ 
+Enter the height 
+as available in 
+INDIAPOST system. 
+^([0-9]{1,10}(\.[0-
+9]{1,5})?|\.[0-
+9]{1,5})$ 
+Required 10 
+8 ins 
+ 
+Enter the ins 
+as available in 
+INDIAPOST system. 
+^(?:100000|[1-
+9]\d{0,4})(?:\.\d{1,
+5})?$ 
+Required 6 
+9 pod 
+ 
+Enter the pod 
+as available in 
+INDIAPOST system. 
+^[A-Z]{1,6}$ Required 6 
+ 
+ 
+     
+ 
+1.3.1 Technical Approach  
+1. All the data will be shared through rest web services. 
+2. ULIP system will provide above fields for which detail is required. 
+3. INDIAPOST API will share details  of Speed Post Tariff  details based on above fields 
+which exist in INDIAPOST system in JSON format. 
+4. INDIAPOST Integration will add JSON in response key in response body. 
+5. ULIP system will provide the data in JSON Object format in response body. 
+ 
+Example: 
+ 
+Above mentioned fields are shared by ULIP system, then INDIAPOST-integration will 
+make a request to INDIAPOST API. 
+ 
+Request: 
+ 
+The request must be of the following format, where required fields is passed within the URL 
+body in JSON format. 
+ 
+For Staging: https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/INDIAPOST/01 
+ 
+{   "productCode":"SP", 
+    "weight":"250", 
+    "sourcePinCode":"400001", 
+    "destinationPinCode":"110001", 
+    "length":"30", 
+    "width":"21", 
+    "height":"0.5", 
+ULIP Integration Requirement Document   
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 1.0 Page 6 of 24 
+ 
+    "ins":"1000", 
+    "pod":"YES"} 
+ 
+Curl URL 
+ 
+curl --location 'https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/INDIAPOST/01' \ 
+--header 'Authorization: Bearer 
+eyJhbGciOiJIUzUxMiJ9.eyJhcHBzIjoiYXBpR2F0ZXdheSIsInN1YiI6InVsaXAiLCJpYXQiOjE3NzgwNDM0M
+jh9.qC2L83TsOmNluGgopHCiTJq9ZEWHm3_ajvZUDTaFYhIqcGiGkzMJrGHuj50bZm_uA13hWO0gJus3GWv7mo
+l5_A' \ 
+--header 'Content-Type: application/json' \ 
+--header 'Accept: application/json' \ 
+--data '{"productCode":"SP", 
+    "weight":"250", 
+    "sourcePinCode":"400001", 
+    "destinationPinCode":"110001", 
+    "length":"30", 
+    "width":"21", 
+    "height":"0.5", 
+    "ins":"1000", 
+    "pod":"YES"}' 
+ 
+For Production: https://www.ulip.dpiit.gov.in/ulip/v1.0.0/INDIAPOST/01 
+ 
+{   "productCode":"SP", 
+    "weight":"250", 
+    "sourcePinCode":"400001", 
+    "destinationPinCode":"110001", 
+    "length":"30", 
+    "width":"21", 
+    "height":"0.5", 
+    "ins":"1000", 
+    "pod":"YES"} 
+ 
+Curl URL 
+ 
+curl --location 'https://www.ulip.dpiit.gov.in/ulip/v1.0.0/INDIAPOST/01' \ 
+--header 'Authorization: Bearer 
+eyJhbGciOiJIUzUxMiJ9.eyJhcHBzIjoiYXBpR2F0ZXdheSIsInN1YiI6InVsaXAiLCJpYXQiOjE3Nzc5NzQ2M
+TF9.WSSfZyf_ayDh-CFDs2_Ubvi2VbfyiW11ZuIZX-EqwXz5xG-
+LzZFfjRA0iE4dsYrFK5_MfQsmAnzZ3EAwIEDrPA' \ 
+--header 'Accept: application/json' \ 
+--header 'Content-Type: application/json' \ 
+--data '{"productCode":"SP", 
+    "weight":"250", 
+    "sourcePinCode":"400001", 
+    "destinationPinCode":"110001", 
+    "length":"30", 
+    "width":"21", 
+ULIP Integration Requirement Document   
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 1.0 Page 7 of 24 
+ 
+    "height":"0.5", 
+    "ins":"1000", 
+    "pod":"YES"}' 
+ 
+For obtaining authentication token, refer Section 1.7 
+ 
+Response 
+ 
+To acknowledge the above request, ULIP will send the response below -  
+ 
+1. Invalid product code 
+ 
+{  "response": [ 
+        { 
+            "response": "Product not found for product code: SPA", 
+            "responseStatus": "ERROR", 
+            "message": null 
+        } 
+    ], 
+    "error": "false", 
+    "code": "200", 
+    "message": "Success"} 
+ 
+2. Invalid pincode 
+ 
+{    "response": null, 
+    "error": "true", 
+    "code": "400 BAD_REQUEST", 
+    "message": "Data format failed OR wrong value entered at:  sourcePinCode. Format 
+should follow  ^[0-9]{6}"} 
+ 
+ 
+3. In case data exist 
+ 
+{   "response": [ 
+        { 
+            "response": { 
+                "success": true, 
+                "product_code": "SP_INLAND_DOC", 
+                "article_type": "SP", 
+                "weight": 250, 
+                "chargeable_weight": 250, 
+                "source_pincode": 400001, 
+                "destination_pincode": 110001, 
+                "is_local": false, 
+                "distance_km": 1166, 
+                "base_tariff": 72, 
+                "vas_charges": 68, 
+                "cgst": 13, 
+                "sgst": 13, 
+                "total_tax": 26, 
+                "final_amount": 166, 
+                "currency": "INR", 
+                "is_document": true, 
+                "delivery_type": "Inter-city", 
+                "timestamp": "2026-05-06T05:51:50.574Z", 
+ULIP Integration Requirement Document   
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 1.0 Page 8 of 24 
+ 
+                "vas_details": { 
+                    "INSVAL": 58, 
+                    "PODVAL": 10, 
+                    "REGVAL": 0, 
+                    "OTPVAL": 0, 
+                    "ACKVAL": 0, 
+                    "CODVAL": 0 
+                } 
+            }, 
+            "responseStatus": "SUCCESS", 
+            "message": null 
+        } 
+    ], 
+    "error": "false", 
+    "code": "200", 
+    "message": "Success"} 
+             
+Status Code 200: INDIAPOST data response 
+Status Code 400: Bad request (Invalid json syntax, invalid json key) 
+Status Code 401 or 403: Unauthenticated or Unauthorized 
+Status Code 500: Some internal server errors occurred 
+Status Code 502: Server is not responding. 
+ 
+1.4 INDIAPOST/02 
+ 
+This API will take below and connect with INDIAPOST API to get data. 
+ 
+S. 
+No. 
+Field Name Field Description Format Require
+d/Not – 
+Require
+d 
+Length 
+1 productCode 
+ 
+Enter the productCode 
+as available in 
+INDIAPOST system. 
+^[A-Z]{1,6}$ Required 6 
+2 weight 
+ 
+Enter the weight 
+as available in 
+INDIAPOST system. 
+^[0-9]{1,10}$ Required 10 
+3 sourcePinCo
+de 
+ 
+Enter the sourcePinCode 
+as available in 
+INDIAPOST system. 
+^[0-9]{6} Required 6 
+4 destinationPi
+nCode 
+ 
+Enter the 
+destinationPinCode 
+as available in 
+INDIAPOST system. 
+^[0-9]{6} Required 6 
+ 
+5 
+length 
+ 
+Enter the length 
+as available in 
+INDIAPOST system. 
+^([0-9]{1,10}(\.[0-
+9]{1,5})?|\.[0-
+9]{1,5})$ 
+Required 10 
+6 width 
+ 
+Enter the width 
+as available in 
+INDIAPOST system. 
+^([0-9]{1,10}(\.[0-
+9]{1,5})?|\.[0-
+9]{1,5})$ 
+Required 10 
+ULIP Integration Requirement Document   
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 1.0 Page 9 of 24 
+ 
+7 height 
+ 
+Enter the height 
+as available in 
+INDIAPOST system. 
+^([0-9]{1,10}(\.[0-
+9]{1,5})?|\.[0-
+9]{1,5})$ 
+Required 10 
+8 ins 
+ 
+Enter the ins 
+as available in 
+INDIAPOST system. 
+^(?:100000|[1-
+9]\d{0,4})(?:\.\d{1,
+5})?$ 
+Required 6 
+ 
+1.4.1 Technical Approach  
+1. All the data will be shared through rest web services. 
+2. ULIP system will provide above fields for which detail is required. 
+3. INDIAPOST API will share details of Business Parcel Tariff based on above fields which 
+exist in INDIAPOST system in JSON format. 
+4. INDIAPOST Integration will add JSON in response key in response body. 
+5. ULIP system will provide the data in JSON Object format in response body. 
+ 
+Example: 
+ 
+Above fields are shared by ULIP system, then INDIAPOST-integration will make a 
+request to INDIAPOST API. 
+ 
+Request: 
+ 
+The request must be of the following format, where date is passed within the URL body in JSON 
+format. 
+ 
+For Staging: https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/INDIAPOST/02 
+ 
+{   "productCode":"BP", 
+    "weight":"550", 
+    "sourcePinCode":"141010", 
+    "destinationPinCode":"110057", 
+    "length":"10", 
+    "width":"5", 
+    "height":"2", 
+    "ins":"1000"} 
+ 
+Curl URL 
+ 
+For Staging: 
+curl --location 'https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/INDIAPOST/02' \ 
+--header 'Authorization: Bearer 
+eyJhbGciOiJIUzUxMiJ9.eyJhcHBzIjoiYXBpR2F0ZXdheSIsInN1YiI6InVsaXAiLCJpYXQiOjE3NDQ3NzQ5O
+TN9.cHL_0MM1zMPYq-CgZkaz_nn8Mnfnilj3HoKyj3S-CXxKf86TBwQ-
+TLNoQdAXvX6dMkt8fcCQb_i6wqFwcnGpHg' \ 
+--header 'Content-Type: application/json' \ 
+--header 'Accept: application/json' \ 
+ULIP Integration Requirement Document   
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 1.0 Page 10 of 24 
+ 
+--data '{ "productCode":"BP", 
+    "weight":"550", 
+    "sourcePinCode":"141010", 
+    "destinationPinCode":"110057", 
+    "length":"10", 
+    "width":"5", 
+    "height":"2", 
+    "ins":"1000"}' 
+ 
+ 
+For Production: https://www.ulip.dpiit.gov.in/ulip/v1.0.0/INDIAPOST/02 
+ 
+{   "productCode":"BP", 
+    "weight":"550", 
+    "sourcePinCode":"141010", 
+    "destinationPinCode":"110057", 
+    "length":"10", 
+    "width":"5", 
+    "height":"2", 
+    "ins":"1000" } 
+ 
+Curl URL 
+ 
+curl --location 'https://www.ulip.dpiit.gov.in/ulip/v1.0.0/INDIAPOST/02' \ 
+--header 'Authorization: Bearer 
+eyJhbGciOiJIUzUxMiJ9.eyJhcHBzIjoiYXBpR2F0ZXdheSIsInN1YiI6InVsaXAiLCJpYXQiOjE3NDQ2OTA2N
+TB9.tHSboGV9SqfWoKngGDWdWovWwSjivHCjLNKw9YBWVIk4Iughm2r0tr-
+zHvf9N3tjWVPpmMlNJ_iWaXIJWF7CzQ' \ 
+--header 'Accept: application/json' \ 
+--header 'Content-Type: application/json' \ 
+--data '{  "productCode":"BP", 
+    "weight":"550", 
+    "sourcePinCode":"141010", 
+    "destinationPinCode":"110057", 
+    "length":"10", 
+    "width":"5", 
+    "height":"2", 
+    "ins":"1000" }' 
+ 
+ 
+For obtaining authentication token, refer Section 1.7 
+ 
+Response 
+ 
+To acknowledge the above request, ULIP will send the response below -  
+ 
+ULIP Integration Requirement Document   
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 1.0 Page 11 of 24 
+ 
+1. Invalid productCode 
+ 
+{    "response": [ 
+        { 
+            "response": "Invalid product code: BPA", 
+            "responseStatus": "ERROR", 
+            "message": null 
+        } 
+    ], 
+    "error": "false", 
+    "code": "200", 
+    "message": "Success" } 
+ 
+2. In case Data exists 
+ 
+{    "response": [ 
+        { 
+            "response": { 
+                "success": true, 
+                "product_code": "BUSINESS_PARCEL", 
+                "article_type": "Business Parcel", 
+                "weight": 550, 
+                "chargeable_weight": 550, 
+                "source_pincode": 141010, 
+                "destination_pincode": 110057, 
+                "is_local": false, 
+                "distance_km": 0.0, 
+                "base_tariff": 70, 
+                "vas_charges": {}, 
+                "cod_charges": 0, 
+                "cgst": 6, 
+                "sgst": 6, 
+                "total_tax": 12, 
+                "final_amount": 82, 
+                "currency": "INR", 
+                "is_document": false, 
+                "delivery_type": "Inter-city", 
+                "timestamp": "2026-05-06T06:34:37.763Z" 
+            }, 
+            "responseStatus": "SUCCESS", 
+            "message": null 
+        } 
+    ], 
+    "error": "false", 
+    "code": "200", 
+    "message": "Success" } 
+ 
+ 
+ 
+ULIP Integration Requirement Document   
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 1.0 Page 12 of 24 
+ 
+3. In case of invalid pinCode   
+{   "response": null, 
+    "error": "true", 
+    "code": "400 BAD_REQUEST", 
+    "message": "Data format failed OR wrong value entered at:  sourcePinCode. Format 
+should follow  ^[0-9]{6}" } 
+ 
+Status Code 200: INDIAPOST data response 
+Status Code 400: Bad request (Invalid json syntax, invalid json key) 
+Status Code 401 or 403: Unauthenticated or Unauthorized 
+Status Code 500: Some internal server errors occurred 
+Status Code 502: Server is not responding. 
+ 
+1.5 INDIAPOST/03 
+ 
+This API will take below fields and connect with INDIAPOST API to get data. 
+ 
+S. 
+No. 
+Field Name Field Description Format Require
+d/Not – 
+Require
+d 
+Length 
+1    pinCode 
+ 
+Enter the pinCode as 
+available in INDIAPOST 
+system. 
+^[0-9]{6} Required 06 
+ 
+ 
+2 
+limit 
+ 
+Enter the limit as 
+available in INDIAPOST 
+system. 
+^(?:[1-9]|[1-4][0-
+9]|50)$ 
+Required 50 
+3 officeType 
+ 
+Enter the officeType as 
+available in INDIAPOST 
+system. 
+^[A-Za-z]+$ Required  
+1.5.1 Technical Approach  
+1. All the data will be shared through rest web services. 
+2. ULIP system will provide above fields for which detail is required. 
+3. INDIAPOST API will share list of post offices comes under given pin code  based on 
+pin code which exist in INDIAPOST system in JSON format. 
+4. INDIAPOST Integration will add JSON in response key in response body. 
+5. ULIP system will provide the data in JSON Object format in response body. 
+ 
+ 
+Example: 
+ 
+Above fields are shared by ULIP system, then INDIAPOST-integration will make a 
+request to INDIAPOST API. 
+ 
+Request: 
+ULIP Integration Requirement Document   
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 1.0 Page 13 of 24 
+ 
+The request must be of the following format, where the fields below are passed within the URL 
+body in JSON format. 
+ 
+For Staging: https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/INDIAPOST/03 
+ 
+{   "pinCode":"228121", 
+    "limit":"50", 
+    "officeType":"post" } 
+ 
+Curl URL 
+ 
+https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/INDIAPOST/03 
+ 
+curl --location 'https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/INDIAPOST/03' \ 
+--header 'Authorization: Bearer 
+eyJhbGciOiJIUzUxMiJ9.eyJhcHBzIjoiYXBpR2F0ZXdheSIsInN1YiI6InVsaXAiLCJpYXQiOjE3NDQ3NzQ5O
+TN9.cHL_0MM1zMPYq-CgZkaz_nn8Mnfnilj3HoKyj3S-CXxKf86TBwQ-
+TLNoQdAXvX6dMkt8fcCQb_i6wqFwcnGpHg' \ 
+--header 'Content-Type: application/json' \ 
+--header 'Accept: application/json' \ 
+--data '{ "pinCode":"228121", 
+    "limit":"50", 
+    "officeType":"post" }' 
+ 
+For Production: https://www.ulip.dpiit.gov.in/ulip/v1.0.0/INDIAPOST/03 
+ 
+{   "pinCode":"228121", 
+    "limit":"50", 
+    "officeType":"post" } 
+ 
+ 
+Curl URL 
+ 
+curl --location 'https://www.ulip.dpiit.gov.in/ulip/v1.0.0/INDIAPOST/03' \ 
+--header 'Authorization: Bearer 
+eyJhbGciOiJIUzUxMiJ9.eyJhcHBzIjoiYXBpR2F0ZXdheSIsInN1YiI6InVsaXAiLCJpYXQiOjE3NDQ2OTA2N
+TB9.tHSboGV9SqfWoKngGDWdWovWwSjivHCjLNKw9YBWVIk4Iughm2r0tr-
+zHvf9N3tjWVPpmMlNJ_iWaXIJWF7CzQ' \ 
+--header 'Accept: application/json' \ 
+--header 'Content-Type: application/json' \ 
+--data '{  "pinCode":"228121", 
+    "limit":"50", 
+    "officeType":"post" }' 
+ 
+For obtaining authentication token, refer Section 1.7 
+ 
+ULIP Integration Requirement Document   
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 1.0 Page 14 of 24 
+ 
+Response 
+ 
+To acknowledge the above request, ULIP will send the below response -  
+ 
+1. Invalid pinCode 
+ 
+{   "response": null, 
+    "error": "true", 
+    "code": "400 BAD_REQUEST", 
+    "message": "Data format failed OR wrong value entered at:  pinCode. Format should 
+follow  ^[0-9]{6}" } 
+ 
+2. In case data exist 
+ 
+{ 
+    "response": [ 
+        { 
+            "response": { 
+                "status_code": 200, 
+                "success": true, 
+                "message": "list retrieved successfully", 
+                "skip": 0, 
+                "limit": 50, 
+                "returned_records_count": 10, 
+                "data": [ 
+                    { 
+                        "pincode": 228121, 
+                        "office_name": "Agai BO", 
+                        "office_id": "31103894", 
+                        "office_type_code": "BPO", 
+                        "state_name": "Uttar Pradesh", 
+                        "delivery_office_flag": true, 
+                        "city_name": "SULTANPUR", 
+                        "taluk_name": "SULTANPUR", 
+                        "village_name": "Agai", 
+                        "is_rolled_out": true, 
+                        "spds_id": "", 
+                        "idc_id": 31660658, 
+                        "idc_name": "Atarsuma SO" 
+                    }, 
+                    { 
+                        "pincode": 228121, 
+                        "office_name": "Atarsuma SO", 
+                        "office_id": "31660658", 
+                        "office_type_code": "SPO", 
+                        "state_name": "Uttar Pradesh", 
+                        "delivery_office_flag": true, 
+ULIP Integration Requirement Document   
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 1.0 Page 15 of 24 
+ 
+                        "city_name": "SULTANPUR", 
+                        "taluk_name": "SULTANPUR SADAR", 
+                        "village_name": "Lohgi", 
+                        "is_rolled_out": true, 
+                        "spds_id": "", 
+                        "idc_id": 31660658, 
+                        "idc_name": "Atarsuma SO" 
+                    }, 
+                    { 
+                        "pincode": 228121, 
+                        "office_name": "Bhikharpur BO", 
+                        "office_id": "31103971", 
+                        "office_type_code": "BPO", 
+                        "state_name": "Uttar Pradesh", 
+                        "delivery_office_flag": true, 
+                        "city_name": "SULTANPUR", 
+                        "taluk_name": "", 
+                        "village_name": "Bhikharpur", 
+                        "is_rolled_out": true, 
+                        "spds_id": "", 
+                        "idc_id": 31660658, 
+                        "idc_name": "Atarsuma SO" 
+                    }, 
+                    { 
+                        "pincode": 228121, 
+                        "office_name": "Bingi BO", 
+                        "office_id": "31103981", 
+                        "office_type_code": "BPO", 
+                        "state_name": "Uttar Pradesh", 
+                        "delivery_office_flag": true, 
+                        "city_name": "SULTANPUR", 
+                        "taluk_name": "SULTANPUR", 
+                        "village_name": "Bingi", 
+                        "is_rolled_out": true, 
+                        "spds_id": "", 
+                        "idc_id": 31660658, 
+                        "idc_name": "Atarsuma SO" 
+                    }, 
+                    { 
+                        "pincode": 228121, 
+                        "office_name": "Chandaur BO", 
+                        "office_id": "31103992", 
+                        "office_type_code": "BPO", 
+                        "state_name": "Uttar Pradesh", 
+                        "delivery_office_flag": true, 
+                        "city_name": "SULTANPUR", 
+ULIP Integration Requirement Document   
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 1.0 Page 16 of 24 
+ 
+                        "taluk_name": "Sultanpur", 
+                        "village_name": "Chandour", 
+                        "is_rolled_out": true, 
+                        "spds_id": "", 
+                        "idc_id": 31660658, 
+                        "idc_name": "Atarsuma SO" 
+                    }, 
+                    { 
+                        "pincode": 228121, 
+                        "office_name": "Jajjaur BO", 
+                        "office_id": "31104081", 
+                        "office_type_code": "BPO", 
+                        "state_name": "Uttar Pradesh", 
+                        "delivery_office_flag": true, 
+                        "city_name": "SULTANPUR", 
+                        "taluk_name": "SULTANPUR", 
+                        "village_name": "Jajjour", 
+                        "is_rolled_out": true, 
+                        "spds_id": "", 
+                        "idc_id": 31660658, 
+                        "idc_name": "Atarsuma SO" 
+                    }, 
+                    { 
+                        "pincode": 228121, 
+                        "office_name": "Makdoomnagar BO", 
+                        "office_id": "31104148", 
+                        "office_type_code": "BPO", 
+                        "state_name": "Uttar Pradesh", 
+                        "delivery_office_flag": true, 
+                        "city_name": "SULTANPUR", 
+                        "taluk_name": "SULTANPUR", 
+                        "village_name": "Barouli", 
+                        "is_rolled_out": true, 
+                        "spds_id": "", 
+                        "idc_id": 31660658, 
+                        "idc_name": "Atarsuma SO" 
+                    }, 
+                    { 
+                        "pincode": 228121, 
+                        "office_name": "Mayang BO", 
+                        "office_id": "31104164", 
+                        "office_type_code": "BPO", 
+                        "state_name": "Uttar Pradesh", 
+                        "delivery_office_flag": true, 
+                        "city_name": "SULTANPUR", 
+                        "taluk_name": "SULTANPUR SADAR", 
+ULIP Integration Requirement Document   
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 1.0 Page 17 of 24 
+ 
+                        "village_name": "Mayang", 
+                        "is_rolled_out": true, 
+                        "spds_id": "", 
+                        "idc_id": 31660658, 
+                        "idc_name": "Atarsuma SO" 
+                    }, 
+                    { 
+                        "pincode": 228121, 
+                        "office_name": "Murua BO", 
+                        "office_id": "31104179", 
+                        "office_type_code": "BPO", 
+                        "state_name": "Uttar Pradesh", 
+                        "delivery_office_flag": true, 
+                        "city_name": "SULTANPUR", 
+                        "taluk_name": "SULTANPUR", 
+                        "village_name": "Mudva", 
+                        "is_rolled_out": true, 
+                        "spds_id": "", 
+                        "idc_id": 31660658, 
+                        "idc_name": "Atarsuma SO" 
+                    }, 
+                    { 
+                        "pincode": 228121, 
+                        "office_name": "Pipargaon BO", 
+                        "office_id": "31104225", 
+                        "office_type_code": "BPO", 
+                        "state_name": "Uttar Pradesh", 
+                        "delivery_office_flag": true, 
+                        "city_name": "SULTANPUR", 
+                        "taluk_name": "SULTANPUR", 
+                        "village_name": "Pipergaon", 
+                        "is_rolled_out": true, 
+                        "spds_id": "", 
+                        "idc_id": 31660658, 
+                        "idc_name": "Atarsuma SO" 
+                    } 
+                ] 
+            }, 
+            "responseStatus": "SUCCESS", 
+            "message": null 
+        } 
+    ], 
+    "error": "false", 
+    "code": "200", 
+    "message": "Success" 
+} 
+ULIP Integration Requirement Document   
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 1.0 Page 18 of 24 
+ 
+3. In case limit beyond 50  
+{    "response": null, 
+    "error": "true", 
+    "code": "400 BAD_REQUEST", 
+    "message": "Data format failed OR wrong value entered at:  limit. Format should 
+follow  ^(?:[1-9]|[1-4][0-9]|50)$"} 
+ 
+Status Code 200: INDIAPOST data response 
+Status Code 400: Bad request (Invalid json syntax, invalid json key) 
+Status Code 401 or 403: Unauthenticated or Unauthorized 
+Status Code 500: Some internal server errors occurred 
+Status Code 502: Server is not responding. 
+ 
+1.6 INDIAPOST/04 
+ 
+This API will take bulk tracking ID and connect with INDIAPOST API to get data. 
+ 
+S. 
+No. 
+Field Name Field Description Format Require
+d/Not – 
+Require
+d 
+Length 
+1 bulk Enter the bulk as available 
+in INDIAPOST system. 
+^([A-Za-
+z]{2}\d{9}[A-Za-
+z]{2})(,\s?[A-Za-
+z]{2}\d{9}[A-Za-
+z]{2}){0,49}$ 
+Required 50 
+ 
+1.6.1 Technical Approach  
+6. All the data will be shared through rest web services. 
+7. ULIP system will provide bulk tracking id’s for which detail is required. 
+8. INDIAPOST API will share tracking details based on bulk tracking id’s which exist in 
+INDIAPOST system in JSON format. 
+9. INDIAPOST Integration will add JSON in response key in response body. 
+10. ULIP system will provide the data in JSON Object format in response body. 
+ 
+Example: 
+ 
+bulk   field is shared by ULIP system, then INDIAPOST-integration will make a request 
+to INDIAPOST API. 
+ 
+Request: 
+ 
+The request must be of the following format, where date is passed within the URL body in JSON 
+format. 
+ 
+ 
+ULIP Integration Requirement Document   
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 1.0 Page 19 of 24 
+ 
+For Staging: https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/INDIAPOST/04 
+ 
+{"bulk": "RK775227016IN,RK440375064IN,RK815417418IN,RK446958412IN,EY011867595IN"} 
+ 
+Curl URL 
+ 
+curl --location 'https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/INDIAPOST/04' \ 
+--header 'Authorization: Bearer 
+eyJhbGciOiJIUzUxMiJ9.eyJhcHBzIjoiYXBpR2F0ZXdheSIsInN1YiI6InVsaXAiLCJpYXQiOjE3NDQ3NzQ5O
+TN9.cHL_0MM1zMPYq-CgZkaz_nn8Mnfnilj3HoKyj3S-CXxKf86TBwQ-
+TLNoQdAXvX6dMkt8fcCQb_i6wqFwcnGpHg' \ 
+--header 'Content-Type: application/json' \ 
+--header 'Accept: application/json' \ 
+--data '{"bulk": 
+"RK775227016IN,RK440375064IN,RK815417418IN,RK446958412IN,EY011867595IN" }' 
+ 
+For Production: https://www.ulip.dpiit.gov.in/ulip/v1.0.0/INDIAPOST/04 
+ 
+{"bulk": "RK775227016IN,RK440375064IN,RK815417418IN,RK446958412IN,EY011867595IN"} 
+ 
+Curl URL 
+ 
+curl --location 'https://www.ulip.dpiit.gov.in/ulip/v1.0.0/INDIAPOST/04' \ 
+--header 'Authorization: Bearer 
+eyJhbGciOiJIUzUxMiJ9.eyJhcHBzIjoiYXBpR2F0ZXdheSIsInN1YiI6InVsaXAiLCJpYXQiOjE3NDQ2OTA2N
+TB9.tHSboGV9SqfWoKngGDWdWovWwSjivHCjLNKw9YBWVIk4Iughm2r0tr-
+zHvf9N3tjWVPpmMlNJ_iWaXIJWF7CzQ' \ 
+--header 'Accept: application/json' \ 
+--header 'Content-Type: application/json' \ 
+--data '{"bulk": 
+"RK775227016IN,RK440375064IN,RK815417418IN,RK446958412IN,EY011867595IN"}' 
+ 
+For obtaining authentication token, refer Section 1.7 
+ 
+Response 
+ 
+To acknowledge the above request, ULIP will send the below response -  
+ 
+1. Invalid bulk format 
+ 
+{   "response": null, 
+    "error": "true", 
+    "code": "400 BAD_REQUEST", 
+    "message": "Data format failed OR wrong value entered at:  bulk. Format should 
+follow  ^([A-Za-z]{2}\\d{9}[A-Za-z]{2})(,\\s?[A-Za-z]{2}\\d{9}[A-Za-z]{2}){0,49}$"} 
+ 
+ULIP Integration Requirement Document   
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 1.0 Page 20 of 24 
+ 
+2. In case data exist 
+ 
+{    "response": [ 
+        { 
+            "response": { 
+                "status_code": 200, 
+                "success": true, 
+                "message": "data retrieved successfully", 
+                "data": [ 
+                    { 
+                        "booking_details": { 
+                            "article_number": "RK440375064IN", 
+                            "booked_at": "", 
+                            "booked_at_officeid": "", 
+                            "bulk_customer_id": null, 
+                            "booked_on": "0001-01-01T00:00:00Z", 
+                            "origin_pincode": "", 
+                            "destination_pincode": "", 
+                            "tariff": 0, 
+                            "article_type": "", 
+                            "delivery_location": "", 
+                            "delivery_confirmed_on": null, 
+                            "destination_office_facility_id": "" 
+                        }, 
+                        "tracking_details": null, 
+                        "del_status": { 
+                            "del_status": "not delivered" 
+                        } 
+                    }, 
+                    { 
+                        "booking_details": { 
+                            "article_number": "RK815417418IN", 
+                            "booked_at": "", 
+                            "booked_at_officeid": "", 
+                            "bulk_customer_id": null, 
+                            "booked_on": "0001-01-01T00:00:00Z", 
+                            "origin_pincode": "", 
+                            "destination_pincode": "", 
+                            "tariff": 0, 
+                            "article_type": "", 
+                            "delivery_location": "", 
+                            "delivery_confirmed_on": null, 
+                            "destination_office_facility_id": "" 
+                        }, 
+                        "tracking_details": null, 
+                        "del_status": { 
+ULIP Integration Requirement Document   
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 1.0 Page 21 of 24 
+ 
+                            "del_status": "not delivered" 
+                        } 
+                    }, 
+                    { 
+                        "booking_details": { 
+                            "article_number": "RK446958412IN", 
+                            "booked_at": "", 
+                            "booked_at_officeid": "", 
+                            "bulk_customer_id": null, 
+                            "booked_on": "0001-01-01T00:00:00Z", 
+                            "origin_pincode": "", 
+                            "destination_pincode": "", 
+                            "tariff": 0, 
+                            "article_type": "", 
+                            "delivery_location": "", 
+                            "delivery_confirmed_on": null, 
+                            "destination_office_facility_id": "" 
+                        }, 
+                        "tracking_details": null, 
+                        "del_status": { 
+                            "del_status": "not delivered" 
+                        } 
+                    }, 
+                    { 
+                        "booking_details": { 
+                            "article_number": "EY011867595IN", 
+                            "booked_at": "", 
+                            "booked_at_officeid": "", 
+                            "bulk_customer_id": null, 
+                            "booked_on": "0001-01-01T00:00:00Z", 
+                            "origin_pincode": "", 
+                            "destination_pincode": "", 
+                            "tariff": 0, 
+                            "article_type": "", 
+                            "delivery_location": "", 
+                            "delivery_confirmed_on": null, 
+                            "destination_office_facility_id": "" 
+                        }, 
+                        "tracking_details": null, 
+                        "del_status": { 
+                            "del_status": "not delivered" 
+                        } 
+                    }, 
+                    { 
+                        "booking_details": { 
+                            "article_number": "RK775227016IN", 
+ULIP Integration Requirement Document   
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 1.0 Page 22 of 24 
+ 
+                            "booked_at": "", 
+                            "booked_at_officeid": "", 
+                            "bulk_customer_id": null, 
+                            "booked_on": "0001-01-01T00:00:00Z", 
+                            "origin_pincode": "", 
+                            "destination_pincode": "", 
+                            "tariff": 0, 
+                            "article_type": "", 
+                            "delivery_location": "", 
+                            "delivery_confirmed_on": null, 
+                            "destination_office_facility_id": "" 
+                        }, 
+                        "tracking_details": null, 
+                        "del_status": { 
+                            "del_status": "not delivered" 
+                        } 
+                    } 
+                ] 
+            }, 
+            "responseStatus": "SUCCESS", 
+            "message": null 
+        } 
+    ], 
+    "error": "false", 
+    "code": "200", 
+    "message": "Success"} 
+ 
+Status Code 200: INDIAPOST data response 
+Status Code 400: Bad request (Invalid json syntax, invalid json key) 
+Status Code 401 or 403: Unauthenticated or Unauthorized 
+Status Code 500: Some internal server errors occurred 
+Status Code 502: Server is not responding. 
+1.7 Data Transmission & Authentication Mechanism 
+ 
+All data exchange would be done over secure HTTP (HTTPS). Requests from ULIP's system 
+would be made in INDIAPOST system through a data exchange URL that has following form: 
+ 
+For Staging: https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/INDIAPOST/01 
+ 
+{   "productCode":"SP", 
+    "weight":"250", 
+    "sourcePinCode":"400001", 
+    "destinationPinCode":"110001", 
+    "length":"30", 
+    "width":"21", 
+    "height":"0.5", 
+ULIP Integration Requirement Document   
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 1.0 Page 23 of 24 
+ 
+    "ins":"1000", 
+    "pod":"YES" } 
+ 
+Access to above data exchange URL would be authorized by use of a security mechanism 
+implemented by the ULIP system. It is as follows: 
+ 
+• First time access:  It would require a username and password [which would be shared with 
+user beforehand].  Once user hit with valid user id and password, ULIP system will return a 
+basic authorization token to  user, using that token user will communicate with ULIP system 
+until tokens will not get expired. 
+ 
+Summary of HTTP Basic Authentication is as follows: 
+ 
+First time User hits ULIP secured API through username and password for access token as follow- 
+ 
+curl --location --request POST 
+'https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/user/login' \ 
+--header 'Accept: application/json' \ 
+--header 'Content-Type: application/json' \ 
+--data-raw '{"username": "xxxx", 
+"password": "xxxx@123"}' 
+ 
+ 
+Authorization:   
+Bearer 
+ eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1bGlwIiwiaWF0IjoxNjgyNDkyNzQ1LCJhcHBzIjoiZGF
+0YXB1c2gifQ.iNjO9ggx99yqkjJw65KKP7dZ9zVatpuQQP76rVBnxxArEYq8QZIn48_ihG8EC
+e34wKm3QTcokX7wrq9RDwZrbA'  
+ 
+Upon successful authentication, the user would be logged into the ULIP system and get an access 
+token. Though this token user can communicate with ULIP. This token has expiry time which 
+represents user session. The session time out for the same to be fixed hour, generally it is for 24 
+hours. After 24 hours, the session (token) will expire and user needs to re authenticate. 
+ 
+Using The above token, users can request ULIP system for cargo details as follow - 
+curl --location 'https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/INDIAPOST/01' \ 
+--header 'Authorization: Bearer 
+eyJhbGciOiJIUzUxMiJ9.eyJhcHBzIjoiYXBpR2F0ZXdheSIsInN1YiI6InVsaXAiLCJpYXQiOjE
+3NDQ3NzQ5OTN9.cHL_0MM1zMPYq-CgZkaz_nn8Mnfnilj3HoKyj3S-CXxKf86TBwQ-
+TLNoQdAXvX6dMkt8fcCQb_i6wqFwcnGpHg' \ 
+--header 'Content-Type: application/json' \ 
+--header 'Accept: application/json' \ 
+--data '{    "productCode":"SP", 
+    "weight":"250", 
+    "sourcePinCode":"400001", 
+    "destinationPinCode":"110001", 
+    "length":"30", 
+    "width":"21", 
+    "height":"0.5", 
+ULIP Integration Requirement Document   
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 1.0 Page 24 of 24 
+ 
+    "ins":"1000", 
+    "pod":"YES" }' 
+ 
+For Production: 
+ 
+curl --location --request POST 
+'https://www.ulip.dpiit.gov.in/ulip/v1.0.0/user/login' \ 
+--header 'Accept: application/json' \ 
+--header 'Content-Type: application/json' \ 
+--data-raw'{"username": "xxxx", 
+"password": "xxxx@123" }' 
+ 
+Authorization:   
+Bearer 
+ eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1bGlwIiwiaWF0IjoxNjgyNDkyNzQ1LCJhcHBzIjoiZGF
+0YXB1c2gifQ.iNjO9ggx99yqkjJw65KKP7dZ9zVatpuQQP76rVBnxxArEYq8QZIn48_ihG8EC
+e34wKm3QTcokX7wrq9RDwZrbA'  
+ 
+Upon successful authentication, the user would be logged into the ULIP system and get an access 
+token. Though this token user can communicate with ULIP. This token has expiry time which 
+represents user session. The session time out for the same to be fixed hour, generally it is for 24 
+hours. After 24 hours, the session (token) will expire and user need to re authenticate. 
+ 
+Using The above token, user can request ULIP system for cargo details as follows - 
+curl --location 'https://www.ulip.dpiit.gov.in/ulip/v1.0.0/INDIAPOST/01' \ 
+--header 'Authorization: Bearer 
+eyJhbGciOiJIUzUxMiJ9.eyJhcHBzIjoiYXBpR2F0ZXdheSIsInN1YiI6InVsaXAiLCJpYXQiOjE
+3NDQ2OTA2NTB9.tHSboGV9SqfWoKngGDWdWovWwSjivHCjLNKw9YBWVIk4Iughm2r0tr
+-zHvf9N3tjWVPpmMlNJ_iWaXIJWF7CzQ' \ 
+--header 'Accept: application/json' \ 
+--header 'Content-Type: application/json' \ 
+--data '{    "productCode":"SP", 
+    "weight":"250", 
+    "sourcePinCode":"400001", 
+    "destinationPinCode":"110001", 
+    "length":"30", 
+    "width":"21", 
+    "height":"0.5", 
+    "ins":"1000", 
+    "pod":"YES" }' 

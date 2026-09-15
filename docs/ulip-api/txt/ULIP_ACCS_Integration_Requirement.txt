@@ -1,0 +1,718 @@
+ULIP Integration Document 
+ 
+  
+                        
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+Version No.: 4.0 
+Date: 24/03/2026 
+Project Name: ULIP 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ULIP Integration Document 
+This document contains proprietary information of NLDSL. Unauthorized access, copying and replication are 
+prohibited. This document must not be copied in whole or part by any means, without the written authorization of 
+NLDSL, Noida, India. 
+ 
+ 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 2 of 15 
+ 
+ 
+ 
+ 
+Revision History 
+Version Date Author Reviewer Significant Changes 
+1.0 09/07/2021 Hasan Mhad Khan Nayab Ali Baseline Version 
+2.0 17/03/2023 Ayush Arya Nayab Ali Updated Version 
+3.0 17/03/2023 Girish Chander Nayab Ali Updated 
+4.0 24/03/2026 Gaurav Tyagi Pranab 
+Manna Updated 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+  
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 3 of 15 
+ 
+Table of Contents 
+ 
+Introduction ................................................................................................................................................. 4 
+1.1 Purpose .................................................................................................................................... 4 
+The Overall Description .............................................................................................................................. 4 
+1.2 Data Integration between KALE System and ULIP application ............................................... 4 
+1.3 KALE/01 ................................................................................................................................... 4 
+1.3.1 Technical Approach ..................................................................................................... 5 
+1.4 KALE/02 ................................................................................................................................... 8 
+1.4.1 Technical Approach ..................................................................................................... 8 
+1.5 Data Transmission & Authentication Mechanism .................................................................. 13 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 4 of 15 
+ 
+Introduction 
+1.1 Purpose 
+ 
+The purpose of this document is to define and provide details for accessing API for  
+KALE system from ULIP system. 
+This document details the following points: 
+ 
+1. Data Integration between KALE and ULIP web service : Identification of operational 
+points where data integration between KALE and ULIP web service will be needed. 
+ 
+2. Technical Approach for performing Data Integration  
+ 
+The Overall Description 
+User will share the information such as Airway bill number based on data send by user 
+ULIP system will call KALE API for accessing information. 
+ 
+Following are the point for accessing information: - 
+ 
+1. This API will share data based on information provided by user. 
+ 
+2. ULIP will expose API for getting data from KALE API. 
+ 
+3. KALE/01 API will take MAWB number from user and get data from KALE API. 
+ 
+4. KALE/02 API will take AWB and HAWB from user and get data from KALE API. 
+1.2 Data Integration between KALE System and ULIP application 
+ 
+User will share information to ULIP system based on data shared ULIP will provide data 
+to user. 
+1.3 KALE/01 
+ 
+This API will take MAWB number and connect with KALE API to get data. 
+ 
+S. 
+No. 
+Field Name Field Description Format Require
+d/Not – 
+Require
+d 
+Length 
+1 mawb Master airway bill as 
+available in KALE system. 
+[0-9]{11} Required 11 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 5 of 15 
+ 
+1.3.1 Technical Approach  
+1. All the data will be shared through rest web services. 
+2. ULIP system will provide MAWB for which detail is required. 
+3. KALE API will share details of vehicle transaction information which exist in KALE system 
+in JSON format. 
+4. ULIP system will provide the data in JSON Object format in response body. 
+ 
+Example: 
+ 
+MAWB 09898989833 is shared by ULIP system, then KALE-integration will make a 
+request to KALE API. 
+ 
+Request: 
+ 
+The request must be of the following format, where MAWB is passed within the URL body in 
+JSON format. 
+ 
+For Production: 
+ 
+https://www.ulip.dpiit.gov.in/ulip/v1.0.0/KALE/01 
+ 
+{"mawb": "09898989833"} 
+ 
+Curl URL 
+ 
+curl --location --request POST 'https://www.ulip.dpiit.gov.in/ulip/v1.0.0/KALE/01' \ 
+--header 'Authorization: Bearer 
+eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhdWRpdHVzciIsImlhdCI6MTYzNzU1MDQz
+NCwiYXBwcyI6ImRhdGFwdXNoIn0.FZjy_fQfrkfvOM4ycwx5PmI-
+Qz2dryaPsby2BNIRgyehBMYOhXkXL8FyXb-
+BgqavGwx40K12RzVXi7JdQm7GCQ' \ 
+--header 'Accept: application/json' \ 
+--header 'Content-Type: application/json' \ 
+--data-raw '{"mawb": "09898989833"}' 
+ 
+ 
+For Staging: 
+ 
+https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/KALE/01 
+ 
+{"mawb": "61829795382"} 
+ 
+ 
+ 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 6 of 15 
+ 
+Curl URL 
+ 
+curl --location --request POST 
+'https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/KALE/01' \ 
+--header 'Authorization: Bearer 
+eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhdWRpdHVzciIsImlhdCI6MTYzNzU1MDQz
+NCwiYXBwcyI6ImRhdGFwdXNoIn0.FZjy_fQfrkfvOM4ycwx5PmI-
+Qz2dryaPsby2BNIRgyehBMYOhXkXL8FyXb-
+BgqavGwx40K12RzVXi7JdQm7GCQ' \ 
+--header 'Accept: application/json' \ 
+--header 'Content-Type: application/json' \ 
+--data-raw '{"mawb": "61829795382"}' 
+ 
+ 
+For obtaining authentication token, refer Section 1.6 
+ 
+Response 
+ 
+To acknowledge the above request, ULIP will send the below response -  
+ 
+a) In case of invalid format 
+ 
+1. Invalid MAWB 
+ 
+{ 
+    "response": null, 
+    "error": "true", 
+    "code": "400", 
+    "message": "Data format failed OR wrong value entered at:  mawb. Format 
+should follow  [0-9]{11}" 
+} 
+ 
+ 
+b) In case of mawb number does not exist in KALE system 
+ 
+{ 
+    "response": [ 
+        { 
+            "response": { 
+                "Message": "An error has occurred." 
+            }, 
+            "responseStatus": "ERROR" 
+        } 
+    ], 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 7 of 15 
+ 
+    "error": "false", 
+    "code": "200", 
+    "message": "Success" 
+} 
+ 
+c) In case MAWB number exist 
+ 
+{ 
+    "response": [ 
+        { 
+            "response": { 
+                "ARR": true, 
+                "RCS": false, 
+                "MANTimeStamp": "0001-01-01T00:00:00", 
+                "FHL": false, 
+                "NFD": true, 
+                "RCFTimeStamp": "12/21/2022 10:30:00 AM", 
+                "DLV": true, 
+                "FWB": false, 
+                "FOHTimeStamp": "0001-01-01T00:00:00", 
+                "EGMTimeStamp": "0001-01-01T00:00:00", 
+                "FWBTimeStamp": "0001-01-01T00:00:00", 
+                "BKD": false, 
+                "BKDTimeStamp": "0001-01-01T00:00:00", 
+                "RCSTimeStamp": "0001-01-01T00:00:00", 
+                "FOH": false, 
+                "MAWBNo": "61829795382", 
+                "Pkgs": 1, 
+                "ChWt": 107.0, 
+                "FHLTimeStamp": "0001-01-01T00:00:00", 
+                "GrWt": 107.0, 
+                "NFDTimeStamp": "12/21/2022 10:30:00 AM", 
+                "EGM": false, 
+                "CustomsClearance": true, 
+                "DEP": false, 
+                "ARRTimeStamp": "2022-12-21T04:30:00", 
+                "DLVTimeStamp": "12/23/2022 4:36:21 PM", 
+                "RCF": true, 
+                "CustomsClearanceTimeStamp": "1900-01-01T00:00:00", 
+                "DEPTimeStamp": "0001-01-01T00:00:00", 
+                "MAN": false, 
+                "HAWBNo": "X925141", 
+                "ExpAcceptanceTemperature": null, 
+                "ImpRecvdTemperature": null, 
+                "Origin": null, 
+                "Destination": null, 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 8 of 15 
+ 
+                "FlightNo": "SQ7969", 
+                "FlightDate": null, 
+                "CustomsStatus": null, 
+                "CustomsClearanceDate": null, 
+                "CustomsClearDate": null, 
+                "ChargeableWt": null, 
+                "IGMNo": "2172379", 
+                "IGMYear": 2022 
+            }, 
+            "responseStatus": "SUCCESS", 
+            "message": null 
+        } 
+    ], 
+    "error": "false", 
+    "code": "200", 
+    "message": "Success" 
+} 
+ 
+Status Code 200: MAWB data response 
+Status Code 400: Bad request (Invalid json syntax, invalid json key) 
+Status Code 401 or 403: Unauthenticated or Unauthorized 
+Status Code 500: Some internal server error occurred 
+Status Code 502: Server is not responding. 
+1.4 KALE/02 
+ 
+This API will take AWB and HAWB number and connect with KALE API to get data. 
+ 
+S. 
+No. 
+Field Name Field Description Format Require
+d/Not – 
+Require
+d 
+Length 
+1 mawb Master airway bill as 
+available in KALE system. 
+[0-9]{11} Required 11 
+2 hawb House airway bill as 
+available in KALE system 
+^[a-zA-Z0-
+9]{0,20}$ 
+Not-
+required 
+Max 20 
+1.4.1 Technical Approach  
+5. All the data will be shared through rest web services. 
+6. ULIP system will provide AWB and HAWB for which detail is required. 
+7. KALE API will share details of vehicle transaction information which exist in KALE system 
+in JSON format. 
+8. ULIP system will provide the data in JSON Object format in response body. 
+ 
+ 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 9 of 15 
+ 
+Example: 
+ 
+AWB 02368696795 and HAWB 501811201324 is shared by ULIP system, then KALE-
+integration will make a request to KALE API. 
+ 
+Request: 
+ 
+The request must be of the following format, where AWB and HAWB is passed within the URL 
+body in JSON format. 
+ 
+For Production: 
+ 
+https://www.ulip.dpiit.gov.in/ulip/v1.0.0/KALE/02 
+ 
+{ 
+ "awb":"02368696795", 
+ "hawb":"501811201324"  
+} 
+ 
+Curl URL 
+ 
+curl --location --request POST 'https://www.ulip.dpiit.gov.in/ulip/v1.0.0/KALE/02' \ 
+--header 'Authorization: Bearer 
+eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhdWRpdHVzciIsImlhdCI6MTYzNzU1MDQz
+NCwiYXBwcyI6ImRhdGFwdXNoIn0.FZjy_fQfrkfvOM4ycwx5PmI-
+Qz2dryaPsby2BNIRgyehBMYOhXkXL8FyXb-
+BgqavGwx40K12RzVXi7JdQm7GCQ' \ 
+--header 'Content-Type: application/json' \ 
+--header 'Accept: application/json' \ 
+--data-raw '{ 
+ "awb":"02368696795", 
+ "hawb":"501811201324"  
+}' 
+ 
+For Staging: 
+ 
+https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/KALE/02 
+ 
+ 
+{"awb":"02368696795", 
+    "hawb":"501811201324"} 
+ 
+Curl URL 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 10 of 15 
+ 
+ 
+curl --location --request POST 
+'https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/KALE/02' \ 
+--header 'Authorization: Bearer 
+eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhdWRpdHVzciIsImlhdCI6MTYzNzU1MDQz
+NCwiYXBwcyI6ImRhdGFwdXNoIn0.FZjy_fQfrkfvOM4ycwx5PmI-
+Qz2dryaPsby2BNIRgyehBMYOhXkXL8FyXb-
+BgqavGwx40K12RzVXi7JdQm7GCQ' \ 
+--header 'Content-Type: application/json' \ 
+--header 'Accept: application/json' \ 
+--data-raw '{ 
+    "awb":"02368696795", 
+    "hawb":"501811201324" 
+}' 
+ 
+ 
+For obtaining authentication token, refer Section 1.6 
+ 
+Response 
+ 
+To acknowledge the above request, ULIP will send the below response -  
+ 
+d) In case of invalid format 
+ 
+1. Invalid AWB 
+ 
+{ 
+    "response": null, 
+    "error": "true", 
+    "code": "400", 
+    "message": "Data format failed OR wrong value entered at:  awb. Format 
+should follow  [0-9]{11}" 
+} 
+ 
+ 
+2. Invalid hawb 
+ 
+{ 
+    "response": null, 
+    "error": "true", 
+    "code": "400", 
+    "message": "Data format failed OR wrong value entered at:  hawb. Format 
+should follow  ^[a-zA-Z0-9]{0,20}$" 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 11 of 15 
+ 
+} 
+ 
+e) In case of awb number does not exist in KALE system 
+ 
+{ 
+    "response": [ 
+        { 
+            "response": { 
+                "Message": "An error has occurred." 
+            }, 
+            "responseStatus": "ERROR" 
+        } 
+    ], 
+    "error": "false", 
+    "code": "200", 
+    "message": "Success" 
+} 
+ 
+f) In case HAWB number does not exist in KALE system 
+ 
+{ 
+    "response": [ 
+        { 
+            "response": { 
+                "Message": "An error has occurred." 
+            }, 
+            "responseStatus": "ERROR" 
+        } 
+    ], 
+    "error": "false", 
+    "code": "200", 
+    "message": "Success" 
+} 
+ 
+g) In case AWB and HAWB number exist 
+ 
+{ 
+    "response": [ 
+        { 
+            "response": { 
+                "ARR": false, 
+                "RCS": false, 
+                "MANTimeStamp": "0001-01-01T00:00:00", 
+                "FHL": false, 
+                "NFD": false, 
+                "RCFTimeStamp": null, 
+                "DLV": false, 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 12 of 15 
+ 
+                "FWB": false, 
+                "FOHTimeStamp": "0001-01-01T00:00:00", 
+                "EGMTimeStamp": "0001-01-01T00:00:00", 
+                "FWBTimeStamp": "0001-01-01T00:00:00", 
+                "BKD": false, 
+                "BKDTimeStamp": "0001-01-01T00:00:00", 
+                "RCSTimeStamp": "0001-01-01T00:00:00", 
+                "FOH": false, 
+                "MAWBNo": null, 
+                "Pkgs": 0, 
+                "ChWt": 0.0, 
+                "FHLTimeStamp": "0001-01-01T00:00:00", 
+                "GrWt": 0.0, 
+                "NFDTimeStamp": null, 
+                "EGM": false, 
+                "CustomsClearance": false, 
+                "DEP": false, 
+                "ARRTimeStamp": "0001-01-01T00:00:00", 
+                "DLVTimeStamp": null, 
+                "RCF": false, 
+                "CustomsClearanceTimeStamp": "0001-01-01T00:00:00", 
+                "DEPTimeStamp": "0001-01-01T00:00:00", 
+                "MAN": false, 
+                "HAWBNo": null, 
+                "ExpAcceptanceTemperature": null, 
+                "ImpRecvdTemperature": null, 
+                "Origin": null, 
+                "Destination": null, 
+                "FlightNo": null, 
+                "FlightDate": null, 
+                "CustomsStatus": null, 
+                "CustomsClearanceDate": null, 
+                "CustomsClearDate": null, 
+                "ChargeableWt": null, 
+                "IGMNo": null, 
+                "IGMYear": 0 
+            }, 
+            "responseStatus": "SUCCESS", 
+            "message": null 
+        } 
+    ], 
+    "error": "false", 
+    "code": "200", 
+    "message": "Success" 
+} 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 13 of 15 
+ 
+ 
+Status Code 200: data response 
+Status Code 400: Bad request (Invalid json syntax, invalid json key) 
+Status Code 401 or 403: Unauthenticated or Unauthorized 
+Status Code 500: Some internal server error occurred 
+Status Code 502: Server is not responding. 
+1.5 Data Transmission & Authentication Mechanism 
+ 
+All data exchange would be done over secure HTTP (HTTPS). Request from ULIP's system would 
+be made in KALE system through a data exchange URL that has following form: 
+ 
+For Production: 
+https://www.ulip.dpiit.gov.in/ulip/v1.0.0/KALE/01 
+ 
+Body:  
+{"mawb": "09898989833"} 
+ 
+Access to above data exchange URL would be authorized by use of a security mechanism 
+implemented by the ULIP system. It is as follows: 
+• First time access:  It would require a username and password [which would be shared with 
+user beforehand].  Once user hit with valid user id and password, ULIP system will return a 
+basic authorization token to  user, using that token user will communicate with ULIP system 
+until token will not get expired. 
+ 
+Brief summary of HTTP Basic Authentication is as follows: 
+ 
+First time when User will hit ULIP secured API through username and password for access token 
+as follow- 
+curl --location --request POST ' 
+https://www.ulip.dpiit.gov.in/ulip/v1.0.0/user/login' \ 
+--header 'Accept: application/json' \ 
+--header 'Content-Type: application/json' \ 
+--data-raw '{ 
+"username": "xxxx", 
+"password": "xxxx@123" 
+}' 
+ 
+Authorization:   
+Bearer  
+eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZXN0MSIsImlhdCI6MTYyNTIzMDQyNywiYXBwcyI6I
+mRhdGFwdXNoIn0.rhumwWJ8BWeeHe9CYmIV1UKyJk-kLHA_ovX5Zi2OwxEv-td-
+KpxnfbKDI_8FZsOoggqx3Al-Du1y2qMoUD7uzA' 
+ 
+Upon successful authentication, the user would be logged into the ULIP system and get an access 
+token. Though this token user can communicate with  ULIP. This token has expiry time which 
+represent user session. The session time out for the same to be fixed hour, generally it is for 30 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 14 of 15 
+ 
+minutes. If there is no request coming from user for 30 minutes, then session (token) will be 
+expired and user need to re authenticate. 
+ 
+Using The above token, user can request ULIP system for vehicle details as follow - 
+ 
+curl -X POST \ 
+   https://www.ulip.dpiit.gov.in/ulip/v1.0.0/KALE/01 \ 
+  -H 'accept: application/json' \ 
+  -H 'authorization: Bearer 
+eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZXN0MSIsImlhdCI6MTYyNTIzMDQyNywiYXBwcyI6I
+mRhdGFwdXNoIn0.rhumwWJ8BWeeHe9CYmIV1UKyJk-kLHA_ovX5Zi2OwxEv-td-
+KpxnfbKDI_8FZsOoggqx3Al-Du1y2qMoUD7uzA' \ 
+  -H 'cache-control: no-cache' \ 
+  -H 'content-type: application/json' \ 
+  -H 'postman-token: 8e8a19a4-ea1e-6373-f616-e2e4af9a1338' \ 
+  -d ‘{"mawb": "09898989833"}' 
+ 
+ 
+ 
+For Staging: 
+ 
+curl --location --request POST ' 
+https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/user/login' \ 
+--header 'Accept: application/json' \ 
+--header 'Content-Type: application/json' \ 
+--data-raw '{ 
+"username": "xxxx", 
+"password": "xxxx@123" 
+}' 
+ 
+ 
+Authorization:   
+Bearer  
+eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZXN0MSIsImlhdCI6MTYyNTIzMDQyNywiYXBwcyI6I
+mRhdGFwdXNoIn0.rhumwWJ8BWeeHe9CYmIV1UKyJk-kLHA_ovX5Zi2OwxEv-td-
+KpxnfbKDI_8FZsOoggqx3Al-Du1y2qMoUD7uzA' 
+ 
+Upon successful authentication, the user would be logged into the ULIP system and get an access 
+token. Though this token user can communicate with ULIP. This token has expiry time which 
+represent user session. The session time out for the same to be fixed hour, generally it is for 30 
+minutes. If there is no request coming from user for 30 minutes, then session (token) will be 
+expired and user need to re authenticate. 
+ 
+ 
+Using The above token, user can request ULIP system for vehicle details as follow - 
+ 
+curl -X POST \ 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 15 of 15 
+ 
+   https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/KALE/01 \ 
+  -H 'accept: application/json' \ 
+  -H 'authorization: Bearer 
+eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZXN0MSIsImlhdCI6MTYyNTIzMDQyNywiYXBwcyI6I
+mRhdGFwdXNoIn0.rhumwWJ8BWeeHe9CYmIV1UKyJk-kLHA_ovX5Zi2OwxEv-td-
+KpxnfbKDI_8FZsOoggqx3Al-Du1y2qMoUD7uzA' \ 
+  -H 'cache-control: no-cache' \ 
+  -H 'content-type: application/json' \ 
+  -H 'postman-token: 8e8a19a4-ea1e-6373-f616-e2e4af9a1338' \ 
+  -d ‘{"mawb": "61829795382"}' 
+ 

@@ -1,0 +1,559 @@
+ULIP Integration Requirement Document 
+ 
+  
+                        
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+Version No.: 2.0 
+Date: 30/09/2024 
+Project Name: ULIP 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ULIP Integration Requirement Document 
+This document contains proprietary information of NLDSL. Unauthorized access, copying and replication are 
+prohibited. This document must not be copied in whole or part by any means, without the written authorization of 
+NLDSL, New Delhi, India. 
+ 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 2.0 Page 2 of 11 
+ 
+ 
+ 
+ 
+Revision History 
+Version Date Author Reviewer Significant 
+Changes 
+1.0 12/09/2023 Girish Chander Nayab Ali Baseline Version 
+2.0 30/09/2024 Ayush Arya Nayab Ali Baseline Version 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+  
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 2.0 Page 3 of 11 
+ 
+Table of Contents 
+ 
+Introduction ................................................................................................................................................. 4 
+1.1 Purpose .................................................................................................................................... 4 
+The Overall Description .............................................................................................................................. 4 
+1.2 Data Integration between SARATHI System and ULIP application ......................................... 4 
+1.3 SARATHI/verifySarathiData ..................................................................................................... 4 
+1.3.1 Technical Approach .................................................................................................... 5 
+1.4 Data Transmission & Authentication Mechanism .................................................................... 9 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 2.0 Page 4 of 11 
+ 
+Introduction 
+1.1 Purpose 
+ 
+The purpose of this document is to define and provide details for authenticating Sarathi Response 
+data with respect to driving license number and dob which we have received from sarathi system. 
+This document details the following points: 
+ 
+1. Data Integration and verification between SARATHI and ULIP web service : 
+Identification of operational points where data integration and verification between 
+SARATHI and ULIP web service will be needed. 
+ 
+2. Technical Approach for performing Data Integration  
+ 
+The Overall Description 
+ 
+User will share the information such as driving license number and date of birth and will at 
+least share either driver name or permit    based on data send by user ULIP system will call 
+respective SARATHI API for accessing information and then verify data based on user input. 
+ 
+Following are the point for accessing vehicle information: - 
+ 
+1. This API will share driving license data based on information provided by user. 
+ 
+2. ULIP will expose API for getting data from SARATHI API and then verify the response if 
+correct information is there or not in the response which we are getting from SARATHI 
+API. 
+ 
+3. SARATHI/verifySarathiData  API will take driving license and date of birth and will 
+share at least driver name and permit from user and get data from SARATHI API and 
+then will verify if correct driver name (which is bioFullName field in SARATHI API 
+response) and permit (which is covabbrv field in SARATHI API response) is coming 
+from SARATHI API response or not. 
+ 
+1.2 Data Integration between SARATHI System and ULIP application 
+ 
+User will share information to ULIP system based on data shared ULIP will verify the data for 
+the user. 
+1.3 SARATHI/verifySarathiData 
+ 
+This API will take driving license number and connect with SARATHI API to get data. 
+ 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 2.0 Page 5 of 11 
+ 
+S. No. Field Name Field Description Format Require
+d/Not – 
+Require
+d 
+Length 
+1 dlnumber Driving license Number as 
+available in SARATHI 
+system. 
+(([A-Z]{2}(-)[0-
+9]{2})|([A-Z]{2}[0-
+9]{2} ))((19|20)[0-
+9][0-9])[0-9]{7}$ 
+ 
+ 
+Required 16 
+2 dob Date of birth as available 
+in SARATHI system. 
+yyyy-mm-dd Require
+d 
+10 
+3 driverName 
+ 
+Driver name as available 
+in SARATHI system. 
+ Non 
+Mandato
+ry 
+ 
+4 permit Permit as available in 
+SARATHI system. 
+ Non 
+Mandato
+ry 
+ 
+ 
+1.3.1 Technical Approach  
+1. All the data will be shared through rest web services. 
+2. ULIP system will provide driving license number and date of birth and will at least 
+share either driver name or permit for which detail and verification needs to be done. 
+3. SARATHI API will share details of driving license information which exist in SARATHI 
+system in JSON format. 
+4. ULIP system will verify the response which is received from SARATHI API based on the 
+driver name and permit which is provided by the user. 
+ 
+5. ULIP system will provide the data in JSON Object format in response body. 
+ 
+Example: 
+ 
+Driving license Number MP44 20100005566 , date of birth 1987-06-02, driver name Vikas 
+Tailor and Permit LMV  is shared by ULIP system, then SARATHI-integration will make a 
+request to SARATHI API. 
+ 
+Request: 
+ 
+The request must be of the following format, where driving license number and date of birth is 
+passed within the URL body in JSON format. 
+ 
+For staging -- 
+https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/AUTHAPI/03 
+ 
+{ 
+    "dlnumber": "MP44 20100005566", 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 2.0 Page 6 of 11 
+ 
+    "dob": "1987-06-02", 
+    "driverName":"VIKAS  TAILOR", 
+    "permit":"LMV",”MCWG” 
+} 
+ 
+Curl URL 
+ 
+curl --location --
+request POST 'https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/AUTHAPI/03' \ 
+--header 'Accept: application/json' \ 
+--header 'Content-Type: application/json' \ 
+--
+header 'Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1bGlwIiwiaWF0Ij
+oxNjk1NzA2NjE3LCJhcHBzIjoiZGF0YXB1c2gifQ.iNBggjsp9rdezG4JhkJtK0DnjdBt9G4ts6ub
+mk0YugIrnjnzYSnfP2E0qR0FHvGNxc2KS6o0GB3cwhWzEEOMcQ' \ 
+--header 'Cookie: __zlcmid=1DSlSDwigKpTJa2; _fw_crm_v=b6a11a26-11c3-4b74-
+d0d1-3b9c43a5b7c7' \ 
+--data-raw '{ 
+    "dlnumber": "MP44 20100005566", 
+    "dob": "1987-06-02", 
+    "driverName": "VIKAS  TAILOR", 
+    "permit" : "LMV,MCWG" 
+ 
+}' 
+ 
+For production – 
+ 
+https://www.ulip.dpiit.gov.in/ulip/v1.0.0/AUTHAPI/03 
+ 
+ 
+{ 
+    "dlnumber": "MP44 20100005566", 
+    "dob": "1987-06-02", 
+    "driverName":"VIKAS  TAILOR", 
+    "permit":"LMV",”MCWG” 
+} 
+ 
+Curl URL 
+ 
+curl --location --
+request POST 'https://www.ulip.dpiit.gov.in/ulip/v1.0.0/AUTHAPI/03' \ 
+--header 'Accept: application/json' \ 
+--header 'Content-Type: application/json' \ 
+--
+header 'Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1bGlwIiwiaWF0Ij
+oxNjk1NzA2NjE3LCJhcHBzIjoiZGF0YXB1c2gifQ.iNBggjsp9rdezG4JhkJtK0DnjdBt9G4ts6ub
+mk0YugIrnjnzYSnfP2E0qR0FHvGNxc2KS6o0GB3cwhWzEEOMcQ' \ 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 2.0 Page 7 of 11 
+ 
+--header 'Cookie: __zlcmid=1DSlSDwigKpTJa2; _fw_crm_v=b6a11a26-11c3-4b74-
+d0d1-3b9c43a5b7c7' \ 
+--data-raw '{ 
+    "dlnumber": "MP44 20100005566", 
+    "dob": "1987-06-02", 
+    "driverName": "VIKAS  TAILOR", 
+    "permit" : "LMV,MCWG" 
+ 
+}' 
+ 
+For obtaining authentication token, refer Section 1.4 
+ 
+Response 
+ 
+To acknowledge the above request, ULIP will send the below response -  
+ 
+a) In case of DL does not exist in SARATHI system 
+ 
+{ 
+    "response": [ 
+        { 
+            "response": { 
+                "errorDesc": "No Response From Sarathi API" 
+            }, 
+            "responseStatus": "SUCCESS" 
+        } 
+    ], 
+    "error": "false", 
+    "code": "200", 
+    "message": "Success" 
+} 
+ 
+ 
+ 
+b) In case Driver name verified successfully  
+ 
+ Note: Driver name should be verified by bioFullName field in SARATHI API response. 
+{ 
+    "responseStatus": "SUCCESS", 
+    "response": { 
+        "driverName": "Verified 
+    } 
+} 
+ 
+c) In case Driver name not verified successfully  
+ 
+      Note: Driver name should be verified by bioFullName field in SARATHI API response. 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 2.0 Page 8 of 11 
+ 
+ 
+ 
+{ 
+    "responseStatus": "SUCCESS", 
+    "response": { 
+        "driverName": "Verification failed” 
+    } 
+} 
+ 
+ 
+d) In case permit verified successfully  
+ 
+Note: PERMIT should be verified by covabbrv field in SARATHI API response. 
+ 
+ 
+{ 
+    "responseStatus": "SUCCESS", 
+    "response": { 
+        "permitLmv": "Verified”, 
+   "permitMCWG": "Verified” 
+ 
+    } 
+} 
+ 
+e) In case permit not verified successfully  
+ 
+Note: PERMIT should be verified by covabbrv field in SARATHI API response. 
+ 
+{ 
+    "responseStatus": "SUCCESS", 
+    "response": { 
+        "permitLmv": "Verification Failed”, 
+   "permitMCWG": " Verification Failed” 
+    } 
+} 
+ 
+ 
+Status Code 200: vehicle data response 
+Status Code 400: Bad request (Invalid json syntax, invalid json key) 
+Status Code 401 or 403: Unauthenticated or Unauthorized 
+Status Code 500: Some internal server error occurred 
+Status Code 502: Server is not responding. 
+ 
+ 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 2.0 Page 9 of 11 
+ 
+1.4 Data Transmission & Authentication Mechanism 
+ 
+All data exchange would be done over secure HTTP (HTTPS). Request from ULIP's system would 
+be made in SARATHI system through a data exchange URL that has following form: 
+ 
+For staging – 
+ 
+https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/AUTHAPI/03 
+ 
+Body:  
+ 
+{ 
+    "dlnumber": "GJ04 20120005008", 
+    "dob": "1987-05-26", 
+    "driverName":"VIKAS TAILOR", 
+  
+} 
+ 
+Access to above data exchange URL would be authorized by use of a security mechanism 
+implemented by the ULIP system. It is as follows: 
+ 
+ First time access: It would require a username and password [which would be shared with 
+user beforehand].  Once user hit with valid user id and password, ULIP system will return a 
+basic authorization token to user, using that token user will communicate with ULIP system 
+until token will not get expired. 
+ 
+Brief summary of HTTP Basic Authentication is as follows: 
+ 
+First time when User will hit ULIP secured API through username and password for access token 
+as follow- 
+curl --location --request POST 
+'https://www.ulip.dpiit.gov.in/ulip/v1.0.0/user/login' \ 
+--header 'Accept: application/json' \ 
+--header 'Content-Type: application/json' \ 
+--data-raw '{ 
+    "username": "xx", 
+    "password": "xx" 
+}' 
+ 
+Authorization:   
+Bearer  
+eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZXN0MSIsImlhdCI6MTYzMDU2MTc1NywiYXBwcyI6ImRh
+dGFwdXNoIn0.o6h4916Nwl81GPvjFDUgeEHLnMWhAh_NdW3okMOa6Q2ddw89RWmdDvDx4UYRoUeJ8
+yfPZyNBxhTPoQZ-uUzgTg' 
+ 
+Upon successful authentication, the user would be logged into the ULIP system and get an access 
+token. Though this token user can communicate with ULIP. This token has expiry time which 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 2.0 Page 10 of 11 
+ 
+represent user session. The session time out for the same to be fixed hour, generally it is for 30 
+minutes. If there is no request coming from user for 30 minutes, then session (token) will be 
+expired and user need to re authenticate. 
+ 
+Using The above token, user can request ULIP system for vehicle details as follow - 
+ 
+curl --location --
+request POST 'https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/AUTHAPI/03' \ 
+--header 'Accept: application/json' \ 
+--header 'Content-Type: application/json' \ 
+--
+header 'Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1bGlwIiwiaWF0Ij
+oxNjk1NzA2NjE3LCJhcHBzIjoiZGF0YXB1c2gifQ.iNBggjsp9rdezG4JhkJtK0DnjdBt9G4ts6ub
+mk0YugIrnjnzYSnfP2E0qR0FHvGNxc2KS6o0GB3cwhWzEEOMcQ' \ 
+--header 'Cookie: __zlcmid=1DSlSDwigKpTJa2; _fw_crm_v=b6a11a26-11c3-4b74-
+d0d1-3b9c43a5b7c7' \ 
+--data-raw '{ 
+    "dlnumber": "MP44 20100005566", 
+    "dob": "1987-06-02", 
+    "driverName": "VIKAS TAILOR", 
+    "permit": "LMV,MCWG" 
+ 
+}' 
+ 
+For production – 
+ 
+https://www.ulip.dpiit.gov.in/ulip/v1.0.0/AUTHAPI/03 
+ 
+Body:  
+ 
+{ 
+    "dlnumber": "GJ04 20120005008", 
+    "dob": "1987-05-26", 
+    "driverName":"VIKAS TAILOR", 
+  
+} 
+ 
+Access to above data exchange URL would be authorized by use of a security mechanism 
+implemented by the ULIP system. It is as follows: 
+ 
+ First time access: It would require a username and password [which would be shared with 
+user beforehand].  Once user hit with valid user id and password, ULIP system will return a 
+basic authorization token to user, using that token user will communicate with ULIP system 
+until token will not get expired. 
+ 
+Brief summary of HTTP Basic Authentication is as follows: 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 2.0 Page 11 of 11 
+ 
+ 
+First time when User will hit ULIP secured API through username and password for access token 
+as follow- 
+curl --location --request POST 
+'https://www.ulip.dpiit.gov.in/ulip/v1.0.0/user/login' \ 
+--header 'Accept: application/json' \ 
+--header 'Content-Type: application/json' \ 
+--data-raw '{ 
+    "username": "xx", 
+    "password": "xx" 
+}' 
+ 
+Authorization:   
+Bearer  
+eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZXN0MSIsImlhdCI6MTYzMDU2MTc1NywiYXBwcyI6ImRh
+dGFwdXNoIn0.o6h4916Nwl81GPvjFDUgeEHLnMWhAh_NdW3okMOa6Q2ddw89RWmdDvDx4UYRoUeJ8
+yfPZyNBxhTPoQZ-uUzgTg' 
+ 
+Upon successful authentication, the user would be logged into the ULIP system and get an access 
+token. Though this token user can communicate with ULIP. This token has expiry time which 
+represent user session. The session time out for the same to be fixed hour, generally it is for 30 
+minutes. If there is no request coming from user for 30 minutes, then session (token) will be 
+expired and user need to re authenticate. 
+ 
+Using The above token, user can request ULIP system for vehicle details as follow - 
+ 
+curl --location --
+request POST 'https://www.ulip.dpiit.gov.in/ulip/v1.0.0/AUTHAPI/03' \ 
+--header 'Accept: application/json' \ 
+--header 'Content-Type: application/json' \ 
+--
+header 'Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1bGlwIiwiaWF0Ij
+oxNjk1NzA2NjE3LCJhcHBzIjoiZGF0YXB1c2gifQ.iNBggjsp9rdezG4JhkJtK0DnjdBt9G4ts6ub
+mk0YugIrnjnzYSnfP2E0qR0FHvGNxc2KS6o0GB3cwhWzEEOMcQ' \ 
+--header 'Cookie: __zlcmid=1DSlSDwigKpTJa2; _fw_crm_v=b6a11a26-11c3-4b74-
+d0d1-3b9c43a5b7c7' \ 
+--data-raw '{ 
+    "dlnumber": "MP44 20100005566", 
+    "dob": "1987-06-02", 
+    "driverName": "VIKAS TAILOR", 
+    "permit": "LMV,MCWG" 
+ 
+}' 
+ 
+ 

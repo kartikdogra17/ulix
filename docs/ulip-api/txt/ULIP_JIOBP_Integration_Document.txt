@@ -1,0 +1,2528 @@
+ULIP Integration Document 
+ 
+  
+                        
+  
+ 
+ 
+ 
+ 
+ 
+ 
+ULIP Integration Document 
+ 
+ 
+ 
+ 
+         Version No.: 1.0  
+    Date: 31/08/2026 Project Name: ULIP 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+This document contains proprietary information of NLDSL. Unauthorized access, copying and 
+replication are prohibited.  This document must not be copied in whole or part by any means, 
+without the written authorization of NLDSL, New Delhi, India. 
+Doc Ref. No: ULIP Integration Doc 
+ Version No: 3.0 Page 2 of 53 
+ULIP Integration Document 
+ 
+  
+                        
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+Revision History 
+ 
+Version Date Author Reviewer Significant 
+Changes 
+1.0 31/08/2026 Sudhanshu Singh Nayab Ali Baseline Version 
+Doc Ref. No: ULIP Integration Doc 
+ Version No: 3.0 Page 3 of 53 
+ULIP Integration Document 
+ 
+  
+                        
+ 
+ 
+Table of Contents 
+ 
+Contents 
+Introduction .................................................................................................................. 4 
+1.1 Purpose ................................ ................................ ................................ ............ 4 
+The Overall Description ................................................................................................. 4 
+1.2 Data Integration between JIOBP System and ULIP application ...............................  4 
+1.3 JIOBP/01 ................................ ................................ ................................ ........... 4 
+1.3.1 Technical Approach ................................ ................................ ...........................  7 
+1.4 Data Transmission & Authentication Mechanism ................................ ................ 51 
+ 
+Doc Ref. No: ULIP Integration Doc 
+ Version No: 3.0 Page 4 of 53 
+ULIP Integration Document 
+ 
+  
+                        
+ 
+ 
+Introduction 
+1.1 Purpose 
+ 
+ 
+The purpose of this document is to define and provide details for accessing API for JIOBP 
+system information (information about oil and natural gas stations based on State 
+Code or geographical location (longitude, latitude, and radius) value from ULIP system 
+ 
+This document details the following points: 
+ 
+1. Data Integration between JIOBP and ULIP web service: Identification of 
+operational points where data integration between JIOBP and ULIP web service will 
+be needed. 
+ 
+2. Technical Approach for performing Data Integration 
+ 
+The Overall Description 
+ 
+Users will need to share their State Code, state name or geographical location (longitude, 
+latitude, and radius) to access the list of public petroleum and natural gas stations through 
+the rest API. 
+ 
+Here are some points to keep in mind when accessing JIOBP API data information: 
+ 
+• The API will only share data that is based on the user's provided information. 
+• ULIP will expose an API for getting data from the JIO BP. 
+• The JIOBP/01 API will take State Code, state name or geographical location 
+(longitude, latitude, and radius) to give information about petroleum and natural gas 
+stations to the user. 
+ 
+1.2 Data Integration between JIOBP System and ULIP application 
+The ULIP system will receive information from the user and provide data in return. 
+ 
+1.3 JIOBP/01 
+This API is designed to retrieve information about petroleum and natural gas stations. It 
+can be used by providing either the take State Code, state  name or the geographical 
+Doc Ref. No: ULIP Integration Doc 
+ Version No: 3.0 Page 5 of 53 
+ULIP Integration Document 
+ 
+  
+                        
+ 
+ 
+location (longitude, latitude, and radius) of the desired location. 
+ 
+If you choose to use the State Code to access JIOBP API data, then the geographical 
+location (longitude, latitude, and radius) fields should be left empty , same for vice versa 
+and state name. 
+ 
+Use the state code from the table below to inquire about the JIOBP outlet in the 
+respective state. 
+ 
+Serial 
+no. State Code State Name 
+1 AN Andaman & Nicobar 
+2 AP Andhra Pradesh 
+3 ARP Arunachal Pradesh 
+4 AS Assam 
+5 BH Bihar 
+6 CD Chandigarh 
+7 CSG Chhatisgarh 
+8 DDH 
+UT OF D&NH AND 
+D&D 
+9 DDH 
+UT OF D&NH AND 
+D&D 
+10 DEL Delhi 
+11 GDD Goa 
+12 GJ Gujarat 
+13 HP Himachal Pradesh 
+14 HR Haryana 
+15 JK Jammu & Kashmir 
+16 JRK Jharkhand 
+17 KAR Karnataka 
+18 KER Kerala 
+19 LAK Lakshwadeep 
+20 LDK Ladakh 
+21 MAH Maharashtra 
+22 MGL Meghalaya 
+23 MNP Manipur 
+24 MP Madhya Pradesh 
+25 MZ Mizoram 
+26 NZ Nagaland 
+27 OR Odisha 
+Doc Ref. No: ULIP Integration Doc 
+ Version No: 3.0 Page 6 of 53 
+ULIP Integration Document 
+ 
+  
+                        
+ 
+ 
+{ 
+    "stateCode": "UP", 
+    "stateName": "", 
+    "longitude": "", 
+    "latitude": "", 
+    "radius" :"" 
+} 
+{ 
+    "stateCode": "", 
+    "stateName": "", 
+    "longitude": "82.23763889", 
+    "latitude": "25.34961111", 
+    "radius" :"10" 
+} 
+ 
+ 
+ 
+ 
+If you choose to use the geographical location to access JIOBP API data, then State code and 
+state name field should be left empty. 
+ 
+ 
+ 
+ Field Name Field 
+Description 
+Format Required/Not 
+– Required 
+Length 
+1 stateCode 
+ State Code ^[A-Z]{1,3}$" 
+ 
+Required 1-3 
+2 stateName State Name ^[A-Za-z &]{1,40}$ Required 1-40 
+3 longitude Longitude ^-?(180(\.0+)?|([0-
+9]|[1-9][0-9]|1[0-7][0-
+9])(\.[0-9]+)?)$ 
+Required 0-18 
+28 PB Punjab 
+29 PY Pondicherry 
+30 RJ Rajasthan 
+31 SK Sikkim 
+32 TG Telangana 
+33 TN Tamil Nadu 
+34 TRP Tripura 
+35 UP Uttar Pradesh 
+36 UTK Uttarakhand 
+37 WB West Bengal 
+Doc Ref. No: ULIP Integration Doc 
+ Version No: 3.0 Page 7 of 53 
+ULIP Integration Document 
+ 
+  
+                        
+ 
+ 
+{ 
+    "stateCode": "WB", 
+    "stateName": "", 
+    "longitude": "", 
+    "latitude": "", 
+    "radius": "" 
+} 
+ 
+curl --location 'https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/JIOBP/01' \ 
+--header 'Authorization: Bearer 
+eyJhbGciOiJIUzUxMiJ9.eyJhcHBzIjoiYXBpR2F0ZXdheSIsInN1YiI6InVsaXAiLCJpYXQiOjE
+3ODgxNTMxNjJ9.fyQzPIbSl2CCZmYYDvbNZljlrNMIpZWeMn2Kn1P6pmpW70x1orQCHi3ld
+0CKKS5loCKcg15TjgRMQvaZeev54g' \ 
+--header 'Content-Type: application/json' \ 
+--header 'Accept: application/json' \ 
+--data '{ 
+    "stateCode": "WB", 
+    "stateName": "", 
+    "longitude": "", 
+    "latitude": "", 
+    "radius" :"" 
+}' 
+4 latitude Latitude ^-?(90(\.0+)?|([0-
+8]?[0-9])(\.[0-9]+)?)$ Required 0-18 
+5 radius Radius ^\d{0,3}(\.\d{1,10})?$ Required 1-10 
+ 
+1.3.1 Technical Approach 
+1. All the data will be shared through REST web services. 
+2. The user will share the input for which information is required. 
+3. JIOBP API will share details of JIOBP fuel station information that exists in the 
+system in JSON format. 
+4. The ULIP system will provide data in JSON Object format in the response body. 
+ 
+Request: The request must be of the following format, where State Code, State Name  or 
+geographical location (longitude, latitude, and radius) are passed within the URL post request 
+body in JSON format. 
+ 
+For staging - https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/JIOBP/01 
+ 
+ 
+Curl URL 
+Doc Ref. No: ULIP Integration Doc 
+ Version No: 3.0 Page 8 of 53 
+ULIP Integration Document 
+ 
+  
+                        
+ 
+ 
+curl --location 'https://www.ulip.dpiit.gov.in/ulip/v1.0.0/JIOBP/01' \ 
+--header 'Authorization: Bearer 
+eyJhbGciOiJIUzUxMiJ9.eyJhcHBzIjoiYXBpR2F0ZXdheSIsInN1YiI6InVsaXAiLCJpYXQiOjE
+3ODgxNDkwOTV9.wVNiQu9CHc3yaJkqwXAQVhBWmsj5e3nsNAJsjy0XkqjeyAC9v0QgQv7
+tLkCKe1VGnjaLkPD7vGSzq6cY1uJcaA' \ 
+--header 'Accept: application/json' \ 
+--header 'Content-Type: application/json' \ 
+--data '{ 
+    "stateCode": "WB", 
+    "stateName": "", 
+    "longitude": "", 
+    "latitude": "", 
+    "radius" :""} 
+ 
+ 
+}' 
+ 
+{ 
+    "response": null, 
+    "error": "true", 
+    "code": "400 BAD_REQUEST", 
+    "message": "Data format failed OR wrong value entered at:  stateCode. Format should 
+follow  ^[A-Z]{1,3}$" 
+} 
+ 
+For production - https://www.ulip.dpiit.gov.in/ulip/v1.0.0/JIOBP/01 
+ 
+ 
+ 
+ 
+Curl URL 
+ 
+ 
+For obtaining an authentication token, refer to Section 1.4 
+ 
+Response 
+ 
+To acknowledge the above request, ULIP will send the following response - 
+ 
+In case of an invalid format 
+1. Invalid state code 
+{ 
+    "stateCode": "WB", 
+    "stateName": "", 
+    "longitude": "", 
+    "latitude": "", 
+    "radius": "" 
+} 
+ 
+Doc Ref. No: ULIP Integration Doc 
+ Version No: 3.0 Page 9 of 53 
+ULIP Integration Document 
+ 
+  
+                        
+ 
+ 
+{ 
+    "response": null, 
+    "error": "true", 
+    "code": "400 BAD_REQUEST", 
+    "message": "Data format failed OR wrong value entered at:  longitude. Format should 
+follow  ^-?(180(\\.0+)?|([0-9]|[1-9][0-9]|1[0-7][0-9])(\\.[0-9]+)?)$" 
+} 
+ 
+ 
+2. Invalid latitude or longitude format 
+ 
+ 
+3. Invalid StateName format 
+ 
+ 
+ 
+4. In case JIOBP API data exists 
+{ 
+    "response": [ 
+        { 
+            "response": [ 
+                { 
+                    "retailOutletCode": "WBF009", 
+                    "roId": 6631, 
+                    "roName": "BELDA KOLKATA", 
+                    "roStatus": "Y", 
+                    "address": "Mouza - Yadavchowk, J L No - 318, , Vill - Jadavchak, PO - Lalnagar 
+Belda, Dist - Paschim Midnapore, Pin - 721424SCHIM MIDNAPORE., BELDA", 
+                    "longitude": 87.35532017, 
+                    "latitude": 22.06196145, 
+                    "territory": null, 
+                    "region": "East", 
+                    "stateOffice": "WB", 
+                    "salesArea": null, 
+                    "salesDistrictCode": null, 
+{ 
+    "response": null, 
+    "error": "true", 
+    "code": "400 BAD_REQUEST", 
+    "message": "Data format failed OR wrong value entered at:  stateName. Format should 
+follow  ^[A-Za-z &]{1,40}$" 
+} 
+Doc Ref. No: ULIP Integration Doc 
+ Version No: 3.0 Page 10 of 53 
+ULIP Integration Document 
+ 
+  
+                        
+ 
+ 
+                    "city": "BELDA", 
+                    "postalCode": 721424, 
+                    "stateName": "West Bengal", 
+                    "msFlag": "Y", 
+                    "hsdFlag": "Y", 
+                    "cngFlag": "N", 
+                    "cbgFlag": "N" 
+                }, 
+                { 
+                    "retailOutletCode": "WBF088", 
+                    "roId": 6541, 
+                    "roName": "MADARIHAT SILIGURI", 
+                    "roStatus": "Y", 
+                    "address": "MOUZA NORTH MADARIHAT, PLOT NO 1105", 
+                    "longitude": 89.284085, 
+                    "latitude": 26.703615, 
+                    "territory": null, 
+                    "region": "East", 
+                    "stateOffice": "WB", 
+                    "salesArea": null, 
+                    "salesDistrictCode": null, 
+                    "city": "SILIGURI", 
+                    "postalCode": 735220, 
+                    "stateName": "West Bengal", 
+                    "msFlag": "Y", 
+                    "hsdFlag": "Y", 
+                    "cngFlag": "N", 
+                    "cbgFlag": "N" 
+                }, 
+                { 
+                    "retailOutletCode": "WBF055", 
+                    "roId": 6140, 
+                    "roName": "HARWOODPOINT", 
+                    "roStatus": "Y", 
+                    "address": "Mouza: Kalinagar,  JL 10, Lot 8, P.O. - Kalinagar, PS:Kakdwip, NH-117, 
+Land Mark Lot 8 Ferry Ghat for Ganga Sagar, 24 Parganas (S), West Bengal 743347", 
+                    "longitude": 88.16677194, 
+                    "latitude": 21.8853286, 
+                    "territory": null, 
+                    "region": "East", 
+                    "stateOffice": "WB", 
+Doc Ref. No: ULIP Integration Doc 
+ Version No: 3.0 Page 11 of 53 
+ULIP Integration Document 
+ 
+  
+                        
+ 
+ 
+                    "salesArea": null, 
+                    "salesDistrictCode": null, 
+                    "city": "HARWOODPOINT", 
+                    "postalCode": 743347, 
+                    "stateName": "West Bengal", 
+                    "msFlag": "N", 
+                    "hsdFlag": "Y", 
+                    "cngFlag": "N", 
+                    "cbgFlag": "N" 
+                }, 
+                { 
+                    "retailOutletCode": "WBF020", 
+                    "roId": 6772, 
+                    "roName": "AMTALA - I KOLKATA", 
+                    "roStatus": "Y", 
+                    "address": "PLOT NO. 413, JL. NO. 29, MOUZA:KHARIBERIA,P.S BISHNUPUR, 
+DIST.:SOUTH24PARGANAS,W BENGAL, AMTALA", 
+                    "longitude": 88.27690277, 
+                    "latitude": 22.39838551, 
+                    "territory": null, 
+                    "region": "East", 
+                    "stateOffice": "WB", 
+                    "salesArea": null, 
+                    "salesDistrictCode": null, 
+                    "city": "KOLKATA", 
+                    "postalCode": 743503, 
+                    "stateName": "West Bengal", 
+                    "msFlag": "Y", 
+                    "hsdFlag": "Y", 
+                    "cngFlag": "N", 
+                    "cbgFlag": "N" 
+                }, 
+                { 
+                    "retailOutletCode": "WBF046", 
+                    "roId": 6737, 
+                    "roName": "KHARAGPUR KOLKATA", 
+                    "roStatus": "Y", 
+                    "address": "P.O. - Inda,P.S. - Kharagpore,Dist. - West Midnapore, West Bengal, pin - 
+721301", 
+                    "longitude": 87.3380963, 
+                    "latitude": 22.3595735, 
+Doc Ref. No: ULIP Integration Doc 
+ Version No: 3.0 Page 12 of 53 
+ULIP Integration Document 
+ 
+  
+                        
+ 
+ 
+                    "territory": null, 
+                    "region": "East", 
+                    "stateOffice": "WB", 
+                    "salesArea": null, 
+                    "salesDistrictCode": null, 
+                    "city": "KHARAGPUR", 
+                    "postalCode": 721301, 
+                    "stateName": "West Bengal", 
+                    "msFlag": "Y", 
+                    "hsdFlag": "Y", 
+                    "cngFlag": "N", 
+                    "cbgFlag": "N" 
+                }, 
+                { 
+                    "retailOutletCode": "WBF083", 
+                    "roId": 6685, 
+                    "roName": "KATWA DURGAPUR", 
+                    "roStatus": "Y", 
+                    "address": "DAG.196(P),197(P) JL.NO.10, KHANERHAT, KOSHIGRAM, 
+POKOSHIGRAM,P.SKATWA,DIST-BURDWAN, KATWA", 
+                    "longitude": 88.08998, 
+                    "latitude": 23.63245, 
+                    "territory": null, 
+                    "region": "East", 
+                    "stateOffice": "WB", 
+                    "salesArea": null, 
+                    "salesDistrictCode": null, 
+                    "city": "DURGAPUR", 
+                    "postalCode": 713150, 
+                    "stateName": "West Bengal", 
+                    "msFlag": "Y", 
+                    "hsdFlag": "Y", 
+                    "cngFlag": "N", 
+                    "cbgFlag": "N" 
+                }, 
+                { 
+                    "retailOutletCode": "WBF087", 
+                    "roId": 6353, 
+                    "roName": "PICHABONI KOLKATA", 
+                    "roStatus": "Y", 
+Doc Ref. No: ULIP Integration Doc 
+ Version No: 3.0 Page 13 of 53 
+ULIP Integration Document 
+ 
+  
+                        
+ 
+ 
+                    "address": "Mouza: Badalpur, Vill. - Badalpur, PO: Pichaboni,PS: Contai, Dist: East  
+Mednipur, West Bengal - 721455,", 
+                    "longitude": 87.67566, 
+                    "latitude": 21.73012, 
+                    "territory": null, 
+                    "region": "East", 
+                    "stateOffice": "WB", 
+                    "salesArea": null, 
+                    "salesDistrictCode": null, 
+                    "city": "PICHABONI", 
+                    "postalCode": 721433, 
+                    "stateName": "West Bengal", 
+                    "msFlag": "Y", 
+                    "hsdFlag": "Y", 
+                    "cngFlag": "N", 
+                    "cbgFlag": "N" 
+                }, 
+                { 
+                    "retailOutletCode": "WBF033", 
+                    "roId": 6404, 
+                    "roName": "KULTI DURGAPUR", 
+                    "roStatus": "Y", 
+                    "address": "KHATIAN 273382,433/1,143/149, JL.NO.22,TOUZI NO.19,PUNURI, PS.-
+KULTI PUNURI,BURDWAN, KULTI", 
+                    "longitude": 86.859451, 
+                    "latitude": 23.724064, 
+                    "territory": null, 
+                    "region": "East", 
+                    "stateOffice": "WB", 
+                    "salesArea": null, 
+                    "salesDistrictCode": null, 
+                    "city": "KULTI", 
+                    "postalCode": 713359, 
+                    "stateName": "West Bengal", 
+                    "msFlag": "Y", 
+                    "hsdFlag": "Y", 
+                    "cngFlag": "N", 
+                    "cbgFlag": "N" 
+                }, 
+                { 
+                    "retailOutletCode": "WBF025", 
+Doc Ref. No: ULIP Integration Doc 
+ Version No: 3.0 Page 14 of 53 
+ULIP Integration Document 
+ 
+  
+                        
+ 
+ 
+                    "roId": 6284, 
+                    "roName": "GHATAKPUKUR", 
+                    "roStatus": "Y", 
+                    "address": "Village Ghatakpukur, PO B Govindapur Dist:  South  24 Paraganas, West 
+Bengal, Pin - 743502.", 
+                    "longitude": 88.610515, 
+                    "latitude": 22.501308, 
+                    "territory": null, 
+                    "region": "East", 
+                    "stateOffice": "WB", 
+                    "salesArea": null, 
+                    "salesDistrictCode": null, 
+                    "city": "GHATAKPUKUR", 
+                    "postalCode": 743502, 
+                    "stateName": "West Bengal", 
+                    "msFlag": "Y", 
+                    "hsdFlag": "Y", 
+                    "cngFlag": "N", 
+                    "cbgFlag": "N" 
+                }, 
+                { 
+                    "retailOutletCode": "WBF060", 
+                    "roId": 6413, 
+                    "roName": "KONNAGAR KOLKATA", 
+                    "roStatus": "Y", 
+                    "address": "Mouza: Rishra, 100/13 GT Road, Baghkal, Rishra, Hooghly, West Bengal 
+- 712248", 
+                    "longitude": 88.35479, 
+                    "latitude": 22.71574, 
+                    "territory": null, 
+                    "region": "East", 
+                    "stateOffice": "WB", 
+                    "salesArea": null, 
+                    "salesDistrictCode": null, 
+                    "city": "KONNAGAR", 
+                    "postalCode": 712248, 
+                    "stateName": "West Bengal", 
+                    "msFlag": "Y", 
+                    "hsdFlag": "Y", 
+                    "cngFlag": "N", 
+                    "cbgFlag": "N" 
+Doc Ref. No: ULIP Integration Doc 
+ Version No: 3.0 Page 15 of 53 
+ULIP Integration Document 
+ 
+  
+                        
+ 
+ 
+                }, 
+                { 
+                    "retailOutletCode": "WBF010", 
+                    "roId": 6576, 
+                    "roName": "DHULIAN DURGAPUR", 
+                    "roStatus": "Y", 
+                    "address": "P.S: Shamsherganj, Murshidabad, Mouza: Malancha, J.L No: 366 Vill - 
+Tarapur, PS - Samsherganj,", 
+                    "longitude": 87.93130221, 
+                    "latitude": 24.67102137, 
+                    "territory": null, 
+                    "region": "East", 
+                    "stateOffice": "WB", 
+                    "salesArea": null, 
+                    "salesDistrictCode": null, 
+                    "city": "DURGAPUR", 
+                    "postalCode": 742202, 
+                    "stateName": "West Bengal", 
+                    "msFlag": "Y", 
+                    "hsdFlag": "Y", 
+                    "cngFlag": "N", 
+                    "cbgFlag": "N" 
+                }, 
+                { 
+                    "retailOutletCode": "WBF061", 
+                    "roId": 6467, 
+                    "roName": "HURA DURGAPUR", 
+                    "roStatus": "Y", 
+                    "address": "Mouza-Lodhurka, P.O.-Lodhurka, Village-Lodhurka, PS. - Hura, Dist. - 
+Purulia, West Bengal - 723148", 
+                    "longitude": 86.52112, 
+                    "latitude": 23.35201, 
+                    "territory": null, 
+                    "region": "East", 
+                    "stateOffice": "WB", 
+                    "salesArea": null, 
+                    "salesDistrictCode": null, 
+                    "city": "HURA", 
+                    "postalCode": 723148, 
+                    "stateName": "West Bengal", 
+                    "msFlag": "Y", 
+Doc Ref. No: ULIP Integration Doc 
+ Version No: 3.0 Page 16 of 53 
+ULIP Integration Document 
+ 
+  
+                        
+ 
+ 
+                    "hsdFlag": "Y", 
+                    "cngFlag": "N", 
+                    "cbgFlag": "N" 
+                }, 
+                { 
+                    "retailOutletCode": "WBF019", 
+                    "roId": 6129, 
+                    "roName": "CK RD", 
+                    "roStatus": "Y", 
+                    "address": "SAKHISOLE,NEAR MONDALKUPI,, P.O:SALBONI, PASCHIM 
+MIDNAPORE-721101, CHANDRAKONA ROAD", 
+                    "longitude": 87.3316683, 
+                    "latitude": 22.66777, 
+                    "territory": null, 
+                    "region": "East", 
+                    "stateOffice": "WB", 
+                    "salesArea": null, 
+                    "salesDistrictCode": null, 
+                    "city": "SALBONI", 
+                    "postalCode": 721147, 
+                    "stateName": "West Bengal", 
+                    "msFlag": "Y", 
+                    "hsdFlag": "Y", 
+                    "cngFlag": "N", 
+                    "cbgFlag": "N" 
+                }, 
+                { 
+                    "retailOutletCode": "WBF015", 
+                    "roId": 6577, 
+                    "roName": "BANKURA DURGAPUR", 
+                    "roStatus": "Y", 
+                    "address": "Mouza: Shakarhati, J.L No: 203, Vill. - Shankarhati, P.O.- Shankarhati, 
+P.S.-Bankura, Dist - Bankura, West Bengal-722101", 
+                    "longitude": 87.08172, 
+                    "latitude": 23.21617, 
+                    "territory": null, 
+                    "region": "East", 
+                    "stateOffice": "WB", 
+                    "salesArea": null, 
+                    "salesDistrictCode": null, 
+                    "city": "DURGAPUR", 
+Doc Ref. No: ULIP Integration Doc 
+ Version No: 3.0 Page 17 of 53 
+ULIP Integration Document 
+ 
+  
+                        
+ 
+ 
+                    "postalCode": 722101, 
+                    "stateName": "West Bengal", 
+                    "msFlag": "Y", 
+                    "hsdFlag": "Y", 
+                    "cngFlag": "N", 
+                    "cbgFlag": "N" 
+                }, 
+                { 
+                    "retailOutletCode": "WBF059", 
+                    "roId": 6738, 
+                    "roName": "KALYANI EXPRESSWAY KOLKATA", 
+                    "roStatus": "Y", 
+                    "address": "J.L No: 17, Dag No: 1313 and 1310, Mouza: Bidyadharpur, Barackpore 
+Kalyani Expressway, Ucchagarh, Bidyadharpur, PS - Jagatdal, 24 Paraganas(North) - 743127", 
+                    "longitude": 88.405812, 
+                    "latitude": 22.825972, 
+                    "territory": null, 
+                    "region": "East", 
+                    "stateOffice": "WB", 
+                    "salesArea": null, 
+                    "salesDistrictCode": null, 
+                    "city": "JAGATDAL", 
+                    "postalCode": 743127, 
+                    "stateName": "West Bengal", 
+                    "msFlag": "Y", 
+                    "hsdFlag": "Y", 
+                    "cngFlag": "N", 
+                    "cbgFlag": "N" 
+                }, 
+                { 
+                    "retailOutletCode": "WBF067", 
+                    "roId": 6583, 
+                    "roName": "MALBAZAR SILIGURI", 
+                    "roStatus": "Y", 
+                    "address": "Village: Malbazar, P.O: Chalsa, P.S: Matelli Rly Station, Chalsa, Land 
+Mark: SSB Camp, Dist: Jalpaiguri, West Bengal- 735206", 
+                    "longitude": 88.77534, 
+                    "latitude": 26.87926, 
+                    "territory": null, 
+                    "region": "East", 
+                    "stateOffice": "WB", 
+Doc Ref. No: ULIP Integration Doc 
+ Version No: 3.0 Page 18 of 53 
+ULIP Integration Document 
+ 
+  
+                        
+ 
+ 
+                    "salesArea": null, 
+                    "salesDistrictCode": null, 
+                    "city": "SILIGURI", 
+                    "postalCode": 735206, 
+                    "stateName": "West Bengal", 
+                    "msFlag": "Y", 
+                    "hsdFlag": "Y", 
+                    "cngFlag": "N", 
+                    "cbgFlag": "N" 
+                }, 
+                { 
+                    "retailOutletCode": "WBT004", 
+                    "roId": 1176, 
+                    "roName": "BARASAT TS", 
+                    "roStatus": "Y", 
+                    "address": "NH-34,Mouza and Vill:Narapatipara, Khatian No. 1301, J.L. No. 
+103,Gram Panchayat - Simurali,P.O. - Narapatipara,P.S. - Chakda,District - Nadia,West 
+Bengal- 741248", 
+                    "longitude": 88.53210456, 
+                    "latitude": 23.01488086, 
+                    "territory": null, 
+                    "region": "East", 
+                    "stateOffice": "WB", 
+                    "salesArea": null, 
+                    "salesDistrictCode": null, 
+                    "city": "BARASAT", 
+                    "postalCode": 741248, 
+                    "stateName": "West Bengal", 
+                    "msFlag": "Y", 
+                    "hsdFlag": "Y", 
+                    "cngFlag": "N", 
+                    "cbgFlag": "N" 
+                }, 
+                { 
+                    "retailOutletCode": "WBF054", 
+                    "roId": 1714, 
+                    "roName": "Namkhana", 
+                    "roStatus": "Y", 
+                    "address": "R.S Dag No: 244(P), 245(P) and LR Dag No: 327(P), 328(P), J.L No: 47, 
+Mouza: Narayanpur, P.O and VILL:Narayanpur, Near Namkhana power house and Namkhana 
+railway station , P.S: Kakdwip, District: South 24 Parganas, Pin Code: 743357.", 
+Doc Ref. No: ULIP Integration Doc 
+ Version No: 3.0 Page 19 of 53 
+ULIP Integration Document 
+ 
+  
+                        
+ 
+ 
+                    "longitude": 88.236336, 
+                    "latitude": 21.770185, 
+                    "territory": null, 
+                    "region": "East", 
+                    "stateOffice": "WB", 
+                    "salesArea": null, 
+                    "salesDistrictCode": null, 
+                    "city": "P.S. Kakdwip", 
+                    "postalCode": 743357, 
+                    "stateName": "West Bengal", 
+                    "msFlag": "Y", 
+                    "hsdFlag": "Y", 
+                    "cngFlag": "N", 
+                    "cbgFlag": "N" 
+                }, 
+                { 
+                    "retailOutletCode": "WBF037", 
+                    "roId": 1618, 
+                    "roName": "RAMPURHAT", 
+                    "roStatus": "Y", 
+                    "address": "KHATIAN NO 300, 59, 540, TOUZI 72, MOUZA BARSHAL, DISTRICT: 
+BIRBHUM nh-60", 
+                    "longitude": 87.77271, 
+                    "latitude": 24.14978, 
+                    "territory": null, 
+                    "region": "East", 
+                    "stateOffice": "WB", 
+                    "salesArea": null, 
+                    "salesDistrictCode": null, 
+                    "city": "RAMPURHAT", 
+                    "postalCode": 731233, 
+                    "stateName": "West Bengal", 
+                    "msFlag": "Y", 
+                    "hsdFlag": "Y", 
+                    "cngFlag": "N", 
+                    "cbgFlag": "N" 
+                }, 
+                { 
+                    "retailOutletCode": "WBF006", 
+                    "roId": 1648, 
+                    "roName": "BERHAMPUR P2", 
+Doc Ref. No: ULIP Integration Doc 
+ Version No: 3.0 Page 20 of 53 
+ULIP Integration Document 
+ 
+  
+                        
+ 
+ 
+                    "roStatus": "Y", 
+                    "address": "DAG NO RS-49/179, JL NO 64, TOUZI 16, MANKARA, BERHAMPORE, 
+SARGACHI, MURSHIDABAD", 
+                    "longitude": 88.24752769, 
+                    "latitude": 24.02698013, 
+                    "territory": null, 
+                    "region": "East", 
+                    "stateOffice": "WB", 
+                    "salesArea": null, 
+                    "salesDistrictCode": null, 
+                    "city": "BERHAMPUR", 
+                    "postalCode": 742408, 
+                    "stateName": "West Bengal", 
+                    "msFlag": "Y", 
+                    "hsdFlag": "Y", 
+                    "cngFlag": "N", 
+                    "cbgFlag": "N" 
+                }, 
+                { 
+                    "retailOutletCode": "WBT009", 
+                    "roId": 1180, 
+                    "roName": "BEHRAMPORE TS", 
+                    "roStatus": "Y", 
+                    "address": "KHATIAN NO 390, MAUZA MATH BINKAR, PS BERHAMPUR TOWN, 
+DISTRICT: MURSHIDABAD", 
+                    "longitude": 88.04148333, 
+                    "latitude": 24.38386111, 
+                    "territory": null, 
+                    "region": "East", 
+                    "stateOffice": "WB", 
+                    "salesArea": null, 
+                    "salesDistrictCode": null, 
+                    "city": "BEHRAMPUR", 
+                    "postalCode": 742235, 
+                    "stateName": "West Bengal", 
+                    "msFlag": "Y", 
+                    "hsdFlag": "Y", 
+                    "cngFlag": "N", 
+                    "cbgFlag": "N" 
+                }, 
+                { 
+Doc Ref. No: ULIP Integration Doc 
+ Version No: 3.0 Page 21 of 53 
+ULIP Integration Document 
+ 
+  
+                        
+ 
+ 
+                    "retailOutletCode": "WBF044", 
+                    "roId": 7125, 
+                    "roName": "Digha", 
+                    "roStatus": "Y", 
+                    "address": "PLOT NO 158, 159, KHATIAN 418, DIGHA KANTHI HIGHWAY, VILLAGE 
+GHERSHAI, BLOCK PADIMAII, POST ALLANKARPUR, DIGHA, DISTRICT: EAST MIDNAPORE", 
+                    "longitude": 87.527161, 
+                    "latitude": 21.639039, 
+                    "territory": null, 
+                    "region": "East", 
+                    "stateOffice": "WB", 
+                    "salesArea": null, 
+                    "salesDistrictCode": null, 
+                    "city": "AST MIDNAPORE", 
+                    "postalCode": 721441, 
+                    "stateName": "West Bengal", 
+                    "msFlag": "Y", 
+                    "hsdFlag": "Y", 
+                    "cngFlag": "N", 
+                    "cbgFlag": "N" 
+                }, 
+                { 
+                    "retailOutletCode": "WBF035", 
+                    "roId": 1209, 
+                    "roName": "NALHATI FF", 
+                    "roStatus": "Y", 
+                    "address": "VILLAGE GOPALPUR ward no-1, POST OFFICE NALHATI, DISTRICT: 
+BIRBHUM NH-60", 
+                    "longitude": 87.855693, 
+                    "latitude": 24.295279, 
+                    "territory": null, 
+                    "region": "East", 
+                    "stateOffice": "WB", 
+                    "salesArea": null, 
+                    "salesDistrictCode": null, 
+                    "city": "NALHATI", 
+                    "postalCode": 731220, 
+                    "stateName": "West Bengal", 
+                    "msFlag": "Y", 
+                    "hsdFlag": "Y", 
+                    "cngFlag": "N", 
+Doc Ref. No: ULIP Integration Doc 
+ Version No: 3.0 Page 22 of 53 
+ULIP Integration Document 
+ 
+  
+                        
+ 
+ 
+                    "cbgFlag": "N" 
+                }, 
+                { 
+                    "retailOutletCode": "WBF004", 
+                    "roId": 1386, 
+                    "roName": "MIDNAPORE FF", 
+                    "roStatus": "Y", 
+                    "address": "DAG NO 1310, 1311, RS JL NO 205, PS KHARAGPUR, MOUZA and 
+VILLAGE SATKUI, DISTRICT: MIDNAPORE (WEST)", 
+                    "longitude": 87.342246, 
+                    "latitude": 22.382153, 
+                    "territory": null, 
+                    "region": "East", 
+                    "stateOffice": "WB", 
+                    "salesArea": null, 
+                    "salesDistrictCode": null, 
+                    "city": "KHARAGPUR", 
+                    "postalCode": 721305, 
+                    "stateName": "West Bengal", 
+                    "msFlag": "Y", 
+                    "hsdFlag": "Y", 
+                    "cngFlag": "N", 
+                    "cbgFlag": "N" 
+                }, 
+                { 
+                    "retailOutletCode": "WBF027", 
+                    "roId": 6584, 
+                    "roName": "ARAMBAG KOLKATA", 
+                    "roStatus": "Y", 
+                    "address": "Mouza: Parul, Vill. - Parul, P.O. - Arambagh,P.S. - Arambagh,Dist - 
+Hooghly,West Bengal, Pin - 712601", 
+                    "longitude": 87.804198, 
+                    "latitude": 22.872229, 
+                    "territory": null, 
+                    "region": "East", 
+                    "stateOffice": "WB", 
+                    "salesArea": null, 
+                    "salesDistrictCode": null, 
+                    "city": "KOLKATA", 
+                    "postalCode": 712601, 
+                    "stateName": "West Bengal", 
+Doc Ref. No: ULIP Integration Doc 
+ Version No: 3.0 Page 23 of 53 
+ULIP Integration Document 
+ 
+  
+                        
+ 
+ 
+                    "msFlag": "Y", 
+                    "hsdFlag": "Y", 
+                    "cngFlag": "N", 
+                    "cbgFlag": "N" 
+                }, 
+                { 
+                    "retailOutletCode": "WBF047", 
+                    "roId": 6297, 
+                    "roName": "BASIRHAT", 
+                    "roStatus": "Y", 
+                    "address": "Dag No: 3236, 3237 and 3238, Khatian No: 1646, J.L.No: 38, Within 
+Raghunathpu, Vill. - Raghunathpur, P.O. -  Raghunathpur, P.S.  Basirhat, Dist. - 24 
+Parganas(North), WB, Pin 743428", 
+                    "longitude": 88.831552, 
+                    "latitude": 22.681, 
+                    "territory": null, 
+                    "region": "East", 
+                    "stateOffice": "WB", 
+                    "salesArea": null, 
+                    "salesDistrictCode": null, 
+                    "city": "BASIRHAT", 
+                    "postalCode": 743412, 
+                    "stateName": "West Bengal", 
+                    "msFlag": "Y", 
+                    "hsdFlag": "Y", 
+                    "cngFlag": "N", 
+                    "cbgFlag": "N" 
+                }, 
+                { 
+                    "retailOutletCode": "WBT002", 
+                    "roId": 1577, 
+                    "roName": "HOWRAH TS", 
+                    "roStatus": "Y", 
+                    "address": "POST MAHISREKHA, VILLAGE PALORA, PS RAJAPUR, NH-6", 
+                    "longitude": 88.0296323, 
+                    "latitude": 22.47676422, 
+                    "territory": null, 
+                    "region": "East", 
+                    "stateOffice": "WB", 
+                    "salesArea": null, 
+                    "salesDistrictCode": null, 
+Doc Ref. No: ULIP Integration Doc 
+ Version No: 3.0 Page 24 of 53 
+ULIP Integration Document 
+ 
+  
+                        
+ 
+ 
+                    "city": "ULUBERIA", 
+                    "postalCode": 711306, 
+                    "stateName": "West Bengal", 
+                    "msFlag": "Y", 
+                    "hsdFlag": "Y", 
+                    "cngFlag": "N", 
+                    "cbgFlag": "N" 
+                }, 
+                { 
+                    "retailOutletCode": "WBF021", 
+                    "roId": 1366, 
+                    "roName": "AMTALA FF", 
+                    "roStatus": "Y", 
+                    "address": "DAG NO 648, 649, 651, JL NO 2, SH-1, VILLAGE RAJARHAT, MOUZA 
+AYODHYANAGAR, PS USTI, DISTRICT: 24 PARGANA (S)", 
+                    "longitude": 88.268093, 
+                    "latitude": 22.324307, 
+                    "territory": null, 
+                    "region": "East", 
+                    "stateOffice": "WB", 
+                    "salesArea": null, 
+                    "salesDistrictCode": null, 
+                    "city": "KOLKATA", 
+                    "postalCode": 743513, 
+                    "stateName": "West Bengal", 
+                    "msFlag": "Y", 
+                    "hsdFlag": "Y", 
+                    "cngFlag": "N", 
+                    "cbgFlag": "N" 
+                }, 
+                { 
+                    "retailOutletCode": "WBF007", 
+                    "roId": 1024, 
+                    "roName": "RANAGHAT NADIA FF", 
+                    "roStatus": "Y", 
+                    "address": "NH-34, VILLAGE PATULI, PS  RANAGHAT, POST OFFICE BEGOPARA, 
+DISTRICT: NADIA", 
+                    "longitude": 88.56554286, 
+                    "latitude": 23.1345214, 
+                    "territory": null, 
+                    "region": "East", 
+Doc Ref. No: ULIP Integration Doc 
+ Version No: 3.0 Page 25 of 53 
+ULIP Integration Document 
+ 
+  
+                        
+ 
+ 
+                    "stateOffice": "WB", 
+                    "salesArea": null, 
+                    "salesDistrictCode": null, 
+                    "city": "RANAGHAT", 
+                    "postalCode": 741256, 
+                    "stateName": "West Bengal", 
+                    "msFlag": "Y", 
+                    "hsdFlag": "Y", 
+                    "cngFlag": "N", 
+                    "cbgFlag": "N" 
+                }, 
+                { 
+                    "retailOutletCode": "WBF076", 
+                    "roId": 1627, 
+                    "roName": "ALIPURDUAR SILIGURI", 
+                    "roStatus": "Y", 
+                    "address": "ALIPUR, DUAR-SONAPUR ROAD, MOUZA-BIRPARA, JL NO 45, DISTRICT: 
+JALPAIGURI", 
+                    "longitude": 89.5016, 
+                    "latitude": 26.48853, 
+                    "territory": null, 
+                    "region": "East", 
+                    "stateOffice": "WB", 
+                    "salesArea": null, 
+                    "salesDistrictCode": null, 
+                    "city": "ALIPURDUAR", 
+                    "postalCode": 736121, 
+                    "stateName": "West Bengal", 
+                    "msFlag": "Y", 
+                    "hsdFlag": "Y", 
+                    "cngFlag": "N", 
+                    "cbgFlag": "N" 
+                }, 
+                { 
+                    "retailOutletCode": "WBF003", 
+                    "roId": 1177, 
+                    "roName": "DALKHOLA FF", 
+                    "roStatus": "Y", 
+                    "address": "POST OFFICE KARANDIGHI, PS KARANDIGHI, VILLAGE PICHHLA, SUB 
+DIVISION ISLAMGRAM, DISTRICT: UTTAR DINAJPUR, PANCHAYAT - KARANDIGHI", 
+                    "longitude": 87.92463486, 
+Doc Ref. No: ULIP Integration Doc 
+ Version No: 3.0 Page 26 of 53 
+ULIP Integration Document 
+ 
+  
+                        
+ 
+ 
+                    "latitude": 25.8313786, 
+                    "territory": null, 
+                    "region": "East", 
+                    "stateOffice": "WB", 
+                    "salesArea": null, 
+                    "salesDistrictCode": null, 
+                    "city": "DALKHOLA", 
+                    "postalCode": 733215, 
+                    "stateName": "West Bengal", 
+                    "msFlag": "Y", 
+                    "hsdFlag": "Y", 
+                    "cngFlag": "N", 
+                    "cbgFlag": "N" 
+                }, 
+                { 
+                    "retailOutletCode": "WBT005", 
+                    "roId": 1178, 
+                    "roName": "MALDA FF", 
+                    "roStatus": "Y", 
+                    "address": "NH-34, VILLAGE PANDUA, POST OFFICE QUTUBSAHAR, PS GAZOLE, 
+DISTRICT: MALDA", 
+                    "longitude": 88.15281604, 
+                    "latitude": 25.12905686, 
+                    "territory": null, 
+                    "region": "East", 
+                    "stateOffice": "WB", 
+                    "salesArea": null, 
+                    "salesDistrictCode": null, 
+                    "city": "MALDA", 
+                    "postalCode": 732102, 
+                    "stateName": "West Bengal", 
+                    "msFlag": "Y", 
+                    "hsdFlag": "Y", 
+                    "cngFlag": "N", 
+                    "cbgFlag": "N" 
+                }, 
+                { 
+                    "retailOutletCode": "WBF039", 
+                    "roId": 1646, 
+                    "roName": "SHERABAZAR", 
+                    "roStatus": "Y", 
+Doc Ref. No: ULIP Integration Doc 
+ Version No: 3.0 Page 27 of 53 
+ULIP Integration Document 
+ 
+  
+                        
+ 
+ 
+                    "address": "PLOT NO 240 and 241, JL NO 2, MOUZA BABROKPUR, SAGRAI, PS RAINA, 
+DISTRICT: BURWDAN", 
+                    "longitude": 87.828256, 
+                    "latitude": 23.180193, 
+                    "territory": null, 
+                    "region": "East", 
+                    "stateOffice": "WB", 
+                    "salesArea": null, 
+                    "salesDistrictCode": null, 
+                    "city": "SHERA BAZAR", 
+                    "postalCode": 713424, 
+                    "stateName": "West Bengal", 
+                    "msFlag": "Y", 
+                    "hsdFlag": "Y", 
+                    "cngFlag": "N", 
+                    "cbgFlag": "N" 
+                }, 
+                { 
+                    "retailOutletCode": "WBT007", 
+                    "roId": 1578, 
+                    "roName": "SILIGURI TS", 
+                    "roStatus": "Y", 
+                    "address": "NH-31, VILLAGE and POST OFFICE BHIMBAR, PS BIDHANAGAR, 
+DISTRICT: DARJEELING", 
+                    "longitude": 88.24354, 
+                    "latitude": 26.50776, 
+                    "territory": null, 
+                    "region": "East", 
+                    "stateOffice": "WB", 
+                    "salesArea": null, 
+                    "salesDistrictCode": null, 
+                    "city": "SILIGURI", 
+                    "postalCode": 734425, 
+                    "stateName": "West Bengal", 
+                    "msFlag": "Y", 
+                    "hsdFlag": "Y", 
+                    "cngFlag": "N", 
+                    "cbgFlag": "N" 
+                }, 
+                { 
+                    "retailOutletCode": "WBF036", 
+Doc Ref. No: ULIP Integration Doc 
+ Version No: 3.0 Page 28 of 53 
+ULIP Integration Document 
+ 
+  
+                        
+ 
+ 
+                    "roId": 1174, 
+                    "roName": "SURI FF", 
+                    "roStatus": "Y", 
+                    "address": "VILLAGE KHAIRAKURI, POST OFFICE -AMJOLA PAHARI, PS MOHAMMAD 
+BAZAR, DISTRICT: BIRBHUM NH-60", 
+                    "longitude": 87.523415, 
+                    "latitude": 23.958852, 
+                    "territory": null, 
+                    "region": "East", 
+                    "stateOffice": "WB", 
+                    "salesArea": null, 
+                    "salesDistrictCode": null, 
+                    "city": "SURI", 
+                    "postalCode": 731127, 
+                    "stateName": "West Bengal", 
+                    "msFlag": "Y", 
+                    "hsdFlag": "Y", 
+                    "cngFlag": "N", 
+                    "cbgFlag": "N" 
+                }, 
+                { 
+                    "retailOutletCode": "WBT012", 
+                    "roId": 1560, 
+                    "roName": "DALKHOLA TS", 
+                    "roStatus": "Y", 
+                    "address": "NH-31, VILLAGE BASTADANGI, PS KANKI, POST OFFICE 
+SIMULIADALTON, DISTRICT: UTTAR DINAJPUR", 
+                    "longitude": 87.8387337, 
+                    "latitude": 25.92482918, 
+                    "territory": null, 
+                    "region": "East", 
+                    "stateOffice": "WB", 
+                    "salesArea": null, 
+                    "salesDistrictCode": null, 
+                    "city": "DALKHOLA", 
+                    "postalCode": 733209, 
+                    "stateName": "West Bengal", 
+                    "msFlag": "Y", 
+                    "hsdFlag": "Y", 
+                    "cngFlag": "N", 
+                    "cbgFlag": "N" 
+Doc Ref. No: ULIP Integration Doc 
+ Version No: 3.0 Page 29 of 53 
+ULIP Integration Document 
+ 
+  
+                        
+ 
+ 
+                }, 
+                { 
+                    "retailOutletCode": "WBF013", 
+                    "roId": 1575, 
+                    "roName": "BURDWAN-1", 
+                    "roStatus": "Y", 
+                    "address": "NH-2, VILLAGE GANGPUR, POST OFFICE JOTHRAM, DISTRICT: 
+BURDWAN", 
+                    "longitude": 87.92933928, 
+                    "latitude": 23.21650787, 
+                    "territory": null, 
+                    "region": "East", 
+                    "stateOffice": "WB", 
+                    "salesArea": null, 
+                    "salesDistrictCode": null, 
+                    "city": "BURDWAN", 
+                    "postalCode": 713104, 
+                    "stateName": "West Bengal", 
+                    "msFlag": "Y", 
+                    "hsdFlag": "Y", 
+                    "cngFlag": "N", 
+                    "cbgFlag": "N" 
+                }, 
+                { 
+                    "retailOutletCode": "WBF081", 
+                    "roId": 6910, 
+                    "roName": "DHUBULIA", 
+                    "roStatus": "Y", 
+                    "address": "Krishna Bhadra Plot no-1044(P),KhatianNo-486 J L No- 100, Village- 
+Gaccha P.S: Nakashipara, Dist: Nadia Dhubulia-741154", 
+                    "longitude": 88.43211493, 
+                    "latitude": 23.53825607, 
+                    "territory": null, 
+                    "region": "East", 
+                    "stateOffice": "WB", 
+                    "salesArea": null, 
+                    "salesDistrictCode": null, 
+                    "city": "DHUBULIA", 
+                    "postalCode": 741154, 
+                    "stateName": "West Bengal", 
+                    "msFlag": "Y", 
+Doc Ref. No: ULIP Integration Doc 
+ Version No: 3.0 Page 30 of 53 
+ULIP Integration Document 
+ 
+  
+                        
+ 
+ 
+                    "hsdFlag": "Y", 
+                    "cngFlag": "N", 
+                    "cbgFlag": "N" 
+                }, 
+                { 
+                    "retailOutletCode": "WBF078", 
+                    "roId": 6179, 
+                    "roName": "WBF078-DHUPGURI SILIGURI", 
+                    "roStatus": "Y", 
+                    "address": "Joy Filling Centre NH31 towards Dhupguri,JL No:67 Chura 
+Bhander,PS:Maynaguri Distt: Jalpaiguri, West Bengal Dhupguri-735224", 
+                    "longitude": 88.89768, 
+                    "latitude": 26.56011, 
+                    "territory": null, 
+                    "region": "East", 
+                    "stateOffice": "WB", 
+                    "salesArea": null, 
+                    "salesDistrictCode": null, 
+                    "city": "ALPAIGURI", 
+                    "postalCode": 735224, 
+                    "stateName": "West Bengal", 
+                    "msFlag": "N", 
+                    "hsdFlag": "N", 
+                    "cngFlag": "N", 
+                    "cbgFlag": "N" 
+                }, 
+                { 
+                    "retailOutletCode": "WBF064", 
+                    "roId": 6963, 
+                    "roName": "RANINAGAR", 
+                    "roStatus": "Y", 
+                    "address": "Durga Autocare Pvt. Ltd. Vill:-PangaBattala,PO:Karjeepara P.S:-Kotwali 
+(Jalpaiguri) Dist:Jalpaiguri Raninagar-735101", 
+                    "longitude": 88.631013, 
+                    "latitude": 26.541001, 
+                    "territory": null, 
+                    "region": "East", 
+                    "stateOffice": "WB", 
+                    "salesArea": null, 
+                    "salesDistrictCode": null, 
+                    "city": "RANINAGAR", 
+Doc Ref. No: ULIP Integration Doc 
+ Version No: 3.0 Page 31 of 53 
+ULIP Integration Document 
+ 
+  
+                        
+ 
+ 
+                    "postalCode": 735121, 
+                    "stateName": "West Bengal", 
+                    "msFlag": "Y", 
+                    "hsdFlag": "Y", 
+                    "cngFlag": "N", 
+                    "cbgFlag": "N" 
+                }, 
+                { 
+                    "retailOutletCode": "WBF048", 
+                    "roId": 6263, 
+                    "roName": "KALNA", 
+                    "roStatus": "Y", 
+                    "address": "Mouza- Jiudhara, Mouza - Jiudhara, Vill - Jiudhara, P.O - Kalna P.S. 
+Kalna, Dist - Burdwan - 713409", 
+                    "longitude": 88.35899993, 
+                    "latitude": 23.20592191, 
+                    "territory": null, 
+                    "region": "East", 
+                    "stateOffice": "WB", 
+                    "salesArea": null, 
+                    "salesDistrictCode": null, 
+                    "city": "KALNA", 
+                    "postalCode": 713409, 
+                    "stateName": "West Bengal", 
+                    "msFlag": "Y", 
+                    "hsdFlag": "Y", 
+                    "cngFlag": "N", 
+                    "cbgFlag": "N" 
+                }, 
+                { 
+                    "retailOutletCode": "WBF065", 
+                    "roId": 6469, 
+                    "roName": "SAINTHIA DURGAPUR", 
+                    "roStatus": "Y", 
+                    "address": "DAGNO.841(P),JL.NO.77,, MOUZA-GUMTA, P.O.-KUNDOLA,, VILL-
+NIMPURDANGA,DISTT-BIRBHUM, BIRBHUM SH-11", 
+                    "longitude": 87.69395, 
+                    "latitude": 23.95725, 
+                    "territory": null, 
+                    "region": "East", 
+                    "stateOffice": "WB", 
+Doc Ref. No: ULIP Integration Doc 
+ Version No: 3.0 Page 32 of 53 
+ULIP Integration Document 
+ 
+  
+                        
+ 
+ 
+                    "salesArea": null, 
+                    "salesDistrictCode": null, 
+                    "city": "BIRBHUM", 
+                    "postalCode": 731234, 
+                    "stateName": "West Bengal", 
+                    "msFlag": "Y", 
+                    "hsdFlag": "Y", 
+                    "cngFlag": "N", 
+                    "cbgFlag": "N" 
+                }, 
+                { 
+                    "retailOutletCode": "WBF045", 
+                    "roId": 6241, 
+                    "roName": "BALURGHAT", 
+                    "roStatus": "Y", 
+                    "address": "Mouza: Malikura, Village - Pariyal, PO - Atreyee, Thana - Kumargunj, Dist 
+- Dinajpur(South), West Bengal-33158", 
+                    "longitude": 88.73426, 
+                    "latitude": 25.34067, 
+                    "territory": null, 
+                    "region": "East", 
+                    "stateOffice": "WB", 
+                    "salesArea": null, 
+                    "salesDistrictCode": null, 
+                    "city": "BALURGHAT", 
+                    "postalCode": 733158, 
+                    "stateName": "West Bengal", 
+                    "msFlag": "Y", 
+                    "hsdFlag": "Y", 
+                    "cngFlag": "N", 
+                    "cbgFlag": "N" 
+                }, 
+                { 
+                    "retailOutletCode": "WBF002", 
+                    "roId": 6945, 
+                    "roName": "MALDA SILIGURI", 
+                    "roStatus": "Y", 
+                    "address": "Village:-Gourbanga;P.O:-Kamalabari; P.S:-English Bazar, 
+District:Malda, West Bengal - 732101", 
+                    "longitude": 88.10969195, 
+                    "latitude": 24.94235717, 
+Doc Ref. No: ULIP Integration Doc 
+ Version No: 3.0 Page 33 of 53 
+ULIP Integration Document 
+ 
+  
+                        
+ 
+ 
+                    "territory": null, 
+                    "region": "East", 
+                    "stateOffice": "WB", 
+                    "salesArea": null, 
+                    "salesDistrictCode": null, 
+                    "city": "SILIGURI", 
+                    "postalCode": 732209, 
+                    "stateName": "West Bengal", 
+                    "msFlag": "Y", 
+                    "hsdFlag": "Y", 
+                    "cngFlag": "N", 
+                    "cbgFlag": "N" 
+                }, 
+                { 
+                    "retailOutletCode": "WBF069", 
+                    "roId": 7153, 
+                    "roName": "COOCH BEHAR", 
+                    "roStatus": "Y", 
+                    "address": "Plot No: 2672(P), 2681(P), 2685(P), JL No: 119, Taluka: Kotwali,Village: 
+Dauaguri, P.O: Dauaguri, P.S: Coochbehar, Dist: Coochbehar , pin code: 736156", 
+                    "longitude": 89.51738511, 
+                    "latitude": 26.31763486, 
+                    "territory": null, 
+                    "region": "East", 
+                    "stateOffice": "WB", 
+                    "salesArea": null, 
+                    "salesDistrictCode": null, 
+                    "city": "COOCH BEHAR", 
+                    "postalCode": 736156, 
+                    "stateName": "West Bengal", 
+                    "msFlag": "Y", 
+                    "hsdFlag": "Y", 
+                    "cngFlag": "N", 
+                    "cbgFlag": "N" 
+                }, 
+                { 
+                    "retailOutletCode": "WBT010", 
+                    "roId": 1745, 
+                    "roName": "DURGAPUR TS", 
+                    "roStatus": "Y", 
+Doc Ref. No: ULIP Integration Doc 
+ Version No: 3.0 Page 34 of 53 
+ULIP Integration Document 
+ 
+  
+                        
+ 
+ 
+                    "address": "Plot No-18,1306,1307,2335,2336,3781,4109. Near Andal Road, Village-
+Bhadur, West Burdwan, West Bengal 713321", 
+                    "longitude": 87.196101, 
+                    "latitude": 23.594138, 
+                    "territory": null, 
+                    "region": "East", 
+                    "stateOffice": "WB", 
+                    "salesArea": null, 
+                    "salesDistrictCode": null, 
+                    "city": "Durgapur", 
+                    "postalCode": 713338, 
+                    "stateName": "West Bengal", 
+                    "msFlag": "Y", 
+                    "hsdFlag": "Y", 
+                    "cngFlag": "Y", 
+                    "cbgFlag": "N" 
+                }, 
+                { 
+                    "retailOutletCode": "WBT003", 
+                    "roId": 1746, 
+                    "roName": "HALDIA TS", 
+                    "roStatus": "Y", 
+                    "address": "Plot No. 2697, 2695, 2687, 2689, 2690, 2693, 2694, 2692, 2691, 2727, 
+2729(P), 2730, 2731, 2732 (P) J.L No. : 135,  P.O:Kapasaria, Village : Kapasaria,  Mouza: 
+Kapasaria, P.S : Mahishadal, District: Purba Medinipur, West Bengal-721628", 
+                    "longitude": 87.985048, 
+                    "latitude": 22.1363, 
+                    "territory": null, 
+                    "region": "East", 
+                    "stateOffice": "WB", 
+                    "salesArea": null, 
+                    "salesDistrictCode": null, 
+                    "city": "Haldia", 
+                    "postalCode": 721628, 
+                    "stateName": "West Bengal", 
+                    "msFlag": "Y", 
+                    "hsdFlag": "Y", 
+                    "cngFlag": "N", 
+                    "cbgFlag": "N" 
+                }, 
+                { 
+Doc Ref. No: ULIP Integration Doc 
+ Version No: 3.0 Page 35 of 53 
+ULIP Integration Document 
+ 
+  
+                        
+ 
+ 
+                    "retailOutletCode": "WBF090", 
+                    "roId": 7196, 
+                    "roName": "DANKUNI", 
+                    "roStatus": "Y", 
+                    "address": "Mouza-Kanajuli, Shibpur, Gurap, Taluka-Dankuni, Hooghly, West 
+Bengal - 712303", 
+                    "longitude": 88.160078, 
+                    "latitude": 22.972754, 
+                    "territory": null, 
+                    "region": "East", 
+                    "stateOffice": "WB", 
+                    "salesArea": null, 
+                    "salesDistrictCode": null, 
+                    "city": "HOOGHLY", 
+                    "postalCode": 712305, 
+                    "stateName": "West Bengal", 
+                    "msFlag": "Y", 
+                    "hsdFlag": "Y", 
+                    "cngFlag": "N", 
+                    "cbgFlag": "N" 
+                }, 
+                { 
+                    "retailOutletCode": "WBF031", 
+                    "roId": 1753, 
+                    "roName": "SODEPUR", 
+                    "roStatus": "Y", 
+                    "address": "Plot No. 3395, 3396, 3397, Mouza-Sukchar, PO-Panihati, PS-Khardah, 
+District-North 24 Parganas, Sodepur, West Bengal - 700114", 
+                    "longitude": 88.374107, 
+                    "latitude": 22.706642, 
+                    "territory": null, 
+                    "region": "East", 
+                    "stateOffice": "WB", 
+                    "salesArea": null, 
+                    "salesDistrictCode": null, 
+                    "city": "Sodepur", 
+                    "postalCode": 700115, 
+                    "stateName": "West Bengal", 
+                    "msFlag": "Y", 
+                    "hsdFlag": "Y", 
+                    "cngFlag": "Y", 
+Doc Ref. No: ULIP Integration Doc 
+ Version No: 3.0 Page 36 of 53 
+ULIP Integration Document 
+ 
+  
+                        
+ 
+ 
+                    "cbgFlag": "N" 
+                }, 
+                { 
+                    "retailOutletCode": "WBT006", 
+                    "roId": 1727, 
+                    "roName": "KHARAGPUR TS", 
+                    "roStatus": "Y", 
+                    "address": "PO. Hat Sultanpur, Mouza: Pategerya & Harina, Kharagpur II, tALUKA, 
+Kharagpur II, District: Paschim Medinipur, West Bengal-721149.", 
+                    "longitude": 87.499719, 
+                    "latitude": 22.396201, 
+                    "territory": null, 
+                    "region": "East", 
+                    "stateOffice": "WB", 
+                    "salesArea": null, 
+                    "salesDistrictCode": null, 
+                    "city": "Harina & Patgaria,Paschim Medinipur", 
+                    "postalCode": 721149, 
+                    "stateName": "West Bengal", 
+                    "msFlag": "Y", 
+                    "hsdFlag": "Y", 
+                    "cngFlag": "N", 
+                    "cbgFlag": "N" 
+                }, 
+                { 
+                    "retailOutletCode": "WBC023", 
+                    "roId": 1788, 
+                    "roName": "Durgapur City", 
+                    "roStatus": "Y", 
+                    "address": "Plot No, 244(P), J.L. No. 117, Dag No.- 3001,Khatian No. 2252, MOUZA - 
+BENACHITY, Benachity, PS:Durgapur, District: PASCHIM BARDHAMAN, State: West Bengal, 
+PIN: 713204", 
+                    "longitude": 87.285968, 
+                    "latitude": 23.563803, 
+                    "territory": null, 
+                    "region": "East", 
+                    "stateOffice": "WB", 
+                    "salesArea": null, 
+                    "salesDistrictCode": null, 
+                    "city": "Durgapur", 
+                    "postalCode": 713204, 
+Doc Ref. No: ULIP Integration Doc 
+ Version No: 3.0 Page 37 of 53 
+ULIP Integration Document 
+ 
+  
+                        
+ 
+ 
+                    "stateName": "West Bengal", 
+                    "msFlag": "Y", 
+                    "hsdFlag": "Y", 
+                    "cngFlag": "N", 
+                    "cbgFlag": "N" 
+                }, 
+                { 
+                    "retailOutletCode": "WBF092", 
+                    "roId": 7327, 
+                    "roName": "Galsi", 
+                    "roStatus": "Y", 
+                    "address": "Plot No.6837,6838, J.L.No.54, Khatian No.5803,5805,5816, Mouza- 
+Goligram", 
+                    "longitude": 87.661101, 
+                    "latitude": 23.354146, 
+                    "territory": null, 
+                    "region": "East", 
+                    "stateOffice": "WB", 
+                    "salesArea": null, 
+                    "salesDistrictCode": null, 
+                    "city": "GALSI", 
+                    "postalCode": 713406, 
+                    "stateName": "West Bengal", 
+                    "msFlag": "Y", 
+                    "hsdFlag": "Y", 
+                    "cngFlag": "N", 
+                    "cbgFlag": "N" 
+                }, 
+                { 
+                    "retailOutletCode": "WBF158", 
+                    "roId": 7360, 
+                    "roName": "Khargram", 
+                    "roStatus": "Y", 
+                    "address": "MOUZA- MONDALSAR, PLOT NO- 1909, 1920, 1921, 1922. J.L NO-97, 
+KHARGRAM, MURSHIDABAD, West Bengal, 742147", 
+                    "longitude": 87.97983, 
+                    "latitude": 24.04834, 
+                    "territory": null, 
+                    "region": "East", 
+                    "stateOffice": "WB", 
+                    "salesArea": null, 
+Doc Ref. No: ULIP Integration Doc 
+ Version No: 3.0 Page 38 of 53 
+ULIP Integration Document 
+ 
+  
+                        
+ 
+ 
+                    "salesDistrictCode": null, 
+                    "city": "MURSHIDABAD", 
+                    "postalCode": 742147, 
+                    "stateName": "West Bengal", 
+                    "msFlag": "Y", 
+                    "hsdFlag": "Y", 
+                    "cngFlag": "N", 
+                    "cbgFlag": "N" 
+                }, 
+                { 
+                    "retailOutletCode": "WBF104", 
+                    "roId": 7386, 
+                    "roName": "Fulbari", 
+                    "roStatus": "Y", 
+                    "address": "NH31D,BESIDE INDIAN OIL PETROL PUMP MZ-BINNAGURI, PLN.285P 
+287P KHN458", 
+                    "longitude": 88.44, 
+                    "latitude": 26.6278, 
+                    "territory": null, 
+                    "region": "East", 
+                    "stateOffice": "WB", 
+                    "salesArea": null, 
+                    "salesDistrictCode": null, 
+                    "city": "JALPAIGURI", 
+                    "postalCode": 735203, 
+                    "stateName": "West Bengal", 
+                    "msFlag": "Y", 
+                    "hsdFlag": "Y", 
+                    "cngFlag": "N", 
+                    "cbgFlag": "N" 
+                }, 
+                { 
+                    "retailOutletCode": "WBF231", 
+                    "roId": 7373, 
+                    "roName": "Fatapukur", 
+                    "roStatus": "Y", 
+                    "address": "OPPOSITE BP PETROL PUMP, NH-31D RD, V-MANIPUR,KISMAT 
+SUKHANI,FATAPUKUR", 
+                    "longitude": 88.533904, 
+                    "latitude": 26.570501, 
+                    "territory": null, 
+Doc Ref. No: ULIP Integration Doc 
+ Version No: 3.0 Page 39 of 53 
+ULIP Integration Document 
+ 
+  
+                        
+ 
+ 
+                    "region": "East", 
+                    "stateOffice": "WB", 
+                    "salesArea": null, 
+                    "salesDistrictCode": null, 
+                    "city": "JALPAIGURI", 
+                    "postalCode": 735134, 
+                    "stateName": "West Bengal", 
+                    "msFlag": "Y", 
+                    "hsdFlag": "Y", 
+                    "cngFlag": "N", 
+                    "cbgFlag": "N" 
+                }, 
+                { 
+                    "retailOutletCode": "WBF141", 
+                    "roId": 7385, 
+                    "roName": "Budbud", 
+                    "roStatus": "Y", 
+                    "address": "NH19,TARASHAKTI RICE MILL,MZ.PPARAJ, 
+PL320P,322P,323,324P,325P,355P", 
+                    "longitude": 87.61038, 
+                    "latitude": 23.37788, 
+                    "territory": null, 
+                    "region": "East", 
+                    "stateOffice": "WB", 
+                    "salesArea": null, 
+                    "salesDistrictCode": null, 
+                    "city": "BARDHAMAN", 
+                    "postalCode": 713403, 
+                    "stateName": "West Bengal", 
+                    "msFlag": "Y", 
+                    "hsdFlag": "Y", 
+                    "cngFlag": "N", 
+                    "cbgFlag": "N" 
+                }, 
+                { 
+                    "retailOutletCode": "WBR003", 
+                    "roId": 7460, 
+                    "roName": "Gopiballavpur", 
+                    "roStatus": "Y", 
+                    "address": "SH 9, PLOT NO-L R 264 P , KHATIAN NO- 495/496 , J.L NO-203, MOUJA- 
+NAYAGRAM, TALUKA - GOPIBALLAVPUR II ,", 
+Doc Ref. No: ULIP Integration Doc 
+ Version No: 3.0 Page 40 of 53 
+ULIP Integration Document 
+ 
+  
+                        
+ 
+ 
+                    "longitude": 86.90875, 
+                    "latitude": 22.24126944, 
+                    "territory": null, 
+                    "region": "East", 
+                    "stateOffice": "WB", 
+                    "salesArea": null, 
+                    "salesDistrictCode": null, 
+                    "city": "WEST MIDNAPORE", 
+                    "postalCode": 721517, 
+                    "stateName": "West Bengal", 
+                    "msFlag": "Y", 
+                    "hsdFlag": "Y", 
+                    "cngFlag": "N", 
+                    "cbgFlag": "N" 
+                }, 
+                { 
+                    "retailOutletCode": "WBF159", 
+                    "roId": 7599, 
+                    "roName": "KALIYAGUNJ", 
+                    "roStatus": "Y", 
+                    "address": "PLOT NO. 512P, 513P, 514P, KHATIAN NO. 1914, JL NO. 94, 
+HOLDIBARI,MOUZA ATGHARA, KALIAGANJ, NORTH DINAJPUR, WEST BENGAL-733129", 
+                    "longitude": 88.2034, 
+                    "latitude": 25.3551, 
+                    "territory": null, 
+                    "region": "East", 
+                    "stateOffice": "WB", 
+                    "salesArea": null, 
+                    "salesDistrictCode": null, 
+                    "city": "NORTH DINAJPUR", 
+                    "postalCode": 733129, 
+                    "stateName": "West Bengal", 
+                    "msFlag": "Y", 
+                    "hsdFlag": "Y", 
+                    "cngFlag": "N", 
+                    "cbgFlag": "N" 
+                }, 
+                { 
+                    "retailOutletCode": "WBR007", 
+                    "roId": 7604, 
+                    "roName": "SALAR", 
+Doc Ref. No: ULIP Integration Doc 
+ Version No: 3.0 Page 41 of 53 
+ULIP Integration Document 
+ 
+  
+                        
+ 
+ 
+                    "roStatus": "Y", 
+                    "address": "PLno: 5727p , khatian no: 8429 JL NO 114, village :Salar, mouza: Kangra", 
+                    "longitude": 88.10512, 
+                    "latitude": 23.794828, 
+                    "territory": null, 
+                    "region": "East", 
+                    "stateOffice": "WB", 
+                    "salesArea": null, 
+                    "salesDistrictCode": null, 
+                    "city": "MURSHIDABAD", 
+                    "postalCode": 742401, 
+                    "stateName": "West Bengal", 
+                    "msFlag": "Y", 
+                    "hsdFlag": "Y", 
+                    "cngFlag": "N", 
+                    "cbgFlag": "N" 
+                }, 
+                { 
+                    "retailOutletCode": "WBF184", 
+                    "roId": 7626, 
+                    "roName": "KHANDAGOSH", 
+                    "roStatus": "Y", 
+                    "address": "Plot No-1840(P), 1846(P), 1844(P), J.L No. 16, Mouza-Aradanga,Taluka: 
+Khandaghosh, Village: Khandaghosh, Purba Bardhaman, West Bengal-713142", 
+                    "longitude": 87.7186, 
+                    "latitude": 23.21557, 
+                    "territory": null, 
+                    "region": "East", 
+                    "stateOffice": "WB", 
+                    "salesArea": null, 
+                    "salesDistrictCode": null, 
+                    "city": "BARDHAMAN", 
+                    "postalCode": 713142, 
+                    "stateName": "West Bengal", 
+                    "msFlag": "Y", 
+                    "hsdFlag": "Y", 
+                    "cngFlag": "N", 
+                    "cbgFlag": "N" 
+                }, 
+                { 
+                    "retailOutletCode": "WBF109", 
+Doc Ref. No: ULIP Integration Doc 
+ Version No: 3.0 Page 42 of 53 
+ULIP Integration Document 
+ 
+  
+                        
+ 
+ 
+                    "roId": 7627, 
+                    "roName": "JANGIPUR", 
+                    "roStatus": "Y", 
+                    "address": "Plot No. 2628(P), 2627(P), 2603(P),J. L. No. 74, 
+Mouza:Teghari,Vill:Jangipur, RAJPUT, TEGHARI RAMPURA, Murshidabad,West Bengal-
+742213", 
+                    "longitude": 88.1426, 
+                    "latitude": 24.44886, 
+                    "territory": null, 
+                    "region": "East", 
+                    "stateOffice": "WB", 
+                    "salesArea": null, 
+                    "salesDistrictCode": null, 
+                    "city": "MURSHIDABAD", 
+                    "postalCode": 742213, 
+                    "stateName": "West Bengal", 
+                    "msFlag": "Y", 
+                    "hsdFlag": "Y", 
+                    "cngFlag": "N", 
+                    "cbgFlag": "N" 
+                }, 
+                { 
+                    "retailOutletCode": "WBF225", 
+                    "roId": 7714, 
+                    "roName": "Rajgram", 
+                    "roStatus": "Y", 
+                    "address": "YSA FILLING STATION Plot no 685P, 729p, 730p", 
+                    "longitude": 87.867399, 
+                    "latitude": 24.520966, 
+                    "territory": null, 
+                    "region": "East", 
+                    "stateOffice": "WB", 
+                    "salesArea": null, 
+                    "salesDistrictCode": null, 
+                    "city": "BIRBHUM", 
+                    "postalCode": 731222, 
+                    "stateName": "West Bengal", 
+                    "msFlag": "Y", 
+                    "hsdFlag": "Y", 
+                    "cngFlag": "N", 
+                    "cbgFlag": "N" 
+Doc Ref. No: ULIP Integration Doc 
+ Version No: 3.0 Page 43 of 53 
+ULIP Integration Document 
+ 
+  
+                        
+ 
+ 
+                }, 
+                { 
+                    "retailOutletCode": "WBF011", 
+                    "roId": 1179, 
+                    "roName": "Berhampore PI", 
+                    "roStatus": "Y", 
+                    "address": "Plot No. LR/RS-946,947, JL  NO. 6, Khatian No.227, Mehendipur, District-
+Murshidabad,Murshidabad, West Bengal, 742187", 
+                    "longitude": 88.21322, 
+                    "latitude": 24.12785, 
+                    "territory": null, 
+                    "region": "East", 
+                    "stateOffice": "WB", 
+                    "salesArea": null, 
+                    "salesDistrictCode": null, 
+                    "city": "BERHAMPORE", 
+                    "postalCode": 742187, 
+                    "stateName": "West Bengal", 
+                    "msFlag": "Y", 
+                    "hsdFlag": "Y", 
+                    "cngFlag": "N", 
+                    "cbgFlag": "N" 
+                }, 
+                { 
+                    "retailOutletCode": "WBF113", 
+                    "roId": 7712, 
+                    "roName": "Keshpur", 
+                    "roStatus": "Y", 
+                    "address": "MEDINIPUR CHANDRAKONA ROAD, PLN.944P, 945P,JL N.434, 
+AMRAKUCHI, KESHPUR, WEST MIDNAPORE, WEST BENGAL - 721150", 
+                    "longitude": 87.4218266, 
+                    "latitude": 22.4940632, 
+                    "territory": null, 
+                    "region": "East", 
+                    "stateOffice": "WB", 
+                    "salesArea": null, 
+                    "salesDistrictCode": null, 
+                    "city": "WEST MIDNAPORE", 
+                    "postalCode": 721150, 
+                    "stateName": "West Bengal", 
+                    "msFlag": "Y", 
+Doc Ref. No: ULIP Integration Doc 
+ Version No: 3.0 Page 44 of 53 
+ULIP Integration Document 
+ 
+  
+                        
+ 
+ 
+                    "hsdFlag": "Y", 
+                    "cngFlag": "N", 
+                    "cbgFlag": "N" 
+                }, 
+                { 
+                    "retailOutletCode": "WBF132", 
+                    "roId": 7715, 
+                    "roName": "GANGARAMPUR", 
+                    "roStatus": "Y", 
+                    "address": "SUHARI,DAG 115,116,MOUZA 108, FIFTEENMIL, RAMPUR SUHARI, 
+DAKSHIN DINAJPUR SOUTH DINAJPUR, West Bengal -733140", 
+                    "longitude": 88.643077, 
+                    "latitude": 25.341697, 
+                    "territory": null, 
+                    "region": "East", 
+                    "stateOffice": "WB", 
+                    "salesArea": null, 
+                    "salesDistrictCode": null, 
+                    "city": "SOUTH DINAJPUR", 
+                    "postalCode": 733410, 
+                    "stateName": "West Bengal", 
+                    "msFlag": "Y", 
+                    "hsdFlag": "Y", 
+                    "cngFlag": "N", 
+                    "cbgFlag": "N" 
+                }, 
+                { 
+                    "retailOutletCode": "WBF110", 
+                    "roId": 7731, 
+                    "roName": "Raigunj Town", 
+                    "roStatus": "Y", 
+                    "address": "JL.NO.69,PLNO.123,124P,126P, TALUKA-RAIGUNJ, MOZ/VILL-
+KRISHNAMURI,  NORTH DINAJPUR, WEST BENGAL-733134", 
+                    "longitude": 88.05605, 
+                    "latitude": 25.6937, 
+                    "territory": null, 
+                    "region": "East", 
+                    "stateOffice": "WB", 
+                    "salesArea": null, 
+                    "salesDistrictCode": null, 
+                    "city": "NORTH DINAJPUR", 
+Doc Ref. No: ULIP Integration Doc 
+ Version No: 3.0 Page 45 of 53 
+ULIP Integration Document 
+ 
+  
+                        
+ 
+ 
+                    "postalCode": 733156, 
+                    "stateName": "West Bengal", 
+                    "msFlag": "Y", 
+                    "hsdFlag": "Y", 
+                    "cngFlag": "N", 
+                    "cbgFlag": "N" 
+                }, 
+                { 
+                    "retailOutletCode": "WBF227", 
+                    "roId": 7713, 
+                    "roName": "ILAMBAZAR", 
+                    "roStatus": "Y", 
+                    "address": "BOLPUR RD, PLN.310,117P,JLN.87,MOZ. ISLAMBAZAR, GP,VILL-
+ILAMBAZAR BIRBHUM, WEST BENGAL-731214", 
+                    "longitude": 88.643077, 
+                    "latitude": 25.341697, 
+                    "territory": null, 
+                    "region": "East", 
+                    "stateOffice": "WB", 
+                    "salesArea": null, 
+                    "salesDistrictCode": null, 
+                    "city": "BIRBHUM", 
+                    "postalCode": 713172, 
+                    "stateName": "West Bengal", 
+                    "msFlag": "Y", 
+                    "hsdFlag": "Y", 
+                    "cngFlag": "N", 
+                    "cbgFlag": "N" 
+                }, 
+                { 
+                    "retailOutletCode": "WBF203", 
+                    "roId": 7792, 
+                    "roName": "IAF Kalaikunda", 
+                    "roStatus": "Y", 
+                    "address": "KHATIAN NO - 69, JL NO - 858, PLOT NO - 36(P), 37(P), 26(P), 23(P), 
+CHANDRI, GUNDURGURU,Chandri, District: Jhargram, West Bengal  - 721503", 
+                    "longitude": 86.93383, 
+                    "latitude": 22.30881, 
+                    "territory": null, 
+                    "region": "East", 
+                    "stateOffice": "WB", 
+Doc Ref. No: ULIP Integration Doc 
+ Version No: 3.0 Page 46 of 53 
+ULIP Integration Document 
+ 
+  
+                        
+ 
+ 
+                    "salesArea": null, 
+                    "salesDistrictCode": null, 
+                    "city": "WEST MIDNAPORE", 
+                    "postalCode": 721503, 
+                    "stateName": "West Bengal", 
+                    "msFlag": "Y", 
+                    "hsdFlag": "Y", 
+                    "cngFlag": "N", 
+                    "cbgFlag": "N" 
+                }, 
+                { 
+                    "retailOutletCode": "WBF234", 
+                    "roId": 7711, 
+                    "roName": "Ghushkara", 
+                    "roStatus": "Y", 
+                    "address": "NH2B, Taluka: Bhatar,Mouza- ORGRAM, Plot No,15363(P),J.L.No.11, 
+Village: Orgram, District: Purba Bardhaman, West Bengal -713128", 
+                    "longitude": 87.7673531, 
+                    "latitude": 23.411245, 
+                    "territory": null, 
+                    "region": "East", 
+                    "stateOffice": "WB", 
+                    "salesArea": null, 
+                    "salesDistrictCode": null, 
+                    "city": "BARDHAMAN", 
+                    "postalCode": 722133, 
+                    "stateName": "West Bengal", 
+                    "msFlag": "Y", 
+                    "hsdFlag": "Y", 
+                    "cngFlag": "N", 
+                    "cbgFlag": "N" 
+                }, 
+                { 
+                    "retailOutletCode": "WBR013", 
+                    "roId": 7779, 
+                    "roName": "Egra 2", 
+                    "roStatus": "Y", 
+                    "address": "JLN.338,KHANN.930,936,939, PLN.1414, 1416,1417,14717/1575, 
+VILL.BAHARDA, MOZ.BAHARADA,GOMUNDA,AINKOLA DANTAN, WEST MIDNAPORE, WEST 
+BENGAL - 721457", 
+                    "longitude": 87.332, 
+Doc Ref. No: ULIP Integration Doc 
+ Version No: 3.0 Page 47 of 53 
+ULIP Integration Document 
+ 
+  
+                        
+ 
+ 
+                    "latitude": 21.8229, 
+                    "territory": null, 
+                    "region": "East", 
+                    "stateOffice": "WB", 
+                    "salesArea": null, 
+                    "salesDistrictCode": null, 
+                    "city": "WEST MIDNAPORE", 
+                    "postalCode": 721457, 
+                    "stateName": "West Bengal", 
+                    "msFlag": "Y", 
+                    "hsdFlag": "Y", 
+                    "cngFlag": "N", 
+                    "cbgFlag": "N" 
+                }, 
+                { 
+                    "retailOutletCode": "WBF140", 
+                    "roId": 7833, 
+                    "roName": "Lodhasouli", 
+                    "roStatus": "Y", 
+                    "address": "PlNo-144(P),Khn 647, JLNo-644, Mauza & Taluka-Sukni Basa 
+GUPTAMONI TEMPLE,Jhargram, Jhargram, West Bengal-721513", 
+                    "longitude": 87.145, 
+                    "latitude": 22.3433, 
+                    "territory": null, 
+                    "region": "East", 
+                    "stateOffice": "WB", 
+                    "salesArea": null, 
+                    "salesDistrictCode": null, 
+                    "city": "WEST MIDNAPORE", 
+                    "postalCode": 721513, 
+                    "stateName": "West Bengal", 
+                    "msFlag": "Y", 
+                    "hsdFlag": "Y", 
+                    "cngFlag": "N", 
+                    "cbgFlag": "N" 
+                }, 
+                { 
+                    "retailOutletCode": "WBF249", 
+                    "roId": 7874, 
+                    "roName": "Futishanko 1", 
+                    "roStatus": "Y", 
+Doc Ref. No: ULIP Integration Doc 
+ Version No: 3.0 Page 48 of 53 
+ULIP Integration Document 
+ 
+  
+                        
+ 
+ 
+                    "address": "NH-116A, Pln.761(P) TO 763(P), 771(P) TO 774(P), JLN 159, Mauza Taluka 
+Majlishpur, PS: Burwan, District: Murshidabad, West Bengal- 742161", 
+                    "longitude": 87.145, 
+                    "latitude": 22.3433, 
+                    "territory": null, 
+                    "region": "East", 
+                    "stateOffice": "WB", 
+                    "salesArea": null, 
+                    "salesDistrictCode": null, 
+                    "city": "MURSHIDABAD", 
+                    "postalCode": 731304, 
+                    "stateName": "West Bengal", 
+                    "msFlag": "Y", 
+                    "hsdFlag": "Y", 
+                    "cngFlag": "N", 
+                    "cbgFlag": "N" 
+                }, 
+                { 
+                    "retailOutletCode": "WBF169", 
+                    "roId": 7884, 
+                    "roName": "Mejia", 
+                    "roStatus": "Y", 
+                    "address": "0.0", 
+                    "longitude": 87.099054, 
+                    "latitude": 23.578481, 
+                    "territory": null, 
+                    "region": "East", 
+                    "stateOffice": "WB", 
+                    "salesArea": null, 
+                    "salesDistrictCode": null, 
+                    "city": "BANKURA", 
+                    "postalCode": 722143, 
+                    "stateName": "West Bengal", 
+                    "msFlag": "Y", 
+                    "hsdFlag": "Y", 
+                    "cngFlag": "N", 
+                    "cbgFlag": "N" 
+                }, 
+                { 
+                    "retailOutletCode": "WBR012", 
+                    "roId": 7893, 
+Doc Ref. No: ULIP Integration Doc 
+ Version No: 3.0 Page 49 of 53 
+ULIP Integration Document 
+ 
+  
+                        
+ 
+ 
+                    "roName": "Ragra", 
+                    "roStatus": "Y", 
+                    "address": "PLN 119P TO 121P,119/542,118/544P,123P, Khata N 378, J.L. N.- 73, 
+Mouza- Haripura, Taluka- Sankrail, Paschim Medinipur, West Bengal-721143                   \"", 
+                    "longitude": 87.068874, 
+                    "latitude": 22.166828, 
+                    "territory": null, 
+                    "region": "East", 
+                    "stateOffice": "WB", 
+                    "salesArea": null, 
+                    "salesDistrictCode": null, 
+                    "city": "WEST MIDNAPORE", 
+                    "postalCode": 721143, 
+                    "stateName": "West Bengal", 
+                    "msFlag": "Y", 
+                    "hsdFlag": "Y", 
+                    "cngFlag": "N", 
+                    "cbgFlag": "N" 
+                }, 
+                { 
+                    "retailOutletCode": "WBF237", 
+                    "roId": 7917, 
+                    "roName": "Bishnupur Bypass", 
+                    "roStatus": "Y", 
+                    "address": "M/S MAA RAKSHAKALI FILLING STATION, Prop: PRITAM DUTTA, 
+PlN,3270P to 3272P,3274P to 3276P, 3278P,JL101, Kh17038,19880,17039,MZ BISHNUPUR 
+MUNICIPALITY, T-Bankura I, BANKURA, West Bengal-722122", 
+                    "longitude": 87.313988, 
+                    "latitude": 23.084328, 
+                    "territory": null, 
+                    "region": "East", 
+                    "stateOffice": "WB", 
+                    "salesArea": null, 
+                    "salesDistrictCode": null, 
+                    "city": "BANKURA", 
+                    "postalCode": 722122, 
+                    "stateName": "West Bengal", 
+                    "msFlag": "Y", 
+                    "hsdFlag": "Y", 
+                    "cngFlag": "N", 
+                    "cbgFlag": "N" 
+Doc Ref. No: ULIP Integration Doc 
+ Version No: 3.0 Page 50 of 53 
+ULIP Integration Document 
+ 
+  
+                        
+ 
+ 
+{ 
+"response": [ 
+{ 
+"response": [], 
+"responseStatus": "SUCCESS" 
+} 
+], 
+"error": "false", 
+"code": "200", 
+"message": "Success" 
+} 
+                }, 
+                { 
+                    "retailOutletCode": "WBF066", 
+                    "roId": 6518, 
+                    "roName": "DOMKAL DURGAPUR", 
+                    "roStatus": "Y", 
+                    "address": "DAG NO.C.S 702,707(P),L.R, 784,788(P), JL.42,KHATNO.758,, 
+759,DOMKAL, MURSHIDABAD., DOMKAL", 
+                    "longitude": 88.537274, 
+                    "latitude": 24.124989, 
+                    "territory": null, 
+                    "region": "East", 
+                    "stateOffice": "WB", 
+                    "salesArea": null, 
+                    "salesDistrictCode": null, 
+                    "city": "DOMKAL", 
+                    "postalCode": 742303, 
+                    "stateName": "West Bengal", 
+                    "msFlag": "Y", 
+                    "hsdFlag": "Y", 
+                    "cngFlag": "N", 
+                    "cbgFlag": "N" 
+                } 
+            ], 
+            "responseStatus": "SUCCESS" 
+        } 
+    ], 
+    "error": "false", 
+    "code": "200", 
+    "message": "Success" 
+} 
+ 
+5. In case the JIOBP API data does not exist 
+Doc Ref. No: ULIP Integration Doc 
+ Version No: 3.0 Page 51 of 53 
+ULIP Integration Document 
+ 
+  
+                        
+ 
+ 
+ 
+Status Code 200: JIOBP API data response 
+Status Code 400: Bad request (Invalid JSON syntax, invalid JSON key) 
+Status Code 401 or 403: Unauthenticated or 
+Unauthorized Status Code 500: Some internal server 
+error occurred Status Code 502: The server is not 
+responding. 
+1.4 Data Transmission & Authentication Mechanism 
+All data exchanges will be securely done with HTTPS. ULIP's system will request data from JIOBP 
+through a URL with the following format: 
+For staging - https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/JIOBP/01 
+ 
+Body: 
+ 
+To access the data exchange URL, you would need to use a security mechanism that is 
+implemented by the ULIP system. The process is as follows: 
+ 
+- First time access: you will require a username and password. The username and 
+password would be shared with you beforehand. Once you enter the valid username and 
+password, the ULIP system will return a basic authorization token to you. You can use this 
+token to communicate with the ULIP system until the token gets expired. 
+ 
+In brief, HTTP Basic Authentication works as follows: 
+ 
+When you hit the ULIP secured API for the first time, you need to provide a username and 
+password to get an access token. 
+curl -- location 
+’https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/user/login’ \ 
+-- header ’Accept: application/json’ \ 
+-- header ’Content - Type: application/json’ \ 
+-- data - raw ’{ 
+{ 
+    "stateCode": "WB", 
+    "stateName": "", 
+    "longitude": "", 
+    "latitude": "", 
+    "radius" :"" 
+} 
+Doc Ref. No: ULIP Integration Doc 
+ Version No: 3.0 Page 52 of 53 
+ULIP Integration Document 
+ 
+  
+                        
+ 
+ 
+"username": "xxxx", 
+"password": "xxxx"}’ 
+ 
+Authorization: 
+Bearer 
+eyshbGciqiJIazmxMiJ8.eyJzdWIiOiJ1bGlwIiwiaWF0IjoxNzI2NTU2ODk4LCJhcHB
+zIjoiZGF0YXB1c2gifQ.dqXUxA7agKxu9w961sr-QNG1g-
+9TWWpQQLUX6CsUO5drkwmny9hU4hIf6cOr8CXHlJ67Nv-HdGNtHtr2bH8Irg 
+     After successfully authenticating, the user will be logged into the ULIP system and obtain an 
+access token. This token will be used by the user to communicate with the ULIP system. The 
+token has an expiry  time that represents the user session, which is typically  set to 24 hours. 
+After 24 hours, the session (token) will expire, and the user will need to re-authenticate. 
+Using the above token, the user can request the ULIP system for the JIOBP API for details as 
+follows  
+ 
+curl --location  ’https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/JIOBP/01’ \ 
+--header ’Authorization: Bearer 
+eyshbGciqiJIazmxMiJ8.eyJzdWIiOiJ1bGlwIiwiaWF0IjoxNzI2NTU2ODk4LCJhcHBzIjoiZGF
+0YXB1c2gifQ.dqXUxA7agKxu9w961sr-QNG1g-
+9TWWpQQLUX6CsUO5drkwmny9hU4hIf6cOr8CXHlJ67Nv-HdGNtHtr2bH8Irg  
+\ 
+--header  ’Content -Type: application/json’ \ 
+--header  ’Accept: application/json’ \ 
+--data -raw ’ { 
+    "stateCode": "WB", 
+    "stateName": "", 
+    "longitude": "", 
+    "latitude": "", 
+    "radius" :"" 
+} 
+’ 
+ 
+For production – 
+curl --location ’https://www.ulip.dpiit.gov.in/ulip/v1.0.0/user/login’ \ 
+--header ’Content -Type: application/json’ \ 
+--header ’Accept: application/json’ \ 
+--data -raw ’{ 
+"username": "xxx", 
+"password": "xxx" 
+}’ 
+Doc Ref. No: ULIP Integration Doc 
+ Version No: 3.0 Page 53 of 53 
+ULIP Integration Document 
+ 
+  
+                        
+ 
+ 
+ 
+Authorization: 
+Bearer 
+eyshbGciqiJIazmxMiJ8.eyJzdWIiOiJ1bGlwIiwiaWF0IjoxNzI2NTU2ODk4LCJhcHBzIj
+oiZGF0YXB1c2gifQ.dqXUxA7agKxu9w961sr-QNG1g-
+9TWWpQQLUX6CsUO5drkwmny9hU4hIf6cOr8CXHlJ67Nv-HdGNtHtr2bH8Irg 
+ 
+Upon successful authentication, the user would be logged into the ULIP system and get an 
+access token. Though this token user can communicate with ULIP. This token has an expiry 
+time that represents the user session. The session time out for the same to be fixed hour 
+generally it is for 24 hours . After 24 hours, the session (token) will expire, and the user 
+needs to reauthenticate. 
+Using the above token, the user can request the ULIP system for details as follows - 
+ 
+https://www.ulip.dpiit.gov.in/ulip/v1.0.0/JIOBP/01 
+curl --location ’https://www.ulip.dpiit.gov.in/ulip/v1.0.0/JIOBP /01’ \ 
+--header ’Authorization: Bearer 
+eyshbGciqiJIazmxMiJ8.eyJzdWIiOiJ1bGlwIiwiaWF0IjoxNzI2NTU2ODk4LCJhcHBzIjoiZGF0YX
+B1c2gifQ.dqXUxA7agKxu9w961sr-QNG1g-
+9TWWpQQLUX6CsUO5drkwmny9hU4hIf6cOr8CXHlJ67Nv-HdGNtHtr2bH8Irg \ 
+--header ’Accept: application/json’ \ 
+--header ’Content -Type: application/json’ \ 
+--data -raw ’  
+{ 
+    "stateCode": "WB", 
+    "stateName": "", 
+    "longitude": "", 
+    "latitude": "", 
+    "radius" :"" 
+} 
+’ 

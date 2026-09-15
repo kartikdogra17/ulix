@@ -1,0 +1,3932 @@
+ULIP Integration Document 
+ 
+  
+                        
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+Version No.: 2.0 
+Date: 18/05/2026 
+Project Name: ULIP 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ULIP Integration Document 
+This document contains proprietary information of NLDSL. Unauthorized access, copying and replication are 
+prohibited. This document must not be copied in whole or part by any means, without the written authorization of 
+NLDSL, Noida, India. 
+ 
+ 
+ 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 2.0 Page 2 of 78 
+ 
+ 
+ 
+ 
+Revision History 
+Version Date Author Reviewer Significant Changes 
+1.0 08/01/2025 Ayush Arya Nayab Ali Baseline Version 
+2.0 24/03/2026 Gaurav Tyagi Pranab Manna Updated 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+  
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 2.0 Page 3 of 78 
+ 
+Table of Contents 
+ 
+Introduction ................................................................................................................................................. 4 
+1.1 Purpose .................................................................................................................................... 4 
+1.2 Data Integration between other system and ULIP application ................................................. 4 
+1.3 BLACKSPOT/01 ....................................................................................................................... 4 
+1.3.1 Technical Approach .................................................................................................... 4 
+1.4 Data Transmission & Authentication Mechanism .................................................................. 77 
+ 
+  
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 2.0 Page 4 of 78 
+ 
+Introduction 
+1.1 Purpose 
+ 
+The purpose of this document is to define and provide details for getting BLACK spot data 
+based on state code from ULIP system. 
+This document details the following points: 
+ 
+1. Data Integration between Other System  and ULIP web service : Identification of 
+operational points where data integration between other system and ULIP web service will 
+be needed. 
+ 
+2. Technical Approach for performing Data Integration  
+ 
+1.2 Data Integration between other system and ULIP application 
+ 
+Users will share information with the ULIP system based on data shared ULIP will 
+provide data (BLACK spot) to the user. 
+1.3 BLACKSPOT/01 
+ 
+This API will take stateCode and based on the user input data, ULIP System will find 
+the BLACK spot data for the state code and send back the response to the user. 
+ 
+S. No. Field Name Field Description Format Required/Not – 
+Required 
+Length 
+1  stateCode  State code for the 
+particular state ^\d{1,5}$ Required  Max 5 
+digit 
+ 
+1.3.1 Technical Approach  
+1. All the data will be shared through rest web services. 
+2. ULIP system will provide data (BLACK spot) for which data is shared. 
+3. ULIP system will provide the data in JSON Object format in response body. 
+ 
+Request: 
+ 
+The request must be of the following format, where stateCode is passed within the request 
+body in JSON format. 
+ 
+ 
+ 
+ 
+ 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 2.0 Page 5 of 78 
+ 
+Below is the list of the state codes we are taking. 
+ 
+State 
+Code State Name 
+1 JAMMU AND KASHMIR 
+2 HIMACHAL PRADESH 
+3 PUNJAB 
+4 CHANDIGARH 
+5 UTTARAKHAND 
+6 HARYANA 
+7 DELHI 
+8 RAJASTHAN 
+9 UTTAR PRADESH 
+10 BIHAR 
+11 SIKKIM 
+12 ARUNACHAL PRADESH 
+13 NAGALAND 
+14 MANIPUR 
+15 MIZORAM 
+16 TRIPURA 
+17 MEGHALAYA 
+18 ASSAM 
+19 WEST BENGAL 
+20 JHARKHAND 
+21 ORISSA 
+22 CHHATTISGARH 
+23 MADHYA PRADESH 
+24 GUJARAT 
+26 Dadra & Nagar Haveli and Daman & 
+Diu 
+27 MAHARASHTRA 
+29 KARNATAKA 
+30 GOA 
+31 LAKSHADWEEP 
+32 KERALA 
+33 TAMIL NADU 
+34 PUDUCHERRY 
+35 ANDAMAN AND NICOBAR 
+36 TELANGANA 
+37 ANDHRA PRADESH 
+38 Ladakh 
+ 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 2.0 Page 6 of 78 
+ 
+For Production: https://www.ulip.dpiit.gov.in/ulip/v1.0.0/BLACKSPOT/01 
+ 
+{"stateCode":"21"} 
+ 
+Curl URL 
+ 
+curl --location 'https://www.ulip.dpiit.gov.in/ulip/v1.0.0/BLACKSPOT/01' \ 
+--header 'Authorization: Bearer 
+eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1bGlwIiwiaWF0IjoxNzM2MTU3ODcyLCJhcHBzIjoiZGF0Y
+XB1c2gifQ.fGIie631Kmbwf4qgCeE0xgkBLFXGgfed1ejzTr8rkIFc3yMuWqnvUc8Nu4H1O97WcN
+TR4TO3r_3DOdsP_fUs1A' \ 
+--header 'Accept: application/json' \ 
+--header 'Content-Type: application/json' \ 
+--data '{"stateCode": "21"}' 
+ 
+For Staging: https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/BLACKSPOT/01 
+ 
+{"stateCode":"21”} 
+ 
+Curl URL 
+ 
+curl --location 'https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/BLACKSPOT/01' \ 
+--header 'Authorization: Bearer 
+eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1bGlwIiwiaWF0IjoxNzM2MzEwNjUxLCJhcHBzIjoiZGF0YX
+B1c2gifQ.OjQj9QuPQlEYKTAyzhJmd0RMlpv7MYzHPNadBasjyLPP_kLgKueL5G11WL21aw_v
+biEigkbq5H4XsW6ZyuN-JQ' \ 
+--header 'Content-Type: application/json' \ 
+--header 'Accept: application/json' \ 
+--data '{"stateCode": "21"}' 
+ 
+ 
+For obtaining authentication token, refer Section 1.4 
+ 
+Response 
+ 
+To acknowledge the above request, ULIP will send the below response -  
+ 
+a) In case of Invalid stateCode format 
+ 
+{    "response": null, 
+    "error": "true", 
+    "code": "400", 
+    "message": "Data format failed OR wrong value entered at:  stateCode. Format shoul
+d follow  ^\d{1,5}$} 
+ 
+ 
+ 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 2.0 Page 7 of 78 
+ 
+b) In case stateCode exists 
+ 
+{    "response": [ 
+        { 
+            "response": [ 
+                { 
+                    "nameOfDistrict": "Gajapati", 
+                    "startingFromLatLong": null, 
+                    "nameOfTheLocation": null, 
+                    "policeStationName": null, 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": null, 
+                    "endingToLatLong": "NIL", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Rayagada", 
+                    "startingFromLatLong": "NIL", 
+                    "nameOfTheLocation": null, 
+                    "policeStationName": null, 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": null, 
+                    "endingToLatLong": null, 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Sundargarh", 
+                    "startingFromLatLong": "NIL", 
+                    "nameOfTheLocation": null, 
+                    "policeStationName": null, 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": null, 
+                    "endingToLatLong": null, 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "UPD,BBSR", 
+                    "startingFromLatLong": "NIL", 
+                    "nameOfTheLocation": null, 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 2.0 Page 8 of 78 
+ 
+                    "policeStationName": null, 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": null, 
+                    "endingToLatLong": null, 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Kendrapada ", 
+                    "startingFromLatLong": "Lat-20. 291799 Long-86.170234", 
+                    "nameOfTheLocation": "Chandol (cuttack- Chandbali Road )", 
+                    "policeStationName": "Sadar PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Orissa", 
+                    "roadName": "SH-9A", 
+                    "endingToLatLong": "Lat-20.292158 Long-86.172502", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Kendrapada ", 
+                    "startingFromLatLong": "Lat-20.303174 Long-86.211972", 
+                    "nameOfTheLocation": "Jantilo chhak (cuttack - Chandbali Road )", 
+                    "policeStationName": "Sadar PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Orissa", 
+                    "roadName": "SH-9A", 
+                    "endingToLatLong": "Lat-20.302391 Long-86.204635", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Kendrapada ", 
+                    "startingFromLatLong": "Lat- 20.305177 Long- 86.221779", 
+                    "nameOfTheLocation": "Duhuria chhak ( Cuttack - Chandbali Road )", 
+                    "policeStationName": "Sadar PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Orissa", 
+                    "roadName": "SH-9A", 
+                    "endingToLatLong": "Lat- 20.305714 Long- 86.225605", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 2.0 Page 9 of 78 
+ 
+                    "nameOfDistrict": "Kendrapada ", 
+                    "startingFromLatLong": "Lat-20.341214 Long- 86.291756", 
+                    "nameOfTheLocation": "Gagua (Cuttak - Chandbali road)", 
+                    "policeStationName": "Pattamundai", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Orissa", 
+                    "roadName": "SH-9A", 
+                    "endingToLatLong": "Lat-20.341214 Long- 86.293588", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Keonjhar", 
+                    "startingFromLatLong": null, 
+                    "nameOfTheLocation": "NIL", 
+                    "policeStationName": null, 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Orissa", 
+                    "roadName": null, 
+                    "endingToLatLong": null, 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Mayurbhanj", 
+                    "startingFromLatLong": "Lat-21.821176 Long- 86.988804", 
+                    "nameOfTheLocation": "Jhinkiria- Bhadarananda", 
+                    "policeStationName": "Morada PS ", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Orissa", 
+                    "roadName": "SH-61", 
+                    "endingToLatLong": "Lat-21.792086 Long-87.008224", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Jagatsinghpur", 
+                    "startingFromLatLong": "Lat-20.35885, Long-86.146651", 
+                    "nameOfTheLocation": "Sudhabhuin", 
+                    "policeStationName": "Paradeep Lock PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Orissa", 
+                    "roadName": "SH-12", 
+                    "endingToLatLong": "Lat-20.35892, Long-86.14671", 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 2.0 Page 10 of 78 
+ 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Jagatsinghpur", 
+                    "startingFromLatLong": "Lat-20.35885, Long-86.14665", 
+                    "nameOfTheLocation": "Barty", 
+                    "policeStationName": "Raghunathpur PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Orissa", 
+                    "roadName": "SH-12", 
+                    "endingToLatLong": "Lat-20.35891, Long-86.14673", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Jharsuguda", 
+                    "startingFromLatLong": "Lat-21.81196 Long-84.00616", 
+                    "nameOfTheLocation": "Sapada Chowk", 
+                    "policeStationName": "Badmal PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Orissa", 
+                    "roadName": "SH-10", 
+                    "endingToLatLong": "Lat-21.81477, Long-84.00596", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Jharsuguda", 
+                    "startingFromLatLong": "Lat-21.79518, Long-84.01019", 
+                    "nameOfTheLocation": "Kherual Chowk", 
+                    "policeStationName": "Badmal PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Orissa", 
+                    "roadName": "SH-10", 
+                    "endingToLatLong": "Lat-21.79072, Long-84.00902", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Jharsuguda", 
+                    "startingFromLatLong": "Lat-21.86824, Long-83.99606", 
+                    "nameOfTheLocation": "Sanjibani hospital Chowk ", 
+                    "policeStationName": "Sadar PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 2.0 Page 11 of 78 
+ 
+                    "state": "Orissa", 
+                    "roadName": "SH-10", 
+                    "endingToLatLong": "Lat-21.84299, Long-83.00394", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Jharsuguda", 
+                    "startingFromLatLong": "Lat-201.897312, Long-84.003938", 
+                    "nameOfTheLocation": "Jharianair Chowk", 
+                    "policeStationName": "Sadar PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Orissa", 
+                    "roadName": "SH-10", 
+                    "endingToLatLong": "Lat-21.898131, Long-83.004340", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Jharsuguda", 
+                    "startingFromLatLong": "Lat-21.929310, Long-84.035388", 
+                    "nameOfTheLocation": "Durlaga Road ", 
+                    "policeStationName": "Jharsuguda PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Orissa", 
+                    "roadName": "SH-10", 
+                    "endingToLatLong": "Lat-21.924374, Long-84.033662", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Kandhamal", 
+                    "startingFromLatLong": null, 
+                    "nameOfTheLocation": "NIL", 
+                    "policeStationName": null, 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Orissa", 
+                    "roadName": null, 
+                    "endingToLatLong": null, 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Boudh", 
+                    "startingFromLatLong": "Lat-20.750236, Long-83.824555", 
+                    "nameOfTheLocation": "Gopalmal Chhak", 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 2.0 Page 12 of 78 
+ 
+                    "policeStationName": "Manamunda PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Orissa", 
+                    "roadName": "SH-41", 
+                    "endingToLatLong": "Lat-20.753626, Long-83.826910", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Nuapada", 
+                    "startingFromLatLong": "Lat-20.09.83.69N, Long-82.63.26.44E", 
+                    "nameOfTheLocation": "Jugenpadar Chhack", 
+                    "policeStationName": "Sinapali PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Orissa", 
+                    "roadName": "Biju Express Way", 
+                    "endingToLatLong": "Lat-20.105675N, Long-82.599606E", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Nuapada", 
+                    "startingFromLatLong": "Lat-20.210597N, Long-82.573216E", 
+                    "nameOfTheLocation": "Near Rajpur Chhak to Kerapadar Chhack", 
+                    "policeStationName": "Boden PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Orissa", 
+                    "roadName": "Biju Express Way", 
+                    "endingToLatLong": "Lat-20.231112N, Long-82.569580E", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Rourkela", 
+                    "startingFromLatLong": "Lat-21.05250N, Long-85.00731E", 
+                    "nameOfTheLocation": "Tensa Ghati Turning No. 16", 
+                    "policeStationName": "Lahuinpada PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Orissa", 
+                    "roadName": "SH-10A", 
+                    "endingToLatLong": "Lat-21.05251N Long-85.00727E", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 2.0 Page 13 of 78 
+ 
+                    "nameOfDistrict": "Rourkela", 
+                    "startingFromLatLong": "Lat-2201423.44N Long-8404415.78E", 
+                    "nameOfTheLocation": "Beldihi", 
+                    "policeStationName": "B. Tarang PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Orissa", 
+                    "roadName": "SH-10", 
+                    "endingToLatLong": "Lat-2281424.17N, Long-8404433.73E", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Sonepur", 
+                    "startingFromLatLong": "Lat-205137.18N, Long-83540.78E", 
+                    "nameOfTheLocation": "Mahanadi Bridge ", 
+                    "policeStationName": "Sonepur PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Orissa", 
+                    "roadName": "SH", 
+                    "endingToLatLong": "Lat-2052109N, Long-83542419E", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Sambalpur", 
+                    "startingFromLatLong": "Lat-21.2936348, Long-83.5920976", 
+                    "nameOfTheLocation": "Bhalupali", 
+                    "policeStationName": "Ainthpalli PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Orissa", 
+                    "roadName": "SH-10", 
+                    "endingToLatLong": "Lat-21.29041712, Long-83.59140506", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Sambalpur", 
+                    "startingFromLatLong": "Lat-21.2951033, Long-84.0409065", 
+                    "nameOfTheLocation": "Pradhanpali", 
+                    "policeStationName": "Sason PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Orissa", 
+                    "roadName": "SH-10", 
+                    "endingToLatLong": "Lat-21.2441695, Long-84.0409065", 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 2.0 Page 14 of 78 
+ 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Sambalpur", 
+                    "startingFromLatLong": "Lat-21.5333343, Long-84.0231863", 
+                    "nameOfTheLocation": "Majhipali", 
+                    "policeStationName": "Sason PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Orissa", 
+                    "roadName": "SH-10", 
+                    "endingToLatLong": "Lat-21.595103, Long-84.0409061", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Sambalpur", 
+                    "startingFromLatLong": "Lat-21.2441706, Long-84.0324922", 
+                    "nameOfTheLocation": "Sason Bypass", 
+                    "policeStationName": "Sason PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Orissa", 
+                    "roadName": "SH-10", 
+                    "endingToLatLong": "Lat-21.533323, Long-84.0231856", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Sambalpur", 
+                    "startingFromLatLong": "Lat-21.32104, Long-83.95394", 
+                    "nameOfTheLocation": "Bargaon to Daspurchhowk", 
+                    "policeStationName": "Dhama PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Orissa", 
+                    "roadName": "SH-15", 
+                    "endingToLatLong": "Lat-21.29924, Long-83.94167", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Sambalpur", 
+                    "startingFromLatLong": "Lat-21.32305 Long-83.95392", 
+                    "nameOfTheLocation": "Chhachanpali to Sahaspurchhowk", 
+                    "policeStationName": "Dhama PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 2.0 Page 15 of 78 
+ 
+                    "state": "Orissa", 
+                    "roadName": "SH-15", 
+                    "endingToLatLong": "Lat-21.34757 Long-83.96693", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Sambalpur", 
+                    "startingFromLatLong": "Lat-21.37858, Long 83.97732", 
+                    "nameOfTheLocation": "Jayaghant to Badtikara Chhawk", 
+                    "policeStationName": "Dhama PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Orissa", 
+                    "roadName": "SH-15", 
+                    "endingToLatLong": "Lat-21.38086, Long- 83.97925", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Sambalpur", 
+                    "startingFromLatLong": "Lat-21.6767522, Long 84.046603", 
+                    "nameOfTheLocation": "Smel Pandloi", 
+                    "policeStationName": "Rengali PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Orissa", 
+                    "roadName": "SH-10", 
+                    "endingToLatLong": "Lat-21.682757, Long-84.043900", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Sambalpur", 
+                    "startingFromLatLong": "Lat-21.6978839, Long-84.0370634", 
+                    "nameOfTheLocation": "Gurupali", 
+                    "policeStationName": "Rengali PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Orissa", 
+                    "roadName": "SH-10", 
+                    "endingToLatLong": "Lat-21.0700110, Long-84.035624", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Sambalpur", 
+                    "startingFromLatLong": "Lat-22.0361458, Long-84.283257", 
+                    "nameOfTheLocation": "Lampti Chowk to Bamphei Chhowk", 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 2.0 Page 16 of 78 
+ 
+                    "policeStationName": "Gobindpur PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Orissa", 
+                    "roadName": "SH-24", 
+                    "endingToLatLong": "Lat-22.1084206, Long-84.2635328", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Sambalpur", 
+                    "startingFromLatLong": "Lat-21.896891, Long-84.38130", 
+                    "nameOfTheLocation": "Keseibahal ", 
+                    "policeStationName": "Mahulpali PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Orissa", 
+                    "roadName": "SH-24", 
+                    "endingToLatLong": "Lat-21.918420, Long-84.382462", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Sambalpur", 
+                    "startingFromLatLong": "Lat-21.75394, Long - 84.00966", 
+                    "nameOfTheLocation": "Thelkoloi Chowk", 
+                    "policeStationName": "Thelkoloi PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Orissa", 
+                    "roadName": "SH-10 Biju Express", 
+                    "endingToLatLong": "Lat-21.76809, Long-84.0133", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Ganjam", 
+                    "startingFromLatLong": "Lat-19.45328, Long-84.882231", 
+                    "nameOfTheLocation": "Bhatakumurada Near Bayidhara Temple", 
+                    "policeStationName": "Purusottampur PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Orissa", 
+                    "roadName": "SH-31", 
+                    "endingToLatLong": "Lat-19.45333, Long- 84.882236", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 2.0 Page 17 of 78 
+ 
+                    "nameOfDistrict": "Ganjam", 
+                    "startingFromLatLong": "Lat-19.619717, Long-84.966107", 
+                    "nameOfTheLocation": "khar khari Bridge", 
+                    "policeStationName": "Kodala PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Orissa", 
+                    "roadName": "SH-30", 
+                    "endingToLatLong": "Lat-19.619722, Long 84.966111", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Ganjam", 
+                    "startingFromLatLong": "Lat-19.581853, Long-84.782596", 
+                    "nameOfTheLocation": "Gudiali Chhaka to thasil office chhaka", 
+                    "policeStationName": "Kabisuryanagar PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Orissa", 
+                    "roadName": "SH-30", 
+                    "endingToLatLong": "Lat-19.581853, Long- 84. 782510", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Ganjam", 
+                    "startingFromLatLong": "Lat:19.661671, Long- 84.690036", 
+                    "nameOfTheLocation": "Charimaile chhaka to Pallimala", 
+                    "policeStationName": "Kotinda PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Orissa", 
+                    "roadName": "SH-33", 
+                    "endingToLatLong": "Lat-19.661676, Long-84.690041", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Ganjam", 
+                    "startingFromLatLong": "Lat-19.525406, Long-84.614278", 
+                    "nameOfTheLocation": "IB Chhaka", 
+                    "policeStationName": "Sheragada PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Orissa", 
+                    "roadName": "SH-349", 
+                    "endingToLatLong": "Lat-19.5254411, Long-84.614283", 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 2.0 Page 18 of 78 
+ 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Ganjam", 
+                    "startingFromLatLong": "Lat-19.577398, Long-84.531469", 
+                    "nameOfTheLocation": "Sadhangipalli to jail Bridge", 
+                    "policeStationName": "Badagada PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Orissa", 
+                    "roadName": "SH-36", 
+                    "endingToLatLong": "Lat-19.577403, Long-84.531474", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Ganjam", 
+                    "startingFromLatLong": "Lat-19.777928, Long-84.496928", 
+                    "nameOfTheLocation": "Near Bibhutia Temple", 
+                    "policeStationName": "Sorada PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Orissa", 
+                    "roadName": "SH-136", 
+                    "endingToLatLong": "Lat-19.777932, Long-84.496932", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Rayagad", 
+                    "startingFromLatLong": "Lat-19.221958 Lo-83.773853", 
+                    "nameOfTheLocation": "Gumuda", 
+                    "policeStationName": "Gudari Ps", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "NH-326", 
+                    "endingToLatLong": "Lat-19.229648 Lo-83.76058", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "UPD,BBSR", 
+                    "startingFromLatLong": "Lat-20 º18 57.69\"N Lo-85º 52 43.87\"E", 
+                    "nameOfTheLocation": "Hanspal Chhak", 
+                    "policeStationName": "Mancheswar PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 2.0 Page 19 of 78 
+ 
+                    "state": "Odisha", 
+                    "roadName": "16", 
+                    "endingToLatLong": "Lat-20 º19 10.02\"N Lo-85º 52 52.12\"E", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "UPD,BBSR", 
+                    "startingFromLatLong": "Lat- 20º 18 06.47\"N Lo-85 º51 52.68\"E", 
+                    "nameOfTheLocation": "Palasuni Chhak", 
+                    "policeStationName": "Mancheswar PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "16", 
+                    "endingToLatLong": "Lat-20º 18 11.10\"N Lo-85º 51 57.34\"E", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "UPD,BBSR", 
+                    "startingFromLatLong": "Lat-20º 17 45.19\"N Lo-85 º50 52.66 \"E", 
+                    "nameOfTheLocation": "Satsanga Vihar Chhak", 
+                    "policeStationName": "Saheed Nagar PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "16", 
+                    "endingToLatLong": "Lat-20 º17 44.68 N Lo-85º 50 58.32\" E", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "UPD,BBSR", 
+                    "startingFromLatLong": "Lat-20º17 49.09\"N Lo-85º 49 59.74\"E", 
+                    "nameOfTheLocation": "Acharay Vihar", 
+                    "policeStationName": "Saheed Nagar PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "16", 
+                    "endingToLatLong": "Lat-20º 17 47 68\" N Lo-85º 50 16 24\"E", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "UPD,BBSR", 
+                    "startingFromLatLong": "Lat-20º 17 43.39\"N Lo-85º49 29.51\"E", 
+                    "nameOfTheLocation": "Jaydev Vihar", 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 2.0 Page 20 of 78 
+ 
+                    "policeStationName": "Saheed Nagar PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "16", 
+                    "endingToLatLong": "Lat-20º17 49 28\" N Lat-85º49 44.22\"E", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "UPD,BBSR", 
+                    "startingFromLatLong": "Lat-20º 17 46.57 N Lo-85º 50 31.49\" E", 
+                    "nameOfTheLocation": "Vanivihar", 
+                    "policeStationName": "Saheed Nagar PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "16", 
+                    "endingToLatLong": "Lat-20º17 49.51\"N Lo-85º 49 43.12\"E", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "UPD,BBSR", 
+                    "startingFromLatLong": "Lat-20º21 07.33\"N Lo-85º 53 21.82\"E", 
+                    "nameOfTheLocation": "Near Hunyadi Show Room", 
+                    "policeStationName": "Balianat PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "16", 
+                    "endingToLatLong": "Lat-20º 21 00.68\"N Lo-85º53 17.51\"E", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "UPD,CTC", 
+                    "startingFromLatLong": "Lat-20.450003 Lo-85.898429", 
+                    "nameOfTheLocation": "End of Fly Over bridge to Samrat Cinema Hall 
+Chhak", 
+                    "policeStationName": "Madhupatna P.S", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "NH-16", 
+                    "endingToLatLong": "Lat-20.448867 Lo-85.897840", 
+                    "startingFromDistance": null 
+                }, 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 2.0 Page 21 of 78 
+ 
+                { 
+                    "nameOfDistrict": "UPD,CTC", 
+                    "startingFromLatLong": "Lat.20.495179 Lo-85.92102", 
+                    "nameOfTheLocation": "Near GoleiChhaka,Jagatpur", 
+                    "policeStationName": "Jagatpur P.S", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "NH-16", 
+                    "endingToLatLong": "Lat-20.493581 Lo.85.919797", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "UPD,CTC", 
+                    "startingFromLatLong": "Lat-20.523503 Lo-85.877817", 
+                    "nameOfTheLocation": "Kajalakana", 
+                    "policeStationName": "Choudwar P.S", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "NH-55", 
+                    "endingToLatLong": "Lat-20.523463 Lo-85.874421", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "UPD,CTC", 
+                    "startingFromLatLong": "Lat-20.469297 Lo-85.906339", 
+                    "nameOfTheLocation": "Sikharpur", 
+                    "policeStationName": "Chauliaganj P.S", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "NH-16", 
+                    "endingToLatLong": "Lat-20.470699 Lo-85.907257", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "UPD,CTC", 
+                    "startingFromLatLong": "Lat-20.456810 Lo-85.901581", 
+                    "nameOfTheLocation": "OMP Square", 
+                    "policeStationName": "Chauliaganj P.S", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "NH-16", 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 2.0 Page 22 of 78 
+ 
+                    "endingToLatLong": "Lat-20.455181 Lo-85.901066", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "UPD,CTC", 
+                    "startingFromLatLong": "Lat-20.456071 Lo-85.908896", 
+                    "nameOfTheLocation": "Chauliaganj Durga Mandap", 
+                    "policeStationName": "Chauliaganj P.S", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "NH-55", 
+                    "endingToLatLong": "Lat-20.455286 Lo-85.910232", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "UPD,CTC", 
+                    "startingFromLatLong": "Lat-20.452671 Lo-85.91604", 
+                    "nameOfTheLocation": "Nayabazar", 
+                    "policeStationName": "Chauliaganj P.S", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "NH-55", 
+                    "endingToLatLong": "Lat-20.451671 Lo-85.918443", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "UPD,CTC", 
+                    "startingFromLatLong": "Lat-20.446912 Lo-85.937717", 
+                    "nameOfTheLocation": "Bidyadharpur", 
+                    "policeStationName": "Chauliaganj P.S", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "NH-55", 
+                    "endingToLatLong": "Lat-20.445489 Lo-85.943187", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "UPD,CTC", 
+                    "startingFromLatLong": "Lat-20.444329 Lo-85.945538", 
+                    "nameOfTheLocation": "Gatiroutpatna", 
+                    "policeStationName": "Chauliaganj P.S", 
+                    "endingToDistance": null, 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 2.0 Page 23 of 78 
+ 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "NH-55", 
+                    "endingToLatLong": "Lat-20.446359 Lo-85.940388", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "UPD,CTC", 
+                    "startingFromLatLong": "Lat-20.363059 L0-85.890834", 
+                    "nameOfTheLocation": "Nakhara", 
+                    "policeStationName": "Sadar P.S", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "NH-16", 
+                    "endingToLatLong": "Lat-20.360655 Lo-85.889755", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "UPD,CTC", 
+                    "startingFromLatLong": "Lat-20.437956 Lo-85.887068", 
+                    "nameOfTheLocation": "Gopalpur", 
+                    "policeStationName": "Sadar P.S", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "NH-16", 
+                    "endingToLatLong": "Lat-20.435725 Lo-85.883608", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "UPD,CTC", 
+                    "startingFromLatLong": "Lat-20.405140 Lo-85.87993", 
+                    "nameOfTheLocation": "Bhanpur", 
+                    "policeStationName": "Sadar P.S", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "NH-16", 
+                    "endingToLatLong": "Lat-20.402230 Lo-85.880672", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "UPD,CTC", 
+                    "startingFromLatLong": "Lat-20.405591 Lo-85.879791 ", 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 2.0 Page 24 of 78 
+ 
+                    "nameOfTheLocation": "Pratap Nagari", 
+                    "policeStationName": "Sadar P.S", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "NH-16", 
+                    "endingToLatLong": "Lat-20.403379 Lo-85.880403 ", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "UPD,CTC", 
+                    "startingFromLatLong": "Lat-20.428347 Lo-85.877534", 
+                    "nameOfTheLocation": "Balikuda", 
+                    "policeStationName": "Sadar P.S", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "NH-16", 
+                    "endingToLatLong": "Lat-20.433708 Lo-85.881013", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "UPD,CTC", 
+                    "startingFromLatLong": "Lat-20.437788 Lo-85.886991", 
+                    "nameOfTheLocation": "Kathajodi Bridge", 
+                    "policeStationName": "Sadar P.S", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "NH-16", 
+                    "endingToLatLong": "Lat-20.435137 Lo-85.882376", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "UPD,CTC", 
+                    "startingFromLatLong": "Lat-20.394783 Lo-85.882267", 
+                    "nameOfTheLocation": "Telengapentha", 
+                    "policeStationName": "Sadar P.S", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "NH-16", 
+                    "endingToLatLong": "Lat-20.391826 Lo-85883987", 
+                    "startingFromDistance": null 
+                }, 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 2.0 Page 25 of 78 
+ 
+                { 
+                    "nameOfDistrict": "UPD,CTC", 
+                    "startingFromLatLong": "Lat-20.37557 Lo-85.88939", 
+                    "nameOfTheLocation": "Bamphakuda", 
+                    "policeStationName": "Sadar P.S", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "NH-16", 
+                    "endingToLatLong": "Lat-20.37463 Lo-85.88989", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "UPD,CTC", 
+                    "startingFromLatLong": "Lat-20.417930 Lo-85.999988", 
+                    "nameOfTheLocation": "Phakirpada", 
+                    "policeStationName": "Kandarpur P.S", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "NH-55", 
+                    "endingToLatLong": "Lat-20.419771 Lo-85.995506", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "UPD,CTC", 
+                    "startingFromLatLong": "Lat-20.427271 Lo-85.976784", 
+                    "nameOfTheLocation": "Nahabhanga", 
+                    "policeStationName": "Kandarpur P.S", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "NH-55", 
+                    "endingToLatLong": "Lat-20.429684 Lo-85.974692", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Cuttack", 
+                    "startingFromLatLong": "Lat-20.5192903 Lo-85.9324119", 
+                    "nameOfTheLocation": "Manguli", 
+                    "policeStationName": "Tangi PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "NH-16", 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 2.0 Page 26 of 78 
+ 
+                    "endingToLatLong": "Lat-20.5241812 Lo-85.9406346", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Cuttack", 
+                    "startingFromLatLong": "Lat-20.5243019 Lo-85.9405405", 
+                    "nameOfTheLocation": "Nirgundi", 
+                    "policeStationName": "Tangi PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "NH-16", 
+                    "endingToLatLong": "Lat-20.5327009 Lo-85.9535806", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Cuttack", 
+                    "startingFromLatLong": "Lat-20.5543669 Lo-85.9904355", 
+                    "nameOfTheLocation": "Tangi", 
+                    "policeStationName": "Tangi PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "NH-16", 
+                    "endingToLatLong": "Lat-20.5592453 Lo-85.9983852", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Cuttack", 
+                    "startingFromLatLong": "Lat-20.5629508 Lo-86.0060550", 
+                    "nameOfTheLocation": "Bandalo", 
+                    "policeStationName": "Tangi PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "NH-16", 
+                    "endingToLatLong": "Lat-20.5841922 Lo-86.0341813", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Cuttack", 
+                    "startingFromLatLong": "Lat-20.548602 Lo-85.786997", 
+                    "nameOfTheLocation": "Kapursingh to Galvaniser Campany", 
+                    "policeStationName": "Gurudijhatia PS", 
+                    "endingToDistance": null, 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 2.0 Page 27 of 78 
+ 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "NH-55", 
+                    "endingToLatLong": "Lat-20.549440 Lo-85.783808", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Jagatsinghpur", 
+                    "startingFromLatLong": "Lat-20.8097 Lo-86.5186", 
+                    "nameOfTheLocation": "Mangalpur", 
+                    "policeStationName": "Jagatsinghpur PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "NH-55", 
+                    "endingToLatLong": "Lat-20.2955 Lo-86.1392", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Jagatsinghpur", 
+                    "startingFromLatLong": "Lat-20.2099 Lo-862184", 
+                    "nameOfTheLocation": "Dhiasahi", 
+                    "policeStationName": "Jagatsinghpur PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "NH-55", 
+                    "endingToLatLong": "Lat-20.2144 Lo-86.2197", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Jagatsinghpur", 
+                    "startingFromLatLong": "Lat-20.2955 Lo-86.1392", 
+                    "nameOfTheLocation": "Jogadhari", 
+                    "policeStationName": "Jagatsinghpur PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "NH-55", 
+                    "endingToLatLong": "Lat-20.2549 Lo-86.1706", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Jagatsinghpur", 
+                    "startingFromLatLong": "Lat-20.1412 Lo-86.2730", 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 2.0 Page 28 of 78 
+ 
+                    "nameOfTheLocation": "Gopalpur", 
+                    "policeStationName": "Balikuda PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "NH-55", 
+                    "endingToLatLong": "Lat-20.1210 Lo-86.2520", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Jagatsinghpur", 
+                    "startingFromLatLong": "Lat-20.3214.61 Lo-86104.739", 
+                    "nameOfTheLocation": "Anakhia", 
+                    "policeStationName": "Biridi PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "NH-55", 
+                    "endingToLatLong": "Lat-20.382968 Lo-86.016174", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Jagatsinghpur", 
+                    "startingFromLatLong": "Lat-20.359057 Lo-86.140850", 
+                    "nameOfTheLocation": "Daleighai", 
+                    "policeStationName": "Biridi PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "NH-55", 
+                    "endingToLatLong": "Lat-20.359095 Lo-86.140089", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Jagatsinghpur", 
+                    "startingFromLatLong": "Lat-20.2019 Lo-86.4010", 
+                    "nameOfTheLocation": "Kothi Bridge", 
+                    "policeStationName": "Erasama PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "NH-55", 
+                    "endingToLatLong": "Lat-20.2032 Lo-86.4045", 
+                    "startingFromDistance": null 
+                }, 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 2.0 Page 29 of 78 
+ 
+                { 
+                    "nameOfDistrict": "Jagatsinghpur", 
+                    "startingFromLatLong": "Lat-20.2863 Lo-86.464", 
+                    "nameOfTheLocation": "Tarinigada", 
+                    "policeStationName": "Paradeep Model PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "NH-53(5-A)", 
+                    "endingToLatLong": "Lat-20.2861 Lo-86.6060", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Dhenkanal", 
+                    "startingFromLatLong": "Lat:20.610541 Long:85.637244", 
+                    "nameOfTheLocation": "Govindipur Chhak", 
+                    "policeStationName": "Sadar PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "NH-55", 
+                    "endingToLatLong": "Lat:20.220760 Long:79.699640", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Ganjam", 
+                    "startingFromLatLong": "La-19.438002 Lo-85.077669", 
+                    "nameOfTheLocation": "Humma", 
+                    "policeStationName": "Rambha PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "NH-16", 
+                    "endingToLatLong": "La-19.430686 Lo-85.075943", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Ganjam", 
+                    "startingFromLatLong": "La-19.422237 Lo-85.073425", 
+                    "nameOfTheLocation": "Jhadakuda", 
+                    "policeStationName": "Rambha PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "NH-16", 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 2.0 Page 30 of 78 
+ 
+                    "endingToLatLong": "La-19.410413 Lo-85.069639", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Ganjam", 
+                    "startingFromLatLong": "La-19.619869 Lo-La-19.619869 Lo- 85.123455", 
+                    "nameOfTheLocation": "Keshapur chakka to Bhejiput", 
+                    "policeStationName": "Kalikote PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "NH-16", 
+                    "endingToLatLong": "La-19.638132 Lo-85.140030", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Ganjam", 
+                    "startingFromLatLong": "La-19.565368 Lo-84.684747", 
+                    "nameOfTheLocation": "Charamaria Chaka to Khadabhaga", 
+                    "policeStationName": "Aska PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "NH-59", 
+                    "endingToLatLong": "La-19.565373 Lo-84.684752", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Ganjam", 
+                    "startingFromLatLong": "La-19.667498 Lo-84.639291", 
+                    "nameOfTheLocation": "Gunthapada to Jagadalapur chaka ", 
+                    "policeStationName": "Aska PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "NH-157", 
+                    "endingToLatLong": "La- 19.667453 Lo-84.639297", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Ganjam", 
+                    "startingFromLatLong": "La-19.657594 Lo-580244", 
+                    "nameOfTheLocation": "Talapatna Chaka", 
+                    "policeStationName": "Dharakote PS ", 
+                    "endingToDistance": null, 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 2.0 Page 31 of 78 
+ 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "NH-59", 
+                    "endingToLatLong": "La-19.657499 Lo-84.580249", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Ganjam", 
+                    "startingFromLatLong": "La- 19.446777 Lo-84.750664", 
+                    "nameOfTheLocation": "Samarajhola Eye Hospital to Esser petrol pump", 
+                    "policeStationName": "Hinjili PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "NH-59", 
+                    "endingToLatLong": "la-19.292339 Lo-84.235228", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Ganjam", 
+                    "startingFromLatLong": "La-19.493472 Lo-84.731375", 
+                    "nameOfTheLocation": "Kanchuradu Chaka", 
+                    "policeStationName": "Hinjili PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "NH-59", 
+                    "endingToLatLong": "La- 19.493477 Lo- 84.731379", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Ganjam", 
+                    "startingFromLatLong": "La-19.29430 Lo- 84.24213", 
+                    "nameOfTheLocation": "Taptapani Ghat", 
+                    "policeStationName": "Pattapur PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "NH-326", 
+                    "endingToLatLong": "la-19.292339 Lo-84.235228", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Ganjam", 
+                    "startingFromLatLong": "La-19.809665 Lo-84.347989", 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 2.0 Page 32 of 78 
+ 
+                    "nameOfTheLocation": "Kharikoti to Banadurga temple", 
+                    "policeStationName": "Sorada Ps", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "NH-59", 
+                    "endingToLatLong": "La-19.809670 Lo- 84.347994", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Ganjam", 
+                    "startingFromLatLong": "La- 19.828904 Lo- 84.329492", 
+                    "nameOfTheLocation": "Pipalapanka Bridge", 
+                    "policeStationName": "Sorada Ps", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "NH-59", 
+                    "endingToLatLong": "La-19828909 Lo-84329492", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Ganjam", 
+                    "startingFromLatLong": "La-19.99752 Lo-84.53778", 
+                    "nameOfTheLocation": "Buduli to Mujagada", 
+                    "policeStationName": "Bhanjnagar PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "NH-157", 
+                    "endingToLatLong": "La2001184 Lo-2001184 Lo- 84.52469", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Ganjam", 
+                    "startingFromLatLong": "La- 19.771804 Lo-84615144", 
+                    "nameOfTheLocation": "Khairaputi Chaka to Kesarapalli Chaka", 
+                    "policeStationName": "Gangapur PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "NH-159", 
+                    "endingToLatLong": "La-19.771809 Lo-84615149", 
+                    "startingFromDistance": null 
+                }, 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 2.0 Page 33 of 78 
+ 
+                { 
+                    "nameOfDistrict": "Balesore", 
+                    "startingFromLatLong": "La-21\"32'N55.8456' Lo-86\"55'9.57432\"E", 
+                    "nameOfTheLocation": "Baruni Polo", 
+                    "policeStationName": "Sahadevkhunta PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "NH", 
+                    "endingToLatLong": "La-21'3248.24708N Lo-86\"54'47.59452E", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Balesore", 
+                    "startingFromLatLong": "La-21'29'0.2404 N Lo-86'53'14'2800'E", 
+                    "nameOfTheLocation": "Nuagaon", 
+                    "policeStationName": "Bampadal A PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "NH", 
+                    "endingToLatLong": "La-21'29'16'2578N Lo-86'53'17'2882'E", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Balesore", 
+                    "startingFromLatLong": "La-21'31'14'6726'E Lo-86'53'40'6505N", 
+                    "nameOfTheLocation": "Salabani", 
+                    "policeStationName": "Bampadal A PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "NH", 
+                    "endingToLatLong": "La-21'31'30'4224E Lo-86'53'43'4224E", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Balesore", 
+                    "startingFromLatLong": "La-21'30'29'.9837'N Lo- 86'53'30'.8400'E", 
+                    "nameOfTheLocation": "Remuna Golei", 
+                    "policeStationName": "Bampadal A PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "NH", 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 2.0 Page 34 of 78 
+ 
+                    "endingToLatLong": "La-21'31'45'9554'N Lo-86'53'34'.1117'E", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Balesore", 
+                    "startingFromLatLong": "La-21'29'25'.8778'N Lo-86'53'19'.0356'E", 
+                    "nameOfTheLocation": "Bampada", 
+                    "policeStationName": "Bampadal A PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "NH", 
+                    "endingToLatLong": "La--21'29'41'.9125'N Lo-86'53'21'.9343'E", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Balesore", 
+                    "startingFromLatLong": "La-21'19'33'.0060'N Lo-86'44'11'.4191E", 
+                    "nameOfTheLocation": "UN Colleg Chak", 
+                    "policeStationName": "Soro PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "NH", 
+                    "endingToLatLong": "La-21'19'42''.9236'N Lo-86'44'25'.1754'E", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Balesore", 
+                    "startingFromLatLong": "La-21'19'54'.7810'N Lo-86'44'41'.7192'E", 
+                    "nameOfTheLocation": "Bidu", 
+                    "policeStationName": "Soro PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "NH", 
+                    "endingToLatLong": "La-21'20'4.5276'N Lo-86'44'55'.6112'E", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Balesore", 
+                    "startingFromLatLong": "La-21'20'17.2061'N Lo-86'45'19.8580'E", 
+                    "nameOfTheLocation": "Barikpur", 
+                    "policeStationName": "Soro PS", 
+                    "endingToDistance": null, 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 2.0 Page 35 of 78 
+ 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "NH", 
+                    "endingToLatLong": "La-21'20'19.5871'N Lo-86'45'24.4033'E", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Balesore", 
+                    "startingFromLatLong": "La-21'17'42'.8176'N Lo-86'41'28'.1119'E", 
+                    "nameOfTheLocation": "Bahanaga", 
+                    "policeStationName": "Soro PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "NH", 
+                    "endingToLatLong": "La- 21'17'51.5285'N Lo-86'41'42.7664'E", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Balesore", 
+                    "startingFromLatLong": "La-21'18'32.6592'N Lo-86'42'45.2178'E", 
+                    "nameOfTheLocation": "Talnagaer", 
+                    "policeStationName": "Soro PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "NH", 
+                    "endingToLatLong": "La-21'18'36.4918'N Lo-86'42'50.8270'E", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Balesore", 
+                    "startingFromLatLong": "La-21'18'32.6592'N Lo-86'42'45.2178'E", 
+                    "nameOfTheLocation": "Nayak Bandh", 
+                    "policeStationName": "Soro PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "NH", 
+                    "endingToLatLong": "La-21'18'36.4918'N Lo-86'42'50.8270'E", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Balesore", 
+                    "startingFromLatLong": "La-21'11'4.0636'N Lo-86'36;10.0494'E", 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 2.0 Page 36 of 78 
+ 
+                    "nameOfTheLocation": "Nidhipanda", 
+                    "policeStationName": "Sardar PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "NH", 
+                    "endingToLatLong": "La-21'11'15.2286'N Lo-86'36'35.1108'E", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Balesore", 
+                    "startingFromLatLong": "La-21.469568'N Lo-86'36;10.0494'E", 
+                    "nameOfTheLocation": "Kuruda", 
+                    "policeStationName": "Sardar PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "NH", 
+                    "endingToLatLong": "La-21'11'15.2286'N Lo-86'36'35.1108'E", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Balesore", 
+                    "startingFromLatLong": "La-21.5626056'N Lo-86'36;10.0494'E", 
+                    "nameOfTheLocation": "Gamon Bridge", 
+                    "policeStationName": "Sardar PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "NH", 
+                    "endingToLatLong": "La-21'11'15.2286'N Lo-86'36'35.1108'E", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Balesore", 
+                    "startingFromLatLong": "La-21.746807 Lo-87.148725", 
+                    "nameOfTheLocation": "Maitapur", 
+                    "policeStationName": "Simulia PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "NH", 
+                    "endingToLatLong": "La-21.750482 Lo-87.150775", 
+                    "startingFromDistance": null 
+                }, 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 2.0 Page 37 of 78 
+ 
+                { 
+                    "nameOfDistrict": "Balesore", 
+                    "startingFromLatLong": "La-21.594833 Lo87.021402", 
+                    "nameOfTheLocation": "Rajghat", 
+                    "policeStationName": "Basta PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "NH", 
+                    "endingToLatLong": "La21.597411 Lo-87.0301", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Balesore", 
+                    "startingFromLatLong": "La-21.693001 Lo-87.077", 
+                    "nameOfTheLocation": "Mathani", 
+                    "policeStationName": "Basta PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "NH", 
+                    "endingToLatLong": "La-21.6699 Lo-87.066329", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Balesore", 
+                    "startingFromLatLong": "La-21.469568'N Lo-86'36;10.0494'E", 
+                    "nameOfTheLocation": "Chalanti", 
+                    "policeStationName": "Jaleswar PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "NH", 
+                    "endingToLatLong": "La-21'11'15.2286'N Lo-86'36'35.1108'E", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Malkangiri", 
+                    "startingFromLatLong": "La-18.289144 Lo-81.840266", 
+                    "nameOfTheLocation": "Near Village MV-13", 
+                    "policeStationName": "Malkangiri Town PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "NH-326", 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 2.0 Page 38 of 78 
+ 
+                    "endingToLatLong": "La- 18.283825 Lo-81.838340", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Koraput", 
+                    "startingFromLatLong": "La-19.0241863 Lo-83.16000425", 
+                    "nameOfTheLocation": "Minapai to Dhamanganda/Kutinga", 
+                    "policeStationName": "Laxmipur PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "NH-326", 
+                    "endingToLatLong": "La-19.07422807 Lo-83.1703167", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Koraput", 
+                    "startingFromLatLong": "La-18.986663 Lo-83.105774", 
+                    "nameOfTheLocation": "Laxmipur to Kusumguda   ", 
+                    "policeStationName": "Laxmipur PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "NH-326", 
+                    "endingToLatLong": "La-18.970280 Lo-83.032264", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Koraput", 
+                    "startingFromLatLong": "La-18.986663 Lo-83.105774", 
+                    "nameOfTheLocation": "Laxmipur to Bandikar", 
+                    "policeStationName": "Laxmipur PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "NH-326", 
+                    "endingToLatLong": "La-19.015076 Lo-83.136541", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Koraput", 
+                    "startingFromLatLong": "La-18.394823 Lo-82.203553", 
+                    "nameOfTheLocation": "Lanagalpakana zero point to Topajodi", 
+                    "policeStationName": "Boipariguda PS", 
+                    "endingToDistance": null, 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 2.0 Page 39 of 78 
+ 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "NH-326", 
+                    "endingToLatLong": "La-18.411053 Lo-82.221723", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Koraput", 
+                    "startingFromLatLong": "La-18.385075 Lo-82.201654", 
+                    "nameOfTheLocation": "Mantriamb to Panditbeda", 
+                    "policeStationName": "Boipariguda PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "NH-326", 
+                    "endingToLatLong": "La-18.381517 Lo-82.201122", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Koraput", 
+                    "startingFromLatLong": "La-19.191207 Lo-82.555714", 
+                    "nameOfTheLocation": "Aunli Chak to Indravati Chowk", 
+                    "policeStationName": "Boriguma PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "NH-26", 
+                    "endingToLatLong": "La19.199192 Lo-82.552951 ", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Koraput", 
+                    "startingFromLatLong": "Lat-18.807430 Lo-82.714836", 
+                    "nameOfTheLocation": "In front of DIG office Koraput", 
+                    "policeStationName": "Koraput Town PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "NH-26", 
+                    "endingToLatLong": "La-18.806694 Lo-82.715524", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Koraput", 
+                    "startingFromLatLong": "La-18.782212 Lo-82.739095", 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 2.0 Page 40 of 78 
+ 
+                    "nameOfTheLocation": "New colony Landiguda", 
+                    "policeStationName": "Koraput Town PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "NH-26", 
+                    "endingToLatLong": "La-18.780090 Lo-82.751255", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Koraput", 
+                    "startingFromLatLong": "La-18.5130 Lo-82.3590", 
+                    "nameOfTheLocation": "Hello Jeypore", 
+                    "policeStationName": "Jeypore Town PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "NH-26", 
+                    "endingToLatLong": "La-18.4230 Lo-82.2589", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Koraput", 
+                    "startingFromLatLong": "La-18.85807 Lo-82.58391", 
+                    "nameOfTheLocation": "Gandhi Chak, Jeypore", 
+                    "policeStationName": "Jeypore Town PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "NH-26", 
+                    "endingToLatLong": "La-18.75832 Lo-82.45621", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Koraput", 
+                    "startingFromLatLong": "La-18.5159 lo-82.3358", 
+                    "nameOfTheLocation": "Kalia Petrol pump to Laxmi panda chak", 
+                    "policeStationName": "Jeypore Town PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "NH-26", 
+                    "endingToLatLong": "La-18.4569 Lo-82.2688", 
+                    "startingFromDistance": null 
+                }, 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 2.0 Page 41 of 78 
+ 
+                { 
+                    "nameOfDistrict": "Koraput", 
+                    "startingFromLatLong": "La-18.5129 Lo-82.3521", 
+                    "nameOfTheLocation": "Global Medical chak", 
+                    "policeStationName": "Jeypore Town PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "Bypass Road NH-326", 
+                    "endingToLatLong": "La-18.4569 Lo-82.2548", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Koraput", 
+                    "startingFromLatLong": "La-18.8159258 Lo-82.6947479", 
+                    "nameOfTheLocation": "Deoghati to IRBn", 
+                    "policeStationName": "Koraput Sardar PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "NH-26", 
+                    "endingToLatLong": "La-18.8431916 Lo-82.6093405", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Koraput", 
+                    "startingFromLatLong": "La-18.8901922 Lo-82.9261213", 
+                    "nameOfTheLocation": "Ambliambaguda Junction", 
+                    "policeStationName": "Kakiriguma PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "NH-326", 
+                    "endingToLatLong": "La-18.8884883 Lo-82.9158817", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Koraput", 
+                    "startingFromLatLong": "La-18.7023572 Lo-82.8598557", 
+                    "nameOfTheLocation": "Jibanjyoti public school to Doliamba Chak", 
+                    "policeStationName": "Semiliguda PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "NH-26", 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 2.0 Page 42 of 78 
+ 
+                    "endingToLatLong": "La-18.6465918 Lo-82.876954", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Koraput", 
+                    "startingFromLatLong": "La-18.568461 Lo-82.9284596", 
+                    "nameOfTheLocation": "Sipaiput Chowk to Kunduli hata", 
+                    "policeStationName": "Pottangi PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "NH-26", 
+                    "endingToLatLong": "La-18.6002972 Lo-82.902919", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Koraput", 
+                    "startingFromLatLong": "La-18.511992 Lo-82.9886263", 
+                    "nameOfTheLocation": "Ralegada to Jodimadili", 
+                    "policeStationName": "Pottangi PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "NH-26", 
+                    "endingToLatLong": "La-18.5002988 Lo-83.0158504", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Koraput", 
+                    "startingFromLatLong": "La-018.54128 Lo-82.33428", 
+                    "nameOfTheLocation": "Pharmacy college to Umuri Bridge", 
+                    "policeStationName": "Jeypore Sardar PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "NH-26", 
+                    "endingToLatLong": "La-18.53403 Lo-82.34435", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Koraput", 
+                    "startingFromLatLong": "La-18.552524 Lo-82.36278", 
+                    "nameOfTheLocation": "Shive temple Gangasiuni temple", 
+                    "policeStationName": "Machkund PS", 
+                    "endingToDistance": null, 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 2.0 Page 43 of 78 
+ 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "NH-26", 
+                    "endingToLatLong": "La-18.50402 Lo-82.36211", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Koraput", 
+                    "startingFromLatLong": "La-18.56408 Lo- 82.33326 ", 
+                    "nameOfTheLocation": "BJ-11 NH-26 to Ambaguda", 
+                    "policeStationName": "Machkund PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "NH-26", 
+                    "endingToLatLong": "La-18.56276 Lo-82.33339", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Nayagarh", 
+                    "startingFromLatLong": "Lo-85.05825 E La-20.1621455 N", 
+                    "nameOfTheLocation": "Similisahi", 
+                    "policeStationName": "Sardar PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "NH-57", 
+                    "endingToLatLong": "Lo- 85.022209 E La- 20.1629897 N", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Nayagarh", 
+                    "startingFromLatLong": "Lo-85.150077 E La-20.140923 N", 
+                    "nameOfTheLocation": "Cinema hall Chak to Khusi Dhaba", 
+                    "policeStationName": "Itamati PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "NH-57", 
+                    "endingToLatLong": "Lo-85.161563 E a-20.146615 N ", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Nayagarh", 
+                    "startingFromLatLong": "Lo-85016'817 E La-20014940 N", 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 2.0 Page 44 of 78 
+ 
+                    "nameOfTheLocation": "Pandusara to Harekrushnapur", 
+                    "policeStationName": "Itamati PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "NH-57", 
+                    "endingToLatLong": "Lo-85018'446\" E La-20015'528\" N", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Nayagarh", 
+                    "startingFromLatLong": "Lo-840976498 E La-200208101 N", 
+                    "nameOfTheLocation": "Sampada", 
+                    "policeStationName": "Nuagaon", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "NH-57", 
+                    "endingToLatLong": "Lo-840982082 La-200199922 N", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Nayagarh", 
+                    "startingFromLatLong": "Lo-84045'32 E La-20023'14\" N", 
+                    "nameOfTheLocation": "Takera", 
+                    "policeStationName": "Daspalla PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "NH-57", 
+                    "endingToLatLong": "Lo-84045'46\" E", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Nayagarh", 
+                    "startingFromLatLong": "Lo-84054'18 E La-20019'05\" N", 
+                    "nameOfTheLocation": "Subalaya", 
+                    "policeStationName": "Daspalla PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "NH-57", 
+                    "endingToLatLong": "Lo-84054'28\" E La-20019'06\" N", 
+                    "startingFromDistance": null 
+                }, 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 2.0 Page 45 of 78 
+ 
+                { 
+                    "nameOfDistrict": "Nayagarh", 
+                    "startingFromLatLong": "Lo-85.24'77\" E La-190.56'92\" N", 
+                    "nameOfTheLocation": "Kandha Nayagarh by-pass", 
+                    "policeStationName": "Chandanpur PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "NHAI-16", 
+                    "endingToLatLong": "Lo-85.25'88\"E La-190.57'21 N", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Nayagarh", 
+                    "startingFromLatLong": "Lo-85.25'18\"E Lat-190.58'074 N", 
+                    "nameOfTheLocation": "Benta Chak", 
+                    "policeStationName": "Chandanpur PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "NHAI-16", 
+                    "endingToLatLong": "Lo-85.26'23\"E La-190.59'69 N", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Nayagarh", 
+                    "startingFromLatLong": "Lo-85.23'36\" E La-190.56'34 N", 
+                    "nameOfTheLocation": "Goura Chandrapur Chak", 
+                    "policeStationName": "Chandanpur PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "NHAI-16", 
+                    "endingToLatLong": "Lo-85.24'63\" E La-190.56'45\"N", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Nayagarh", 
+                    "startingFromLatLong": "Lo-85.26'150 E La-190.58'074 N", 
+                    "nameOfTheLocation": "Champagada", 
+                    "policeStationName": "Chandanpur PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "NHAI-16", 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 2.0 Page 46 of 78 
+ 
+                    "endingToLatLong": "Lo-85.26'291 E Lat-190.58'173 N", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Khordha", 
+                    "startingFromLatLong": "Lo-85.564480 La-20.203589", 
+                    "nameOfTheLocation": "Pubusahi to Jayamangal", 
+                    "policeStationName": "Model PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "NH-57", 
+                    "endingToLatLong": "Lo-85.542053 La-20.214353", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Khordha", 
+                    "startingFromLatLong": "Lo-85.572879 La-20.103286", 
+                    "nameOfTheLocation": "Tapanga Chak", 
+                    "policeStationName": "Sardar PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "NH-16", 
+                    "endingToLatLong": "lon-85.573153 La-20104118", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Khordha", 
+                    "startingFromLatLong": "Lo-85.54008 La-20.21485 ", 
+                    "nameOfTheLocation": "Baghamari chak to Sarua Chak", 
+                    "policeStationName": "Baghamari PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "NH-57", 
+                    "endingToLatLong": "Lo-85.48193 La-2021242", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Khordha", 
+                    "startingFromLatLong": "Lo-85.456091 La-20.203718", 
+                    "nameOfTheLocation": "Begunia Post Office to Pichukulii Bazar", 
+                    "policeStationName": "Begunia PS", 
+                    "endingToDistance": null, 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 2.0 Page 47 of 78 
+ 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "NH-57", 
+                    "endingToLatLong": "Lo-85.378037 La-20.184717", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Khordha", 
+                    "startingFromLatLong": "Lo-85.21217 La-20.16082", 
+                    "nameOfTheLocation": "Dighiri to Raja Sunakhala", 
+                    "policeStationName": "Bolagarh PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "NH-57", 
+                    "endingToLatLong": "Lo-85.34135 La-20.17537", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Khordha", 
+                    "startingFromLatLong": "Lo-83.95799 La-21.976009", 
+                    "nameOfTheLocation": "Malipada Chak to Ugratara", 
+                    "policeStationName": "Jankia PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "NH-16", 
+                    "endingToLatLong": "Lo-85.397461 La-19.929402", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Khordha", 
+                    "startingFromLatLong": "Lo-85.0629 La-19.936184", 
+                    "nameOfTheLocation": "Tangi to Kuhudi", 
+                    "policeStationName": "Tangi PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "NH-16", 
+                    "endingToLatLong": "Lo-85.32603 La-19.866437", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Khordha", 
+                    "startingFromLatLong": "Lo-85.2837568 La-19.8405129", 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 2.0 Page 48 of 78 
+ 
+                    "nameOfTheLocation": "Kaudikhani", 
+                    "policeStationName": "Nachuni PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "NH-16", 
+                    "endingToLatLong": "Lo-85.2851378 La-19.8410257", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Khordha", 
+                    "startingFromLatLong": "Lo-85.253562 La-19.807694", 
+                    "nameOfTheLocation": "Pranadeipur Village Chak to Chhatragada Chak", 
+                    "policeStationName": "Balugaon PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "NH-16", 
+                    "endingToLatLong": "Lo-85.175590 La-19.682969   ", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Khordha", 
+                    "startingFromLatLong": "Lo-85.199344 La-19.766353", 
+                    "nameOfTheLocation": "Bishnudiha over bridge to Belapada petrol pump", 
+                    "policeStationName": "Banpur PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "NH-16", 
+                    "endingToLatLong": "Lo-85.183768 La-19.744508", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Bhadrak", 
+                    "startingFromLatLong": "La-21.069456 Lo-86511213", 
+                    "nameOfTheLocation": "Near New Bus Stand", 
+                    "policeStationName": "Bhadrak Town PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "NH-16", 
+                    "endingToLatLong": "Lt-21.0785645 Lo-86.511966", 
+                    "startingFromDistance": null 
+                }, 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 2.0 Page 49 of 78 
+ 
+                { 
+                    "nameOfDistrict": "Bhadrak", 
+                    "startingFromLatLong": "Lt-21.069456 Lo-86.511213", 
+                    "nameOfTheLocation": "Near Royal Enfield showroom, Dhanigadia", 
+                    "policeStationName": "Bhadrak Town PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "NH-16", 
+                    "endingToLatLong": "Lt-21.0785645 Lo-86.511966", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Bhadrak", 
+                    "startingFromLatLong": "Lt-21.118995 Lo-86.545336", 
+                    "nameOfTheLocation": "Near Trisalpur", 
+                    "policeStationName": "Bhadrak Town PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "NH-16", 
+                    "endingToLatLong": "Lt-21.118117 Lo-86.559169", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Bhadrak", 
+                    "startingFromLatLong": "Lt-21.069847 Lo-86.5091913", 
+                    "nameOfTheLocation": "Near Gelpur Grid Chaka ", 
+                    "policeStationName": "Bhadrak Town PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "NH-16", 
+                    "endingToLatLong": "Lt- 21.026623 Lo-86.470999", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Bhadrak", 
+                    "startingFromLatLong": "Lt-21.038912 Lo- 86.473650", 
+                    "nameOfTheLocation": "Reliance petrol pump", 
+                    "policeStationName": "Bhadrak Town PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "NH-16", 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 2.0 Page 50 of 78 
+ 
+                    "endingToLatLong": "Lt-21.034233 Lo-86.470500", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Kalahandi", 
+                    "startingFromLatLong": "Lat-19.90601, Long -83.14538", 
+                    "nameOfTheLocation": "Paradeshipada Chowk to Satsangbihar", 
+                    "policeStationName": "Town PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "NH-26", 
+                    "endingToLatLong": "Lat-19.90726, Long-83.14538", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Kalahandi", 
+                    "startingFromLatLong": "Lat-19.988536 ,Long -83.17980", 
+                    "nameOfTheLocation": "Tentulikhunti Chowk to Belamal Chowk", 
+                    "policeStationName": "Sadar PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "NH-26", 
+                    "endingToLatLong": "Lat- 20.00261, Long - 83.17599", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Kalahandi", 
+                    "startingFromLatLong": "Lat-19.908092, Long -83.07153", 
+                    "nameOfTheLocation": "Badli Chowk to Rice Mill", 
+                    "policeStationName": "Sadar PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "NH-26", 
+                    "endingToLatLong": "Lat-19.91187,Long -83.08736", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Kalahandi", 
+                    "startingFromLatLong": "Lat- 20.084740, Long -83.16953", 
+                    "nameOfTheLocation": "Utkela Arihant filing station Chhock to Mini stadium 
+chhowk", 
+                    "policeStationName": "Kesinga PS", 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 2.0 Page 51 of 78 
+ 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "NH-26", 
+                    "endingToLatLong": "Lat-  20.097317,Long -83.174173", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Kalahandi", 
+                    "startingFromLatLong": "Lat-20.061383,Long -83.171825", 
+                    "nameOfTheLocation": "Gaigaon HP petrol pump to Gaigaon Duarsuni 
+Temple ", 
+                    "policeStationName": "Kesinga PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "NH-26", 
+                    "endingToLatLong": "Lat-20.042559,Long -83.177061", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Kalahandi", 
+                    "startingFromLatLong": "Lat- 20.174867, Long -83.207121", 
+                    "nameOfTheLocation": "Reliance petrol pump to Indian oil npetrol pump 
+Kesinga", 
+                    "policeStationName": "Kesinga PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "NH-26", 
+                    "endingToLatLong": "Lat-20.177521,Long -83.209776", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Kalahandi", 
+                    "startingFromLatLong": "Lat-20.089585, Long -83.171727", 
+                    "nameOfTheLocation": "Kokomunda to Chancher Shiv temple ", 
+                    "policeStationName": "Kesinga PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "NH-26", 
+                    "endingToLatLong": "Lat-20.161741      ,     Long -83.203711", 
+                    "startingFromDistance": null 
+                }, 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 2.0 Page 52 of 78 
+ 
+                { 
+                    "nameOfDistrict": "Kalahandi", 
+                    "startingFromLatLong": "Lat-20.174219      ,     Long - 83.206729", 
+                    "nameOfTheLocation": "Boringpadar to Boringpadar HP petrol pump", 
+                    "policeStationName": "Kesinga PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "NH-26", 
+                    "endingToLatLong": "Lat-20.161741      ,     Long -83.203711", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Kalahandi", 
+                    "startingFromLatLong": "Lat-20.205817      ,     Long -83.238634", 
+                    "nameOfTheLocation": "Tahansir to Kantesir", 
+                    "policeStationName": "Kesinga PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "NH-26", 
+                    "endingToLatLong": "Lat- 20.217290    ,     Long -83.247244", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Kalahandi", 
+                    "startingFromLatLong": "Lat-20.152793      ,     Long -83.195783", 
+                    "nameOfTheLocation": "Jolko bridge to Jolko turning ", 
+                    "policeStationName": "Kesinga PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "NH-26", 
+                    "endingToLatLong": "Lat-20.156655      ,     Long -83.201771", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Kalahandi", 
+                    "startingFromLatLong": "Lat- 20.293608  ,     Long -83.377154", 
+                    "nameOfTheLocation": "Kendubahali Chock to Palam Chhock ", 
+                    "policeStationName": "Kesinga PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "NH-59", 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 2.0 Page 53 of 78 
+ 
+                    "endingToLatLong": "Lat-20.260465     ,     Long -83.411714", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Kalahandi", 
+                    "startingFromLatLong": "Lat-20.176688      ,     Long -83.563434", 
+                    "nameOfTheLocation": "Kendughati", 
+                    "policeStationName": "M. Rampur PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "NH-59", 
+                    "endingToLatLong": "Lat-20.162383      ,     Long -83.602802", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Kalahandi", 
+                    "startingFromLatLong": "Lat-19.868141    ,     Long -82.782368", 
+                    "nameOfTheLocation": "Kasibahal to Bad-Basul", 
+                    "policeStationName": "Dharamgarh PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "NH-130-C", 
+                    "endingToLatLong": "Lat-19.866136     ,     Long -82.788134", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Kalahandi", 
+                    "startingFromLatLong": "Lat- 19.784144     ,     Long -82.848269", 
+                    "nameOfTheLocation": "Sanyasi kundamal to Mahichala High school", 
+                    "policeStationName": "Junagarh PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "NH-26", 
+                    "endingToLatLong": "Lat-   19.806101   ,     Long -82.866671", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Kalahandi", 
+                    "startingFromLatLong": "Lat- 19.85277   ,     Long -82.92082", 
+                    "nameOfTheLocation": "Hatiriver to Baldiamal ", 
+                    "policeStationName": "Junagarh PS", 
+                    "endingToDistance": null, 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 2.0 Page 54 of 78 
+ 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "NH-26", 
+                    "endingToLatLong": "Lat-19.8433      ,     Long - 82.90753", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Kalahandi", 
+                    "startingFromLatLong": "Lat-19.887981      ,     Long -83.004715", 
+                    "nameOfTheLocation": "Jaring IRBN Camp to Tarini Temple ", 
+                    "policeStationName": "Junagarh PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "NH-26", 
+                    "endingToLatLong": "Lat- 19.886636     ,     Long -82.999092", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Kalahandi", 
+                    "startingFromLatLong": "Lat-  19.5537    ,     Long -82.6201", 
+                    "nameOfTheLocation": "Ampanighati to Birimuhan Chowk", 
+                    "policeStationName": "Ampani PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "NH-26", 
+                    "endingToLatLong": "Lat- 19.5445     ,     Long -82.6099", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Kalahandi", 
+                    "startingFromLatLong": "Lat- 19.751542      ,     Long -82.816653", 
+                    "nameOfTheLocation": "Pakhaguda Chock to Towards BH. Patna ", 
+                    "policeStationName": "Koksara PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "NH-26", 
+                    "endingToLatLong": "Lat- 19.753204     ,     Long -82.816776", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Kalahandi", 
+                    "startingFromLatLong": "Lat-19.689370    ,     Long -82.743980 ", 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 2.0 Page 55 of 78 
+ 
+                    "nameOfTheLocation": "Dangriguda to towards BH. Patna ", 
+                    "policeStationName": "Koksara PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "NH-26", 
+                    "endingToLatLong": "Lat- 19.691255     ,     Long -82.745745", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Angul", 
+                    "startingFromLatLong": "Lat- 20.882987, Long- 85.024082", 
+                    "nameOfTheLocation": "Jindal main gate to Mahitaila Chhak", 
+                    "policeStationName": "Industrial PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "63", 
+                    "endingToLatLong": "Lat- 20.885192, Long- 85.021986", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Angul", 
+                    "startingFromLatLong": "Lat- 20.698955, Long- 85.177379", 
+                    "nameOfTheLocation": "Mahidharpur Chhak", 
+                    "policeStationName": "Banarpal PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "64", 
+                    "endingToLatLong": "Lat- 20.697438, Long- 85.169435", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Angul", 
+                    "startingFromLatLong": "Lat-20.71075, Long-85.171902", 
+                    "nameOfTheLocation": "Village Khandanali", 
+                    "policeStationName": "Banarpal PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "64", 
+                    "endingToLatLong": "Lat-20.717673, Long- 85.169435", 
+                    "startingFromDistance": null 
+                }, 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 2.0 Page 56 of 78 
+ 
+                { 
+                    "nameOfDistrict": "Bargarh", 
+                    "startingFromLatLong": null, 
+                    "nameOfTheLocation": null, 
+                    "policeStationName": null, 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": null, 
+                    "endingToLatLong": "NIL", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Berhampur", 
+                    "startingFromLatLong": "Lat-19.2738, Long- 84.8962", 
+                    "nameOfTheLocation": "Narayanpur", 
+                    "policeStationName": "Sadar PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "SH-217", 
+                    "endingToLatLong": "Lat-19.314962, Long- 84.794090", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Berhampur", 
+                    "startingFromLatLong": "Lat-19.3135, Long- 84.7821", 
+                    "nameOfTheLocation": "Balipoda Temple ", 
+                    "policeStationName": "Sadar PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "SH-217", 
+                    "endingToLatLong": "Lat-19.314762, Long84.7832", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Berhampur", 
+                    "startingFromLatLong": "Lat-19.3560, Long-84.7369", 
+                    "nameOfTheLocation": "Lanjiaya", 
+                    "policeStationName": "Sadar PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "SH-217", 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 2.0 Page 57 of 78 
+ 
+                    "endingToLatLong": "Lat-19.3666, Long- 84.7433", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Berhampur", 
+                    "startingFromLatLong": "Lat- 19.3777, Long- 84.5668", 
+                    "nameOfTheLocation": "Rajnagar Chhak", 
+                    "policeStationName": "Degapahandi PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "SH-17", 
+                    "endingToLatLong": "Lat-19.387388, Long- 85.051544", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Berhampur", 
+                    "startingFromLatLong": "Lat-19.3080, Long- 84.7706", 
+                    "nameOfTheLocation": "Kuraisuni Temple ", 
+                    "policeStationName": "Degapahandi PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "SH-17", 
+                    "endingToLatLong": "Lat-19.2998, Long-84.7965", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Berhampur", 
+                    "startingFromLatLong": "Lat-19.1312, Long-84.5727", 
+                    "nameOfTheLocation": "kelua Chhak to Patrapur bus stand ", 
+                    "policeStationName": "Jarapada PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "SH", 
+                    "endingToLatLong": "Lat-19.1136, Long-84.5787", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Bolangir", 
+                    "startingFromLatLong": null, 
+                    "nameOfTheLocation": null, 
+                    "policeStationName": null, 
+                    "endingToDistance": null, 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 2.0 Page 58 of 78 
+ 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": null, 
+                    "endingToLatLong": "NIL", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Deogarh", 
+                    "startingFromLatLong": null, 
+                    "nameOfTheLocation": null, 
+                    "policeStationName": null, 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": null, 
+                    "endingToLatLong": "NIL", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Dhenkanal", 
+                    "startingFromLatLong": "Lat-20.638343, Long-85.587478", 
+                    "nameOfTheLocation": "Gengutia Chhak", 
+                    "policeStationName": "Sadar PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "SH", 
+                    "endingToLatLong": "Lat-20.72544, Long- 85.56015", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Dhenkanal", 
+                    "startingFromLatLong": "Lat- 20.882787, Long-85.838385", 
+                    "nameOfTheLocation": "Nilakanthapur Bridge", 
+                    "policeStationName": "Bhuban PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "SH", 
+                    "endingToLatLong": "Lat-20.88086, Long- 85.85470", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Jajpur", 
+                    "startingFromLatLong": "Lat-20.640383, Long- 86.849448", 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 2.0 Page 59 of 78 
+ 
+                    "nameOfTheLocation": "Military Chhak", 
+                    "policeStationName": "Jaipur Road PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "SH", 
+                    "endingToLatLong": "Lat-20.5810, Long-86.522", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Jajpur", 
+                    "startingFromLatLong": "Lat-21.086553, Long-85.95442", 
+                    "nameOfTheLocation": "Tomka Chhack", 
+                    "policeStationName": "Tomka PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "SH", 
+                    "endingToLatLong": "Lat-21.08542, Long-85.95821", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Ganjam", 
+                    "startingFromLatLong": "Lat.19.866706 Lo.84.580918", 
+                    "nameOfTheLocation": "Kantaipalli Chhaka", 
+                    "policeStationName": "Gangapur PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "SH- 136", 
+                    "endingToLatLong": "Lat.19.866706 Lon.84.580918", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Ganjam", 
+                    "startingFromLatLong": "Lat.19.088931 Lon.84.680122", 
+                    "nameOfTheLocation": "Bara Chhaka", 
+                    "policeStationName": "Tarasinghpur", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "SH-37", 
+                    "endingToLatLong": "Lat.19.088936 Lon.84.680127", 
+                    "startingFromDistance": null 
+                }, 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 2.0 Page 60 of 78 
+ 
+                { 
+                    "nameOfDistrict": "Ganjam", 
+                    "startingFromLatLong": "Lat.19106047 Lon.84.699017", 
+                    "nameOfTheLocation": "Jadadhara Chhaka", 
+                    "policeStationName": "Tarasinghpur PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "SH-37", 
+                    "endingToLatLong": "Lat.19106057 Lon.84.699019", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Balesore", 
+                    "startingFromLatLong": "Nil", 
+                    "nameOfTheLocation": null, 
+                    "policeStationName": null, 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": null, 
+                    "endingToLatLong": null, 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Malkangiri", 
+                    "startingFromLatLong": "Nil", 
+                    "nameOfTheLocation": null, 
+                    "policeStationName": null, 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": null, 
+                    "endingToLatLong": null, 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Koraput", 
+                    "startingFromLatLong": "Lat.19.130434 Lon.82.210159", 
+                    "nameOfTheLocation": "Mandalguda to Rupkona/keskapadi", 
+                    "policeStationName": "Laxmipur PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "SH-44", 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 2.0 Page 61 of 78 
+ 
+                    "endingToLatLong": "Lat.19.139416 Lon.83.21797", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Koraput", 
+                    "startingFromLatLong": "Lat.18.452403 Lon.82.310210", 
+                    "nameOfTheLocation": "Durga temple(petaghati) to Peta chhak", 
+                    "policeStationName": "Boipariguda PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "SH", 
+                    "endingToLatLong": "Lat.18.442607 Lon.82.325495", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Koraput", 
+                    "startingFromLatLong": "Lat.18.8266027 Lon.82.7035189", 
+                    "nameOfTheLocation": "Jhadiguda to Ranigada road", 
+                    "policeStationName": "Koraput Sadar PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "SH-48", 
+                    "endingToLatLong": "Lat.18.9413145 Lon.82.6826017", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Koraput", 
+                    "startingFromLatLong": "Lat.18.886766 Lon.83.210136", 
+                    "nameOfTheLocation": "Kumbhari girls school to Dandabadi River bridge 
+road", 
+                    "policeStationName": "Narayanpatna PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "SH-51", 
+                    "endingToLatLong": "Lat.18.901242 Lon.83.218703", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Koraput", 
+                    "startingFromLatLong": "Lat.18.440367 Lon.82.682500", 
+                    "nameOfTheLocation": "Balda to Padwa", 
+                    "policeStationName": "Padwa PS", 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 2.0 Page 62 of 78 
+ 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "SH", 
+                    "endingToLatLong": "Lat.18.372538 Lon.82.678928", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Koraput", 
+                    "startingFromLatLong": "Lat.18.366953 Lon.82.683301", 
+                    "nameOfTheLocation": "Badadebata temple chowk to Chatwa chowk", 
+                    "policeStationName": "Padwa PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "SH", 
+                    "endingToLatLong": "Lat.18.355776 Lon.82.764580", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Koraput", 
+                    "startingFromLatLong": "Lat.6203848 Lon.82.952071", 
+                    "nameOfTheLocation": "Lamtaput to Sagar", 
+                    "policeStationName": "Machkund PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "SH", 
+                    "endingToLatLong": "Lat.18.508991 Lon.82.6082", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Nayagarh", 
+                    "startingFromLatLong": "Nil", 
+                    "nameOfTheLocation": null, 
+                    "policeStationName": null, 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": null, 
+                    "endingToLatLong": null, 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Khordha", 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 2.0 Page 63 of 78 
+ 
+                    "startingFromLatLong": "Lat.85.519599 Lon.20.033588", 
+                    "nameOfTheLocation": "Jankai Chhak to Siko chhak", 
+                    "policeStationName": "Jankai PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "SH-12", 
+                    "endingToLatLong": "Lat.85.426858 Lon.20.070638", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Bhadrak", 
+                    "startingFromLatLong": "Lat.21.0362 Lon.86.8090", 
+                    "nameOfTheLocation": "Biras to Dipiora", 
+                    "policeStationName": "Naikanidihi Ps", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "SH", 
+                    "endingToLatLong": "Lat.85.519599 Lon.20.033588", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Bhadrak", 
+                    "startingFromLatLong": "Lat.21.0630 Lon.86.8274667", 
+                    "nameOfTheLocation": "Chandimal to Kantianail", 
+                    "policeStationName": "Kasia Marine PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "SH", 
+                    "endingToLatLong": "Lat.21.0283417 Lon.86.8274667", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Kalahandi", 
+                    "startingFromLatLong": "Lat.19.958653 Lon.83.248655", 
+                    "nameOfTheLocation": "Gopinathpur to Deypur", 
+                    "policeStationName": "Sadar PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "SH-06", 
+                    "endingToLatLong": "Lat.19.96123 Lon.83.25217", 
+                    "startingFromDistance": null 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 2.0 Page 64 of 78 
+ 
+                }, 
+                { 
+                    "nameOfDistrict": "Kalahandi", 
+                    "startingFromLatLong": "Lat.19.939272 Lon.83.395124", 
+                    "nameOfTheLocation": "Behera Bridge to Kidding Kauguda", 
+                    "policeStationName": "Narla PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "SH-6", 
+                    "endingToLatLong": "Lat.19.941241 Lon.83.393129", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Kalahandi", 
+                    "startingFromLatLong": "Lat.19.874331 Lon.82.752069", 
+                    "nameOfTheLocation": "Golai Chock to Parla", 
+                    "policeStationName": "Dharamgarh PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "Biju express way", 
+                    "endingToLatLong": "Lat.19.872753 Lon.82.740614", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Kalahandi", 
+                    "startingFromLatLong": "Lat.19.706634 Lon.82.796199", 
+                    "nameOfTheLocation": "Bangla Chock Moter", 
+                    "policeStationName": "Koksara PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "SH Main Road", 
+                    "endingToLatLong": "Lat.19.701873 Lon.82.795194", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Kalahandi", 
+                    "startingFromLatLong": "Lat.19.94181 Lon.82.80228", 
+                    "nameOfTheLocation": "Ghotia to Khamar Haldi", 
+                    "policeStationName": "Golamunda PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 2.0 Page 65 of 78 
+ 
+                    "roadName": "Biju express way", 
+                    "endingToLatLong": "Lat.19.90844 Lon.82.8006", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Kalahandi", 
+                    "startingFromLatLong": "Lat.19.95516 Lon.82.79386", 
+                    "nameOfTheLocation": "Bishipada chowk to Brundabahal", 
+                    "policeStationName": "Golamunda PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "Biju express way", 
+                    "endingToLatLong": "Lat.19.98123 Lon.82.81643", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Angul", 
+                    "startingFromLatLong": "NIL", 
+                    "nameOfTheLocation": null, 
+                    "policeStationName": null, 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": null, 
+                    "endingToLatLong": null, 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Bargarh", 
+                    "startingFromLatLong": "NIL", 
+                    "nameOfTheLocation": null, 
+                    "policeStationName": null, 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": null, 
+                    "endingToLatLong": null, 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Berhampur", 
+                    "startingFromLatLong": "NIL", 
+                    "nameOfTheLocation": null, 
+                    "policeStationName": null, 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 2.0 Page 66 of 78 
+ 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": null, 
+                    "endingToLatLong": null, 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Bolangir", 
+                    "startingFromLatLong": "NIL", 
+                    "nameOfTheLocation": null, 
+                    "policeStationName": null, 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": null, 
+                    "endingToLatLong": null, 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Deogarh", 
+                    "startingFromLatLong": "NIL", 
+                    "nameOfTheLocation": null, 
+                    "policeStationName": null, 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": null, 
+                    "endingToLatLong": null, 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Dhenkanal", 
+                    "startingFromLatLong": "NIL", 
+                    "nameOfTheLocation": null, 
+                    "policeStationName": null, 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": null, 
+                    "endingToLatLong": null, 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Gajapati", 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 2.0 Page 67 of 78 
+ 
+                    "startingFromLatLong": "NIL", 
+                    "nameOfTheLocation": null, 
+                    "policeStationName": null, 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": null, 
+                    "endingToLatLong": null, 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Jaipur", 
+                    "startingFromLatLong": "NIL", 
+                    "nameOfTheLocation": null, 
+                    "policeStationName": null, 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": null, 
+                    "endingToLatLong": null, 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Kendrapada", 
+                    "startingFromLatLong": "NIL", 
+                    "nameOfTheLocation": null, 
+                    "policeStationName": null, 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": null, 
+                    "endingToLatLong": null, 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Keonjhar", 
+                    "startingFromLatLong": "NIL", 
+                    "nameOfTheLocation": null, 
+                    "policeStationName": null, 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": null, 
+                    "endingToLatLong": null, 
+                    "startingFromDistance": null 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 2.0 Page 68 of 78 
+ 
+                }, 
+                { 
+                    "nameOfDistrict": "Mayurbhanj", 
+                    "startingFromLatLong": "NIL", 
+                    "nameOfTheLocation": null, 
+                    "policeStationName": null, 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": null, 
+                    "endingToLatLong": null, 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Nabarangapur", 
+                    "startingFromLatLong": "NIL", 
+                    "nameOfTheLocation": null, 
+                    "policeStationName": null, 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": null, 
+                    "endingToLatLong": null, 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Puri", 
+                    "startingFromLatLong": "NIL", 
+                    "nameOfTheLocation": null, 
+                    "policeStationName": null, 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": null, 
+                    "endingToLatLong": null, 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Rayagada", 
+                    "startingFromLatLong": "Lat.19.5290 Lon.83.4857", 
+                    "nameOfTheLocation": "Tolona chowk ", 
+                    "policeStationName": "Puttasing PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 2.0 Page 69 of 78 
+ 
+                    "roadName": "MDR", 
+                    "endingToLatLong": "Lat.19.52431 Lon.83.573018", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Rayagada", 
+                    "startingFromLatLong": "Lat.19.998342 Lon.83.44444", 
+                    "nameOfTheLocation": "Near village Attada", 
+                    "policeStationName": "Seskhal PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "MDR-48", 
+                    "endingToLatLong": "Lat.19.090442 Lon.83.412767", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Rayagada", 
+                    "startingFromLatLong": "Lat.19.09 385 Lon.83.03459", 
+                    "nameOfTheLocation": "Bilamal chowk", 
+                    "policeStationName": "Tikiri PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "MDR", 
+                    "endingToLatLong": "Lat.19.09377 Lon.83.03214", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Sundargarh", 
+                    "startingFromLatLong": "Lat.22°05'16.9\"N Lon.83°55'43.7\"E", 
+                    "nameOfTheLocation": "Ujalpur Hanuman temple to Ujalpur Dasi Dhaba 
+road", 
+                    "policeStationName": "Lephripada PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "MDR-27", 
+                    "endingToLatLong": "Lat.22°05'13.5\"N Lon.83°54'49.1\"E", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Sundargarh", 
+                    "startingFromLatLong": "Lat.22°07'04.3\"N Lon.84°00'37.4\"E", 
+                    "nameOfTheLocation": "IB River Bridge to Reliance Reliance patrol pump", 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 2.0 Page 70 of 78 
+ 
+                    "policeStationName": "Sadar PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "MDR-27", 
+                    "endingToLatLong": "Lat.22°06'47.5\"N Lon.84°00'06.8\"E", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Sundargarh", 
+                    "startingFromLatLong": "Lat.22°05'58.1\"N Lon.83°57'33.9\"E", 
+                    "nameOfTheLocation": "Mahupali FIR Ststion to Chakarala Bridge chowk", 
+                    "policeStationName": "Sadar PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "MDR-27", 
+                    "endingToLatLong": "Lat.22°05'42.7\"N Lon.83°56'59.5\"E", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Sundargarh", 
+                    "startingFromLatLong": "Lat.22°00'45.1\"N Lon.83°46'04.4\"E", 
+                    "nameOfTheLocation": "Garjanbahal chowk to Garjanbahal by pass 
+chowk", 
+                    "policeStationName": "Hemgir PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "MDR-29", 
+                    "endingToLatLong": "Lat.22°00'26.1\"N Lon.83°45'52.8\"E", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "UPD,BBSR", 
+                    "startingFromLatLong": "NIL", 
+                    "nameOfTheLocation": null, 
+                    "policeStationName": null, 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": null, 
+                    "endingToLatLong": null, 
+                    "startingFromDistance": null 
+                }, 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 2.0 Page 71 of 78 
+ 
+                { 
+                    "nameOfDistrict": "UPD,CTC", 
+                    "startingFromLatLong": "NIL", 
+                    "nameOfTheLocation": null, 
+                    "policeStationName": null, 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": null, 
+                    "endingToLatLong": null, 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Cuttack", 
+                    "startingFromLatLong": "NIL", 
+                    "nameOfTheLocation": null, 
+                    "policeStationName": null, 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": null, 
+                    "endingToLatLong": null, 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Jagatsinghpur", 
+                    "startingFromLatLong": "Lat.20.1190 Lon.86.1933", 
+                    "nameOfTheLocation": "Naugaon", 
+                    "policeStationName": "Naugaon PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "MDR", 
+                    "endingToLatLong": "Lat.20.1107 Lon.86.1933", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Jagatsinghpur", 
+                    "startingFromLatLong": "Lat.20.1112 Lon.86.1916", 
+                    "nameOfTheLocation": "Palasahi", 
+                    "policeStationName": "Naugaon PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "MDR", 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 2.0 Page 72 of 78 
+ 
+                    "endingToLatLong": "Lat.20.1014 Lon.86.1917", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Jharsuguda", 
+                    "startingFromLatLong": "NIL", 
+                    "nameOfTheLocation": null, 
+                    "policeStationName": null, 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": null, 
+                    "endingToLatLong": null, 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Kandhamal", 
+                    "startingFromLatLong": "NIL", 
+                    "nameOfTheLocation": null, 
+                    "policeStationName": null, 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": null, 
+                    "endingToLatLong": null, 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Boudh", 
+                    "startingFromLatLong": "NIL", 
+                    "nameOfTheLocation": null, 
+                    "policeStationName": null, 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": null, 
+                    "endingToLatLong": null, 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Nuapada", 
+                    "startingFromLatLong": "NIL", 
+                    "nameOfTheLocation": null, 
+                    "policeStationName": null, 
+                    "endingToDistance": null, 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 2.0 Page 73 of 78 
+ 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": null, 
+                    "endingToLatLong": null, 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Rourkela", 
+                    "startingFromLatLong": "NIL", 
+                    "nameOfTheLocation": null, 
+                    "policeStationName": null, 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": null, 
+                    "endingToLatLong": null, 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Sonepur", 
+                    "startingFromLatLong": "NIL", 
+                    "nameOfTheLocation": null, 
+                    "policeStationName": null, 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": null, 
+                    "endingToLatLong": null, 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Sambalpur", 
+                    "startingFromLatLong": "Lat.21.5735948 Lon.84.1222386", 
+                    "nameOfTheLocation": "Kusumdihi to gumaloi", 
+                    "policeStationName": "Katarbaga PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "MDR-19", 
+                    "endingToLatLong": "Lat.21.6368632 Lon.84.1374122", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Sambalpur", 
+                    "startingFromLatLong": "Lat.21.65389 Lon.84.14664", 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 2.0 Page 74 of 78 
+ 
+                    "nameOfTheLocation": "Runimahul to Junadihi", 
+                    "policeStationName": "Katarbaga PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "MDR-19", 
+                    "endingToLatLong": "Lat.21.7456363 Lon.84.3328526", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Sambalpur", 
+                    "startingFromLatLong": "Lat.21.471488 Lon.83.960029", 
+                    "nameOfTheLocation": "Rajghat to Laxmidungari ring road", 
+                    "policeStationName": "Khetrajpur PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "MDR", 
+                    "endingToLatLong": "Lat.21.497988 Lon.83.931239", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Ganjam", 
+                    "startingFromLatLong": "Lat.19.634422 Lon.84.853840", 
+                    "nameOfTheLocation": "Gudiapalli to marda chhaka", 
+                    "policeStationName": "Polasara PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "MDR-72", 
+                    "endingToLatLong": "Lat.19.634427 Lon.84.853845", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Ganjam", 
+                    "startingFromLatLong": "Lat.19.727653 Lon.84.828430", 
+                    "nameOfTheLocation": "Sunari buguda chhaka", 
+                    "policeStationName": "Polasara PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "MDR-72", 
+                    "endingToLatLong": "Lat.19.727658 Lon.84.828435", 
+                    "startingFromDistance": null 
+                }, 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 2.0 Page 75 of 78 
+ 
+                { 
+                    "nameOfDistrict": "Ganjam", 
+                    "startingFromLatLong": "Lat.19.802981 Lon.84.797969", 
+                    "nameOfTheLocation": "Near santoshi maa temple", 
+                    "policeStationName": "Buguda PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "MDR-33", 
+                    "endingToLatLong": "Lat.19.802986 Lon.84.797974", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Balesore", 
+                    "startingFromLatLong": "NIL", 
+                    "nameOfTheLocation": null, 
+                    "policeStationName": null, 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": null, 
+                    "endingToLatLong": null, 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Malkangiri", 
+                    "startingFromLatLong": "NIL", 
+                    "nameOfTheLocation": null, 
+                    "policeStationName": null, 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": null, 
+                    "endingToLatLong": null, 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Koraput", 
+                    "startingFromLatLong": "Lat.18.798519 Lon.82.401450", 
+                    "nameOfTheLocation": "Kamarguda to Thuba chowk", 
+                    "policeStationName": "Nandapur", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "MDR-55", 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 2.0 Page 76 of 78 
+ 
+                    "endingToLatLong": "Lat.18.514435 Lon.82.659583", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Bhadrak", 
+                    "startingFromLatLong": "Lat.21.069456 Lon.86.511213", 
+                    "nameOfTheLocation": "Dahanigadia Chhaka", 
+                    "policeStationName": "Bhadrak Town PS", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "ODR", 
+                    "endingToLatLong": "Lat.21.0785645 Lon.86.511966", 
+                    "startingFromDistance": null 
+                }, 
+                { 
+                    "nameOfDistrict": "Kalahandi", 
+                    "startingFromLatLong": "LaT.20.228315 Lon.83.525609", 
+                    "nameOfTheLocation": "Near village Tujung", 
+                    "policeStationName": "M.Rampur", 
+                    "endingToDistance": null, 
+                    "stateCode": 21, 
+                    "state": "Odisha", 
+                    "roadName": "ODR", 
+                    "endingToLatLong": "LaT.20.224902 Lon.83.523575", 
+                    "startingFromDistance": null 
+                } 
+            ], 
+            "responseStatus": "SUCCESS" 
+        } 
+    ], 
+    "error": "false", 
+    "code": "200", 
+    "message": "Success"} 
+ 
+c) In case of stateCode does not exist  
+ 
+{    "response": [ 
+        { 
+            "response": [], 
+            "responseStatus": "SUCCESS" 
+        } 
+    ], 
+    "error": "false", 
+    "code": "200", 
+    "message": "Success"} 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 2.0 Page 77 of 78 
+ 
+Status Code 200: corporate data response 
+Status Code 400: Bad request (Invalid json syntax, invalid json key) 
+Status Code 401 or 403: Unauthenticated or Unauthorized 
+Status Code 500: Some internal server errors occurred 
+Status Code 502: Server is not responding. 
+ 
+1.4 Data Transmission & Authentication Mechanism 
+ 
+All data exchange would be done over secure HTTP (HTTPS). Request from ULIP's system would 
+be made in ULIP system through a data exchange URL that has following form: 
+ 
+For Production: https://www.ulip.dpiit.gov.in/ulip/v1.0.0/BLACKSPOT/01 
+ 
+Body:  
+ 
+{"stateCode": "21"} 
+ 
+Access to above data exchange URL would be authorized by use of a security mechanism 
+implemented by the ULIP system. It is as follows: 
+ 
+• First time access:  It would require a username and password [which would be shared with 
+user beforehand].  Once user hit with valid user id and password, ULIP system will return a 
+basic authorization token to  user, using that token user will communicate with ULIP system 
+until tokens will not get expired. 
+ 
+Summary of HTTP Basic Authentication is as follows: 
+ 
+First time User hits ULIP secured API through username and password for access token as 
+follows- 
+ 
+curl --location --request POST 'https://www.ulip.dpiit.gov.in/ulip/v1.0.0/user/login' \ 
+--header 'Accept: application/json' \ 
+--header 'Content-Type: application/json' \ 
+--data-raw '{"username": "xxxx", 
+"password": "xxxx@123" }' 
+ 
+Authorization:   
+Bearer  
+eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZXN0MSIsImlhdCI6MTYyNTIzMDQyNywiYXBwcyI6I
+mRhdGFwdXNoIn0.rhumwWJ8BWeeHe9CYmIV1UKyJk-kLHA_ovX5Zi2OwxEv-td-
+KpxnfbKDI_8FZsOoggqx3Al-Du1y2qMoUD7uzA' 
+ 
+Upon successful authentication, the user would be logged into the ULIP system and get an access 
+token. Though this token user can communicate with  ULIP. This token has expiry time which 
+represents user session. The session time out for the same to be fixed hour, generally it is for 30 
+minutes. If there is no request coming from user for 30 minutes, then session (token) will be 
+expired, and user need to re authenticate. 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 2.0 Page 78 of 78 
+ 
+Using The above token, user can request ULIP system for CIN details as follow - 
+ 
+curl -X POST \ 
+  https://www.ulip.dpiit.gov.in/ulip/v1.0.0/BLACKSPOT/01 
+\ 
+  -H 'accept: application/json' \ 
+  -H 'authorization: Bearer 
+eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZXN0MSIsImlhdCI6MTYyNTIzMDQyNywiYXBwcyI6I
+mRhdGFwdXNoIn0.rhumwWJ8BWeeHe9CYmIV1UKyJk-kLHA_ovX5Zi2OwxEv-td-
+KpxnfbKDI_8FZsOoggqx3Al-Du1y2qMoUD7uzA' \ 
+  -H 'cache-control: no-cache' \ 
+  -H 'content-type: application/json' \ 
+  -H 'postman-token: 8e8a19a4-ea1e-6373-f616-e2e4af9a1338' \ 
+  -d '{ }' 
+ 
+For Staging: 
+ 
+curl --location --request POST 'https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/user/login' \ 
+--header 'Accept: application/json' \ 
+--header 'Content-Type: application/json' \ 
+--data-raw '{ 
+"username": "xxxx", 
+"password": "xxxx@123" 
+}' 
+ 
+Authorization:   
+Bearer  
+eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZXN0MSIsImlhdCI6MTYyNTIzMDQyNywiYXBwcyI6I
+mRhdGFwdXNoIn0.rhumwWJ8BWeeHe9CYmIV1UKyJk-kLHA_ovX5Zi2OwxEv-td-
+KpxnfbKDI_8FZsOoggqx3Al-Du1y2qMoUD7uzA' 
+ 
+Upon successful authentication, the user would be logged into the ULIP system and get an access 
+token. Though this token user can communicate with ULIP. This token has expiry time which 
+represents user session. The session time out for the same to be fixed hour, generally it is for 30 
+minutes. If there is no request coming from user for 30 minutes, then session (token) will be 
+expired, and user need to re authenticate. 
+ 
+Using The above token, user can request ULIP system for details as follow - 
+ 
+curl --location 'https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/BLACKSPOT/01' \ 
+--header 'Authorization: Bearer 
+eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1bGlwIiwiaWF0IjoxNzM2MzEwNjUxLCJhcHBzIjoiZGF
+0YXB1c2gifQ.OjQj9QuPQlEYKTAyzhJmd0RMlpv7MYzHPNadBasjyLPP_kLgKueL5G11WL
+21aw_vbiEigkbq5H4XsW6ZyuN-JQ' \ 
+--header 'Content-Type: application/json' \ 
+--header 'Accept: application/json' \ 
+--data '{"stateCode": "21"}' 

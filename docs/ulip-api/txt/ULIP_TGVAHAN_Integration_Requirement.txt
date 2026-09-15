@@ -1,0 +1,483 @@
+ULIP Integration Requirement Document 
+ 
+  
+                        
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+Version No.: 2.0 
+Date: 30/03/2026 
+Project Name: ULIP 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ULIP Integration Requirement Document 
+This document contains proprietary information of NLDSL. Unauthorized access, copying and replication are 
+prohibited. This document must not be copied in whole or part by any means, without the written authorization of 
+NLDSL, Noida, India. 
+ 
+ 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 1.0 Page 2 of 10 
+ 
+ 
+ 
+ 
+Revision History 
+Version Date Author Reviewer Significant Changes 
+1.0 03/10/2024 Hasan Nayab Ali Baseline Version 
+2.0 30/03/2026 Gaurav Tyagi Pranab 
+Manna Updated 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+  
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 1.0 Page 3 of 10 
+ 
+Table of Contents 
+ 
+Introduction ................................................................................................................................................. 4 
+1.1 Purpose .................................................................................................................................... 4 
+The Overall Description .............................................................................................................................. 4 
+1.2 Data Integration between TGVAHAN System and ULIP application ....................................... 4 
+1.3 TGVAHAN/01 ........................................................................................................................... 4 
+1.3.1 Technical Approach .................................................................................................... 5 
+1.4 Data Transmission & Authentication Mechanism .................................................................... 8 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 1.0 Page 4 of 10 
+ 
+Introduction 
+1.1 Purpose 
+ 
+The purpose of this document is to define and provide details for accessing API for 
+TGVAHAN system information from the ULIP system. 
+This document details the following points: 
+ 
+1. Data Integration between TGVAHAN and ULIP web service : Identification of 
+operational points where data integration between the Telangana Transport Department 
+and ULIP web service will be needed. 
+ 
+2. Technical Approach for Performing Data Integration  
+ 
+The Overall Description 
+The user will share information such as vehicle numbers based on data sent by the 
+user. The ULIP system will call the respective TGVAHAN API to access information. 
+ 
+The following are the points for accessing cargo information: - 
+ 
+1. This API will share data based on information provided by the user. 
+ 
+2. ULIP will expose API for getting data from TGVAHAN API. 
+ 
+3. TGVAHAN /01 API will take the vehicle number from the user and get data from 
+TGVAHAN API. 
+1.2 Data Integration between TGVAHAN System and ULIP application 
+ 
+The user will share information with the ULIP system based on the data shared ULIP 
+will provide data to the user. 
+1.3 TGVAHAN/01 
+ 
+This API will take the vehicle number and connect with the TGVAHAN API to get data. 
+ 
+S. 
+No. 
+Field Name Field Description Format Require
+d/Not – 
+Require
+d 
+Length 
+1 vehiclenumber 
+ 
+Vehicle number 
+ 
+ ^[A-Z0-9]{5,11}$ 
+ 
+Required Max 11 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 1.0 Page 5 of 10 
+ 
+1.3.1 Technical Approach  
+1. All the data will be shared through the rest web services. 
+2. The ULIP system will provide the Vehicle number for which detail is required. 
+3. TGVAHAN API will share details of the vehicle registration information that exists in the 
+TGVAHAN system in JSON format. 
+4. TGVAHAN Integration will add JSON in the response key in the response body. 
+5. The ULIP system will provide the data in JSON Object format in the response body. 
+ 
+Example: 
+ 
+Vehicle number TG08T1024 is shared by the ULIP system, and then TGVAHAN-
+integration will request TGVAHAN API. 
+ 
+Request: 
+ 
+The request must be of the following format, where the vehicle number is passed within the URL 
+body in JSON format. 
+ 
+For staging – 
+ 
+https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/TGVAHAN/01 
+ 
+ 
+{"vehiclenumber": "TG08T1024"} 
+ 
+Curl URL 
+ 
+ 
+  curl --location --
+request POST 'https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/TG
+VAHAN/01' \ 
+--
+header 'authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhdW
+RpdHVzciIsImlhdCI6MTY0MDY2NTk3MiwiYXBwcyI6ImRhdGFwdXNoIn0.z80h8i5
+-0yygtVtY0lHRRfpIt8nf_t8v-hrrD8WrDulXZ5bQ9q8Z5U4Tot9r7u6Hd-
+m3DF_H5J9LqV_rlLvCXA' \ 
+--header 'accept: application/json' \ 
+--header 'content-type: application/json' \ 
+--data-raw ' 
+{ 
+    "vehiclenumber": "TG08T1024" 
+} 
+' 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 1.0 Page 6 of 10 
+ 
+ 
+For production – 
+ 
+https://www.ulip.dpiit.gov.in/ulip/v1.0.0/TGVAHAN/01 
+ 
+{ 
+    "vehiclenumber": "TG08T1024" 
+} 
+ 
+Curl URL 
+ 
+curl --location 
+'https://www.ulip.dpiit.gov.in/ulip/v1.0.0/TGVAHAN/01' \ 
+--header 'authorization: Bearer 
+eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1bGlwIiwiaWF0IjoxNzI3MTUxNjkwLCJh
+cHBzIjoiZGF0YXB1c2gifQ.jnDTg3LoNNOS6ErRC4JH_i0bkhIVmv7TxWtis3KUqQ
+Wz_lq3Lr6mYqo94mzkz7mz-0Hb0lW40AUt-4p8TLT9Ig' \ 
+--header 'accept: application/json' \ 
+--header 'content-type: application/json' \ 
+--data '{ 
+    "vehiclenumber": "TG08T1024" 
+}' 
+ 
+For obtaining an authentication token, refer Section 1.5 
+ 
+Response 
+ 
+To acknowledge the above request, ULIP will send the below response -  
+ 
+a) In case of an invalid format 
+ 
+1. Invalid vehicle number 
+ 
+ 
+{ 
+    "response": null, 
+    "error": "true", 
+    "code": "400", 
+    "message": "Data format failed OR wrong value entered a
+t:  vehiclenumber. Format should follow  ^[A-Z0-9]{5,11}$" 
+} 
+ 
+ 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 1.0 Page 7 of 10 
+ 
+b) In case of vehicle number does not exist in the TGVAHAN system 
+ 
+{ 
+    "response": [ 
+        { 
+            "response": "<NewDataSet>\r\n  <errors>\r\n    <isError>Y</isErro
+r>\r\n    <errorMessage>No data found</errorMessage>\r\n  </errors>\r\n  <dat
+a>\r\n    <Regn_No />\r\n    <Owner_Name />\r\n    <FatherName />\r\n    <Pre
+sentAddress />\r\n    <PermanentAddress />\r\n    <Mobile_No />\r\n    <Regis
+trationDate />\r\n    <Chassis_No />\r\n    <Engine_No />\r\n    <Vehicle_Cla
+ssdesc />\r\n    <Maker_Name />\r\n    <Model_Desc />\r\n    <Body_Type />\r\
+n    <Fuel />\r\n    <Color />\r\n    <FC_Validity />\r\n    <rc_np_upto />\r
+\n    <Tax_Validity />\r\n    <rc_norms_desc />\r\n    <FinancerName />\r\n  
+  <Insurance_CmpyName />\r\n    <Insurance_No />\r\n    <Insurance_Validity /
+>\r\n    <IssuePlace />\r\n    <RcStatus />\r\n    <Make_Yr />\r\n    <ULW />
+\r\n    <GVW />\r\n    <NumberofCylinder />\r\n    <CubicCapacity />\r\n    <
+SeatingCapacity />\r\n    <SleeperCapacity />\r\n    <StandCapacity />\r\n   
+ <WheelBase />\r\n    <rc_np_issued_by />\r\n    <OwnerSerialNo />\r\n    <Ve
+hicleType />\r\n    <PUCCVALIDFROM />\r\n    <PUCCVALIDTO />\r\n    <PERMITNO
+ />\r\n    <Permit_Validity />\r\n    <PERMIT_TYPE />\r\n    <TheftStatus />\
+r\n    <RCValid_Upto />\r\n    <Office_Code />\r\n    <Vehicle_ClassID />\r\n
+    <Approved_Date />\r\n    <RCPurchaseDt />\r\n    <NOCStay_Perd />\r\n    
+<NOCIssueDt />\r\n    <NOCTOOFFICE />\r\n  </data>\r\n</NewDataSet>", 
+            "responseStatus": "SUCCESS", 
+            "message": null 
+        } 
+    ], 
+    "error": "false", 
+    "code": "200", 
+    "message": "Success" 
+} 
+ 
+c) In case the vehicle number exists 
+ 
+{ 
+    "response": [ 
+        { 
+            "response": "<NewDataSet>\r\n  <errors>\r\n    <isError>N</isErro
+r>\r\n    <errorMessage />\r\n  </errors>\r\n  <data>\r\n    <Regn_No>TG08T10
+24</Regn_No>\r\n    <Owner_Name>S*I *A* E*T*R*R*S*S*</Owner_Name>\r\n    <Fat
+herName>YALLANKI USHA</FatherName>\r\n    <PresentAddress>PLOT NO.44 AND 45,F
+LAT NO. 401,4TH FLOOR,SRI VENKATA SAI COLONY,KOMPALLY</PresentAddress>\r\n   
+ <PermanentAddress>PLOT NO.44 AND 45,FLAT NO. 401,4TH FLOOR,SRI VENKATA SAI C
+OLONY,KOMPALLY</PermanentAddress>\r\n    <Mobile_No>9949648964</Mobile_No>\r\
+n    <RegistrationDate>Apr 23 2024  4:07PM</RegistrationDate>\r\n    <Chassis
+_No>MB1A5CHD7RPNA1586</Chassis_No>\r\n    <Engine_No>RNPZ107043</Engine_No>\r
+\n    <Vehicle_Classdesc>Goods Carriage</Vehicle_Classdesc>\r\n    <Maker_Nam
+e>ASHOK LEYLAND LTD</Maker_Name>\r\n    <Model_Desc>EA 1920/66 H CO FES BSVI-
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 1.0 Page 8 of 10 
+ 
+PH2</Model_Desc>\r\n    <Body_Type>Closed</Body_Type>\r\n    <Fuel>DIESEL</Fu
+el>\r\n    <Color>NP</Color>\r\n    <FC_Validity>Apr 22 2026  2:45PM</FC_Vali
+dity>\r\n    <rc_np_upto />\r\n    <Tax_Validity>Sep 30 2024 12:00AM</Tax_Val
+idity>\r\n    <rc_norms_desc />\r\n    <FinancerName>MAHINDRA &amp;MAHINDRA F
+IN SER LTD</FinancerName>\r\n    <Insurance_CmpyName>CHOLAMANDALAM MS GENERAL
+ INSURANCE COMPANY LTD.</Insurance_CmpyName>\r\n    <Insurance_No>123</Insura
+nce_No>\r\n    <Insurance_Validity>Mar 14 2025 12:00AM</Insurance_Validity>\r
+\n    <IssuePlace>TG008</IssuePlace>\r\n    <RcStatus>Approved</RcStatus>\r\n
+    <Make_Yr>Feb  2 2024 12:00AM</Make_Yr>\r\n    <ULW>8720.00</ULW>\r\n    <
+GVW>18500.00</GVW>\r\n    <NumberofCylinder />\r\n    <CubicCapacity>6600.00<
+/CubicCapacity>\r\n    <SeatingCapacity>3</SeatingCapacity>\r\n    <SleeperCa
+pacity />\r\n    <StandCapacity>0</StandCapacity>\r\n    <WheelBase>5760</Whe
+elBase>\r\n    <rc_np_issued_by />\r\n    <OwnerSerialNo />\r\n    <VehicleTy
+pe>T</VehicleType>\r\n    <PUCCVALIDFROM />\r\n    <PUCCVALIDTO />\r\n    <PE
+RMITNO>TG008/2982/NPPUC/2024</PERMITNO>\r\n    <Permit_Validity>Apr 23 2029  
+4:11PM</Permit_Validity>\r\n    <PERMIT_TYPE>NP</PERMIT_TYPE>\r\n    <TheftSt
+atus>N</TheftStatus>\r\n    <RCValid_Upto>Apr 22 2026  4:07PM</RCValid_Upto>\
+r\n    <Office_Code>TG008</Office_Code>\r\n    <Vehicle_ClassID>GCRT</Vehicle
+_ClassID>\r\n    <Approved_Date>Apr 23 2024  3:42PM</Approved_Date>\r\n    <R
+CPurchaseDt>Mar 15 2024 12:00AM</RCPurchaseDt>\r\n    <NOCStay_Perd />\r\n   
+ <NOCIssueDt />\r\n    <NOCTOOFFICE />\r\n  </data>\r\n</NewDataSet>", 
+            "responseStatus": "SUCCESS", 
+            "message": null 
+        } 
+    ], 
+    "error": "false", 
+    "code": "200", 
+    "message": "Success" 
+} 
+ 
+ 
+Status Code 200: VRN data response 
+Status Code 400: Bad request (Invalid JSON syntax, invalid JSON key) 
+Status Code 401 or 403: Unauthenticated or Unauthorized 
+Status Code 500: Some internal server error occurred 
+Status Code 502: The server is not responding. 
+ 
+1.4 Data Transmission & Authentication Mechanism 
+ 
+All data exchange would be done over secure HTTP (HTTPS). Request from ULIP's system would 
+be made in the TGVAHAN system through a data exchange URL that has the following form: 
+ 
+For Staging – 
+ 
+https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/TGVAHAN/01 
+ 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 1.0 Page 9 of 10 
+ 
+Body:  
+ 
+{"vehiclenumber": "TG08T1024"} 
+ 
+Access to above data exchange URL would be authorized by use of a security mechanism 
+implemented by the ULIP system. It is as follows: 
+ 
+• First time access:  It would require a username and password [which would be shared with 
+user beforehand].  Once user hit with valid user id and password, ULIP system will return a 
+basic authorization token to  user, using that token user will communicate with ULIP system 
+until token will not get expired. 
+ 
+Summary of HTTP Basic Authentication is as follows: 
+ 
+First time user hits ULIP secured API through username and password for access token as follow- 
+ curl -X POST  
+‘https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/user/login’ 
+ -H 'accept: application/json'  
+   -H 'content-type: application/json'  
+-data ‘{"username":"xxxxxx","password":" XXxxx@12345"} ‘ 
+ 
+ 
+Authorization:   
+Bearer 
+eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJpbnRlcmNvbnQiLCJpYXQiOjE1ODU1NjYyMzcsImFwcHMi
+OiJkYXRhcHVzaCJ9.jb-23DbkWpz-3ptsuuZofzH-
+ce7jd0xR5WlkFfBPO_Dzjop01dSx9OamqsjsgUAryLUPtUDiMX07oHG4L2AfFQ  
+ 
+Upon successful authentication, the user would be logged into the ULIP system and get an access 
+token. Though this token user can communicate with ULIP. This token has expiry time which 
+represent user session. The session time out for the same to be fixed hour, generally it is for 30 
+minutes. If there is no request coming from user for 30 minutes, then session (token) will be 
+expired, and user need to re authenticate. 
+ 
+Using The above token, user can request ULIP system for details as follow - 
+ 
+curl --location --
+request POST 'https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/TGVAHAN/01' \ 
+--
+header 'authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1bGlwIiwiaWF0Ij
+oxNjQwNjcxMTU4LCJhcHBzIjoiZGF0YXB1c2gifQ.C1kSY1oUhhaJcch5Svaq9HUB7WtLHYnsVMIm
+6P1kyvr39qnqNxTqYTZ0QPAEiKsITxdE8ohCyFWPGdvsWrn8cg' \ 
+--header 'accept: application/json' \ 
+--header 'content-type: application/json' \ 
+--data-raw ' {"vehiclenumber": "TG08T1024"}' 
+ 
+ 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 1.0 Page 10 of 10 
+ 
+For Production – 
+ 
+curl --location 'https://www.ulip.dpiit.gov.in/ulip/v1.0.0/user/login' \ 
+--header 'Content-Type: application/json' \ 
+--header 'Accept: application/json' \ 
+--data-raw '{ 
+    "username": "xxxx", 
+    "password": "xxxx@123" 
+}' 
+ 
+Authorization:   
+Bearer  
+eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1bGlwIiwiaWF0IjoxNzI3MTYxMDgwLCJhcHBzIjoiZGF0
+YXB1c2gifQ.XhVZm7NiCD05-
+v9091WJQhYzdk1a0Shs_ley0T4R2MX63swRyxHbHxh6bVXtzqWvWiSLwwNGRQIcqGhr49hpGg 
+ 
+Upon successful authentication, the user would be logged into the ULIP system and get an access 
+token. Though this token user can communicate with  ULIP. This token has expiry time which 
+represent user session. The session time out for the same to be f ixed hour, generally it is for 30 
+minutes. If there is no request coming from user for 30 minutes, the n session (token) will be 
+expired, and user need to re authenticate. 
+ 
+Using The above token, user can request ULIP system for vehicle details as follow - 
+ 
+https://www.ulip.dpiit.gov.in/ulip/v1.0.0/TGVAHAN/01 
+ 
+curl --location 'https://www.ulip.dpiit.gov.in/ulip/v1.0.0/TGVAHAN/01' \ 
+--header 'authorization: Bearer 
+eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1bGlwIiwiaWF0IjoxNzI3MTYxMDgwLCJhcHBzIjoiZGF0
+YXB1c2gifQ.XhVZm7NiCD05-
+v9091WJQhYzdk1a0Shs_ley0T4R2MX63swRyxHbHxh6bVXtzqWvWiSLwwNGRQIcqGhr49hpGg' \ 
+--header 'accept: application/json' \ 
+--header 'content-type: application/json' \ 
+--data '{"vehiclenumber": "TG08T1024"}' 
+ 

@@ -1,0 +1,1678 @@
+ULIP Integration Requirement Document 
+ 
+  
+                        
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+Version No.: 4.0 
+Date: 19/05/2026 
+Project Name: ULIP 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ULIP Integration Requirement Document 
+This document contains proprietary information of NLDSL. Unauthorized access, copying and replication are 
+prohibited. This document must not be copied in whole or part by any means, without the written authorization of 
+NLDSL, Noida, India. 
+ 
+ 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 2 of 33 
+ 
+ 
+ 
+ 
+Revision History 
+Version Date Author Reviewer Significant Changes 
+1.0 26/04/2023 Ayush Arya Nayab Ali Baseline Version 
+2.0 12/06/2023 Ayush Arya Nayab Ali New APIs added 
+3.0 01/10/2024 Girish Chander Nayab Ali Updated 
+4.0 19/05/2026 Gaurav Tyagi Pranab Manna Updated 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+  
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 3 of 33 
+ 
+Table of Contents 
+ 
+Introduction ................................................................................................................................................. 4 
+1.1 Purpose .................................................................................................................................... 4 
+The Overall Description .............................................................................................................................. 4 
+1.2 Data Integration between GATISHAKTI System and ULIP application ................................... 4 
+1.3 GATISHAKTI/01 ....................................................................................................................... 4 
+1.3.1 Technical Approach .................................................................................................... 5 
+1.4 GATISHAKTI/02 ....................................................................................................................... 8 
+1.4.1 Technical Approach .................................................................................................... 8 
+1.5 GATISHAKTI/03 ..................................................................................................................... 11 
+1.5.1 Technical Approach .................................................................................................. 11 
+1.6 GATISHAKTI/04 ..................................................................................................................... 17 
+1.6.1 Technical Approach .................................................................................................. 17 
+1.7 GATISHAKTI/05 ..................................................................................................................... 27 
+1.7.1 Technical Approach .................................................................................................. 28 
+1.8 Data Transmission & Authentication Mechanism .................................................................. 31 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 4 of 33 
+ 
+Introduction 
+1.1 Purpose 
+ 
+The purpose of this document is to define and provide details for accessing API for Gati 
+Shakti system information (information about nhno and stated available in Gati Shakti 
+system) from ULIP system. This document details the following points: 
+ 
+1. Data Integration between GATISHAKTI and ULIP web service : Identification of 
+operational points where data integration between GATISHAKTI and ULIP web service 
+will be needed. 
+ 
+2. Technical Approach for performing Data Integration  
+ 
+The Overall Description 
+Users will share information such as NH number based on data sent by user ULIP 
+system will call respective GATISHAKTI API for accessing information. 
+ 
+Following are the points for accessing vehicle information: - 
+ 
+1. This API will share data based on information provided by users. 
+ 
+2. ULIP will expose API for getting data from GATISHAKTI API. 
+ 
+3. GATISHAKTI/02 API will take NH number from user and get data from GATISHAKTI 
+API. 
+1.2 Data Integration between GATISHAKTI System and ULIP 
+application 
+ 
+Users will share information with the ULIP system based on data shared ULIP will 
+provide data to user. 
+1.3 GATISHAKTI/01 
+ 
+This API will take NH (national highway) number and connect with GATISHAKTI API 
+to get data. 
+ 
+S. No. Field Name Field Description Format Required/Not 
+– Required 
+Length 
+1 nhno Enter the NH number as 
+available in GATISHAKTI 
+system. 
+[A-Z]{2}-[A-
+Z0-9]{1,4} 
+Required 7 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 5 of 33 
+ 
+1.3.1 Technical Approach  
+1. All the data will be shared through rest web services. 
+2. ULIP system will provide NH number for which detail is required. 
+3. GATISHAKTI API will share details of national highway road  information which exist in 
+GATISHAKTI system in JSON format. 
+4. GATISHAKTI Integration will add JSON in response key in response body. 
+5. ULIP system will provide the data in JSON Object format in response body. 
+ 
+Example: NH number NH-71 is shared by ULIP system, then GATISHAKTI-integration 
+will make a request to GATISHAKTI API. 
+ 
+Request: The request must be of the following format, where national highway (NH) number is 
+passed within the URL body in JSON format. 
+ 
+For Staging: https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/GATISHAKTI/01 
+ 
+{"nhno":"NH-5"} 
+ 
+Curl URL 
+ 
+curl --location --request POST 'https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/GATISHAKTI/01' \ 
+--
+header 'Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1bGlwIiwiaWF0IjoxNjgyNDkx
+MDkwLCJhcHBzIjoiZGF0YXB1c2gifQ.pnqeBwtBo3XxYDyFKAFL1CD2OsdCuVx-
+nl4KkWV2OaCxrAJl-nHM0gAeI8pevDMUuS4oqereLLfHD19Rfy_x6Q' \ 
+--header 'Accept: application/json' \ 
+--header 'Content-Type: application/json' \ 
+--data-raw '{"nhno":"NH-5"}' 
+ 
+For Production: https://www.ulip.dpiit.gov.in/ulip/v1.0.0/GATISHAKTI/01 
+ 
+{"nhno":"NH-5"} 
+ 
+Curl URL 
+ 
+curl --location --request POST 'https://www.ulip.dpiit.gov.in/ulip/v1.0.0/GATISHAKTI/01' \ 
+--
+header 'Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1bGlwIiwiaWF0IjoxNjgyNDkx
+MDkwLCJhcHBzIjoiZGF0YXB1c2gifQ.pnqeBwtBo3XxYDyFKAFL1CD2OsdCuVx-
+nl4KkWV2OaCxrAJl-nHM0gAeI8pevDMUuS4oqereLLfHD19Rfy_x6Q' \ 
+--header 'Accept: application/json' \ 
+--header 'Content-Type: application/json' \ 
+--data-raw '{"nhno":"NH-5"}' 
+ 
+For obtaining authentication token, refer Section 1.5 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 6 of 33 
+ 
+Response 
+ 
+To acknowledge the above request, ULIP will send the below response -  
+ 
+1. Invalid nhno number 
+ 
+{    "response": null, 
+    "error": "true", 
+    "code": "400", 
+    "message": "Data format failed OR wrong value entered at:  nhno. Format should follow  [A-
+Z]{2}-[A-Z0-9]{1,4}"} 
+ 
+2. In case nhno number exists 
+ 
+{    "response": [ 
+        { 
+            "response": { 
+                "data": [ 
+                    { 
+                        "road_name": "NH-71", 
+                        "gis_length": 44.178, 
+                        "road_type": "National Highway", 
+                        "lane_statu": "2L", 
+                        "state_ut": "Andhra Pradesh" 
+                    }, 
+                    { 
+                        "road_name": "NH-71", 
+                        "gis_length": 53.542, 
+                        "road_type": "National Highway", 
+                        "lane_statu": "2L", 
+                        "state_ut": "Andhra Pradesh" 
+                    }, 
+                    { 
+                        "road_name": "NH-71", 
+                        "gis_length": 21.504, 
+                        "road_type": "National Highway", 
+                        "lane_statu": "2L", 
+                        "state_ut": "Andhra Pradesh" 
+                    }, 
+                    { 
+                        "road_name": "NH-71", 
+                        "gis_length": 11.184, 
+                        "road_type": "National Highway", 
+                        "lane_statu": "2L", 
+                        "state_ut": "Andhra Pradesh" 
+                    }, 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 7 of 33 
+ 
+                    { 
+                        "road_name": "NH-71", 
+                        "gis_length": 49.677, 
+                        "road_type": "National Highway", 
+                        "lane_statu": "2L", 
+                        "state_ut": "Andhra Pradesh" 
+                    }, 
+                    { 
+                        "road_name": "NH-71", 
+                        "gis_length": 44.178, 
+                        "road_type": "National Highway", 
+                        "lane_statu": "2L", 
+                        "state_ut": "Andhra Pradesh" 
+                    }, 
+                    { 
+                        "road_name": "NH-71", 
+                        "gis_length": 44.178, 
+                        "road_type": "National Highway", 
+                        "lane_statu": "2L", 
+                        "state_ut": "Andhra Pradesh" 
+                    } 
+                ], 
+                "Result": true 
+            }, 
+            "responseStatus": "SUCCESS" 
+        } 
+    ], 
+    "error": "false", 
+    "code": "200", 
+    "message": "Success"} 
+ 
+3. In case nhno number does not exist 
+ 
+{    "response": [ 
+        { 
+            "response": { 
+                "data": [], 
+                "Result": true 
+            }, 
+            "responseStatus": "SUCCESS" 
+        } 
+    ], 
+    "error": "false", 
+    "code": "200", 
+    "message": "Success"} 
+ 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 8 of 33 
+ 
+Status Code 200: GATISHAKTI data response 
+Status Code 400: Bad request (Invalid json syntax, invalid json key) 
+Status Code 401 or 403: Unauthenticated or Unauthorized 
+Status Code 500: Some internal server errors occurred 
+Status Code 502: Server is not responding. 
+1.4 GATISHAKTI/02 
+ 
+This API will take stateid number and connect with GATISHAKTI API to get data. 
+ 
+S. No. Field Name Field Description Format Required/Not 
+– Required 
+Length 
+1 stateid Enter the stateid number 
+as available in GatiShakti 
+system. 
+[0-9]{1,10} Required Min=1, 
+Max=10. 
+ 
+1.4.1 Technical Approach  
+1. All the data will be shared through rest web services. 
+2. ULIP system will provide State Id number for which detail is required. 
+3. GATISHAKTI API will share details of road information which exist in GATISHAKTI system 
+in JSON format on the basis of State Id. 
+4. GATISHAKTI Integration will add JSON in response key in response body. 
+5. ULIP system will provide the data in JSON Object format in response body. 
+ 
+Example: State Id number 19 is shared by ULIP system, then GATISHAKTI-integration 
+will make a request to GATISHAKTI API. 
+ 
+Request: The request must be of the following format, where state ID number passed within 
+the URL body in JSON format. 
+ 
+For Staging: https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/GATISHAKTI/02 
+ 
+{"stateid":"19"} 
+ 
+Curl URL 
+ 
+curl --location --request POST 'https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/GATISHAKTI/02' \ 
+--
+header 'Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1bGlwIiwiaWF0IjoxNjgyNDk
+wNTMxLCJhcHBzIjoiZGF0YXB1c2gifQ.nQFIZGKOKLWRSpGvhAKvqAPQhyb4AIObuT-
+AdzaTf__hldPNWmtb-JdmZFsFfJ00cHc4dJSc8eB2wJ3EbsfJ1A' \ 
+--header 'Accept: application/json' \ 
+--header 'Content-Type: application/json' \ 
+--data-raw '{"stateid":"19"}' 
+ 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 9 of 33 
+ 
+For Production: https://www.ulip.dpiit.gov.in/ulip/v1.0.0/GATISHAKTI/02 
+ 
+{"stateid":"19"} 
+ 
+Curl URL 
+ 
+curl --location --request POST 'https://www.ulip.dpiit.gov.in/ulip/v1.0.0/GATISHAKTI/02' \ 
+--
+header 'Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1bGlwIiwiaWF0IjoxNjgyNDk
+wNTMxLCJhcHBzIjoiZGF0YXB1c2gifQ.nQFIZGKOKLWRSpGvhAKvqAPQhyb4AIObuT-
+AdzaTf__hldPNWmtb-JdmZFsFfJ00cHc4dJSc8eB2wJ3EbsfJ1A' \ 
+--header 'Accept: application/json' \ 
+--header 'Content-Type: application/json' \ 
+--data-raw '{"stateid":"19"}' 
+ 
+For obtaining authentication token, refer Section 1.5 
+ 
+Response 
+ 
+To acknowledge the above request, ULIP will send the below response -  
+ 
+1. Invalid stateid number 
+ 
+{    "response": null, 
+    "error": "true", 
+    "code": "400", 
+    "message": "Data format failed OR wrong value entered at:  stateid. Format should follow  [0-
+9]{1,10}"} 
+ 
+2. In case stateid number exists 
+ 
+{    "response": [ 
+        { 
+            "response": { 
+                "data": [ 
+                    { 
+                        "infrastr_s": "DELHI", 
+                        "infrastr_a": "F.C.I., Food Storage Depot Mayapuri, Delhi-110064", 
+                        "infrastr_n": "FSD NARAINA", 
+                        "type_owner": "TRANSFERRED FROM GOI", 
+                        "storage_ca": "82730", 
+                        "type_infra": "LOAD BEARING STRUCTURES" 
+                    }, 
+                    { 
+                        "infrastr_s": "DELHI", 
+                        "infrastr_a": "F.C.I., Food Storage Depot CTO, Delhi-110060", 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 10 of 33 
+ 
+                        "infrastr_n": "FSD CTO", 
+                        "type_owner": "TRANSFERRED FROM GOI", 
+                        "storage_ca": "9877", 
+                        "type_infra": "LOAD BEARING STRUCTURES" 
+                    }, 
+                    { 
+                        "infrastr_s": "DELHI", 
+                        "infrastr_a": "F.C.I., Food Storage Depot Okhla-PAHSE -1, Delhi-110020", 
+                        "infrastr_n": "FSD OKHLA", 
+                        "type_owner": "LEASED FROM DDA", 
+                        "storage_ca": "13360", 
+                        "type_infra": "RCC STRUCTURES" 
+                    }, 
+                    { 
+                        "infrastr_s": "DELHI", 
+                        "infrastr_a": "F.C.I., Food Storage Depot Narela, Delhi-110040", 
+                        "infrastr_n": "FSD NARELA", 
+                        "type_owner": "PURCHASED THROUGH ACQUISITION OF LAND", 
+                        "storage_ca": "63000", 
+                        "type_infra": "LOAD BEARING STRUCTURES" 
+                    }, 
+                    { 
+                        "infrastr_s": "DELHI", 
+                        "infrastr_a": "F.C.I., Food Storage Depot Ghevra, Delhi-110081", 
+                        "infrastr_n": "FSD GHEVRA", 
+                        "type_owner": "PURCHASED THROUGH ACQUISITION OF LAND", 
+                        "storage_ca": "141426", 
+                        "type_infra": "LOAD BEARING STRUCTURES" 
+                    }, 
+                    { 
+                        "infrastr_s": "DELHI", 
+                        "infrastr_a": "F.C.I., Food Storage Depot Shaktinagar, Delhi-110007", 
+                        "infrastr_n": "FSD SHAKTINAGAR", 
+                        "type_owner": "TRANSFERRED FROM GOI", 
+                        "storage_ca": "17236", 
+                        "type_infra": "LOAD BEARING STRUCTURES" 
+                    } 
+                ], 
+                "Result": true 
+            }, 
+            "responseStatus": "SUCCESS" 
+        } 
+    ], 
+    "error": "false", 
+    "code": "200", 
+    "message": "Success"} 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 11 of 33 
+ 
+3. In case stateid number does not exist 
+ 
+{    "response": [ 
+        { 
+            "response": { 
+                "data": [], 
+                "Result": true 
+            }, 
+            "responseStatus": "SUCCESS" 
+        } 
+    ], 
+    "error": "false", 
+    "code": "200", 
+    "message": "Success"} 
+ 
+Status Code 200: GATISHAKTI data response 
+Status Code 400: Bad request (Invalid json syntax, invalid json key) 
+Status Code 401 or 403: Unauthenticated or Unauthorized 
+Status Code 500: Some internal server errors occurred 
+Status Code 502: Server is not responding. 
+ 
+1.5 GATISHAKTI/03 
+ 
+This API will take stateid number and connect with GATISHAKTI API to get data. 
+ 
+S. No. Field Name Field Description Format Required/Not 
+– Required 
+Length 
+1 stateid Enter the stateid number 
+as available in GatiShakti 
+system. 
+[0-9]{1,10} Required Min=1, 
+Max=10. 
+ 
+1.5.1 Technical Approach  
+1. All the data will be shared through rest web services. 
+2. ULIP system will provide State Id number for which detail is required. 
+3. GATISHAKTI API will share details of industrial park location which exist in GATISHAKTI 
+system in JSON format on the basis of State Id. 
+4. GATISHAKTI Integration will add JSON in response key in response body. 
+5. ULIP system will provide the data in JSON Object format in response body. 
+ 
+Example: State Id number 19 is shared by ULIP system, then GATISHAKTI-integration 
+will make a request to GATISHAKTI API. 
+ 
+Request: The request must be of the following format, where state ID number is passed within 
+the URL body in JSON format. 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 12 of 33 
+ 
+For Staging: https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/GATISHAKTI/03 
+ 
+{"stateid":"19"} 
+ 
+Curl URL 
+ 
+curl --location --request POST ‘https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/GATISHAKTI/03' \ 
+--
+header 'Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1bGlwIiwiaWF0IjoxNjg2MjA0
+NTk1LCJhcHBzIjoiZGF0YXB1c2gifQ.f0XgksxmszP1Th25FXEkhyH0Ra8q80tEz0vrnuBA8-
+uejR06lQj2CgRKKyniMxFSmlB86srYeHKYlWClaG-vhA' \ 
+--header 'Content-Type: application/json' \ 
+--header 'Accept: application/json' \ 
+--data-raw '{"stateid":"19"}' 
+ 
+For Production: https://www.ulip.dpiit.gov.in/ulip/v1.0.0/GATISHAKTI/03 
+ 
+{"stateid":"19"} 
+ 
+Curl URL 
+ 
+curl --location --request POST ‘https://www.ulip.dpiit.gov.in/ulip/v1.0.0/GATISHAKTI/03' \ 
+--
+header 'Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1bGlwIiwiaWF0IjoxNjg2MjA0
+NTk1LCJhcHBzIjoiZGF0YXB1c2gifQ.f0XgksxmszP1Th25FXEkhyH0Ra8q80tEz0vrnuBA8-
+uejR06lQj2CgRKKyniMxFSmlB86srYeHKYlWClaG-vhA' \ 
+--header 'Content-Type: application/json' \ 
+--header 'Accept: application/json' \ 
+--data-raw '{"stateid":"19"}' 
+ 
+For obtaining authentication token, refer Section 1.5 
+ 
+Response 
+ 
+To acknowledge the above request, ULIP will send the below response -  
+ 
+1. Invalid stateid number 
+ 
+{   "response": null, 
+    "error": "true", 
+    "code": "400", 
+    "message": "Data format failed OR wrong value entered at:  stateid. Format should follow  [0-
+9]{1,10}"} 
+ 
+2. In case stateid number exists 
+ 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 13 of 33 
+ 
+{    "response": [ 
+        { 
+            "response": { 
+                "data": [ 
+                    { 
+                        "st_name": "WEST BENGAL", 
+                        "dist_name": "Murshidabad", 
+                        "sub_dist": "Raghunathganj - I", 
+                        "vname": "Katnai", 
+                        "park_name": "Jangipur Bengal Mega Food Park Limited", 
+                        "land_cat": "Industrial Park", 
+                        "land_avail": 0, 
+                        "park_type": "Other", 
+                        "lat": "24.4059522538221785", 
+                        "lon": "88.0467862324777286" 
+                    }, 
+                    { 
+                        "st_name": "WEST BENGAL", 
+                        "dist_name": "North Twenty Four Parganas", 
+                        "sub_dist": "Barrackpur - I", 
+                        "vname": "Malancha (P)", 
+                        "park_name": "EMC-Naihati-WB", 
+                        "land_cat": "Industrial Land", 
+                        "land_avail": 19, 
+                        "park_type": "Industrial Cluster", 
+                        "lat": "22.9036144349493753", 
+                        "lon": "88.4324715905935221" 
+                    }, 
+                    { 
+                        "st_name": "WEST BENGAL", 
+                        "dist_name": "South Twenty Four Parganas", 
+                        "sub_dist": "Diamond Harbour - II", 
+                        "vname": "Ramnagar", 
+                        "park_name": "EMC-Falta-West Bengal", 
+                        "land_cat": "Industrial Land", 
+                        "land_avail": 13, 
+                        "park_type": "Industrial Cluster", 
+                        "lat": "22.2426884180004976", 
+                        "lon": "88.0945246379337732" 
+                    }, 
+                    { 
+                        "st_name": "WEST BENGAL", 
+                        "dist_name": "North Twenty Four Parganas", 
+                        "sub_dist": "Amdanga", 
+                        "vname": "Panihati (M)", 
+                        "park_name": "Bengal Chemicals & Pharmaceuticals Limited", 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 14 of 33 
+ 
+                        "land_cat": "Industrial Land", 
+                        "land_avail": 8, 
+                        "park_type": "Industrial Area", 
+                        "lat": "22.6913716356124873", 
+                        "lon": "88.3733253290241834" 
+                    }, 
+                    { 
+                        "st_name": "WEST BENGAL", 
+                        "dist_name": "North Twenty Four Parganas", 
+                        "sub_dist": "Amdanga", 
+                        "vname": "Panihati (M)", 
+                        "park_name": "Bengal Chemicals & Pharmaceuticals Limited", 
+                        "land_cat": "Bulk/Open", 
+                        "land_avail": 0, 
+                        "park_type": "Other", 
+                        "lat": "22.6914277296117426", 
+                        "lon": "88.3679239493586692" 
+                    }, 
+                    { 
+                        "st_name": "WEST BENGAL", 
+                        "dist_name": "Kolkata", 
+                        "sub_dist": "", 
+                        "vname": "Kolkata (M Corp.)", 
+                        "park_name": "Bengal Chemicals & Pharmaceuticals Limited", 
+                        "land_cat": "Industrial Land", 
+                        "land_avail": 0, 
+                        "park_type": "Industrial Area", 
+                        "lat": "22.579042757654527", 
+                        "lon": "88.3998653814076789" 
+                    }, 
+                    { 
+                        "st_name": "WEST BENGAL", 
+                        "dist_name": "North Twenty Four Parganas", 
+                        "sub_dist": "Amdanga", 
+                        "vname": "Panihati (M)", 
+                        "park_name": "Bengal Chemicals & Pharmaceuticals Limited", 
+                        "land_cat": "Bulk/Open", 
+                        "land_avail": 0, 
+                        "park_type": "Other", 
+                        "lat": "22.6951245059316875", 
+                        "lon": "88.3665470608780197" 
+                    }, 
+                    { 
+                        "st_name": "WEST BENGAL", 
+                        "dist_name": "North Twenty Four Parganas", 
+                        "sub_dist": "Amdanga", 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 15 of 33 
+ 
+                        "vname": "Panihati (M)", 
+                        "park_name": "Bengal Chemicals & Pharmaceuticals Limited", 
+                        "land_cat": "Bulk/Open", 
+                        "land_avail": 0, 
+                        "park_type": "Other", 
+                        "lat": "22.6929500680083969", 
+                        "lon": "88.371683664519324" 
+                    }, 
+                    { 
+                        "st_name": "WEST BENGAL", 
+                        "dist_name": "North Twenty Four Parganas", 
+                        "sub_dist": "Amdanga", 
+                        "vname": "Panihati (M)", 
+                        "park_name": "Bengal Chemicals & Pharmaceuticals Limited", 
+                        "land_cat": "Bulk/Open", 
+                        "land_avail": 0, 
+                        "park_type": "Other", 
+                        "lat": "22.6924205301895547", 
+                        "lon": "88.3708317440806184" 
+                    }, 
+                    { 
+                        "st_name": "WEST BENGAL", 
+                        "dist_name": "Kolkata", 
+                        "sub_dist": "Kolkata", 
+                        "vname": "Madhyamgram (M)", 
+                        "park_name": "EIGMEF Apparel Park", 
+                        "land_cat": "Industrial Park", 
+                        "land_avail": 0, 
+                        "park_type": "Other", 
+                        "lat": "22.5785624839039656", 
+                        "lon": "88.4407970288360445" 
+                    }, 
+                    { 
+                        "st_name": "WEST BENGAL", 
+                        "dist_name": "Kolkata", 
+                        "sub_dist": "", 
+                        "vname": "Kolkata (M Corp.)", 
+                        "park_name": "Bengal Chemicals & Pharmaceuticals Limited", 
+                        "land_cat": "Industrial Land", 
+                        "land_avail": 0, 
+                        "park_type": "Other", 
+                        "lat": "22.5689841887632845", 
+                        "lon": "88.3538222080004232" 
+                    }, 
+                    { 
+                        "st_name": "WEST BENGAL", 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 16 of 33 
+ 
+                        "dist_name": "North Twenty Four Parganas", 
+                        "sub_dist": "Amdanga", 
+                        "vname": "Panihati (M)", 
+                        "park_name": "Bengal Chemicals & Pharmaceuticals Limited", 
+                        "land_cat": "Bulk/Open", 
+                        "land_avail": 0, 
+                        "park_type": "Other", 
+                        "lat": "22.6944267141347709", 
+                        "lon": "88.3671867302642084" 
+                    }, 
+                    { 
+                        "st_name": "WEST BENGAL", 
+                        "dist_name": "South Twenty Four Parganas", 
+                        "sub_dist": "Falta", 
+                        "vname": "Basulat", 
+                        "park_name": "FALTA SPECIAL ECONOMIC ZONE", 
+                        "land_cat": "Industrial Land", 
+                        "land_avail": 17, 
+                        "park_type": "Special Economic Zones", 
+                        "lat": "22.2716380738630022", 
+                        "lon": "88.1029852694224189" 
+                    } 
+                ], 
+                "Result": true 
+            }, 
+            "responseStatus": "SUCCESS" 
+        } 
+    ], 
+    "error": "false", 
+    "code": "200", 
+    "message": "Success"} 
+ 
+3. In case stateid number does not exist 
+ 
+{    "response": [ 
+        { 
+            "response": { 
+                "data": [], 
+                "Result": true 
+            }, 
+            "responseStatus": "SUCCESS" 
+        } 
+    ], 
+    "error": "false", 
+    "code": "200", 
+    "message": "Success"} 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 17 of 33 
+ 
+Status Code 200: GATISHAKTI data response 
+Status Code 400: Bad request (Invalid json syntax, invalid json key) 
+Status Code 401 or 403: Unauthenticated or Unauthorized 
+Status Code 500: Some internal server errors occurred 
+Status Code 502: Server is not responding. 
+1.6 GATISHAKTI/04 
+ 
+This API will take stateid number and connect with GATISHAKTI API to get data. 
+ 
+S. No. Field Name Field Description Format Required/Not 
+– Required 
+Length 
+1 stateid Enter the stateid number 
+as available in GatiShakti 
+system. 
+[0-9]{1,10} Required Min=1, 
+Max=10. 
+ 
+1.6.1 Technical Approach  
+1. All the data will be shared through rest web services. 
+2. ULIP system will provide State Id number for which detail is required. 
+3. GATISHAKTI API will share details of toll plaza NHAI which exist in GATISHAKTI system 
+in JSON format on the basis of State Id. 
+4. GATISHAKTI Integration will add JSON in response key in response body. 
+5. ULIP system will provide the data in JSON Object format in response body. 
+ 
+Example: State Id number 12 is shared by ULIP system, then GATISHAKTI-integration 
+will make a request to GATISHAKTI API. 
+ 
+Request: The request must be of the following format, where state ID number is passed within 
+the URL body in JSON format. 
+ 
+For Staging: https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/GATISHAKTI/04 
+ 
+{"stateid":"19"} 
+ 
+Curl URL 
+ 
+curl --location --request POST ‘https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/GATISHAKTI/04' \ 
+--
+header 'Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1bGlwIiwiaWF0IjoxNjg2MjA0
+NTk1LCJhcHBzIjoiZGF0YXB1c2gifQ.f0XgksxmszP1Th25FXEkhyH0Ra8q80tEz0vrnuBA8-
+uejR06lQj2CgRKKyniMxFSmlB86srYeHKYlWClaG-vhA' \ 
+--header 'Content-Type: application/json' \ 
+--header 'Accept: application/json' \ 
+--data-raw '{"stateid":"19"}' 
+ 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 18 of 33 
+ 
+For Production: https://www.ulip.dpiit.gov.in/ulip/v1.0.0/GATISHAKTI/04 
+ 
+{"stateid":"19"} 
+ 
+Curl URL 
+ 
+curl --location --request POST ‘https://www.ulip.dpiit.gov.in/ulip/v1.0.0/GATISHAKTI/04' \ 
+--
+header 'Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1bGlwIiwiaWF0IjoxNjg2MjA0
+NTk1LCJhcHBzIjoiZGF0YXB1c2gifQ.f0XgksxmszP1Th25FXEkhyH0Ra8q80tEz0vrnuBA8-
+uejR06lQj2CgRKKyniMxFSmlB86srYeHKYlWClaG-vhA' \ 
+--header 'Content-Type: application/json' \ 
+--header 'Accept: application/json' \ 
+--data-raw '{"stateid":"19"}' 
+ 
+For obtaining authentication token, refer Section 1.5 
+ 
+Response 
+ 
+To acknowledge the above request, ULIP will send the below response -  
+ 
+1. Invalid stateid number 
+ 
+{    "response": null, 
+    "error": "true", 
+    "code": "400", 
+    "message": "Data format failed OR wrong value entered at:  stateid. Format should follow  [0-
+9]{1,10}"} 
+ 
+2. In case stateid number exists 
+ 
+{    "response": [ 
+        { 
+            "response": { 
+                "data": [ 
+                    { 
+                        "tollplazan": "Vanagari", 
+                        "tollplazal": 16.290681, 
+                        "tollplaz_1": 75.923324, 
+                        "nooflanes": "4L", 
+                        "nhno_new": "NH- 50", 
+                        "nearesthos": "1)Govt. Hospital, kustagi 2)Government Hospital Kudala Sangam
+a, Karnataka 587115, 3)Rudagi Govt Hospital Rudagi, Karnataka 586116 4)Wandal PHC Railw
+ay Station Rd Wandal, Karnataka 586201", 
+                        "tollcollec": "M/s GMR OSE Hungund Hospet Highways Pvt Ltd", 
+                        "project_na": "Hungund-Hospet" 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 19 of 33 
+ 
+                    }, 
+                    { 
+                        "tollplazan": "Shahapur", 
+                        "tollplazal": 15.357898, 
+                        "tollplaz_1": 76.312781, 
+                        "nooflanes": "4L", 
+                        "nhno_new": "NH- 50", 
+                        "nearesthos": "1)Govt. Hospital, Munirabad 2)Diwator Nagar Koppal, Karnataka ,
+ 3)Nursing Home B.T.Patil Nagar Koppal, Karnataka", 
+                        "tollcollec": "M/s GMR OSE HungundHospet HighwaysPvt Ltd", 
+                        "project_na": "Hungund-Hospet" 
+                    }, 
+                    { 
+                        "tollplazan": "Hitnal", 
+                        "tollplazal": 15.323649, 
+                        "tollplaz_1": 76.303646, 
+                        "nooflanes": "4L", 
+                        "nhno_new": "NH- 50", 
+                        "nearesthos": "1 ) Govt Hosptial Munirabad 2)Government Hospital Hosapete, K
+arnataka 583201, 3)Al Shifa Clinic Huligi, Karnataka Ph.:081399 47434", 
+                        "tollcollec": "M/s GMR OSE Hungund Hospet Highways Pvt Ltd", 
+                        "project_na": "Hungund-Hospet" 
+                    }, 
+                    { 
+                        "tollplazan": "Hazamady", 
+                        "tollplazal": 13.108245, 
+                        "tollplaz_1": 74.784562, 
+                        "nooflanes": "4L", 
+                        "nhno_new": "NH- 66", 
+                        "tollcollec": "NA", 
+                        "project_na": "kundapur surathkal" 
+                    }, 
+                    { 
+                        "tollplazan": "Kasaba (Bijapur)", 
+                        "tollplazal": 16.786741, 
+                        "tollplaz_1": 75.739648, 
+                        "nooflanes": "4L", 
+                        "nhno_new": "NH- 50", 
+                        "nearesthos": "1)Sri Sai Hospital, Bijapur . Phone No.08352-
+329291, 2)Govt. Hospital, Bijapur,Phone No.08352-270009", 
+                        "tollcollec": "M/s Bijapur Hungund Toll Way Pvt Ltd", 
+                        "project_na": "Bijapur-Hungund" 
+                    }, 
+                    { 
+                        "tollplazan": "Nagarhalla", 
+                        "tollplazal": 16.292989, 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 20 of 33 
+ 
+                        "tollplaz_1": 75.921069, 
+                        "nooflanes": "4L", 
+                        "nhno_new": "NH- 50", 
+                        "nearesthos": "1) Govt. Hospital Nidagundi, Ph. No. 08426-
+281432 2) Govt. Hospital Hungund, Ph. No. 08351-
+261629, 3) Sangam Govt. Hospital, Kudalsangam, Ph. No. 08351-268345", 
+                        "tollcollec": "M/s Bijapur Hungund Toll Way Pvt Ltd (BHTPL)", 
+                        "project_na": "Bijapur-Hungund" 
+                    }, 
+                    { 
+                        "tollplazan": "Banglore - Neelamangla (km14.855)", 
+                        "tollplazal": 13.090749, 
+                        "tollplaz_1": 77.400004, 
+                        "nooflanes": "6L", 
+                        "nhno_new": "NH- 75", 
+                        "nearesthos": "Harsha Ramiah Hospital, Sarojini Hospital", 
+                        "tollcollec": "TBR Infra Pvt Ltd.", 
+                        "project_na": "Bangalore - Nelamangala" 
+                    }, 
+                    { 
+                        "tollplazan": "Banglore - Neelamangla (km26.05) Banglore (4 Side Plazas - 16.60
+0, 17.100, 23.150 and 23.800)", 
+                        "tollplazal": 13.049934, 
+                        "tollplaz_1": 77.494367, 
+                        "nooflanes": "6L", 
+                        "nhno_new": "NH- 75", 
+                        "nearesthos": "Harsha Ramiah Hospital, Sarojini Hospital", 
+                        "tollcollec": "TBR Infra Pvt Limited", 
+                        "project_na": "Bangalore - Nelamangala" 
+                    }, 
+                    { 
+                        "tollplazan": "Mulbagal", 
+                        "tollplazal": 13.148469, 
+                        "tollplaz_1": 78.290548, 
+                        "nooflanes": "4L", 
+                        "nhno_new": "NH- 75", 
+                        "nearesthos": "1)Jalapa Hospital â€“ 08152-
+210605 , 2)Government Hospital Mulbagal, Karnataka 563131, 3)Manjunatha Health Care Behi
+nd SNR Hospital, Bangarpet Road , 563101 SH 5 Kanakanapalya Kolar, Karnataka Ph.:081522 
+23151, 4) Govt. Hospital - 08159-242114", 
+                        "tollcollec": "M/s Lanco Hoskote Highway Limited", 
+                        "project_na": "Bengaluru-Hoskote-Mulbagal" 
+                    }, 
+                    { 
+                        "tollplazan": "Hoskote", 
+                        "tollplazal": 13.059436, 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 21 of 33 
+ 
+                        "tollplaz_1": 77.770734, 
+                        "nooflanes": "4L", 
+                        "nhno_new": "NH- 75", 
+                        "nearesthos": "1)MVJ Hospital 08027931473 2) Govt Hospital Hoskote3) Sathya 
+Sai Orthopaedic amp Multispeciality Hospital 070226 49111", 
+                        "tollcollec": "M/s Lanco Hoskote Highway Limited", 
+                        "project_na": "Bengaluru-Hoskote-Mulbagal" 
+                    }, 
+                    { 
+                        "tollplazan": "Navayuga Devanhally/Sadahalli", 
+                        "tollplazal": 13.19355, 
+                        "tollplaz_1": 77.649812, 
+                        "nooflanes": "6L", 
+                        "nhno_new": "NH- 44", 
+                        "nearesthos": "1)NRV Hospita-9342873366 2)Govt. Hospital 3)Yelahanka -
+9845480709 4)Govt. Hospital, Devanahalli-9449404656", 
+                        "tollcollec": "M/s Navayuga Devanahalli Tollway Pvt Ltd", 
+                        "project_na": "Hyderabad Bengaluru (KNT-2)" 
+                    }, 
+                    { 
+                        "tollplazan": "Gaddur", 
+                        "tollplazal": 13.194218, 
+                        "tollplaz_1": 78.545197, 
+                        "nooflanes": "4L", 
+                        "nhno_new": "NH- 69", 
+                        "nearesthos": "Government Hospital,Nangli", 
+                        "tollcollec": "M/s J.S.R.Mulbagal Tollways Pvt Ltd", 
+                        "project_na": "AP/KNT border-Mulbagal" 
+                    }, 
+                    { 
+                        "tollplazan": "Attibele (BETL)", 
+                        "tollplazal": 12.776883, 
+                        "tollplaz_1": 77.777119, 
+                        "nooflanes": "6L", 
+                        "nhno_new": "NH- 44", 
+                        "nearesthos": "1)N R Hospital NH7 Attibele, Karnataka 562107, 2)Government H
+ospitals Attibele Attibele, Karnataka 562107", 
+                        "tollcollec": "M/s Bangalore Elevated Tollway Private Limited", 
+                        "project_na": "O&M and fee collection from Silk Board Junction(Km.8.765) to Atti
+bele (Km.33.130) of NH-7" 
+                    }, 
+                    { 
+                        "tollplazan": "Bankapur", 
+                        "tollplazal": 14.90999, 
+                        "tollplaz_1": 75.2798, 
+                        "nooflanes": "4L", 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 22 of 33 
+ 
+                        "nhno_new": "NH- 4", 
+                        "nearesthos": "1)Shiggaon Civil Hospital-
+08378255233 ,2)Malladad Rudramma Memorial Hospital Ashwini Nagar Haveri, Karnataka Ph.:
+083752 35108", 
+                        "tollcollec": "Sh. Navin Kumar Gupta", 
+                        "project_na": "Haveri-Hubli Section" 
+                    }, 
+                    { 
+                        "tollplazan": "Brahamarakotlu", 
+                        "tollplazal": 12.875095, 
+                        "tollplaz_1": 75.003849, 
+                        "nooflanes": "4L", 
+                        "nhno_new": "NH- 66 73 169", 
+                        "nearesthos": "1)Father Muller Hospital Ph.:097432 88789, Thumbe, 2)A.J.Hospi
+tal, Kuntikan, Mangalore 3)Radha Nursing Home Farangipete, Karnataka 574143", 
+                        "tollcollec": "Ms Skylark Infra Eng. Pvt. Ltd.", 
+                        "project_na": "NMPT PROJECT" 
+                    }, 
+                    { 
+                        "tollplazan": "Doddakarenahalli (Neelmangala )", 
+                        "tollplazal": 13.068175, 
+                        "tollplaz_1": 77.3606, 
+                        "nooflanes": "4L", 
+                        "nhno_new": "NH- 75", 
+                        "nearesthos": "1)Asha Kiran Ayurvedic Hospital NH 48 Doddakarenahalli Karnata
+ka 562123 2)Harsha Hospital 1934 Sondekoppa Circle NH 4 Nelamangala Bengaluru Karnatak
+a Ph.094832 22666 3)J P Hospital B H Road Nelamangala", 
+                        "tollcollec": "M/s Lanco Devihalli Highawys Ltd", 
+                        "project_na": "Nelamangala-Devihalli" 
+                    }, 
+                    { 
+                        "tollplazan": "Elevated Section/ Electronic City", 
+                        "tollplazal": 12.847667, 
+                        "tollplaz_1": 77.670866, 
+                        "nooflanes": "6L", 
+                        "nhno_new": "NH- 44", 
+                        "nearesthos": "1)SRI BASAVESWARA SWAMY MEDICALS AND GENERAL ST
+ORES #55/8, Govinda Shetty Palya, Konappana Agrahara, Electronic city post, Bengaluru, Karn
+ataka 560100 2)Infosys Medical Center Electronics City Phase 1, Electronic City Bengaluru, Kar
+nataka 560100, 3)Swami", 
+                        "tollcollec": "M/s Bangalore Elevated Tollway Private Limited", 
+                        "project_na": "O&M and fee collection from Silk Board Junction(Km.8.765) to Atti
+bele (Km.33.130) of NH-7" 
+                    }, 
+                    { 
+                        "tollplazan": "Gabbur (MoRTH)", 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 23 of 33 
+ 
+                        "tollplazal": 15.318834, 
+                        "tollplaz_1": 75.139696, 
+                        "nooflanes": "4L", 
+                        "nhno_new": "NH- 48", 
+                        "nearesthos": "1)Qadri Hospital Unnamed Rd, Navyoudha Nagar, Hubballi, Karn
+ataka 580024 ,2)Government Hospital NH4 Navyoudha Nagar Hubli, Karnataka 580024 3)Datti 
+Dr P V Anchatgeri Lane, Hubli 29 Anchatgeri Lane Hubli, Karnataka Ph.:0836 236 2522", 
+                        "tollcollec": "MORTH", 
+                        "project_na": "Hubli -Dharwad" 
+                    }, 
+                    { 
+                        "tollplazan": "Guilalu", 
+                        "tollplazal": 14.053778, 
+                        "tollplaz_1": 76.560573, 
+                        "nooflanes": "6L", 
+                        "nhno_new": "NH- 48", 
+                        "nearesthos": "1)Hiriyur Govt. Hospital 2)PHC NH4 Guilalu, Karnataka ph.08193
+2 06331, 2)Akshay Global Hospital Opp.Sri Rama Kalyana Mantapa, Challakere Road SH 48 C
+hitradurga, Karnataka ph.:098452 00810", 
+                        "tollcollec": "M/s IRB Tumkur Chitradurga Tollway Pvt Ltd", 
+                        "project_na": "Tumkur-Chitradurga" 
+                    }, 
+                    { 
+                        "tollplazan": "Gundmi", 
+                        "tollplazal": 13.47641, 
+                        "tollplaz_1": 74.713082, 
+                        "nooflanes": "4L", 
+                        "nhno_new": "NH- 66", 
+                        "tollcollec": "M/s Navayuga Udupi Tollway Private Limited", 
+                        "project_na": "kundapur surathkal" 
+                    }, 
+                    { 
+                        "tollplazan": "Hattargi", 
+                        "tollplazal": 16.1433, 
+                        "tollplaz_1": 74.51696, 
+                        "nooflanes": "4L", 
+                        "nhno_new": "NH- 48", 
+                        "nearesthos": "1)Civil Hosptal, Yamakanmardi - 8333276017 ,2)Terani Helth SU
+B Center Terani, Maharashtra 416506, 3)Dr. Wagoji Hospital Gokak - Hukkeri Rd Gajabarwadi 
+Hukkeri, Karnataka Ph.:087225 55505", 
+                        "tollcollec": "Ms Ashoka Concessions Ltd", 
+                        "project_na": "Belgaum Maharashtra Border Road Project" 
+                    }, 
+                    { 
+                        "tollplazan": "Hebbalu", 
+                        "tollplazal": 14.375564, 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 24 of 33 
+ 
+                        "tollplaz_1": 76.106875, 
+                        "nooflanes": "6L", 
+                        "nhno_new": "NH- 48", 
+                        "nearesthos": "1)Angudo Govt. Hospital 2)Government Hospital Davanagere Kar
+nataka 577514 3)PVS Hospital Maniyur Chitradurga, Karnataka 577501", 
+                        "tollcollec": "M/s Ashoka Concessions Limited", 
+                        "project_na": "Chitradurga - Davanagere including New Chitradurga Bypass (Ch 
+189- 260)" 
+                    }, 
+                    { 
+                        "tollplazan": "Hirebagewadi", 
+                        "tollplazal": 15.76311, 
+                        "tollplaz_1": 74.64785, 
+                        "nooflanes": "6L", 
+                        "nhno_new": "NH- 48", 
+                        "nearesthos": "1)Govt Hospital Hire Bagewadi, Karnataka 591109", 
+                        "tollcollec": "M/s Ashoka Belgaum Dharwad Tollway Ltd", 
+                        "project_na": "Dharwad-Belgaum" 
+                    }, 
+                    { 
+                        "tollplazan": "Kamkole", 
+                        "tollplazal": 17.645717, 
+                        "tollplaz_1": 77.820114, 
+                        "nooflanes": "4L", 
+                        "nhno_new": "NH- 65", 
+                        "tollcollec": "NA", 
+                        "project_na": "MH/KNT Border-Sangareddy" 
+                    }, 
+                    { 
+                        "tollplazan": "Karbylu (Bellur Cross)", 
+                        "tollplazal": 12.962828, 
+                        "tollplaz_1": 76.765205, 
+                        "nooflanes": "4L", 
+                        "nhno_new": "NH- 75", 
+                        "nearesthos": "1)Bellur Cross -
+08234287575/7755, 2)Adichunchanagiri Institute of Medical Sciences and Research Centre Ban
+galore - Mangalore Hwy Karnataka 571418, 3)BGS Hospital", 
+                        "tollcollec": "M/s Lanco Devihalli Highawys Ltd", 
+                        "project_na": "Nelamangala-Devihalli" 
+                    }, 
+                    { 
+                        "tollplazan": "Karjeevanhalli", 
+                        "tollplazal": 13.612918, 
+                        "tollplaz_1": 76.953866, 
+                        "nooflanes": "6L", 
+                        "nhno_new": "NH- 48", 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 25 of 33 
+ 
+                        "nearesthos": "1)Sira Govt. Hospital 2)Shridevi Institute of Medical Sciences & R
+esearch Hospital sira road, Tumkur, Karnataka Ph.:0816 221 2192", 
+                        "tollcollec": "M/s IRB Tumkur Chitradurga Tollway Pvt Ltd", 
+                        "project_na": "Tumkur-Chitradurga" 
+                    }, 
+                    { 
+                        "tollplazan": "Kaythsandra/Tumkur/Chokkanahalli", 
+                        "tollplazal": 13.302065, 
+                        "tollplaz_1": 77.161956, 
+                        "nooflanes": "6L", 
+                        "nhno_new": "NH- 48", 
+                        "nearesthos": "1)Nelamangala Govt. Hospital, 2)Sanjeevini Ayurvedic Hospital B
+eside HMSIT College NH4 Mydala, Karnataka Ph.:094489 51201 ,3)Government Primary Healt
+h Centre Nelamangala Taluk SH 3 Dabaspete, Karnataka 562111", 
+                        "tollcollec": "M/s JASS Toll Road Co. Ltd", 
+                        "project_na": "Nelamangala Tumkur (6L)" 
+                    }, 
+                    { 
+                        "tollplazan": "Kadabahalli", 
+                        "tollplazal": 12.3049, 
+                        "tollplaz_1": 77.0505, 
+                        "nooflanes": "4L", 
+                        "nhno_new": "NH- 75", 
+                        "nearesthos": "1)Adichunchanagiri Institute of Medical Sciences and Research C
+entre Bangalore - Mangalore Hwy Karnataka 571418 2)Nagesh Hospital SH 7 Channarayapatta
+na, Karnataka 573225", 
+                        "tollcollec": "M/s L&T Devihalli Hassan Tollways Ltd", 
+                        "project_na": "Devihalli - Hassan" 
+                    }, 
+                    { 
+                        "tollplazan": "Kognoli", 
+                        "tollplazal": 16.5422, 
+                        "tollplaz_1": 74.31825, 
+                        "nooflanes": "4L", 
+                        "nhno_new": "NH- 48", 
+                        "nearesthos": "1)MG Hospital Nipani - 08338220172 ,2)Krishna Hospital NH Serv
+ice Rd Gokul Shirgaon MIDC, Maharashtra 416234 3)Rukade Fracture Accident and Orthopedic
+ Hospital vijay arcade NH4 Kagal, Maharashtra 416216", 
+                        "tollcollec": "M/s Ashoka Concessions Limited", 
+                        "project_na": "Belgaum Maharashtra Border Road Project" 
+                    }, 
+                    { 
+                        "tollplazan": "Mangalgi", 
+                        "tollplazal": 17.745596, 
+                        "tollplaz_1": 77.317882, 
+                        "nooflanes": "4L", 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 26 of 33 
+ 
+                        "nhno_new": "NH- 65", 
+                        "tollcollec": "NA", 
+                        "project_na": "MH/KNT Border-Sangareddy" 
+                    }, 
+                    { 
+                        "tollplazan": "Neelamangala - Tumkur /Kulumepalya", 
+                        "tollplazal": 13.114638, 
+                        "tollplaz_1": 77.37463, 
+                        "nooflanes": "6L", 
+                        "nhno_new": "NH- 48", 
+                        "nearesthos": "1)Nelamangala Govt. Hospital 2)Shree Krishna Life line Medicals 
+-
+1, Laxmipura Main Road, Madanayakanahalli, Bengaluru, Karnataka Ph.:084949 53946, 3)SSM
+C Hospital Banglore Rural District. T.Begur, Karnataka", 
+                        "tollcollec": "M/s JASS Toll Road Co. Ltd", 
+                        "project_na": "Nelamangala Tumkur (6L)" 
+                    }, 
+                    { 
+                        "tollplazan": "Shanthigrama", 
+                        "tollplazal": 12.982709, 
+                        "tollplaz_1": 76.228913, 
+                        "nooflanes": "4L", 
+                        "nhno_new": "NH- 75", 
+                        "nearesthos": "1)SSM Hospital Hassan- 08172-
+261010 , 2)S Dyavalapura Kommanahalli, Karnataka Ph.:099649 40222, 3)Mangala Hospital Kri
+shnaraja Pura Hassan, Karnataka", 
+                        "tollcollec": "M/s L&T Devihalli Hassan Tollway Limited", 
+                        "project_na": "Devihalli - Hassan" 
+                    }, 
+                    { 
+                        "tollplazan": "Surathkal", 
+                        "tollplazal": 12.993098, 
+                        "tollplaz_1": 74.792333, 
+                        "nooflanes": "4L", 
+                        "nhno_new": "NH- 66 73 169", 
+                        "nearesthos": "1)Father Muller Hospital Ph.:097432 88789, Thumbe, 2)A.J.Hospi
+tal, Kuntikan, Mangalore 3)Radha Nursing Home Farangipete, Karnataka 574143", 
+                        "tollcollec": "M/s Ridhi Sidhi associates", 
+                        "project_na": "NMPT PROJECT" 
+                    }, 
+                    { 
+                        "tollplazan": "Talapady", 
+                        "tollplazal": 12.75958, 
+                        "tollplaz_1": 74.874087, 
+                        "nooflanes": "4L", 
+                        "nhno_new": "NH- 66", 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 27 of 33 
+ 
+                        "nearesthos": "father muller hospital,0824 223 8000", 
+                        "tollcollec": "M/s Navayuga Udupi Tollway Private Limited", 
+                        "project_na": "kundapur surathkal" 
+                    } 
+                ], 
+                "Result": true 
+            }, 
+            "responseStatus": "SUCCESS" 
+        } 
+    ], 
+    "error": "false", 
+    "code": "200", 
+    "message": "Success"} 
+ 
+3. In case stateid number does not exist 
+ 
+{    "response": [ 
+        { 
+            "response": { 
+                "data": [], 
+                "Result": true 
+            }, 
+            "responseStatus": "SUCCESS" 
+        } 
+    ], 
+    "error": "false", 
+    "code": "200", 
+    "message": "Success"} 
+ 
+Status Code 200: GATISHAKTI data response 
+Status Code 400: Bad request (Invalid json syntax, invalid json key) 
+Status Code 401 or 403: Unauthenticated or Unauthorized 
+Status Code 500: Some internal server errors occurred 
+Status Code 502: Server is not responding. 
+1.7 GATISHAKTI/05 
+ 
+This API will connect with GATISHAKTI API to get data. 
+ 
+S. No. Field Name Field Description Format Required/Not – 
+Required 
+Length 
+1 N/A N/A N/A N/A N/A 
+ 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 28 of 33 
+ 
+1.7.1 Technical Approach  
+1. All the data will be shared through rest web services. 
+2. ULIP system will provide detail is required. 
+3. GATISHAKTI API will share details of national corridors information which exist in 
+GATISHAKTI system in JSON format. 
+4. GATISHAKTI Integration will add JSON in response key in response body. 
+5. ULIP system will provide the data in JSON Object format in response body. 
+ 
+Example: Data is shared by ULIP system, then GATISHAKTI-integration will make a 
+request to GATISHAKTI API. 
+ 
+Request: The request must be of the following format and passed within the URL body in 
+JSON format. 
+ 
+For Staging: https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/GATISHAKTI/05 
+ 
+{} 
+ 
+Curl URL 
+ 
+curl --location --request POST ‘https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/GATISHAKTI/05' \ 
+--
+header 'Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1bGlwIiwiaWF0IjoxNjg2NTQ
+5MjU4LCJhcHBzIjoiZGF0YXB1c2gifQ.WHgxZU1OUlcZHVh0I5QN5MA6IBkYn608rz82HnVaOlx
+MEplwIeFUzdsM95BfNnyCy07cKCzmViFAkeTxr4GY9A' \ 
+--header 'Content-Type: application/json' \ 
+--header 'Accept: application/json' \ 
+--data-raw '{}' 
+ 
+For Production: https://www.ulip.dpiit.gov.in/ulip/v1.0.0/GATISHAKTI/05 
+ 
+{} 
+ 
+Curl URL 
+ 
+curl --location --request POST ‘https://www.ulip.dpiit.gov.in/ulip/v1.0.0/GATISHAKTI/05' \ 
+--
+header 'Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1bGlwIiwiaWF0IjoxNjg2NTQ
+5MjU4LCJhcHBzIjoiZGF0YXB1c2gifQ.WHgxZU1OUlcZHVh0I5QN5MA6IBkYn608rz82HnVaOlx
+MEplwIeFUzdsM95BfNnyCy07cKCzmViFAkeTxr4GY9A' \ 
+--header 'Content-Type: application/json' \ 
+--header 'Accept: application/json' \ 
+--data-raw '{}' 
+ 
+For obtaining authentication token, refer Section 1.5 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 29 of 33 
+ 
+Response 
+ 
+To acknowledge the above request, ULIP will send the below response -  
+ 
+1. Success response  
+ 
+{    "response": [ 
+        { 
+            "response": { 
+                "data": [ 
+                    { 
+                        "gid": 1, 
+                        "name": "Srinagar to Kanyakumari", 
+                        "lane": "4", 
+                        "longitude": "79.5874486355", 
+                        "latitude": "22.5329316636095", 
+                        "dat": "04-02-2016", 
+                        "length": 407 
+                    }, 
+                    { 
+                        "gid": 2, 
+                        "name": "Srinagar to Kanyakumari", 
+                        "lane": "4", 
+                        "longitude": "75.5909048306264", 
+                        "latitude": "31.3550436334972", 
+                        "dat": "20-11-2015", 
+                        "length": 274 
+                    }, 
+                    { 
+                        "gid": 3, 
+                        "name": "Srinagar to Kanyakumari", 
+                        "lane": "4", 
+                        "longitude": "77.540534", 
+                        "latitude": "8.08212320000018", 
+                        "dat": "22-04-2016", 
+                        "length": 574 
+                    }, 
+                    { 
+                        "gid": 4, 
+                        "name": "Srinagar to Kanyakumari", 
+                        "lane": "6", 
+                        "longitude": "78.2234799521444", 
+                        "latitude": "12.5031359156179", 
+                        "dat": "11-05-2016", 
+                        "length": 133 
+                    }, 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 30 of 33 
+ 
+                    { 
+                        "gid": 5, 
+                        "name": "Srinagar to Kanyakumari", 
+                        "lane": "4", 
+                        "longitude": "77.7240897514696", 
+                        "latitude": "13.289731081653", 
+                        "dat": "03-04-2016", 
+                        "length": 854 
+                    }, 
+                    { 
+                        "gid": 6, 
+                        "name": "Srinagar to Kanyakumari", 
+                        "lane": "2", 
+                        "longitude": "78.5751054857387", 
+                        "latitude": "19.8223948738805", 
+                        "dat": "04-02-2016", 
+                        "length": 2 
+                    }, 
+                    { 
+                        "gid": 7, 
+                        "name": "Srinagar to Kanyakumari", 
+                        "lane": "4", 
+                        "longitude": "78.5713057638126", 
+                        "latitude": "19.8418532042657", 
+                        "dat": "04-02-2016", 
+                        "length": 6 
+                    }, 
+                    { 
+                        "gid": 8, 
+                        "name": "Srinagar to Kanyakumari", 
+                        "lane": "2", 
+                        "longitude": "78.5510557150841", 
+                        "latitude": "19.8885997530821", 
+                        "dat": "04-02-2016", 
+                        "length": 14 
+                    }, 
+                    { 
+                        "gid": 14, 
+                        "name": "Srinagar to Kanyakumari", 
+                        "lane": "2", 
+                        "longitude": "79.5444280565349", 
+                        "latitude": "22.4098883321153", 
+                        "dat": "22-12-2016", 
+                        "length": 16 
+                    }, 
+                    { 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 31 of 33 
+ 
+                        "gid": 9, 
+                        "name": "Srinagar to Kanyakumari", 
+                        "lane": "4", 
+                        "longitude": "78.534736660917", 
+                        "latitude": "20.0025283220315", 
+                        "dat": "04-02-2016", 
+                        "length": 39 
+                    }, 
+                    { 
+                        "gid": 10, 
+                        "name": "Srinagar to Kanyakumari", 
+                        "lane": "2", 
+                        "longitude": "78.7159319451039", 
+                        "latitude": "20.2736744434191", 
+                        "dat": "16-02-2016", 
+                        "length": 20 
+                    }, 
+                    { 
+                        "gid": 11, 
+                        "name": "Srinagar to Kanyakumari", 
+                        "lane": "4", 
+                        "longitude": "78.7477536948538", 
+                        "latitude": "20.4424686373791", 
+                        "dat": "30-03-2016", 
+                        "length": 138 
+                    } 
+    ], 
+                "Result": true 
+            }, 
+            "responseStatus": "SUCCESS" 
+        } 
+    ], 
+    "error": "false", 
+    "code": "200", 
+    "message": "Success"} 
+ 
+Status Code 200: GATISHAKTI data response 
+Status Code 400: Bad request (Invalid json syntax, invalid json key) 
+Status Code 401 or 403: Unauthenticated or Unauthorized 
+Status Code 500: Some internal server errors occurred 
+Status Code 502: Server is not responding. 
+1.8 Data Transmission & Authentication Mechanism 
+ 
+All data exchange would be done over secure HTTP (HTTPS). Request from ULIP's system would 
+be made in GATISHAKTI system through a data exchange URL that has following form: 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 32 of 33 
+ 
+For Staging: https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/GATISHAKTI/01 
+ 
+{"nhno":"NH-38"} 
+ 
+Access to above data exchange URL would be authorized by use of a security mechanism 
+implemented by the ULIP system. It is as follows: 
+ 
+• First time access:  It would require a username and password [which would be shared with 
+user beforehand].  Once user hit with valid user id and password, ULIP system will return a 
+basic authorization token to  user, using that token user will communicate with ULIP system 
+until token will not get expired. 
+ 
+Summary of HTTP Basic Authentication is as follows: 
+ 
+First time User hits ULIP secured API through username and password for access token as follow- 
+ 
+curl --location --request POST 
+'https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/user/login' \ 
+--header 'Accept: application/json' \ 
+--header 'Content-Type: application/json' \ 
+--data-raw '{ 
+"username": "xxxx", 
+"password": "xxxx@123"}' 
+ 
+Authorization:   
+Bearer 
+ eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1bGlwIiwiaWF0IjoxNjgyNDkyNzQ1LCJhcHBzIjoiZGF
+0YXB1c2gifQ.iNjO9ggx99yqkjJw65KKP7dZ9zVatpuQQP76rVBnxxArEYq8QZIn48_ihG8EC
+e34wKm3QTcokX7wrq9RDwZrbA'  
+ 
+Upon successful authentication, the user would be logged into the ULIP system and get an access 
+token. Though this token user can communicate with ULIP. This token has expiry time which 
+represents user session. The session time out for the same to be fixed hour, generally it is for 30 
+minutes. If there is no request coming from user for 30 minutes, then session (token) will be 
+expired, and user need to re authenticate. 
+ 
+Using The above token, users can request ULIP system for cargo details as follow - 
+curl --location --
+request POST 'https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/GATISHAKTI/01' \ 
+--
+header 'Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1bGlwIiwiaWF0IjoxNjg
+yNDkyNzQ1LCJhcHBzIjoiZGF0YXB1c2gifQ.iNjO9ggx99yqkjJw65KKP7dZ9zVatpuQQP76r
+VBnxxArEYq8QZIn48_ihG8ECe34wKm3QTcokX7wrq9RDwZrbA' \ 
+--header 'Accept: application/json' \ 
+--header 'Content-Type: application/json' \ 
+--data-raw '{"nhno":"NH-55"}' 
+ 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 33 of 33 
+ 
+For Production: 
+ 
+curl --location --request POST 
+'https://www.ulip.dpiit.gov.in/ulip/v1.0.0/user/login' \ 
+--header 'Accept: application/json' \ 
+--header 'Content-Type: application/json' \ 
+--data-raw '{ 
+"username": "xxxx", 
+"password": "xxxx@123"}' 
+ 
+ 
+Authorization:   
+Bearer 
+ eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1bGlwIiwiaWF0IjoxNjgyNDkyNzQ1LCJhcHBzIjoiZGF
+0YXB1c2gifQ.iNjO9ggx99yqkjJw65KKP7dZ9zVatpuQQP76rVBnxxArEYq8QZIn48_ihG8EC
+e34wKm3QTcokX7wrq9RDwZrbA'  
+ 
+Upon successful authentication, the user would be logged into the ULIP system and get an access 
+token. Though this token user can communicate with ULIP. This token has expiry time which 
+represents user session. The session time out for the same to be fixed hour, generally it is for 30 
+minutes. If there is no request coming from user for 30 minutes, then session (token) will be 
+expired, and user need to re authenticate. 
+ 
+Using The above token, users can request ULIP system for cargo details as follow - 
+curl --location --request POST 'https://www.ulip.dpiit.gov.in/ulip/v1.0.0/GATISHAKTI/01' \ 
+--
+header 'Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1bGlwIiwiaWF0IjoxNjg
+yNDkyNzQ1LCJhcHBzIjoiZGF0YXB1c2gifQ.iNjO9ggx99yqkjJw65KKP7dZ9zVatpuQQP76r
+VBnxxArEYq8QZIn48_ihG8ECe34wKm3QTcokX7wrq9RDwZrbA' \ 
+--header 'Accept: application/json' \ 
+--header 'Content-Type: application/json' \ 
+--data-raw '{"nhno":"NH-55"}' 
+ 

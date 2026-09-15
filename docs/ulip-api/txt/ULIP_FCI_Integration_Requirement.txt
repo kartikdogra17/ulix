@@ -1,0 +1,412 @@
+ULIP Integration Requirement Document 
+ 
+  
+                        
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+Version No.: 1.0 
+Date: 15/06/2023 
+Project Name: ULIP 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ULIP Integration Requirement Document 
+This document contains proprietary information of NLDSL. Unauthorized access, copying and replication are 
+prohibited. This document must not be copied in whole or part by any means, without the written authorization of 
+NLDSL, Noida, India. 
+ 
+ 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 1.0 Page 2 of 9 
+ 
+ 
+ 
+ 
+Revision History 
+Version Date Author Reviewer Significant Changes 
+1.0 15/06/2023 Ayush Arya Nayab Ali Baseline Version 
+2.0 01/10/2024 Ayush Arya Nayab Ali Updated 
+3.0 19/05/2026 Gaurav Tyagi Pranab Manna Updated 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+  
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 1.0 Page 3 of 9 
+ 
+Table of Contents 
+ 
+Introduction ................................................................................................................................................. 4 
+1.1 Purpose .................................................................................................................................... 4 
+The Overall Description .............................................................................................................................. 4 
+1.2 Data Integration between FCI System and ULIP application ................................................... 4 
+1.3 FCI/01 ....................................................................................................................................... 4 
+1.3.1 Technical Approach .................................................................................................... 5 
+1.4 Data Transmission & Authentication Mechanism .................................................................... 7 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 1.0 Page 4 of 9 
+ 
+Introduction 
+1.1 Purpose 
+ 
+The purpose of this document is to define and provide details for accessing API for FCI 
+system information from ULIP system. 
+This document details the following points: 
+ 
+1. Data Integration between FCI and ULIP web service: Identification of operational points 
+where data integration between FCI and ULIP web service will be needed. 
+ 
+2. Technical Approach for performing Data Integration  
+ 
+The Overall Description 
+ 
+Users will just hit the API and get the data (no need to share any data in the request 
+bocy). ULIP system will call respective FCI API for accessing information. 
+ 
+Following are the points for accessing vehicle information: - 
+ 
+1. This API will share the vehicle information data to the user. 
+ 
+2. ULIP will expose API to get data from FCI API. 
+ 
+3. FCI/01 API will take no data in request body from user and get data from FCI API. 
+1.2 Data Integration between FCI System and ULIP application 
+ 
+Users will share information to ULIP system based on data shared ULIP will provide 
+data to user. 
+1.3 FCI/01 
+ 
+This API will connect with FCI API to get data. 
+ 
+S. No. Field Name Field Description Format Required/Not – 
+Required 
+Length 
+1 N/A N/A N/A N/A N/A 
+ 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 1.0 Page 5 of 9 
+ 
+1.3.1 Technical Approach  
+1. All the data will be shared through rest web services. 
+2. ULIP system will provide detail is required. 
+3. FCI API will share details of FCI vehicle information which exist in FCI system in JSON 
+format. 
+4. FCI Integration will add JSON in response key in response body. 
+5. ULIP system will provide the data in JSON Object format in response body. 
+ 
+Example: Data is shared by ULIP system, then FCI-integration will make a request to 
+FCI API. 
+ 
+Request: The request must be of the following format and passed within the URL body in 
+JSON format. 
+ 
+For staging: https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/FCI/01 
+ 
+{} 
+ 
+Curl URL 
+ 
+curl --location --request POST 'https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/FCI/01' \ 
+--
+header 'Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1bGlwIiwiaWF0IjoxNjg3MzM
+2NDA1LCJhcHBzIjoiZGF0YXB1c2gifQ.r0kHctO0lmLe-taVNp_u-
+tV2UJebPHk48scHdhJIZgk_n54sBu3N9vXYiEFTmMwfERn9aHv2Qo9fHPugUgg48w' \ 
+--header 'Content-Type: application/json' \ 
+--header 'Accept: application/json' \ 
+--data-raw '{}' 
+ 
+For production: https://www.ulip.dpiit.gov.in/ulip/v1.0.0/FCI/01 
+ 
+{} 
+ 
+Curl URL 
+ 
+curl --location 'https://www.ulip.dpiit.gov.in/ulip/v1.0.0/FCI/01' \ 
+--header'authorization:Bearer 
+eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1bGlwIiwiaWF0IjoxNzI3NzYyNzcxLCJhcHBzIjoiZGF0YXB
+1c2gifQ.9_kJwxuXfJYoMt0QeMgOSWi01EaxXQkZQ1JLevfNo-vJ5vjCY9oIemZ_B4hiiq2ZCog-
+yAbIUgL6YN-TVie3cA' \ 
+--header 'accept: application/json' \ 
+--header 'content-type: application/json' \ 
+--data '{}' 
+ 
+For obtaining authentication token, refer Section 1.4 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 1.0 Page 6 of 9 
+ 
+Response 
+ 
+To acknowledge the above request, ULIP will send the below response -  
+ 
+1. Success response  
+ 
+{    "response": [ 
+        { 
+            "response": { 
+                "trips": [ 
+                    { 
+                        "VehicleRegNo": "RJ09GB0797", 
+                        "Latitude": "24.192329", 
+                        "Longitude": "82.770493", 
+                        "ServerlogDateTime": "2023-06-15 09:08:23", 
+                        "Commodity": "Wheat", 
+                        "TrackingDateTime": "2023-06-15 09:08:05" 
+                    }, 
+                    { 
+                        "VehicleRegNo": "HR576733", 
+                        "Latitude": "29.41037", 
+                        "Longitude": "74.212463", 
+                        "ServerlogDateTime": "2023-06-15 09:35:42", 
+                        "Commodity": "Wheat", 
+                        "TrackingDateTime": "2023-06-15 09:35:25" 
+                    }, 
+                    { 
+                        "VehicleRegNo": "HR57A5033", 
+                        "Latitude": "29.407866", 
+                        "Longitude": "74.220901", 
+                        "ServerlogDateTime": "2023-06-15 09:35:44", 
+                        "Commodity": "Wheat", 
+                        "TrackingDateTime": "2023-06-15 09:35:26" 
+                    }, 
+                    { 
+                        "VehicleRegNo": "RJ31GA9250", 
+                        "Latitude": "29.482855", 
+                        "Longitude": "74.68367", 
+                        "ServerlogDateTime": "2023-06-15 09:35:41", 
+                        "Commodity": "Wheat", 
+                        "TrackingDateTime": "2023-06-15 09:35:24" 
+                    }, 
+                    { 
+                        "VehicleRegNo": "RJ41GA1433", 
+                        "Latitude": "29.491783", 
+                        "Longitude": "74.71566", 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 1.0 Page 7 of 9 
+ 
+                        "ServerlogDateTime": "2023-06-15 09:34:16", 
+                        "Commodity": "Wheat", 
+                        "TrackingDateTime": "2023-06-15 09:33:58" 
+                    }, 
+                    { 
+                        "VehicleRegNo": "RJ52GA5444", 
+                        "Latitude": "25.326105", 
+                        "Longitude": "74.634727", 
+                        "ServerlogDateTime": "2023-05-30 22:55:35", 
+                        "Commodity": "Wheat", 
+                        "TrackingDateTime": "2023-05-30 22:55:24" 
+                    } 
+                ], 
+                "message": { 
+                    "IsVerified": "Y", 
+                    "MessageInfo": "Success", 
+                    "Status": "S", 
+                    "MobileNo": null, 
+                    "Email": null, 
+                    "refreshtoken": null, 
+                    "token": null, 
+                    "DesignationId": null 
+                } 
+            }, 
+            "responseStatus": "SUCCESS" 
+        } 
+    ], 
+    "error": "false", 
+    "code": "200", 
+    "message": "Success"} 
+ 
+Status Code 200: FCI data response 
+Status Code 400: Bad request (Invalid json syntax, invalid json key) 
+Status Code 401 or 403: Unauthenticated or Unauthorized 
+Status Code 500: Some internal server errors occurred 
+Status Code 502: Server is not responding. 
+1.4 Data Transmission & Authentication Mechanism 
+ 
+All data exchange would be done over secure HTTP (HTTPS). Request from ULIP's system would 
+be made in FCI system through a data exchange URL that has following form: 
+ 
+For staging: https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/FCI/01 
+ 
+{} 
+ 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 1.0 Page 8 of 9 
+ 
+Access to above data exchange URL would be authorized by use of a security mechanism 
+implemented by the ULIP system. It is as follows: 
+ 
+• First time access:  It would require a username and password [which would be shared with 
+user beforehand].  Once user hit with valid user id and password, ULIP system will return a 
+basic authorization token to  user, using that token user will communicate with ULIP system 
+until token will not get expired. 
+ 
+Summary of HTTP Basic Authentication is as follows: 
+ 
+First time User hits ULIP secured API through username and password for access token as follow- 
+ 
+curl --location --request POST 
+'https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/user/login' \ 
+--header 'Accept: application/json' \ 
+--header 'Content-Type: application/json' \ 
+--data-raw '{"username": "xxxx","password": "xxxx@123"}' 
+ 
+Authorization:   
+Bearer 
+ eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1bGlwIiwiaWF0IjoxNjg3MzM2NDA1LCJhcHBzIjoiZGF0YXB
+1c2gifQ.r0kHctO0lmLe-taVNp_u-
+tV2UJebPHk48scHdhJIZgk_n54sBu3N9vXYiEFTmMwfERn9aHv2Qo9fHPugUgg48w' 
+ 
+Upon successful authentication, the user would be logged into the ULIP system and get an access 
+token. Though this token user can communicate with ULIP. This token has expiry time which 
+represents user session. The session time out for the same to be fixed hour, generally it is for 30 
+minutes. If there is no request coming from user for 30 minutes, then session (token) will be 
+expired, and user need to re authenticate. 
+ 
+Using The above token, user can request ULIP system for vehicle details as follow - 
+curl --location --request POST 'https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/FCI/01' \ 
+--
+header 'Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1bGlwIiwiaWF0IjoxNjg3Mz
+M2NDA1LCJhcHBzIjoiZGF0YXB1c2gifQ.r0kHctO0lmLe-taVNp_u-
+tV2UJebPHk48scHdhJIZgk_n54sBu3N9vXYiEFTmMwfERn9aHv2Qo9fHPugUgg48w' \ 
+--header 'Content-Type: application/json' \ 
+--header 'Accept: application/json' \ 
+--data-raw '{}' 
+ 
+For production – 
+ 
+curl --location 'https://www.ulip.dpiit.gov.in/ulip/v1.0.0/user/login' \ 
+--header 'Accept: application/json' \ 
+--header 'Content-Type: application/json' \ 
+--data-raw '{ "username": "xxxx","password": "xxxx@123"}' 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 1.0 Page 9 of 9 
+ 
+ 
+Authorization:   
+Bearer  
+eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1bGlwIiwiaWF0IjoxNzI3MTYxMDgwLCJhcHBzIjoiZGF0
+YXB1c2gifQ.XhVZm7NiCD05-
+v9091WJQhYzdk1a0Shs_ley0T4R2MX63swRyxHbHxh6bVXtzqWvWiSLwwNGRQIcqGhr49hpGg 
+ 
+Upon successful authentication, the user would be logged into the ULIP system and get an access 
+token. Though this token user can communicate with  ULIP. This token has expiry time which 
+represents user session. The session time out for the same to be fixed hour, generally it is for 30 
+minutes. If there is no request coming from user for 30 minutes, the n session (token) will be 
+expired, and user need to re authenticate. 
+ 
+Using The above token, user can request ULIP system for details as follow - 
+ 
+https://www.ulip.dpiit.gov.in/ulip/v1.0.0/FCI/01 
+ 
+curl --location 'https://www.ulip.dpiit.gov.in/ulip/v1.0.0/FCI/01' \ 
+--header 'authorization: Bearer 
+eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1bGlwIiwiaWF0IjoxNzI3NzYyNzcxLCJhcHBzIjoiZGF0
+YXB1c2gifQ.9_kJwxuXfJYoMt0QeMgOSWi01EaxXQkZQ1JLevfNo-
+vJ5vjCY9oIemZ_B4hiiq2ZCog-yAbIUgL6YN-TVie3cA' \ 
+--header 'accept: application/json' \ 
+--header 'content-type: application/json' \ 
+--data '{}' 

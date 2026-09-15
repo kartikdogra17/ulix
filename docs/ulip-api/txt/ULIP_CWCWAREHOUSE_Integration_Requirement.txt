@@ -1,0 +1,410 @@
+ULIP Integration Requirement Document 
+ 
+  
+                        
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+Version No.: 1.0 
+Date: 09/07/2026 
+Project Name: ULIP 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ULIP Integration Requirement Document 
+This document contains proprietary information of NLDSL. Unauthorized access, copying and replication are 
+prohibited. This document must not be copied in whole or part by any means, without the written authorization of 
+NLDSL, Noida, India. 
+ 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 1.0 Page 2 of 9 
+ 
+ 
+ 
+ 
+Revision History 
+Version Date Author Reviewer Significant Changes 
+1.0 09/07/2026 Sudhanshu Singh Nayab Ali Baseline Version 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 1.0 Page 3 of 9 
+ 
+Table of Contents 
+ 
+Introduction ................................................................................................................................................. 4 
+1.1 Purpose .................................................................................................................................... 4 
+The Overall Description .............................................................................................................................. 4 
+1.2 Data Integration between WAREHOUSE System and ULIP application ................................. 4 
+1.3 WAREHOUSE/01 ..................................................................................................................... 4 
+1.3.1 Technical Approach .................................................................................................... 5 
+1.4 Data Transmission & Authentication Mechanism .................................................................. 80 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 1.0 Page 4 of 9 
+ 
+Introduction 
+1.1 Purpose 
+ 
+The purpose of this document is to define and provide details for accessing API for 
+WAREHOUSE system information from ULIP system. 
+ 
+This document details the following points: 
+ 
+1. Data Integration between WAREHOUSE and ULIP web service : Identification 
+of operational points where data integration between WAREHOUSE and ULIP web 
+service will be needed. 
+ 
+2. Technical Approach for performing Data Integration  
+ 
+The Overall Description 
+ 
+Users will share information such as StateCode, based on data sent by user ULIP 
+system will call respective WAREHOUSE API for accessing information. 
+ 
+Following are the points for accessing different warehouse locations: - 
+ 
+1. This API will share data based on information provided by users. 
+ 
+2. ULIP will expose API for getting data from WAREHOUSE API. 
+ 
+3. WAREHOUSE/01 API will take StateCode from user and get data from 
+WAREHOUSE API. 
+ 
+1.2 Data Integration between WAREHOUSE System and ULIP 
+application 
+ 
+User will share information to ULIP system based on data shared ULIP will provide data 
+to user. 
+ 
+1.3 WAREHOUSE/01 
+ 
+This API will take StateCode and connect with WAREHOUSE API to get data. 
+ 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 1.0 Page 5 of 9 
+ 
+S. No. Field Name Field Description Format Required/Not – 
+Required 
+Length 
+1 StateCode StateCode as available in 
+WAREHOUSE system. 
+^(?:\d{2}|O
+T)$ 
+Required Max 2 
+ 
+1.3.1 Technical Approach  
+1. All the data will be shared through rest web services. 
+2. ULIP system will provide StateCode for which detail is required. 
+3. WAREHOUSE API will share details of locations of different warehouses which exist in 
+WAREHOUSE system in JSON format. 
+4. WAREHOUSE Integration will add JSON in response key in response body. 
+5. ULIP system will provide the data in JSON Object format in response body. 
+ 
+Example: "StateCode" "09" is shared by ULIP system, then WAREHOUSE-integration 
+will make a request to WAREHOUSE API. 
+ 
+Request: 
+ 
+The request must be of the following format, where StateCode is passed within the URL body in 
+JSON format. 
+ 
+https://www.ulip.dpiit.gov.in/ulip/v1.0.0/WAREHOUSE/01 
+ 
+{"StateCode": "09"} 
+ 
+Curl URL 
+ 
+curl --location 'https://www.ulip.dpiit.gov.in/ulip/v1.0.0/WAREHOUSE/01' \ 
+--header 'Authorization: Bearer 
+eyJhbGciOiJIUzUxMiJ9.eyJhcHBzIjoiYXBpR2F0ZXdheSIsInN1YiI6InVsaXAiLCJpYXQi
+OjE3ODM0ODYzOTl9.3bl_wLmpJAMtyb8D7pjKidcSNwq6q9Gx1k8uT8dxt6vzx-
+uFkVc2aAsKAaRU33i7vvHQTpFO9DWiSoDUO6gsYQ' \ 
+--header 'Content-Type: application/json' \ 
+--header 'Accept: application/json' \ 
+--data '{"StateCode": "09"}' 
+ 
+For obtaining authentication token, refer Section 1.4 
+ 
+Response 
+ 
+To acknowledge the above request, ULIP will send the below response -  
+ 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 1.0 Page 6 of 9 
+ 
+a) In case of invalid format 
+ 
+1. Invalid StateCode 
+ 
+{   "response": null, 
+    "error": "true", 
+    "code": "400 BAD_REQUEST", 
+    "message": "Data format failed OR wrong value entered at:  StateCode. Format 
+should follow  ^(?:\\d{2}|OT)$"} 
+ 
+ 
+b) In case of StateCode does not exist in WAREHOUSE system 
+ 
+{  "response": [ 
+        { 
+            "response": [], 
+            "responseStatus": "SUCCESS" 
+        } 
+    ], 
+    "error": "false", 
+    "code": "200", 
+    "message": "Success"} 
+ 
+c) In case StateCode number exists 
+ 
+{    "response": [ 
+        { 
+            "response": [ 
+                { 
+                    "OfficeId": 647, 
+                    "OfficeName": "CW AYODHYA", 
+                    "StateId": "09", 
+                    "StateName": "UTTAR PRADESH", 
+                    "StateCode": "09", 
+                    "DistrictId": 58, 
+                    "DistrictName": "FAIZABAD", 
+                    "CityId": 58, 
+                    "CityName": "Faizabad", 
+                    "PinCode": "224001", 
+                    "AddressLine1": "Navin Mandi, Raibareilly Road, Faizabad- 224001", 
+                    "Capacity": 8910.0, 
+                    "Longitude": 0.0, 
+                    "Latitude": 0.0, 
+                    "WarehouseOwnerName": "Owned", 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 1.0 Page 7 of 9 
+ 
+                    "vaccantspace": 547.7, 
+                    "Mobileno": "7405860139", 
+                    "Warehousecode": "4712", 
+                    "Email": "wmfzd@cewacor.nic.in" 
+                }, 
+                { 
+                    "OfficeId": 668, 
+                    "OfficeName": "CW SAHARANPUR BD", 
+                    "StateId": "09", 
+                    "StateName": "UTTAR PRADESH", 
+                    "StateCode": "09", 
+                    "DistrictId": 96, 
+                    "DistrictName": "SAHARANPUR", 
+                    "CityId": 96, 
+                    "CityName": "Saharanpur", 
+                    "PinCode": "247232", 
+                    "AddressLine1": "Base Depot, Pilkhani, Saharanpur - 247232", 
+                    "Capacity": 78970.5, 
+                    "Longitude": 77.47029, 
+                    "Latitude": 29.997423, 
+                    "WarehouseOwnerName": "Owned", 
+                    "vaccantspace": 3412.04, 
+                    "Mobileno": "9458821676", 
+                    "Warehousecode": "4729", 
+                    "Email": "cw.saharanpurbd@cewacor.nic.in" 
+                }, 
+                { 
+                    "OfficeId": 679, 
+                    "OfficeName": "CW SAHIBABAD-I", 
+                    "StateId": "09", 
+                    "StateName": "UTTAR PRADESH", 
+                    "StateCode": "09", 
+                    "DistrictId": 63, 
+                    "DistrictName": "GHAZIABAD", 
+                    "CityId": 63, 
+                    "CityName": "Ghaziabad", 
+                    "PinCode": "201007", 
+                    "AddressLine1": "G.T Road, (Mohan Nagar) Sahibabad, Ghaziabad, 
+UP—201 001.", 
+                    "Capacity": 6879.0, 
+                    "Longitude": 0.0, 
+                    "Latitude": 0.0, 
+                    "WarehouseOwnerName": "Owned", 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 1.0 Page 8 of 9 
+ 
+                    "vaccantspace": 128.22, 
+                    "Mobileno": "9799040499", 
+                    "Warehousecode": "2919", 
+                    "Email": "cwcdli.sbd1@gmail.com" 
+                } 
+            ], 
+            "responseStatus": "SUCCESS" 
+        } 
+    ], 
+    "error": "false", 
+    "code": "200", 
+    "message": "Success"} 
+ 
+Status Code 200: warehouse data response 
+Status Code 400: Bad request (Invalid json syntax, invalid json key) 
+Status Code 401 or 403: Unauthenticated or Unauthorized 
+Status Code 500: Some internal server error occurred 
+Status Code 502: Server is not responding. 
+ 
+1.4 Data Transmission & Authentication Mechanism 
+ 
+All data exchange would be done over secure HTTP (HTTPS). Requests from ULIP's system 
+would be made in WAREHOUSE system through a data exchange URL that has following form: 
+ 
+https://www.ulip.dpiit.gov.in/ulip/v1.0.0/WAREHOUSE/01 
+ 
+Body:  
+ 
+{"StateCode": "09"} 
+ 
+Access to above data exchange URL would be authorized by use of a security mechanism 
+implemented by the ULIP system. It is as follows: 
+ 
+• First time access:  It would require a username and password [which would be shared with 
+user beforehand].  Once user hit with valid user id and password, ULIP system will return a 
+basic authorization token to  user, using that token user will communicate with ULIP system 
+until token will not get expired. 
+ 
+Brief summary of HTTP Basic Authentication is as follows: 
+ 
+First time when User will hit ULIP secured API through username and password for access token 
+as follows- 
+ 
+ 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 1.0 Page 9 of 9 
+ 
+ curl -X POST  
+‘https://www.ulip.dpiit.gov.in/ulip/v1.0.0/user/login’ 
+ -H 'accept: application/json'  
+   -H 'content-type: application/json'  
+-data ‘{"username":"xxxxxx","password":" XXxxx@12345"} ‘ 
+ 
+Authorization:   
+Bearer 
+eyJhbGciOiJIUzUxMiJ9.eyJhcHBzIjoiYXBpR2F0ZXdheSIsInN1YiI6InVsaXAiLCJpYXQiOjE3
+ODM1NzI4MDl9.1u-
+w6fZZed25xJa6ng3gy3K5SgXhMhngf9BcLiMQA0HMB4loJtB79JogHG7une27hjut2nsbSsBgVIfo
+BH4-6w 
+ 
+Upon successful authentication, the user would be logged into the ULIP system and get an access 
+token. Though this token user can communicate with ULIP. This token has expiry time which 
+represent user session. The session time out for the same to be fixed hour, generally it is for 30 
+minutes. If there is no request coming from user for 30 minutes, then session (token) will be 
+expired and user need to re authenticate. 
+ 
+Using The above token, user can request ULIP system for vehicle details as follow - 
+ 
+curl --location 'https://www.ulip.dpiit.gov.in/ulip/v1.0.0/WAREHOUSE/01' \ 
+--header 'Authorization: Bearer 
+eyJhbGciOiJIUzUxMiJ9.eyJhcHBzIjoiYXBpR2F0ZXdheSIsInN1YiI6InVsaXAiLCJpYXQiOjE3
+ODM1NzI4MDl9.1u-
+w6fZZed25xJa6ng3gy3K5SgXhMhngf9BcLiMQA0HMB4loJtB79JogHG7une27hjut2nsbSsBgVIfo
+BH4-6w' \ 
+--header 'Content-Type: application/json' \ 
+--header 'Accept: application/json' \ 
+--data '{"StateCode": "09"}' 

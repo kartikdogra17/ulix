@@ -1,0 +1,1574 @@
+ULIP Integration Requirement Document 
+ 
+  
+                        
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+Version No.: 6.0 
+Date: 27/03/2026 
+Project Name: ULIP 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ULIP Integration Requirement Document 
+This document contains proprietary information of NLDSL. Unauthorized access, copying and replication are 
+prohibited. This document must not be copied in whole or part by any means, without the written authorization of 
+NLDSL, Noida, India. 
+ 
+ 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 6.0 Page 2 of 32 
+ 
+ 
+ 
+ 
+Revision History 
+Version Date Author Reviewer Significant Changes 
+1.0 02/07/2021 Hasan Mhad Khan Nayab Ali Baseline Version 
+2.0 23/05/2022 Akshay Singh Nayab Ali Update format & 
+response 
+3.0 05/08/2022 Akshay Singh Nayab Ali Update Response 
+4.0 20/09/2024 Ayush Arya Nayab Ali Updated 
+5.0 03/02/2026 Sudhanshu Singh Nayab Ali 
+Add new VAHAN 
+API VAHAN/04, 
+VAHAN/05, 
+VAHAN/06 
+6.0 27/03/2026 Gaurav Tyagi Pranab Manna Updated 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 6.0 Page 3 of 32 
+ 
+Table of Contents 
+ 
+Introduction ................................................................................................................................................. 4 
+1.1 Purpose .................................................................................................................................... 4 
+The Overall Description .............................................................................................................................. 4 
+1.2 Data Integration between VAHAN System and ULIP application ............................................ 5 
+1.3 VAHAN Integration masking fields ........................................................................................... 5 
+1.4 VAHAN/01 ................................................................................................................................ 5 
+1.4.1 Technical Approach .................................................................................................... 5 
+1.5 VAHAN/02 ................................................................................................................................ 8 
+1.5.1 Technical Approach .................................................................................................... 9 
+1.6 VAHAN/03 .............................................................................................................................. 12 
+1.6.1 Technical Approach .................................................................................................. 13 
+1.7 VAHAN/04 .............................................................................................................................. 17 
+1.7.1 Technical Approach .................................................................................................. 17 
+1.8 VAHAN/05 .............................................................................................................................. 21 
+1.8.1 Technical Approach .................................................................................................. 21 
+1.9 VAHAN/06 .............................................................................................................................. 25 
+1.9.1 Technical Approach .................................................................................................. 26 
+1.10 Data Transmission & Authentication Mechanism ............................................................. 30 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 6.0 Page 4 of 32 
+ 
+Introduction 
+1.1 Purpose 
+ 
+The purpose of this document is to define and provide details for accessing API for vehicle 
+information from ULIP system. 
+This document details the following points: 
+ 
+1. Data Integration between VAHAN and ULIP web service : Identification of operational 
+points where data integration between VAHAN and ULIP web service will be needed. 
+ 
+2. Technical Approach for performing Data Integration  
+ 
+The Overall Description 
+ 
+User will share vehicle information such as vehicle number, chassis number and 
+engine number based on data send by user ULIP system will call respective VAHAN 
+APIs for accessing information. 
+ 
+Following are the points for accessing vehicle information: - 
+ 
+1. This API will share vehicle data based on information provided by user. 
+ 
+2. ULIP will expose six API for getting data from VAHAN API. 
+ 
+3. For VAHAN/01 ULIP will take vehicle number from user and get xml data from Vahan 
+API based on vehicle number. 
+ 
+4. For VAHAN/02 ULIP will take chassis number from user and get xml data from Vahan 
+API based on chassis number. 
+ 
+5. For VAHAN/03 ULIP will take engine number from user and get xml data from Vahan 
+API based on engine number. 
+ 
+6. For VAHAN/04 ULIP will take vehicle number from user and get Json data from Vahan 
+API based on vehicle number. 
+ 
+7. For VAHAN/05 ULIP will take chassis number from user and get Json data from 
+Vahan API based on chassis number. 
+ 
+8. For VAHAN/06 ULIP will take engine number from user and get Json data from Vahan 
+API based on engine number. 
+ 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 6.0 Page 5 of 32 
+ 
+1.2 Data Integration between VAHAN System and ULIP application 
+ 
+Users will share information to ULIP system based on data shared ULIP will provide 
+data to user. 
+ 
+1.3 VAHAN Integration masking fields  
+ 
+We are masking some fields in vahan integration. These are the fields - 
+rc_present_address, rc_permanent_address, rc_owner_name, rc_mobile_no, 
+rc_f_name. We are applying default masking for these fields for all the users.  
+1.4 VAHAN/01 
+ 
+This API will take vehicle number and connect with VAHAN API to get data. 
+ 
+S. No. Field Name Field Description Format Require
+d/Not – 
+Require
+d 
+Length 
+1 vehiclenumber Vahicle Number as available 
+in VAHAN system 
+^[a-zA-Z0-
+9]{5,11}$ 
+Required Min 5 
+Max 11 
+ 
+1.4.1 Technical Approach  
+1. All the data will be shared through rest web services. 
+2. ULIP system will provide vehicle number for which detail is required.  
+3. VAHAN API will share details of vehicle which exist in VAHAN system in xml format. 
+4. Data receive from VAHAN is in XML format. ULIP system convert this data to string format 
+and assign it to key “response”. 
+5. ULIP system will provide the data in JSON Object format in response body. 
+ 
+Example: 
+ 
+Users will share Vehicle Number UP91L0001 to ULIP system, then ULIP system will 
+make a request to VAHAN API. 
+ 
+Request: 
+ 
+The request must be of the following format, where vehicle number is passed within the URL 
+body in JSON format. 
+ 
+ 
+ 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 6.0 Page 6 of 32 
+ 
+For Production - 
+ 
+https://www.ulip.dpiit.gov.in/ulip/v1.0.0/VAHAN/01 
+ 
+{ 
+   "vehiclenumber": "UP91L0001" 
+} 
+ 
+Curl URL 
+ 
+curl -X POST \ 
+   https://www.ulip.dpiit.gov.in/ulip/v1.0.0/VAHAN/01 \ 
+   -H 'accept: application/json' \ 
+   -H 'authorization: Bearer 
+eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZXN0MSIsImlhdCI6MTYyNTIyNDQxMCwi
+YXBwcyI6ImRhdGFwdXNoIn0.STkF5e_NKQeiv7Kyu6rRRRYMisrEbQwUjZbJzoi
+2u-1LNH2oTsJQToVytU8FCQua6xzJNnIE5IFT9Bh2CLFugA' \ 
+   -H 'content-type: application/json' \ 
+    -d '{ 
+   "vehiclenumber": "UP91L0001" 
+}' 
+ 
+For Staging - 
+ 
+https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/VAHAN/01 
+ 
+{ 
+    "vehiclenumber": "UP32KH0320" 
+} 
+ 
+Curl URL 
+ 
+curl --location 'https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/VAHAN/01' \ 
+--header 'Authorization: Bearer 
+eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1bGlwIiwiaWF0IjoxNzI2ODEyNTk0LCJhcH
+BzIjoiZGF0YXB1c2gifQ.ihjX6nSI2mIdZJBjJ6ZnzUXNwi3PlKH5pfqEm7HVORWe
+hcLghZyq1zhZDdZClPm0ZD4YgROImnBmMU3kryxNow' \ 
+--header 'Content-Type: application/json' \ 
+--header 'Accept: application/json' \ 
+--data '{ 
+    "vehiclenumber": "UP32KH0320" 
+}' 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 6.0 Page 7 of 32 
+ 
+For obtaining authentication token, refer Section 1.10 
+ 
+Response 
+ 
+To acknowledge the above request, ULIP will send the response below -  
+ 
+a) In case of invalid format 
+ 
+{ 
+    "response": [ 
+        { 
+            "response": "<?xml version=\"1.0\" encoding=\"UTF-8\" 
+standalone=\"yes\"?>\n<VehicleDetails>\n    
+<stautsMessage>OK</stautsMessage>\n    
+<rc_regn_no>UP91L0001</rc_regn_no>\n    <rc_regn_dt>26-Jan-
+2017</rc_regn_dt>\n    <rc_regn_upto>25-Jan-2032</rc_regn_upto>\n    
+<rc_purchase_dt>24-Jan-2017</rc_purchase_dt>\n    
+<rc_owner_sr>1</rc_owner_sr>\n    <rc_owner_name>R***L 
+K***R</rc_owner_name>\n    <state_cd>UP</state_cd>\n    
+<rto_cd>91</rto_cd>\n    <rc_present_address>, 
+999999</rc_present_address>\n    <rc_permanent_address>, 
+999999</rc_permanent_address>\n    <rc_vch_catg>2WN</rc_vch_catg>\n    
+<rc_vh_class_desc>M-Cycle/Scooter(2WN)</rc_vh_class_desc>\n    
+<rc_vhclass_desc>M-Cycle/Scooter</rc_vhclass_desc>\n    
+<rc_chasi_no>ME4JF509AH70*****</rc_chasi_no>\n    
+<rc_eng_no>JF50E760*****</rc_eng_no>\n    <rc_maker_desc>HONDA 
+MOTORCYCLE AND SCOOTER INDIA (P) LTD</rc_maker_desc>\n    
+<rc_maker_model>HONDA ACTIVA</rc_maker_model>\n    
+<rc_body_type_desc>SOLO</rc_body_type_desc>\n    
+<rc_fuel_desc>PETROL</rc_fuel_desc>\n    <rc_color>P A WHITE</rc_color>\n    
+<rc_norms_desc>BHARAT STAGE II</rc_norms_desc>\n    <rc_fit_upto>25-
+Jan-2032</rc_fit_upto>\n    <rc_tax_upto>25-01-2032</rc_tax_upto>\n    
+<rc_financer></rc_financer>\n    <rc_insurance_comp>HDFC ERGO General 
+Insurance Company Ltd</rc_insurance_comp>\n    
+<rc_insurance_policy_no>2320100501934300000</rc_insurance_policy_no>\n    
+<rc_insurance_upto>15-Sep-2020</rc_insurance_upto>\n    
+<rc_manu_month_yr>1/2017</rc_manu_month_yr>\n    
+<rc_unld_wt>108</rc_unld_wt>\n    <rc_gvw>269</rc_gvw>\n    
+<rc_no_cyl>1</rc_no_cyl>\n    <rc_cubic_cap>109.00</rc_cubic_cap>\n    
+<rc_seat_cap>2</rc_seat_cap>\n    <rc_sleeper_cap></rc_sleeper_cap>\n    
+<rc_stand_cap>0</rc_stand_cap>\n    <rc_wheelbase>1230</rc_wheelbase>\n    
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 6.0 Page 8 of 32 
+ 
+<rc_registered_at>HAMIRPUR(UP), Uttar Pradesh</rc_registered_at>\n    
+<rc_status_as_on>03-Feb-2026</rc_status_as_on>\n    
+<rc_status>ACTIVE</rc_status>\n    
+<rc_blacklist_status></rc_blacklist_status>\n    
+<rc_noc_details></rc_noc_details>\n    <rc_vh_type>N</rc_vh_type>\n    
+<rc_vh_class>1</rc_vh_class>\n    <rc_noc_dt></rc_noc_dt>\n    
+<rc_fuel_cd>1</rc_fuel_cd>\n    <rc_maker_cd>36</rc_maker_cd>\n    
+<rc_model_cd>HONDA ACTIVA</rc_model_cd>\n    
+<rc_norms_cd>0</rc_norms_cd>\n    <rc_sale_amt>51129.0</rc_sale_amt>\n    
+<rc_own_catg_desc>OTHERS</rc_own_catg_desc>\n    
+<rc_vch_catg_desc>TWO WHEELER(NT)</rc_vch_catg_desc>\n    
+<rc_owner_cd_desc>INDIVIDUAL</rc_owner_cd_desc>\n    
+<rc_vehicle_surrendered_to_dealer>0</rc_vehicle_surrendered_to_dealer>\n    
+<rc_currentadd_districtcode>0</rc_currentadd_districtcode>\n    
+<rc_non_use>false</rc_non_use>\n    
+<rc_passenger_tax></rc_passenger_tax>\n    <rc_goods_tax></rc_goods_tax>\n    
+<rc_tax_mode>L</rc_tax_mode>\n</VehicleDetails>\n", 
+            "responseStatus": "SUCCESS", 
+            "message": null 
+        } 
+    ], 
+    "error": "false", 
+    "code": "200", 
+    "message": "Success" 
+} 
+ 
+Status Code 200: vehicle data response 
+Status Code 400: Bad request (Invalid json syntax, invalid json key) 
+Status Code 401 or 403: Unauthenticated or Unauthorized 
+Status Code 500: Some internal server error occurred 
+Status Code 502: Server is not responding. 
+1.5 VAHAN/02 
+ 
+This API will take vehicle number and connect with VAHAN API to get data. 
+ 
+S. No. Field Name Field Description Format Require
+d/Not – 
+Require
+d 
+Length 
+1 chasisnumber Chassis Number as available 
+in VAHAN system 
+^[a-zA-Z0-
+9]{1,20}$ 
+Required Min 1 
+Max 20 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 6.0 Page 9 of 32 
+ 
+1.5.1 Technical Approach  
+ 
+1. All the data will be shared through rest web services. 
+2. ULIP system will provide chassis number for which detail is required. 
+3. VAHAN API will share details of vehicle which exist in VAHAN system in xml format. 
+4. Data receive from VAHAN is in XML format. ULIP system convert this data to string format 
+and assign it to key “response”. 
+5. ULIP system will provide the data in JSON Object format in response body. 
+ 
+Example: 
+ 
+Chassis Number ME4JF509AH7069705 is shared by ULIP system, then VAHAN-
+integration will make a request to VAHAN API. 
+ 
+Request: 
+ 
+The request must be of the following format, where chassis number is passed within the URL 
+body in JSON format. 
+ 
+For Production - 
+ 
+https://www.ulip.dpiit.gov.in/ulip/v1.0.0/VAHAN/02 
+ 
+{ 
+   "chasisnumber": " ME4JF509AH7069705" 
+} 
+ 
+Curl URL 
+ 
+curl -X POST \ 
+   https://www.ulip.dpiit.gov.in/ulip/v1.0.0/VAHAN/02 \ 
+         -H 'accept: application/json' \ 
+         -H 'authorization: Bearer 
+eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZXN0MSIsImlhdCI6MTYyNTIyNDQxMCwi
+YXBwcyI6ImRhdGFwdXNoIn0.STkF5e_NKQeiv7Kyu6rRRRYMisrEbQwUjZbJzoi
+2u-1LNH2oTsJQToVytU8FCQua6xzJNnIE5IFT9Bh2CLFugA' \ 
+         -H 'content-type: application/json' \ 
+         -d '{ 
+         "chasisnumber": "ME4JF509AH7069705" 
+}' 
+ 
+ 
+ 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 6.0 Page 10 of 32 
+ 
+For Staging - 
+ 
+https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/VAHAN/02 
+ 
+{ 
+    "chasisnumber": "MAT447230H3F13971" 
+} 
+ 
+Curl URL 
+ 
+curl --location 'https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/VAHAN/02' \ 
+--header 'authorization: Bearer 
+eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1bGlwIiwiaWF0IjoxNzI2ODEyNTk0LCJhcH
+BzIjoiZGF0YXB1c2gifQ.ihjX6nSI2mIdZJBjJ6ZnzUXNwi3PlKH5pfqEm7HVORWe
+hcLghZyq1zhZDdZClPm0ZD4YgROImnBmMU3kryxNow' \ 
+--header 'accept: application/json' \ 
+--header 'Content-Type: application/json' \ 
+--data '{ 
+    "chasisnumber": "MAT447230H3F13971" 
+}' 
+ 
+For obtaining authentication token, refer Section 1.10 
+ 
+Response 
+ 
+To acknowledge the above request, ULIP will send the below response –  
+ 
+a) In case of invalid format 
+ 
+{ 
+   "response": null, 
+      "error": "true", 
+      "code": "400", 
+      "message": "Data format failed OR wrong value entered at:  chasisnumber. 
+Format should follow ^[a-zA-Z0-9]{1,17}$" 
+} 
+ 
+b) In case of chassis number does not exist in VAHAN system 
+ 
+ 
+{ 
+   "response": [ 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 6.0 Page 11 of 32 
+ 
+   { 
+      "response": "<?xml version=\"1.0\" encoding=\"UTF-8\" 
+standalone=\"yes\"?>\n<VehicleDetails>\n    <stautsMessage>Vehicle Data Not 
+Found</stautsMessage>\n</VehicleDetails>\n", 
+         "responseStatus": "SUCCESS" 
+   } 
+   ], 
+   "error": "false", 
+      "code": "200", 
+      "message": "Success" 
+} 
+ 
+c) In case of chassis number exist 
+ 
+{ 
+    "response": [ 
+        { 
+            "response": "<?xml version=\"1.0\" encoding=\"UTF-8\" 
+standalone=\"yes\"?>\n<VehicleDetails>\n    <stautsMessage>OK</stautsMessage>\n    
+<rc_regn_no>UP91L0001</rc_regn_no>\n    <rc_regn_dt>26-Jan-2017</rc_regn_dt>\n    
+<rc_regn_upto>25-Jan-2032</rc_regn_upto>\n    <rc_purchase_dt>24-Jan-
+2017</rc_purchase_dt>\n    <rc_owner_sr>1</rc_owner_sr>\n    
+<rc_owner_name>R***L K***R</rc_owner_name>\n    <state_cd>UP</state_cd>\n    
+<rto_cd>91</rto_cd>\n    <rc_present_address>, 999999</rc_present_address>\n    
+<rc_permanent_address>, 999999</rc_permanent_address>\n    
+<rc_vch_catg>2WN</rc_vch_catg>\n    <rc_vh_class_desc>M-
+Cycle/Scooter(2WN)</rc_vh_class_desc>\n    <rc_vhclass_desc>M-
+Cycle/Scooter</rc_vhclass_desc>\n    
+<rc_chasi_no>ME4JF509AH70*****</rc_chasi_no>\n    
+<rc_eng_no>JF50E760*****</rc_eng_no>\n    <rc_maker_desc>HONDA 
+MOTORCYCLE AND SCOOTER INDIA (P) LTD</rc_maker_desc>\n    
+<rc_maker_model>HONDA ACTIVA</rc_maker_model>\n    
+<rc_body_type_desc>SOLO</rc_body_type_desc>\n    
+<rc_fuel_desc>PETROL</rc_fuel_desc>\n    <rc_color>P A WHITE</rc_color>\n    
+<rc_norms_desc>BHARAT STAGE II</rc_norms_desc>\n    <rc_fit_upto>25-Jan-
+2032</rc_fit_upto>\n    <rc_tax_upto>25-01-2032</rc_tax_upto>\n    
+<rc_financer></rc_financer>\n    <rc_insurance_comp>HDFC ERGO General Insurance 
+Company Ltd</rc_insurance_comp>\n    
+<rc_insurance_policy_no>2320100501934300000</rc_insurance_policy_no>\n    
+<rc_insurance_upto>15-Sep-2020</rc_insurance_upto>\n    
+<rc_manu_month_yr>1/2017</rc_manu_month_yr>\n    
+<rc_unld_wt>108</rc_unld_wt>\n    <rc_gvw>269</rc_gvw>\n    
+<rc_no_cyl>1</rc_no_cyl>\n    <rc_cubic_cap>109.00</rc_cubic_cap>\n    
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 6.0 Page 12 of 32 
+ 
+<rc_seat_cap>2</rc_seat_cap>\n    <rc_sleeper_cap></rc_sleeper_cap>\n    
+<rc_stand_cap>0</rc_stand_cap>\n    <rc_wheelbase>1230</rc_wheelbase>\n    
+<rc_registered_at>HAMIRPUR(UP), Uttar Pradesh</rc_registered_at>\n    
+<rc_status_as_on>03-Feb-2026</rc_status_as_on>\n    
+<rc_status>ACTIVE</rc_status>\n    <rc_blacklist_status></rc_blacklist_status>\n    
+<rc_noc_details></rc_noc_details>\n    <rc_vh_type>N</rc_vh_type>\n    
+<rc_vh_class>1</rc_vh_class>\n    <rc_noc_dt></rc_noc_dt>\n    
+<rc_fuel_cd>1</rc_fuel_cd>\n    <rc_maker_cd>36</rc_maker_cd>\n    
+<rc_model_cd>HONDA ACTIVA</rc_model_cd>\n    
+<rc_norms_cd>0</rc_norms_cd>\n    <rc_sale_amt>51129.0</rc_sale_amt>\n    
+<rc_own_catg_desc>OTHERS</rc_own_catg_desc>\n    <rc_vch_catg_desc>TWO 
+WHEELER(NT)</rc_vch_catg_desc>\n    
+<rc_owner_cd_desc>INDIVIDUAL</rc_owner_cd_desc>\n    
+<rc_vehicle_surrendered_to_dealer>0</rc_vehicle_surrendered_to_dealer>\n    
+<rc_currentadd_districtcode>0</rc_currentadd_districtcode>\n    
+<rc_non_use>false</rc_non_use>\n    <rc_passenger_tax></rc_passenger_tax>\n    
+<rc_goods_tax></rc_goods_tax>\n    
+<rc_tax_mode>L</rc_tax_mode>\n</VehicleDetails>\n", 
+            "responseStatus": "SUCCESS", 
+            "message": null 
+        } 
+    ], 
+    "error": "false", 
+    "code": "200", 
+    "message": "Success" 
+} 
+ 
+Status Code 200: vehicle data response 
+Status Code 400: Bad request (Invalid json syntax, invalid json key) 
+Status Code 401 or 403: Unauthenticated or Unauthorized 
+Status Code 500: Some internal server error occurred 
+Status Code 502: Server is not responding. 
+1.6 VAHAN/03 
+ 
+This API will take engine number and connect with VAHAN API to get data. 
+ 
+S. No. Field Name Field Description Format Require
+d/Not – 
+Require
+d 
+Length 
+1 enginenumber Engine Number as available 
+in VAHAN system 
+^[a-zA-Z0-
+9]{1,20}$ 
+Required Min 1 
+Max 20 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 6.0 Page 13 of 32 
+ 
+1.6.1 Technical Approach  
+1. All the data will be shared through rest web services. 
+2. ULIP system will provide engine number for which detail is required. 
+3. VAHAN API will share details of vehicle which exist in VAHAN system in xml format. 
+4. Data receive from VAHAN is in XML format. ULIP system convert this data to string format 
+and assign it to key “response”. 
+5. ULIP system will provide the data in JSON Object format in response body. 
+ 
+Example: 
+ 
+Engine Number JF50E76069768 is shared by ULIP system, then VAHAN-integration will 
+make a request to VAHAN API. 
+ 
+Request: 
+ 
+The request must be of the following format, where vehicle number is passed within the URL 
+body in JSON format. 
+ 
+For Production - 
+ 
+https://www.ulip.dpiit.gov.in/ulip/v1.0.0/VAHAN/03 
+ 
+{ 
+   "enginenumber": "JF50E76069768” 
+} 
+ 
+Curl URL 
+ 
+curl -X POST \ 
+   https://www.ulip.dpiit.gov.in/ulip/v1.0.0/VAHAN/03 \ 
+         -H 'accept: application/json' \ 
+         -H 'authorization: Bearer 
+eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZXN0MSIsImlhdCI6MTYyNTIzMDQyNywi
+YXBwcyI6ImRhdGFwdXNoIn0.rhumwWJ8BWeeHe9CYmIV1UKyJk-
+kLHA_ovX5Zi2OwxEv-td-KpxnfbKDI_8FZsOoggqx3Al-Du1y2qMoUD7uzA' \ 
+         -H 'cache-control: no-cache' \ 
+         -H 'content-type: application/json' \ 
+         -H 'postman-token: 9cb5ac3c-59dd-4505-0b69-a03c07e59f26' \ 
+         -d '{ 
+         "enginenumber": "JF50E76069768" 
+}' 
+ 
+ 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 6.0 Page 14 of 32 
+ 
+For Staging - 
+ 
+https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/VAHAN/03 
+ 
+{ 
+    "enginenumber": "GC74B44246" 
+} 
+ 
+Curl URL 
+ 
+curl --location 'https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/VAHAN/03' \ 
+--header 'authorization: Bearer 
+eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1bGlwIiwiaWF0IjoxNzI2ODEyNTk0LCJhcH
+BzIjoiZGF0YXB1c2gifQ.ihjX6nSI2mIdZJBjJ6ZnzUXNwi3PlKH5pfqEm7HVORWe
+hcLghZyq1zhZDdZClPm0ZD4YgROImnBmMU3kryxNow' \ 
+--header 'accept: application/json' \ 
+--header 'content-type: application/json' \ 
+--data '{ 
+    "enginenumber": "GC74B44246" 
+}' 
+ 
+ 
+For obtaining authentication token, refer Section 1.10 
+ 
+Response 
+ 
+To acknowledge the above request, ULIP will send the below response –  
+ 
+a) In case of invalid format 
+ 
+{ 
+   "response": null, 
+      "error": "true", 
+      "code": "400", 
+      "message": "Data format failed OR wrong value entered at:  enginenumber. 
+Format should follow ^[a-zA-Z0-9]{1,12}$" 
+} 
+ 
+ 
+ 
+ 
+ 
+ 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 6.0 Page 15 of 32 
+ 
+b) In case of engine numbers, they do not exist in VAHAN system 
+ 
+ 
+{ 
+   "response": [ 
+   { 
+      "response": "<?xml version=\"1.0\" encoding=\"UTF-8\" 
+standalone=\"yes\"?>\n<VehicleDetails>\n    <stautsMessage>Vehicle Data Not 
+Found</stautsMessage>\n</VehicleDetails>\n", 
+         "responseStatus": "SUCCESS" 
+   } 
+   ], 
+   "error": "false", 
+      "code": "200", 
+      "message": "Success" 
+} 
+ 
+ 
+c) In case of engine number exist 
+ 
+{ 
+    "response": [ 
+        { 
+            "response": "<?xml version=\"1.0\" encoding=\"UTF-8\" 
+standalone=\"yes\"?>\n<VehicleDetails>\n    <stautsMessage>OK</stautsMessage>\n    
+<rc_regn_no>UP91L0001</rc_regn_no>\n    <rc_regn_dt>26-Jan-2017</rc_regn_dt>\n    
+<rc_regn_upto>25-Jan-2032</rc_regn_upto>\n    <rc_purchase_dt>24-Jan-
+2017</rc_purchase_dt>\n    <rc_owner_sr>1</rc_owner_sr>\n    
+<rc_owner_name>R***L K***R</rc_owner_name>\n    <state_cd>UP</state_cd>\n    
+<rto_cd>91</rto_cd>\n    <rc_present_address>, 999999</rc_present_address>\n    
+<rc_permanent_address>, 999999</rc_permanent_address>\n    
+<rc_vch_catg>2WN</rc_vch_catg>\n    <rc_vh_class_desc>M-
+Cycle/Scooter(2WN)</rc_vh_class_desc>\n    <rc_vhclass_desc>M-
+Cycle/Scooter</rc_vhclass_desc>\n    
+<rc_chasi_no>ME4JF509AH70*****</rc_chasi_no>\n    
+<rc_eng_no>JF50E760*****</rc_eng_no>\n    <rc_maker_desc>HONDA 
+MOTORCYCLE AND SCOOTER INDIA (P) LTD</rc_maker_desc>\n    
+<rc_maker_model>HONDA ACTIVA</rc_maker_model>\n    
+<rc_body_type_desc>SOLO</rc_body_type_desc>\n    
+<rc_fuel_desc>PETROL</rc_fuel_desc>\n    <rc_color>P A WHITE</rc_color>\n    
+<rc_norms_desc>BHARAT STAGE II</rc_norms_desc>\n    <rc_fit_upto>25-Jan-
+2032</rc_fit_upto>\n    <rc_tax_upto>25-01-2032</rc_tax_upto>\n    
+<rc_financer></rc_financer>\n    <rc_insurance_comp>HDFC ERGO General Insurance 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 6.0 Page 16 of 32 
+ 
+Company Ltd</rc_insurance_comp>\n    
+<rc_insurance_policy_no>2320100501934300000</rc_insurance_policy_no>\n    
+<rc_insurance_upto>15-Sep-2020</rc_insurance_upto>\n    
+<rc_manu_month_yr>1/2017</rc_manu_month_yr>\n    
+<rc_unld_wt>108</rc_unld_wt>\n    <rc_gvw>269</rc_gvw>\n    
+<rc_no_cyl>1</rc_no_cyl>\n    <rc_cubic_cap>109.00</rc_cubic_cap>\n    
+<rc_seat_cap>2</rc_seat_cap>\n    <rc_sleeper_cap></rc_sleeper_cap>\n    
+<rc_stand_cap>0</rc_stand_cap>\n    <rc_wheelbase>1230</rc_wheelbase>\n    
+<rc_registered_at>HAMIRPUR(UP), Uttar Pradesh</rc_registered_at>\n    
+<rc_status_as_on>03-Feb-2026</rc_status_as_on>\n    
+<rc_status>ACTIVE</rc_status>\n    <rc_blacklist_status></rc_blacklist_status>\n    
+<rc_noc_details></rc_noc_details>\n    <rc_vh_type>N</rc_vh_type>\n    
+<rc_vh_class>1</rc_vh_class>\n    <rc_noc_dt></rc_noc_dt>\n    
+<rc_fuel_cd>1</rc_fuel_cd>\n    <rc_maker_cd>36</rc_maker_cd>\n    
+<rc_model_cd>HONDA ACTIVA</rc_model_cd>\n    
+<rc_norms_cd>0</rc_norms_cd>\n    <rc_sale_amt>51129.0</rc_sale_amt>\n    
+<rc_own_catg_desc>OTHERS</rc_own_catg_desc>\n    <rc_vch_catg_desc>TWO 
+WHEELER(NT)</rc_vch_catg_desc>\n    
+<rc_owner_cd_desc>INDIVIDUAL</rc_owner_cd_desc>\n    
+<rc_vehicle_surrendered_to_dealer>0</rc_vehicle_surrendered_to_dealer>\n    
+<rc_currentadd_districtcode>0</rc_currentadd_districtcode>\n    
+<rc_non_use>false</rc_non_use>\n    <rc_passenger_tax></rc_passenger_tax>\n    
+<rc_goods_tax></rc_goods_tax>\n    
+<rc_tax_mode>L</rc_tax_mode>\n</VehicleDetails>\n", 
+            "responseStatus": "SUCCESS", 
+            "message": null 
+        } 
+    ], 
+    "error": "false", 
+    "code": "200", 
+    "message": "Success" 
+} 
+ 
+Status Code 200: vehicle data response 
+Status Code 400: Bad request (Invalid json syntax, invalid json key) 
+Status Code 401 or 403: Unauthenticated or Unauthorized 
+Status Code 500: Some internal server error occurred 
+Status Code 502: Server is not responding. 
+ 
+ 
+ 
+ 
+ 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 6.0 Page 17 of 32 
+ 
+1.7 VAHAN/04 
+ 
+This API will take vehicle number and connect with VAHAN API to get data. 
+ 
+S. No. Field Name Field Description Format Require
+d/Not – 
+Require
+d 
+Length 
+1 vehiclenumber Vehicle Number as available 
+in VAHAN system 
+^[a-zA-Z0-
+9]{5,11}$ 
+Required Min 5 
+Max 11 
+1.7.1 Technical Approach  
+1. All the data will be shared through rest web services. 
+2. ULIP system will provide vehicle number for which detail is required. 
+3. VAHAN API will share details  of chassis number details based on vehiclenumber exist in  
+VAHAN system in JSON format. 
+4. VAHAN Integration will add JSON in response key in response body. 
+5. ULIP system will provide the data in JSON Object format in response body. 
+ 
+Example: 
+ 
+Users will share Vehicle Number UP91L0001 to ULIP system, then ULIP system will make a 
+request to VAHAN API. 
+ 
+Request: 
+The request must be of the following format, where vehicle number is passed within the URL 
+body in JSON format. 
+ 
+For Production - 
+ 
+https://www.ulip.dpiit.gov.in/ulip/v1.0.0/VAHAN/04 
+{ 
+   "vehiclenumber": "UP91L0001" 
+} 
+ 
+Curl URL 
+curl --location 'https://www.ulip.dpiit.gov.in/ulip/v1.0.0/VAHAN/04' \ 
+--header 'Content-Type: application/json' \ 
+--header 'Authorization: Bearer 
+eyJhbGciOiJIUzUxMiJ9.eyJhcHBzIjoiYXBpR2F0ZXdheSIsInN1YiI6InVsaXAiLCJ
+pYXQiOjE3NzAwNDE2NDV9.iERfbuYgZbDbeuVOOUB89TfO3ttZnnaTB8_kSGj
+3R12gID8lVz0cLVL2EvADOmEu1hZtbn8P4ivymEJCDG9FAA' \ 
+--data '{"vehiclenumber": "UP91L0001"}' 
+ 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 6.0 Page 18 of 32 
+ 
+For Staging - 
+ 
+https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/VAHAN/04 
+ 
+{"vehiclenumber": "UP32KH0320"} 
+ 
+Curl URL 
+ 
+curl --location 'https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/VAHAN/04' \ 
+--header 'Authorization: Bearer 
+eyJhbGciOiJIUzUxMiJ9.eyJhcHBzIjoiYXBpR2F0ZXdheSIsInN1YiI6InVsaXAiLCJ
+pYXQiOjE3NzAwOTE4NTd9.3ku5gqG3yAwOazqC5EA69PEiiZzmDymndimvRfr
+1lCz6nFjvLHbRw2LrCCUz2edQmZt_dZj0B8x-_jrth157OQ' \ 
+--header 'Content-Type: application/json' \ 
+--header 'Accept: application/json' \ 
+--data '{"vehiclenumber": "UP32KH0320"} 
+ 
+For obtaining authentication token, refer Section 1.10 
+ 
+Response 
+ 
+To acknowledge the above request, ULIP will send the response below -  
+ 
+b) In case of invalid format 
+ 
+{ 
+    "response": null, 
+    "error": "true", 
+    "code": "400 BAD_REQUEST", 
+    "message": "Data format failed OR wrong value entered at:  vehiclenumber. 
+Format should follow ^[A-Z0-9]{5,11}$" 
+} 
+ 
+c) In case of vehicle number does not exist in VAHAN system 
+ 
+{ 
+    "response": [ 
+        { 
+            "response": null, 
+            "responseStatus": "ERROR", 
+            "message": { 
+                "id": null, 
+                "code": "231", 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 6.0 Page 19 of 32 
+ 
+                "params": null, 
+                "text": "Vehicle Details not Found" 
+            } 
+        } 
+    ], 
+    "error": "false", 
+    "code": "200", 
+    "message": "Success" 
+} 
+ 
+d) In case vehicles exist 
+ 
+{ 
+    "response": [ 
+        { 
+            "response": { 
+                "stautsMessage": "OK", 
+                "stateCd": "UP", 
+                "rtoCd": "91", 
+                "rcRegnNo": "UP91L0001", 
+                "rcRegnDt": "26-Jan-2017", 
+                "rcPurchaseDt": "24-Jan-2017", 
+                "rcChasiNo": "ME4JF509AH70*****", 
+                "rcEngNo": "JF50E760*****", 
+                "rcVhClassDesc": "M-Cycle/Scooter", 
+                "rcMakerDesc": "HONDA MOTORCYCLE AND SCOOTER 
+INDIA (P) LTD", 
+                "rcMakerModel": "HONDA ACTIVA", 
+                "rcBodyTypeDesc": "SOLO", 
+                "rcFuelDesc": "PETROL", 
+                "rcColor": "P A WHITE", 
+                "rcOwnerName": "R***L K***R", 
+                "rcPermanentAddress": ", 999999", 
+                "rcPresentAddress": ", 999999", 
+                "rcFitUpto": "25-Jan-2032", 
+                "rcNormsDesc": "BHARAT STAGE II", 
+                "rcFinancer": "", 
+                "rcRegisteredAt": "HAMIRPUR(UP), Uttar Pradesh", 
+                "rcStatusAsOn": "03-Feb-2026 05:02:62604", 
+                "rcManuMonthYr": "1/2017", 
+                "rcUnldWt": "108", 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 6.0 Page 20 of 32 
+ 
+                "rcVchCatg": "2WN", 
+                "rcGvw": "269", 
+                "rcNoCyl": "1", 
+                "rcCubicCap": "109.00", 
+                "rcSeatCap": "2", 
+                "rcWheelbase": "1230", 
+                "rcStandCap": "0", 
+                "rcSleeperCap": "", 
+                "rcOwnerSr": "1", 
+                "rcPuccUpto": "", 
+                "rcPuccNo": "", 
+                "rcBlacklistStatus": "", 
+                "rcNocDetails": "", 
+                "rcNocDt": "", 
+                "rcVhClass": 1, 
+                "rcVhType": "N", 
+                "rcFuelCd": "1", 
+                "rcMakerCd": "36", 
+                "rcModelCd": "HONDA ACTIVA", 
+                "rcSaleAmt": "51129", 
+                "rcRegnUpto": "25-Jan-2032", 
+                "rcOwnCatgDesc": "OTHERS", 
+                "rcVchCatgDesc": "TWO WHEELER(NT)", 
+                "rcOwnerCdDesc": "INDIVIDUAL", 
+                "rcPassengerTax": "", 
+                "rcGoodsTax": "", 
+                "rcOwnerHistory": [ 
+                    { 
+                        "stateCd": "", 
+                        "offName": "", 
+                        "ownerSr": 0, 
+                        "ownerName": "" 
+                    } 
+                ], 
+                "rcTaxUpto": "25-Jan-2032", 
+                "rcTaxMode": "L", 
+                "rcInsuranceComp": "HDFC ERGO General Insurance Company 
+Ltd", 
+                "rcInsurancePolicyNo": "2320100501934300000", 
+                "rcInsuranceUpto": "15-Sep-2020", 
+                "rcStatus": "ACTIVE" 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 6.0 Page 21 of 32 
+ 
+            }, 
+            "responseStatus": "SUCCESS", 
+            "message": null 
+        } 
+    ], 
+    "error": "false", 
+    "code": "200", 
+    "message": "Success" 
+} 
+ 
+Status Code 200: vehicle data response 
+Status Code 400: Bad request (Invalid json syntax, invalid json key) 
+Status Code 401 or 403: Unauthenticated or Unauthorized 
+Status Code 500: Some internal server error occurred 
+Status Code 502: Server is not responding. 
+ 
+1.8 VAHAN/05 
+ 
+This API will take vehicle number and connect with VAHAN API to get data. 
+ 
+S. No. Field Name Field Description Format Require
+d/Not – 
+Require
+d 
+Length 
+1 chasisnumber Chassis Number as available 
+in VAHAN system 
+^[^\s]{5,24}$ 
+ 
+Required Min 5 
+Max 24 
+ 
+1.8.1 Technical Approach  
+ 
+1. All the data will be shared through rest web services. 
+2. ULIP system will provide chassis number for which detail is required. 
+3. VAHAN API will share details  of chassis number details based on chasisnumber exist in 
+VAHAN system in JSON format. 
+4. VAHAN Integration will add JSON in response key in response body. 
+5. ULIP system will provide the data in JSON Object format in response body. 
+ 
+Example: 
+ 
+Chassis Number ME4JF509AH7069705 is shared by ULIP system, then VAHAN-
+integration will make a request to VAHAN API. 
+ 
+ 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 6.0 Page 22 of 32 
+ 
+Request: 
+ 
+The request must be of the following format, where chassis number is passed within the URL 
+body in JSON format. 
+ 
+For Production - 
+ 
+https://www.ulip.dpiit.gov.in/ulip/v1.0.0/VAHAN/05 
+ 
+{"chasisnumber": " ME4JF509AH7069705"} 
+ 
+Curl URL 
+ 
+curl --location 'https://www.ulip.dpiit.gov.in/ulip/v1.0.0/VAHAN/05' \ 
+--header 'Content-Type: application/json' \ 
+--header 'Authorization: Bearer 
+eyJhbGciOiJIUzUxMiJ9.eyJhcHBzIjoiYXBpR2F0ZXdheSIsInN1YiI6InVsaXAiLCJ
+pYXQiOjE3NzAwNDE2NDV9.iERfbuYgZbDbeuVOOUB89TfO3ttZnnaTB8_kSGj
+3R12gID8lVz0cLVL2EvADOmEu1hZtbn8P4ivymEJCDG9FAA' \ 
+--data '{ 
+    "chasisnumber": "ME4JF509AH7069705" 
+}' 
+ 
+For Staging - 
+ 
+https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/VAHAN/05 
+ 
+{"chasisnumber": "MAT447230H3F13971"} 
+ 
+Curl URL 
+ 
+curl --location 'https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/VAHAN/05' \ 
+--header 'authorization: Bearer 
+eyJhbGciOiJIUzUxMiJ9.eyJhcHBzIjoiYXBpR2F0ZXdheSIsInN1YiI6InVsaXAiLCJ
+pYXQiOjE3NzAwOTE4NTd9.3ku5gqG3yAwOazqC5EA69PEiiZzmDymndimvRfr
+1lCz6nFjvLHbRw2LrCCUz2edQmZt_dZj0B8x-_jrth157OQ' \ 
+--header 'accept: application/json' \ 
+--header 'Content-Type: application/json' \ 
+--data '{"chasisnumber": "MAT447230H3F13971"} 
+ 
+For obtaining authentication token, refer Section 1.10 
+ 
+ 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 6.0 Page 23 of 32 
+ 
+Response 
+ 
+To acknowledge the above request, ULIP will send the below response –  
+ 
+d) In case of invalid format 
+ 
+{ 
+    "response": null, 
+    "error": "true", 
+    "code": "400 BAD_REQUEST", 
+    "message": "Data format failed OR wrong value entered at:  chasisnumber. 
+Format should follow  ^[^\\s]{5,24}$" 
+} 
+ 
+e) In case of chassis number does not exist in VAHAN system 
+ 
+{ 
+    "response": [ 
+        { 
+            "response": null, 
+            "responseStatus": "ERROR", 
+            "message": { 
+                "id": null, 
+                "code": "231", 
+                "params": null, 
+                "text": "Vehicle Details not Found" 
+            } 
+        } 
+    ], 
+    "error": "false", 
+    "code": "200", 
+    "message": "Success" 
+} 
+ 
+f) In case of chassis number exist 
+ 
+{ 
+    "response": [ 
+        { 
+            "response": { 
+                "stautsMessage": "OK", 
+                "stateCd": "UP", 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 6.0 Page 24 of 32 
+ 
+                "rtoCd": "91", 
+                "rcRegnNo": "UP91L0001", 
+                "rcRegnDt": "26-Jan-2017", 
+                "rcPurchaseDt": "24-Jan-2017", 
+                "rcChasiNo": "ME4JF509AH70*****", 
+                "rcEngNo": "JF50E760*****", 
+                "rcVhClassDesc": "M-Cycle/Scooter", 
+                "rcMakerDesc": "HONDA MOTORCYCLE AND SCOOTER INDIA (P) LTD", 
+                "rcMakerModel": "HONDA ACTIVA", 
+                "rcBodyTypeDesc": "SOLO", 
+                "rcFuelDesc": "PETROL", 
+                "rcColor": "P A WHITE", 
+                "rcOwnerName": "R***L K***R", 
+                "rcPermanentAddress": ", 999999", 
+                "rcPresentAddress": ", 999999", 
+                "rcFitUpto": "25-Jan-2032", 
+                "rcNormsDesc": "BHARAT STAGE II", 
+                "rcFinancer": "", 
+                "rcRegisteredAt": "HAMIRPUR(UP), Uttar Pradesh", 
+                "rcStatusAsOn": "03-Feb-2026 12:02:45044", 
+                "rcManuMonthYr": "1/2017", 
+                "rcUnldWt": "108", 
+                "rcVchCatg": "2WN", 
+                "rcGvw": "269", 
+                "rcNoCyl": "1", 
+                "rcCubicCap": "109.00", 
+                "rcSeatCap": "2", 
+                "rcWheelbase": "1230", 
+                "rcStandCap": "0", 
+                "rcSleeperCap": "", 
+                "rcOwnerSr": "1", 
+                "rcPuccUpto": "", 
+                "rcPuccNo": "", 
+                "rcBlacklistStatus": "", 
+                "rcNocDetails": "", 
+                "rcNocDt": "", 
+                "rcVhClass": 1, 
+                "rcVhType": "N", 
+                "rcFuelCd": "1", 
+                "rcMakerCd": "36", 
+                "rcModelCd": "HONDA ACTIVA", 
+                "rcSaleAmt": "51129", 
+                "rcRegnUpto": "25-Jan-2032", 
+                "rcOwnCatgDesc": "OTHERS", 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 6.0 Page 25 of 32 
+ 
+                "rcVchCatgDesc": "TWO WHEELER(NT)", 
+                "rcOwnerCdDesc": "INDIVIDUAL", 
+                "rcPassengerTax": "", 
+                "rcGoodsTax": "", 
+                "rcOwnerHistory": [ 
+                    { 
+                        "stateCd": "", 
+                        "offName": "", 
+                        "ownerSr": 0, 
+                        "ownerName": "" 
+                    } 
+                ], 
+                "rcTaxUpto": "25-Jan-2032", 
+                "rcTaxMode": "L", 
+                "rcInsuranceComp": "HDFC ERGO General Insurance Company Ltd", 
+                "rcInsurancePolicyNo": "2320100501934300000", 
+                "rcInsuranceUpto": "15-Sep-2020", 
+                "rcStatus": "ACTIVE" 
+            }, 
+            "responseStatus": "SUCCESS", 
+            "message": null 
+        } 
+    ], 
+    "error": "false", 
+    "code": "200", 
+    "message": "Success" 
+} 
+ 
+Status Code 200: vehicle data response 
+Status Code 400: Bad request (Invalid json syntax, invalid json key) 
+Status Code 401 or 403: Unauthenticated or Unauthorized 
+Status Code 500: Some internal server error occurred 
+Status Code 502: Server is not responding. 
+1.9 VAHAN/06 
+ 
+This API will take engine number and connect with VAHAN API to get data. 
+ 
+S. No. Field Name Field Description Format Require
+d/Not – 
+Require
+d 
+Length 
+1 enginenumber Engine Number as available 
+in VAHAN system 
+^[^\s]{1,20}$ 
+ 
+Required Min 1 
+Max 20 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 6.0 Page 26 of 32 
+ 
+1.9.1 Technical Approach  
+1. All the data will be shared through rest web services. 
+2. ULIP system will provide engine number for which detail is required. 
+3. VAHAN API will share details  of engine number details based on enginenumber exist in 
+VAHAN system in JSON format. 
+4. VAHAN Integration will add JSON in response key in response body. 
+5. ULIP system will provide the data in JSON Object format in response body. 
+ 
+Example: 
+ 
+Engine Number JF50E76069768 is shared by ULIP system, then VAHAN-integration will 
+make a request to VAHAN API. 
+ 
+Request: 
+ 
+The request must be of the following format, where vehicle number is passed within the URL 
+body in JSON format. 
+ 
+For Production - 
+ 
+https://www.ulip.dpiit.gov.in/ulip/v1.0.0/VAHAN/06 
+ 
+{"enginenumber": "JF50E76069768”} 
+ 
+Curl URL 
+ 
+curl --location 'https://www.ulip.dpiit.gov.in/ulip/v1.0.0/VAHAN/06' \ 
+--header 'authorization: Bearer 
+eyJhbGciOiJIUzUxMiJ9.eyJhcHBzIjoiYXBpR2F0ZXdheSIsInN1YiI6InVsaXAiLCJ
+pYXQiOjE3NzAwNDE2NDV9.iERfbuYgZbDbeuVOOUB89TfO3ttZnnaTB8_kSGj
+3R12gID8lVz0cLVL2EvADOmEu1hZtbn8P4ivymEJCDG9FAA' \ 
+--header 'accept: application/json' \ 
+--header 'content-type: application/json' \ 
+--data '{ 
+    "enginenumber": "JF50E76069768" 
+}' 
+ 
+For Staging - 
+ 
+https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/VAHAN/06 
+ 
+{"enginenumber": "GC74B44246"} 
+ 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 6.0 Page 27 of 32 
+ 
+Curl URL 
+ 
+curl --location 'https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/VAHAN/06' \ 
+--header 'authorization: Bearer 
+eyJhbGciOiJIUzUxMiJ9.eyJhcHBzIjoiYXBpR2F0ZXdheSIsInN1YiI6InVsaXAiLCJpYXQiOjE
+3NzAwOTE4NTd9.3ku5gqG3yAwOazqC5EA69PEiiZzmDymndimvRfr1lCz6nFjvLHbRw2Lr
+CCUz2edQmZt_dZj0B8x-_jrth157OQ' \ 
+--header 'accept: application/json' \ 
+--header 'content-type: application/json' \ 
+--data '{"enginenumber": "GC74B44246"}' 
+ 
+For obtaining authentication token, refer Section 1.10 
+ 
+Response 
+ 
+To acknowledge the above request, ULIP will send the below response –  
+ 
+d) In case of invalid format 
+ 
+{ 
+    "response": null, 
+    "error": "true", 
+    "code": "400 BAD_REQUEST", 
+    "message": "Data format failed OR wrong value entered at:  enginenumber. Format 
+should follow  ^[^\\s]{1,20}$" 
+} 
+ 
+e) In case of engine number do not exist in VAHAN system 
+ 
+{ 
+    "response": [ 
+        { 
+            "response": null, 
+            "responseStatus": "ERROR", 
+            "message": { 
+                "id": null, 
+                "code": "231", 
+                "params": null, 
+                "text": "Vehicle Details not Found" 
+            } 
+        } 
+    ], 
+    "error": "false", 
+    "code": "200", 
+    "message": "Success" 
+} 
+ 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 6.0 Page 28 of 32 
+ 
+ 
+f) In case of engine number exist 
+ 
+{ 
+    "response": [ 
+        { 
+            "response": { 
+                "stautsMessage": "OK", 
+                "stateCd": "UP", 
+                "rtoCd": "91", 
+                "rcRegnNo": "UP91L0001", 
+                "rcRegnDt": "26-Jan-2017", 
+                "rcPurchaseDt": "24-Jan-2017", 
+                "rcChasiNo": "ME4JF509AH70*****", 
+                "rcEngNo": "JF50E760*****", 
+                "rcVhClassDesc": "M-Cycle/Scooter", 
+                "rcMakerDesc": "HONDA MOTORCYCLE AND SCOOTER INDIA (P) LTD", 
+                "rcMakerModel": "HONDA ACTIVA", 
+                "rcBodyTypeDesc": "SOLO", 
+                "rcFuelDesc": "PETROL", 
+                "rcColor": "P A WHITE", 
+                "rcOwnerName": "R***L K***R", 
+                "rcPermanentAddress": ", 999999", 
+                "rcPresentAddress": ", 999999", 
+                "rcFitUpto": "25-Jan-2032", 
+                "rcNormsDesc": "BHARAT STAGE II", 
+                "rcFinancer": "", 
+                "rcRegisteredAt": "HAMIRPUR(UP), Uttar Pradesh", 
+                "rcStatusAsOn": "03-Feb-2026 12:02:44194", 
+                "rcManuMonthYr": "1/2017", 
+                "rcUnldWt": "108", 
+                "rcVchCatg": "2WN", 
+                "rcGvw": "269", 
+                "rcNoCyl": "1", 
+                "rcCubicCap": "109.00", 
+                "rcSeatCap": "2", 
+                "rcWheelbase": "1230", 
+                "rcStandCap": "0", 
+                "rcSleeperCap": "", 
+                "rcOwnerSr": "1", 
+                "rcPuccUpto": "", 
+                "rcPuccNo": "", 
+                "rcBlacklistStatus": "", 
+                "rcNocDetails": "", 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 6.0 Page 29 of 32 
+ 
+                "rcNocDt": "", 
+                "rcVhClass": 1, 
+                "rcVhType": "N", 
+                "rcFuelCd": "1", 
+                "rcMakerCd": "36", 
+                "rcModelCd": "HONDA ACTIVA", 
+                "rcSaleAmt": "51129", 
+                "rcRegnUpto": "25-Jan-2032", 
+                "rcOwnCatgDesc": "OTHERS", 
+                "rcVchCatgDesc": "TWO WHEELER(NT)", 
+                "rcOwnerCdDesc": "INDIVIDUAL", 
+                "rcPassengerTax": "", 
+                "rcGoodsTax": "", 
+                "rcOwnerHistory": [ 
+                    { 
+                        "stateCd": "", 
+                        "offName": "", 
+                        "ownerSr": 0, 
+                        "ownerName": "" 
+                    } 
+                ], 
+                "rcTaxUpto": "25-Jan-2032", 
+                "rcTaxMode": "L", 
+                "rcInsuranceComp": "HDFC ERGO General Insurance Company Ltd", 
+                "rcInsurancePolicyNo": "2320100501934300000", 
+                "rcInsuranceUpto": "15-Sep-2020", 
+                "rcStatus": "ACTIVE" 
+            }, 
+            "responseStatus": "SUCCESS", 
+            "message": null 
+        } 
+    ], 
+    "error": "false", 
+    "code": "200", 
+    "message": "Success" 
+} 
+ 
+Status Code 200: vehicle data response 
+Status Code 400: Bad request (Invalid json syntax, invalid json key) 
+Status Code 401 or 403: Unauthenticated or Unauthorized 
+Status Code 500: Some internal server error occurred 
+Status Code 502: Server is not responding. 
+ 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 6.0 Page 30 of 32 
+ 
+1.10 Data Transmission & Authentication Mechanism 
+ 
+All data exchange would be done over secure HTTP (HTTPS). Request from ULIP's system would 
+be made in VAHAN system through a data exchange URL that has following form: 
+ 
+For Production – 
+ 
+https://www.ulip.dpiit.gov.in/ulip/v1.0.0/VAHAN/<sequence number> 
+ 
+Body:  
+ 
+For VAHAN/01 
+{ 
+    "vehiclenumber": "UP91L0001" 
+} 
+ 
+For VAHAN/02 
+{ 
+    "chasisnumber": "ME4JF509AH7069705" 
+} 
+ 
+For VAHAN/03 
+{ 
+    "enginenumber": "JF50E76069768" 
+} 
+ 
+For VAHAN/04 
+{ 
+    "vehiclenumber": "UP91L0001" 
+} 
+ 
+For VAHAN/05 
+{ 
+    "chasisnumber": "ME4JF509AH7069705" 
+} 
+ 
+For VAHAN/06 
+{ 
+    "enginenumber": "JF50E76069768" 
+} 
+ 
+ 
+ 
+Access to above data exchange URL would be authorized by use of a security mechanism 
+implemented by the ULIP system. It is as follows: 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 6.0 Page 31 of 32 
+ 
+ 
+• First time access:  It would require a username and password [which would be shared with 
+user beforehand].  Once user hit with valid user id and password, ULIP system will return a 
+basic authorization token to  user, using that token user will communicate with ULIP system 
+until token will not get expired. 
+ 
+Brief summary of HTTP Basic Authentication is as follows: 
+ 
+First time when User will hit ULIP secured API through username and password for access token 
+as follow- 
+ 
+curl --location --request POST 'https://www.ulip.dpiit.gov.in/ulip/v1.0.0/user/login' \ 
+--header 'Accept: application/json' \ 
+--header 'Content-Type: application/json' \ 
+--data-raw '{ 
+    "username": "xxxx", 
+    "password": "xxxx@123" 
+}' 
+ 
+ 
+Authorization:   
+Bearer  
+eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZXN0MSIsImlhdCI6MTYyNTIzMDQyNywiYXBwcyI6ImRh
+dGFwdXNoIn0.rhumwWJ8BWeeHe9CYmIV1UKyJk-kLHA_ovX5Zi2OwxEv-td-
+KpxnfbKDI_8FZsOoggqx3Al-Du1y2qMoUD7uzA' 
+ 
+Upon successful authentication, the user would be logged into the ULIP system and get an access 
+token. Though this token user can communicate with  ULIP. This token has expiry time which 
+represent user session. The session time out for the same to be f ixed hour, generally it is for 30 
+minutes. If there is no request coming from user for 30 minutes, the n session (token) will be 
+expired and user need to re authenticate. 
+ 
+Using The above token, user can request ULIP system for vehicle details as follow - 
+ 
+curl -X POST \ 
+  https://www.ulip.dpiit.gov.in/ulip/v1.0.0/VAHAN/01 \ 
+  -H 'accept: application/json' \ 
+  -H 'authorization: Bearer 
+eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZXN0MSIsImlhdCI6MTYyNTIzMDQyNywiYXBwcyI6ImRh
+dGFwdXNoIn0.rhumwWJ8BWeeHe9CYmIV1UKyJk-kLHA_ovX5Zi2OwxEv-td-
+KpxnfbKDI_8FZsOoggqx3Al-Du1y2qMoUD7uzA' \ 
+  -H 'cache-control: no-cache' \ 
+  -H 'content-type: application/json' \ 
+  -H 'postman-token: 8e8a19a4-ea1e-6373-f616-e2e4af9a1338' \ 
+  -d '{ 
+    "vehiclenumber": "UP91L0001" 
+}' 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 6.0 Page 32 of 32 
+ 
+For Staging – 
+ 
+curl --location 'https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/user/login' \ 
+--header 'Accept: application/json' \ 
+--header 'Content-Type: application/json' \ 
+--data-raw '{ 
+    "username": "xxxx", 
+    "password": "xxxx@123" 
+}' 
+ 
+ 
+Authorization:   
+Bearer  
+eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1bGlwIiwiaWF0IjoxNzI2ODEyNTk0LCJhcHBzIjoiZGF0
+YXB1c2gifQ.ihjX6nSI2mIdZJBjJ6ZnzUXNwi3PlKH5pfqEm7HVORWehcLghZyq1zhZDdZClPm0ZD
+4YgROImnBmMU3kryxNow 
+ 
+Upon successful authentication, the user would be logged into the ULIP system and get an access 
+token. Though this token user can communicate with  ULIP. This token has expiry time which 
+represent user session. The session time out for the same to be f ixed hour, generally it is for 30 
+minutes. If there is no request coming from user for 30 minutes, the n session (token) will be 
+expired and user need to re authenticate. 
+ 
+Using The above token, user can request ULIP system for vehicle details as follow - 
+ 
+curl --location 'https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/VAHAN/01' \ 
+--header 'Authorization: Bearer 
+eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1bGlwIiwiaWF0IjoxNzI2ODEyNTk0LCJhcHBzIjoiZGF0
+YXB1c2gifQ.ihjX6nSI2mIdZJBjJ6ZnzUXNwi3PlKH5pfqEm7HVORWehcLghZyq1zhZDdZClPm0ZD
+4YgROImnBmMU3kryxNow' \ 
+--header 'Content-Type: application/json' \ 
+--header 'Accept: application/json' \ 
+--data '{"vehiclenumber": "UP32KH0320"} 
+ 
+ 

@@ -1,0 +1,23 @@
+{
+  "name": "ULIP — Unified Logistics Interface Platform",
+  "short_name": "ULIP",
+  "description": "Multimodal shipment visibility, fleet intelligence, compliance and the ULIP API gateway console.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#0a0f1a",
+  "theme_color": "#0a0f1a",
+  "categories": ["business", "productivity", "logistics"],
+  "icons": [
+    { "src": "/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/icon-maskable.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    { "name": "Consignments", "url": "/#/shipments" },
+    { "name": "Fleet", "url": "/#/fleet" },
+    { "name": "API console", "url": "/#/apis" }
+  ]
+}

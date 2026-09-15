@@ -1,0 +1,544 @@
+ULIP Integration Document 
+ 
+  
+                        
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+Version No.: 4.0 
+Date: 07/04/2026 
+Project Name: ULIP 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+  
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ULIP Integration Document 
+This document contains proprietary information of NLDSL. Unauthorized access, copying and replication are 
+prohibited. This document must not be copied in whole or part by any means, without the written authorization of 
+NLDSL, Noida, India. 
+ 
+ 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 2 of 11 
+ 
+ 
+ 
+ 
+Revision History 
+Version Date Author Reviewer Significant Changes 
+1.0 21/03/2024 Hasan Mhad Khan Nayab Ali Baseline Version 
+2.0 01/10/2024 Ayush Arya Nayab Ali Updated 
+3.0 07/03/2025 Ayush Arya Nayab Ali Request body 
+changes 
+4.0 07/04/2026 Gaurav Tyagi Pranab Manna Updated 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+  
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 3 of 11 
+ 
+Table of Contents 
+ 
+Introduction ................................................................................................................................................. 4 
+1.1 Purpose .................................................................................................................................... 4 
+The Overall Description .............................................................................................................................. 4 
+1.2 Data Integration between EVYATRA System and ULIP application ........................................ 4 
+1.3 EVYATRA/01 ............................................................................................................................ 4 
+1.3.1 Technical Approach .................................................................................................... 6 
+1.4 Data Transmission & Authentication Mechanism .................................................................... 9 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 4 of 11 
+ 
+Introduction 
+1.1 Purpose 
+ 
+The purpose of this document is to define and provide details for accessing API for  
+EV charging stations across India, via using input parameters such as state  and 
+geolocation such as latitude and longitude.  
+ 
+This document details the following points: 
+ 
+1. Data Integration between Bureau of Energy Efficiency (BEE) and ULIP web service: 
+Identification of operational points where data integration between  Bureau of Energy 
+Efficiency (BEE) and ULIP web service will be needed. 
+ 
+2. Technical Approach for Performing Data Integration  
+ 
+The Overall Description 
+Users will need to share their state ID or geolocation to access the list of public electric 
+vehicle charging stations through the rest API. A comprehensive list of state ID can be 
+found by clicking on the provided link. 
+ 
+Here are some points to keep in mind when accessing EV charging station information: 
+ 
+• The API will only share data that is based on the user's provided information. 
+ 
+• ULIP will provide an API that allows users to obtain data from the BEE API. 
+ 
+• The EVYATRA/01 API will retrieve data from the BEE database using the stateId, 
+or geolocation (latitude and longitude) provided by the user. 
+ 
+1.2 Data Integration between EVYATRA System and ULIP application 
+ 
+The ULIP system will receive information from the user and provide data in return. 
+ 
+1.3 EVYATRA/01 
+ 
+This API is designed to retrieve information about electric vehicle (EV) charging stations. It can 
+be used by providing either the state ID or the geolocation (latitude and longitude) of the desired 
+location. 
+ 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 5 of 11 
+ 
+Please note that when making a request, all of the JSON keys are mandatory in the payload . If 
+you choose to use the stateId to access EV stations, the latitude and longitude fields should be 
+left empty. 
+ 
+{ 
+    "stateId": "1", 
+    "lat": " ", 
+    "long": " " 
+} 
+ 
+Use the state code below  from the table to inquire about the (EV) charging  stations 
+outlet in the respective state. 
+ 
+State Name State ID 
+Andaman & Nicobar 
+Islands 1 
+Andhra Pradesh 2 
+Arunachal Pradesh 3 
+Assam 4 
+Bihar 5 
+Chandigarh 6 
+Chhattisgarh 7 
+Delhi 10 
+Goa 11 
+Gujarat 12 
+Haryana 13 
+Himachal Pradesh 14 
+Jammu & Kashmir 15 
+Jharkhand 16 
+Karnataka 17 
+Kerala 18 
+Lakshadweep 19 
+Madhya Pradesh 20 
+Maharashtra 21 
+Manipur 22 
+Meghalaya 23 
+Mizoram 24 
+Nagaland 25 
+Odisha 26 
+Puducherry 27 
+Punjab 28 
+Rajasthan 29 
+Sikkim 30 
+Tamil Nadu 31 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 6 of 11 
+ 
+Tripura 32 
+Telangana 33 
+Uttar Pradesh 34 
+Uttarakhand 35 
+West Bengal 36 
+Ladakh 37 
+UT OF D&NH AND D&D 38 
+Lakshadweep 44 
+ 
+ 
+When sending geolocation data, if the user provides geocoordinate latitude and longitude, the 
+state ID will be empty. 
+ 
+ { 
+    "stateId": "", 
+    "lat": "11.604053", 
+    "long": "92.694109" 
+} 
+ 
+ 
+ 
+Field Name Field 
+Description 
+Format Required/Not – 
+Required 
+Length 
+1 stateId State ID [0-9]{0,6} Required 0-6 
+2 lat latitude ^[0-9]{2}\.{0,1}[0-
+9]{2,10}|[0-9]{0,2} 
+Required  
+0-13 
+ 
+3 long longitude ^[0-9]{2}\.{0,1}[0-
+9]{2,10}|[0-9]{0,2} 
+Required 0-13 
+ 
+ 
+1.3.1 Technical Approach  
+ 
+1. All the data will be shared through REST web services. 
+2. The user will share the input for which information is required. 
+3. EVYATRA API will share details of EV charging station information that exists in the BEE 
+system in JSON format. 
+4. The ULIP system will provide data in JSON Object format in the response body. 
+ 
+Example: 
+ 
+Request: The request must be of the following format, where state ID, latitude and longitude 
+are passed within the URL post request body in JSON format. 
+ 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 7 of 11 
+ 
+For production – 
+ 
+https://www.ulip.dpiit.gov.in/ulip/v1.0.0/EVYATRA/01 
+ 
+{ 
+    "stateId": "", 
+    "lat": "18.595556", 
+    "long": "73.717167" 
+} 
+ 
+Curl URL 
+ 
+curl -L -X POST 'https://www.ulip.dpiit.gov.in/ulip/v1.0.0/EVYATRA/01' -H 'Accept: 
+application/json' -H 'Content-Type: application/json' -H 'Authorization: Bearer 
+eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1bGlwIiwiaWF0IjoxNzEyMjA1MzMxLCJhcHBzIjoiZGF
+0YXB1c2gifQ.O9k3Lg_L1e55hatY-54V7tK-ctMsDy5gNjuLQeAja3RbXctpz_r_TTvvmZgj_v-
+z7i9tifH_LpDKZvYoOW12mw'  --data-raw '{ 
+    "stateId": "", 
+    "lat": "18.595556", 
+    "long": "73.717167" 
+}' 
+ 
+For staging – 
+https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/EVYATRA/01 
+ 
+{ 
+    "stateId": "", 
+    "lat": "18.595556", 
+    "long": "73.717167" 
+} 
+ 
+Curl URL 
+curl --location 'https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/EVYATRA/01' \ 
+--header 'Authorization: Bearer 
+eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1bGlwMiIsImlhdCI6MTcyNzY5MDAwMCwiYXBwcyI6I
+mRhdGFwdXNoIn0.2BrY8dCCS_BAH5Y6faXPYAPJEV52bGuZZRtKXD04AOmAUtooBy9T
+C-wmWVvxyAWsqLR9ifBhYD9xfqGMDPH9_A' \ 
+--header 'Content-Type: application/json' \ 
+--header 'Accept: application/json' \ 
+--data '{ 
+    "stateId": "", 
+    "lat": "18.503194", 
+    "long": "73.969694" 
+}' 
+ 
+ 
+ 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 8 of 11 
+ 
+For obtaining an authentication token, refer to Section 1.6 
+ 
+Responses 
+ 
+To acknowledge the above request, ULIP will send the below response -  
+ 
+a) In case of an invalid format 
+ 
+1. Invalid stateId 
+{ 
+    "response": null, 
+    "error": "true", 
+    "code": "400", 
+    "message": "Data format failed OR wrong value entered at:  stateId. Format should 
+follow  [0-9]{0,6}$" 
+} 
+ 
+2. Invalid lat and long format 
+{ 
+    "response": null, 
+    "error": "true", 
+    "code": "400", 
+    "message": "Data format failed OR wrong value entered at:  lat. Format should follow  
+^[0-9]{2}\\.{0,1}[0-9]{2,10}|[0-9]{0,2}$" 
+} 
+ 
+b) In case EV charging station data does not exist in the EVYATRA system 
+{ 
+    "response": [ 
+        { 
+            "response": [], 
+            "responseStatus": "SUCCESS", 
+            "message": null 
+        } 
+    ], 
+    "error": "false", 
+    "code": "200", 
+    "message": "Success" 
+} 
+ 
+c) In case EV charging stations exist 
+{ 
+    "response": [ 
+        { 
+            "response": [ 
+                { 
+                    "id": 31290, 
+                    "cpo_id": 1144, 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 9 of 11 
+ 
+                    "state_id": 21, 
+                    "city_id": 6602, 
+                    "discom_id": null, 
+                    "station_name": null, 
+                    "address": "22/11 Kv Ibp Switching S/Stn", 
+                    "pincode": null, 
+                    "lat": 18.595556, 
+                    "lng": 73.717167, 
+                    "createdBy": null, 
+                    "createdDateGnrl": 0, 
+                    "isActive": 0, 
+                    "isDeleted": 0, 
+                    "lastUpdatedDateTimezoneId": 0, 
+                    "lastUpdatedDateGnrl": 0, 
+                    "updatedBy": null 
+                } 
+            ], 
+            "responseStatus": "SUCCESS", 
+            "message": null 
+        } 
+    ], 
+    "error": "false", 
+    "code": "200", 
+    "message": "Success" 
+} 
+ 
+Status Code 200: EV charging station data response 
+Status Code 400: Bad request (Invalid JSON syntax, invalid JSON key) 
+Status Code 401 or 403: Unauthenticated or Unauthorized 
+Status Code 500: Some internal server errors occurred 
+Status Code 502: The server is not responding. 
+ 
+1.4 Data Transmission & Authentication Mechanism 
+ 
+All data exchanges will be securely done over HTTPS. ULIP's system will request data from 
+EVYATRA through a URL with the following format: 
+ 
+For staging - 
+https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/EVYATRA/01 
+ 
+Body:  
+{ 
+"stateId": "", 
+    "lat": "18.503194", 
+    "long": "73.969694" 
+} 
+ 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 10 of 11 
+ 
+To access the data exchange URL, you would need to use a security mechanism that is 
+implemented by the ULIP system. The process is as follows: 
+ 
+- First time access: you would require a username and password. The username and password 
+would be shared with you beforehand. Once you enter the valid username and password, the 
+ULIP system will return a basic authorization token to you. You can use this token to 
+communicate with the ULIP system until the token gets expired. 
+ 
+In brief, HTTP Basic Authentication works as follows: 
+ 
+When you hit the ULIP secured API for the first time, you need to provide a username and 
+password to get an access token. 
+curl --location --request POST  
+ 
+'https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/user/login' \ 
+--header 'Accept: application/json' \ 
+--header 'Content-Type: application/json' \ 
+--data-raw '{ 
+"username": "xxxx", 
+"password": "xxxx@123" 
+}' 
+ 
+Authorization:   
+Bearer  
+eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZXN0MSIsImlhdCI6MTYyNTIzMDQyNywiYXBwcyI6I
+mRhdGFwdXNoIn0.rhumwWJ8BWeeHe9CYmIV1UKyJk-kLHA_ovX5Zi2OwxEv-td-
+KpxnfbKDI_8FZsOoggqx3Al-Du1y2qMoUD7uzA' 
+ 
+After successfully authenticating, the user will be logged into the ULIP system and obtain 
+an access token. This token will be used by the user to communicate with the ULIP 
+system. The token has an expiry time that represents the user session, which is typically 
+set to 24 hours. If there is no request from the user within this time frame, the session 
+(token) will expire, and the user will need to re-authenticate. 
+ 
+With the obtained token, the user can request EV charging station details from the ULIP system 
+as follows: 
+ 
+ 
+curl -L -X POST 'https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/EVYATRA/01' -H 'Accept: 
+application/json' -H 'Content-Type: application/json' -H 'Authorization: Bearer 
+eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1bGlwIiwiaWF0IjoxNzEyMjA1MzMxLCJhcHBzIjoiZGF
+0YXB1c2gifQ.O9k3Lg_L1e55hatY-54V7tK-ctMsDy5gNjuLQeAja3RbXctpz_r_TTvvmZgj_v-
+z7i9tifH_LpDKZvYoOW12mw' -data '{"stateId": "", 
+    "lat": "18.503194", 
+    "long": "73.969694" 
+}' 
+ 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 11 of 11 
+ 
+For production – 
+ 
+curl --location 'https://www.ulip.dpiit.gov.in/ulip/v1.0.0/user/login' \ 
+--header 'Accept: application/json' \ 
+--header 'Content-Type: application/json' \ 
+--data-raw '{ 
+    "username": "xxxx", 
+    "password": "xxxx@123" 
+}' 
+ 
+Authorization:   
+Bearer  
+eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1bGlwIiwiaWF0IjoxNzI3MTYxMDgwLCJhcHBzIjoiZGF0
+YXB1c2gifQ.XhVZm7NiCD05-
+v9091WJQhYzdk1a0Shs_ley0T4R2MX63swRyxHbHxh6bVXtzqWvWiSLwwNGRQIcqGhr49hpGg 
+ 
+Upon successful authentication, the user would be logged into the ULIP system and get an access 
+token. Though this token user can communicate with  ULIP. This token has expiry time which 
+represent user session. The session time out for the same to be f ixed hour, generally it is for 30 
+minutes. If there is no request coming from user for 30 minutes, the n session (token) will be 
+expired and user need to re authenticate. 
+ 
+Using The above token, user can request ULIP system for details as follow - 
+ 
+https://www.ulip.dpiit.gov.in/ulip/v1.0.0/EVYATRA/01 
+ 
+curl --location 'https://www.ulip.dpiit.gov.in/ulip/v1.0.0/EVYATRA/01' \ 
+--header 'Authorization: Bearer 
+eyJhbGciOiJIUzUxMiJ9.eyJhcHBzIjoiYXBpR2F0ZXdheSIsInN1YiI6InVsaXAiLCJpYXQiOjE
+3NDE2NzQzNTV9.LQaLh24Unq0ADAmK_X02FTTksm6ouq0EHWv9tdeDRLTsyYFQRPTJC
+nbrtRfVdCNF6Kx9_Z9jgRY8tZbm3ok7xg' \ 
+--header 'Accept: application/json' \ 
+--header 'Content-Type: application/json' \ 
+--data '{ 
+    "stateId": "", 
+    "lat": "18.503194", 
+    "long": "73.969694" 
+}' 
+ 

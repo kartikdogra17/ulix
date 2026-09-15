@@ -1,0 +1,3632 @@
+ULIP Integration Document 
+ 
+  
+                        
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+Version No.: 5.0 
+Date: 08/05/2026 
+Project Name: ULIP 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ULIP Integration Document 
+This document contains proprietary information of NEC corporation India Pvt Ltd . Unauthorized access, copying 
+and replication are prohibited. This document must not be copied in whole or part by any means, without the written 
+authorization of NEC corporation India  Pvt Ltd, Noida, India.  
+ 
+ 
+ULIP Integration Document   
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 5.0 Page 2 of 70 
+ 
+ 
+ 
+ 
+Revision History 
+Version Date Author Reviewer Significant Changes 
+1.0 05/04/2021 Vikash Kumar Nayab Ali Baseline Version 
+2.0 27/04/2021 Akshay Singh Nayab Ali Added IWAI/10 to    
+IWAI/14 
+3.0 29/04/2021 Akshay Singh Nayab Ali Bean format 
+update 
+4.0 29/04/2021 Girish Chander Nayab Ali Updated 
+5.0 27/04/2026 Sudhanshu Singh Nayab Ali New IWAI_10 to 
+IWAI_15 API 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ULIP Integration Document   
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 5.0 Page 3 of 70 
+ 
+Table of Contents 
+ 
+1.1 Purpose .................................................................................................................................... 6 
+The Overall Description .............................................................................................................................. 6 
+1.2 Data Integration between IWAI System and ULIP application ................................................. 6 
+1.3 IWAI/01 ..................................................................................................................................... 6 
+1.3.1 Technical Approach ..................................................................................................... 6 
+1.3.2 Curl URL ...................................................................................................................... 7 
+1.3.3 Curl URL ...................................................................................................................... 7 
+1.3.4 Response ..................................................................................................................... 7 
+1.4 IWAI/02 ..................................................................................................................................... 8 
+1.4.1 Technical Approach ..................................................................................................... 9 
+1.4.2 Curl URL ...................................................................................................................... 9 
+1.4.3 Curl URL ...................................................................................................................... 9 
+1.4.4 Response ................................................................................................................... 10 
+1.5 IWAI/03 ................................................................................................................................... 13 
+1.5.1 Technical Approach ................................................................................................... 13 
+1.5.2 Curl URL .................................................................................................................... 14 
+1.5.3 Curl URL .................................................................................................................... 14 
+1.5.4 Response ................................................................................................................... 15 
+1.6 IWAI/04 ................................................................................................................................... 17 
+1.6.1 Technical Approach ................................................................................................... 17 
+1.6.2 Curl URL .................................................................................................................... 17 
+1.6.3 Curl URL .................................................................................................................... 18 
+1.6.4 Response ................................................................................................................... 18 
+1.7 IWAI/05 ................................................................................................................................... 19 
+1.7.1 Technical Approach ................................................................................................... 19 
+1.7.2 Curl URL .................................................................................................................... 20 
+1.7.3 Curl URL .................................................................................................................... 20 
+1.7.4 Response ................................................................................................................... 20 
+1.8 IWAI/06 ................................................................................................................................... 23 
+1.8.1 Technical Approach ................................................................................................... 23 
+1.8.2 Curl URL .................................................................................................................... 24 
+1.8.3 Curl URL .................................................................................................................... 24 
+1.8.4 Response ................................................................................................................... 24 
+1.9 IWAI/07 ................................................................................................................................... 26 
+ULIP Integration Document   
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 5.0 Page 4 of 70 
+ 
+1.9.1 Technical Approach ................................................................................................... 26 
+1.9.2 Curl URL .................................................................................................................... 27 
+1.9.3 Curl URL .................................................................................................................... 27 
+1.9.4 Response ................................................................................................................... 27 
+1.10 IWAI/08 ................................................................................................................................ 40 
+1.10.1 Technical Approach ................................................................................................. 40 
+1.10.2 Curl URL .................................................................................................................. 41 
+1.10.3 Curl URL .................................................................................................................. 41 
+1.10.4 Response ................................................................................................................. 41 
+1.11 IWAI/09 ................................................................................................................................ 43 
+1.11.1 Technical Approach ................................................................................................. 44 
+1.11.2 Curl URL .................................................................................................................. 44 
+1.11.3 Curl URL .................................................................................................................. 44 
+1.11.4 Response ................................................................................................................. 45 
+1.12 IWAI/10 ................................................................................................................................ 48 
+1.12.1 Technical Approach ................................................................................................. 48 
+1.12.2 Curl URL .................................................................................................................. 49 
+1.12.3 Curl URL .................................................................................................................. 49 
+1.12.4 Response ................................................................................................................. 49 
+1.13 IWAI/11 ................................................................................................................................ 51 
+1.13.1 Technical Approach ................................................................................................. 51 
+1.13.2 Curl URL .................................................................................................................. 51 
+1.13.3 Curl URL .................................................................................................................. 51 
+1.13.4 Response ................................................................................................................. 52 
+1.14 IWAI/12 ................................................................................................................................ 54 
+1.14.1 Technical Approach ................................................................................................. 54 
+1.14.2 Curl URL .................................................................................................................. 54 
+1.14.3 Curl URL .................................................................................................................. 55 
+1.14.4 Response ................................................................................................................. 55 
+1.15 IWAI/13 ................................................................................................................................ 59 
+1.15.1 Technical Approach ................................................................................................. 59 
+1.15.2 Curl URL .................................................................................................................. 60 
+1.15.3 Curl URL .................................................................................................................. 60 
+1.15.4 Response ................................................................................................................. 60 
+1.16 IWAI/14 ................................................................................................................................ 62 
+1.16.1 Technical Approach ................................................................................................. 62 
+ULIP Integration Document   
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 5.0 Page 5 of 70 
+ 
+1.16.2 Curl URL .................................................................................................................. 63 
+1.16.3 Curl URL .................................................................................................................. 63 
+1.16.4 Response ................................................................................................................. 63 
+1.17 IWAI/15 ................................................................................................................................ 66 
+1.17.1 Technical Approach ................................................................................................. 66 
+1.17.2 Curl Url ..................................................................................................................... 66 
+1.17.3 Curl Url ..................................................................................................................... 67 
+1.17.4 Response ................................................................................................................. 67 
+1.18 Data Transmission & Authentication Mechanism ............................................................... 69 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+Introduction 
+ULIP Integration Document   
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 5.0 Page 6 of 70 
+ 
+1.1 Purpose 
+ 
+The purpose of this document is to define and provide details for accessing API for  
+transaction details from IWAI (Inland Waterways Authority of India ) system from ULIP 
+system. This document details the following points: 
+ 
+1. Data Integration between IWAI and ULIP web service : Identification of operational 
+points where data integration between IWAI and ULIP web service will be needed. 
+ 
+2. Technical Approach for performing Data Integration  
+ 
+The Overall Description 
+Users will share information based on data sent by user ULIP system will call IWAI API 
+for accessing information. 
+Followings are the points for accessing cargo information: - 
+ 
+1. This API will share data based on information provided by users. 
+ 
+2. ULIP will expose API for getting data from IWAI API. 
+ 
+3. IWAI/01 API will take information from user and get data from IWAI API. 
+1.2 Data Integration between IWAI System and ULIP application 
+ 
+Users will share information with the ULIP system based on data shared ULIP will 
+provide data to user. 
+1.3 IWAI/01 
+ 
+This API will connect with IWAI API to get data. 
+ 
+S. No. Field Name Field Description Format Required/Not 
+– Required 
+Length 
+1 N/A N/A N/A N/A N/A 
+1.3.1 Technical Approach  
+1. All the data will be shared through rest web services. 
+2. ULIP system will provide detail is required. 
+3. IWAI API will share details of cargo information which exist in IWAI system in JSON format. 
+4. ULIP system will provide the data in JSON Object format in response body. 
+ 
+Example: Data is shared by ULIP system, then IWAI-integration will make a request to 
+IWAI API. 
+ULIP Integration Document   
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 5.0 Page 7 of 70 
+ 
+Request: The request must be of the following format and passed within the URL body in 
+JSON format. 
+ 
+For Staging: https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/IWAI/01 
+ 
+{ } 
+ 
+1.3.2 Curl URL 
+curl --location --request POST 'https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/IWAI/01' \ 
+--
+header 'Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1bGlwIiwiaWF0IjoxNjQ5MjIw
+NDA0LCJhcHBzIjoiZGF0YXB1c2gifQ.XG9zpDhZ0hqXFVHHtucnyYNJ4yQHXmTRWNAqHH1M
+M--Swd7_iJaKQ2zr0LKap-YKzLmq85SzkkPyh39KE0KR7w' \ 
+--header 'Content-Type: application/json' \ 
+--header 'Accept: application/json' \ 
+--data-raw '{ }' 
+ 
+For Production: https://www.ulip.dpiit.gov.in/ulip/v1.0.0/IWAI/01 
+ 
+{ } 
+ 
+1.3.3 Curl URL 
+curl --location --request POST 'https://www.ulip.dpiit.gov.in/ulip/v1.0.0/IWAI/01' \ 
+--
+header 'Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1bGlwIiwiaWF0IjoxNjQ5MjIw
+NDA0LCJhcHBzIjoiZGF0YXB1c2gifQ.XG9zpDhZ0hqXFVHHtucnyYNJ4yQHXmTRWNAqHH1M
+M--Swd7_iJaKQ2zr0LKap-YKzLmq85SzkkPyh39KE0KR7w' \ 
+--header 'Content-Type: application/json' \ 
+--header 'Accept: application/json' \ 
+--data-raw '{ }' 
+ 
+For obtaining authentication token, refer Section 1.18 
+1.3.4 Response 
+To acknowledge the above request, ULIP will send the response below -  
+ 
+a) Success response 
+ 
+{ 
+    "response": [ 
+        { 
+            "response": { 
+                "status": "success", 
+                "data": [ 
+                    { 
+                        "NAME": "Cargo Traffic", 
+ULIP Integration Document   
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 5.0 Page 8 of 70 
+ 
+                        "VALUE1": 0, 
+                        "VALUE2": 0, 
+                        "MNAME": null, 
+                        "YNAME": "FY 26-27" 
+                    }, 
+                    { 
+                        "NAME": "Passengers", 
+                        "VALUE1": 0, 
+                        "VALUE2": 0, 
+                        "MNAME": null, 
+                        "YNAME": "FY 26-27" 
+                    }, 
+                    { 
+                        "NAME": "Cargo Tonnage km", 
+                        "VALUE1": 0, 
+                        "VALUE2": 0, 
+                        "MNAME": null, 
+                        "YNAME": "FY 26-27" 
+                    } 
+                ], 
+                "message": null, 
+                "total_records": 0, 
+                "previous_page": null, 
+                "next_page": null 
+            }, 
+            "responseStatus": "SUCCESS", 
+            "message": null 
+        } 
+    ], 
+    "error": "false", 
+    "code": "200", 
+    "message": "Success" } 
+ 
+Status Code 200: success data response 
+Status Code 400: Bad request (Invalid json syntax, invalid json key) 
+Status Code 401 or 403: Unauthenticated or Unauthorized 
+Status Code 500: Some internal server errors occurred 
+Status Code 502: Server is not responding. 
+1.4 IWAI/02 
+ 
+This API will connect with IWAI API to get data. 
+ 
+S. No. Field Name Field Description Format Required/Not 
+– Required 
+Length 
+1 N/A N/A N/A N/A N/A 
+ULIP Integration Document   
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 5.0 Page 9 of 70 
+ 
+1.4.1 Technical Approach  
+5. All the data will be shared through rest web services. 
+6. ULIP system will provide detail is required. 
+7. IWAI API will share details of cargo information which exist in IWAI system in JSON format. 
+8. ULIP system will provide the data in JSON Object format in response body. 
+ 
+Example: Data is shared by ULIP system, then IWAI-integration will make a request to 
+IWAI API. 
+ 
+Request: The request must be of the following format and passed within the URL body in 
+JSON format. 
+ 
+For Staging: https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/IWAI/02 
+ 
+{} 
+ 
+1.4.2 Curl URL 
+curl --location --request POST 'https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/IWAI/02' \ 
+--
+header 'Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1bGlwIiwiaWF0IjoxNjQ5MjIw
+NDA0LCJhcHBzIjoiZGF0YXB1c2gifQ.XG9zpDhZ0hqXFVHHtucnyYNJ4yQHXmTRWNAqHH1M
+M--Swd7_iJaKQ2zr0LKap-YKzLmq85SzkkPyh39KE0KR7w' \ 
+--header 'Content-Type: application/json' \ 
+--header 'Accept: application/json' \ 
+--data-raw '{}' 
+ 
+For Production: https://www.ulip.dpiit.gov.in/ulip/v1.0.0/IWAI/02 
+ 
+{} 
+ 
+1.4.3 Curl URL 
+curl --location --request POST 'https://www.ulip.dpiit.gov.in/ulip/v1.0.0/IWAI/02' \ 
+--
+header 'Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1bGlwIiwiaWF0IjoxNjQ5MjIw
+NDA0LCJhcHBzIjoiZGF0YXB1c2gifQ.XG9zpDhZ0hqXFVHHtucnyYNJ4yQHXmTRWNAqHH1M
+M--Swd7_iJaKQ2zr0LKap-YKzLmq85SzkkPyh39KE0KR7w' \ 
+--header 'Content-Type: application/json' \ 
+--header 'Accept: application/json' \ 
+--data-raw '{}' 
+ 
+For obtaining authentication token, refer Section 1.18 
+ 
+ULIP Integration Document   
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 5.0 Page 10 of 70 
+ 
+1.4.4 Response 
+ 
+To acknowledge the above request, ULIP will send the response below -  
+ 
+a) Success response 
+ 
+{ 
+    "response": [ 
+        { 
+            "response": { 
+                "status": "success", 
+                "data": [ 
+                    [ 
+                        { 
+                            "text": "Ferry", 
+                            "value": "18bbe971-44cc-11ef-8f98-005056883868" 
+                        }, 
+                        { 
+                            "text": "Dry Bulk", 
+                            "value": "2d008a7c-e2b6-11ea-a765-c809a8f74e0e" 
+                        }, 
+                        { 
+                            "text": "Ro-Ro", 
+                            "value": "2d645ff1-e2b6-11ea-a765-c809a8f74e0e" 
+                        }, 
+                        { 
+                            "text": "Break Bulk", 
+                            "value": "2de9a3c6-e2b6-11ea-a765-c809a8f74e0e" 
+                        }, 
+                        { 
+                            "text": "Liquid Bulk", 
+                            "value": "2e5f1e42-e2b6-11ea-a765-c809a8f74e0e" 
+                        }, 
+                        { 
+                            "text": "Container", 
+                            "value": "2ed42ab4-e2b6-11ea-a765-c809a8f74e0e" 
+                        }, 
+                        { 
+                            "text": "ODC/Project Cargo", 
+                            "value": "2f595ade-e2b6-11ea-a765-c809a8f74e0e" 
+                        }, 
+                        { 
+                            "text": "Ro-Pax", 
+                            "value": "6a9219a6-7d6f-11eb-a9d3-005056883868" 
+                        }, 
+                        { 
+                            "text": "Passengers", 
+                            "value": "849758a1-045a-11ee-98f4-005056883868" 
+ULIP Integration Document   
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 5.0 Page 11 of 70 
+ 
+                        }, 
+                        { 
+                            "text": "CPO & CPKO", 
+                            "value": "c2a26eaa-72cb-11ec-99fd-005056883868" 
+                        }, 
+                        { 
+                            "text": "NA", 
+                            "value": "f222c249-a4b5-11ea-a89a-8218f17267ae" 
+                        } 
+                    ], 
+                    [ 
+                        { 
+                            "text": " ADANI WILMAR LIMITED", 
+                            "value": " ADANI WILMAR LIMITED" 
+                        }, 
+                        { 
+                            "text": " EMAMI AGROTECH LTD(Qty of 5009.532 MT)AWL AGRI BUSINESS 
+LIMITED (Qty of 7952.88 MT).", 
+                            "value": " EMAMI AGROTECH LTD(Qty of 5009.532 MT)AWL AGRI 
+BUSINESS LIMITED (Qty of 7952.88 MT)." 
+                        }, 
+                        { 
+                            "text": " GEMINI EDIBLES & BUNGE INDIA", 
+                            "value": " GEMINI EDIBLES & BUNGE INDIA" 
+                        }, 
+                        { 
+                            "text": " GIMPEX PRIVATE LTD.", 
+                            "value": " GIMPEX PRIVATE LTD." 
+                        }, 
+                        { 
+                            "text": " GOKUL AGRO RESOURCES", 
+                            "value": " GOKUL AGRO RESOURCES" 
+                        }, 
+                        { 
+                            "text": " GOKUL AGRO RESOURCES LIMITED", 
+                            "value": " GOKUL AGRO RESOURCES LIMITED" 
+                        }, 
+                        { 
+                            "text": " GOKUL AGRO RESOURCES LIMITED.", 
+                            "value": " GOKUL AGRO RESOURCES LIMITED." 
+                        }, 
+                        { 
+                            "text": " M/s Majumdar Agro Industries Pvt. Ltd.", 
+                            "value": " M/s Majumdar Agro Industries Pvt. Ltd." 
+                        }, 
+                        { 
+                            "text": " RAIN CEMENTS LIMTED. ", 
+                            "value": " RAIN CEMENTS LIMTED. " 
+                        }, 
+ULIP Integration Document   
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 5.0 Page 12 of 70 
+ 
+                        { 
+                            "text": " Shri Marutis universal pvt ltd", 
+                            "value": " Shri Marutis universal pvt ltd" 
+                        }, 
+                        { 
+                            "value": "a99b3b0a-7d3f-11ee-8f98-005056883868", 
+                            "text": "Mahua Ghat, Doriganj ", 
+                            "nw": "NW-1" 
+                        }, 
+                        { 
+                            "value": "4a64eab6-d9df-11ee-8f98-005056883868", 
+                            "text": "Maia Riverine Port (INLGL1)", 
+                            "nw": "IBP" 
+                        }, 
+                        { 
+                            "value": "e37a0558-4c4f-11f0-a590-005056883868", 
+                            "text": "Maijan ", 
+                            "nw": "NW-2" 
+                        }, 
+                        { 
+                            "value": "5d2310af-169e-11ef-8f98-005056883868", 
+                            "text": "Malwa", 
+                            "nw": "NW-16" 
+                        }, 
+                        { 
+                            "value": "17b69b7f-e2c3-11ea-a765-c809a8f74e0e", 
+                            "text": "Manikchak", 
+                            "nw": "NW-1" 
+                        }, 
+                        { 
+                            "value": "abaa6ccd-ee13-11ec-98f4-005056883868", 
+                            "text": "Maniyapramabu", 
+                            "nw": "NW-3" 
+                        }, 
+                        { 
+], 
+                    [ 
+                        { 
+                            "CurrentFyear": "FY 26-27", 
+                            "PreviousFyear": "FY 25-26" 
+                        } 
+                    ], 
+                    null, 
+                    null 
+                ], 
+                "message": null, 
+                "total_records": 0, 
+                "previous_page": null, 
+                "next_page": null 
+ULIP Integration Document   
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 5.0 Page 13 of 70 
+ 
+            }, 
+            "responseStatus": "SUCCESS", 
+            "message": null 
+        } 
+    ], 
+    "error": "false", 
+    "code": "200", 
+    "message": "Success" 
+} 
+ 
+Status Code 200: success data response 
+Status Code 400: Bad request (Invalid json syntax, invalid json key) 
+Status Code 401 or 403: Unauthenticated or Unauthorized 
+Status Code 500: Some internal server error occurred 
+Status Code 502: Server is not responding. 
+1.5 IWAI/03 
+ 
+This API will take YEAR1, YEAR2, NWTYPE and TERMINAL to connect with IWAI API 
+to get data. 
+ 
+S. No. Field Name Field Description Format Required/Not 
+– Required 
+Length 
+1 year1 year1 as available in 
+IWAI system. 
+[a-zA-Z\d-\s]{8} Required 8 
+2 year2 year2 as available in 
+IWAI system. 
+[a-zA-Z\d-\s]{8} Required 8 
+3 nwtype nwtype as available 
+in IWAI system. 
+N/A Not Required N/A 
+4 terminal terminal as available 
+in IWAI system. 
+N/A Not Required N/A 
+1.5.1 Technical Approach  
+1. All the data will be shared through rest web services. 
+2. ULIP system will provide YEAR1, YEAR2, NWTYPE and TERMINAL for which detail 
+is required. 
+3. IWAI API will share details of cargo information which exist in IWAI system in JSON format. 
+4. ULIP system will provide the data in JSON Object format in response body. 
+ 
+Example: Data is shared by ULIP system, then IWAI-integration will make a request to 
+IWAI API. 
+ 
+Request: The request must be of the following format and passed within the URL body in 
+JSON format. 
+ULIP Integration Document   
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 5.0 Page 14 of 70 
+ 
+For Staging: https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/IWAI/03 
+ 
+{   "year1": "", 
+    "year2": "", 
+    "nwtype": "", 
+    "terminal": "" } 
+ 
+1.5.2 Curl URL 
+curl --location --request POST 'https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/IWAI/03' \ 
+--
+header 'Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1bGlwIiwiaWF0IjoxNjQ5MjIw
+NDA0LCJhcHBzIjoiZGF0YXB1c2gifQ.XG9zpDhZ0hqXFVHHtucnyYNJ4yQHXmTRWNAqHH1M
+M--Swd7_iJaKQ2zr0LKap-YKzLmq85SzkkPyh39KE0KR7w' \ 
+--header 'Content-Type: application/json' \ 
+--header 'Accept: application/json' \ 
+--data-raw '{    "year1": "", 
+    "year2": "", 
+    "nwtype": "", 
+    "terminal": "" }' 
+ 
+For obtaining authentication token, refer Section 1.18 
+ 
+For Production: https://www.ulip.dpiit.gov.in/ulip/v1.0.0/IWAI/03 
+ 
+{    "year1": "", 
+    "year2": "", 
+    "nwtype": "", 
+    "terminal": "" } 
+ 
+1.5.3 Curl URL 
+curl --location --request POST 'https://www.ulip.dpiit.gov.in/ulip/v1.0.0/IWAI/03' \ 
+--
+header 'Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1bGlwIiwiaWF0IjoxNjQ5MjIw
+NDA0LCJhcHBzIjoiZGF0YXB1c2gifQ.XG9zpDhZ0hqXFVHHtucnyYNJ4yQHXmTRWNAqHH1M
+M--Swd7_iJaKQ2zr0LKap-YKzLmq85SzkkPyh39KE0KR7w' \ 
+--header 'Content-Type: application/json' \ 
+--header 'Accept: application/json' \ 
+--data-raw '{   "year1": "", 
+    "year2": "", 
+    "nwtype": "", 
+    "terminal": "" }' 
+ 
+For obtaining authentication token, refer Section 1.18 
+ 
+ULIP Integration Document   
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 5.0 Page 15 of 70 
+ 
+1.5.4 Response 
+ 
+To acknowledge the above request, ULIP will send the response below -  
+ 
+a) Success response 
+ 
+{    "response": [ 
+        { 
+            "response": { 
+                "status": "success", 
+                "data": [ 
+                    { 
+                        "s": 1, 
+                        "Month": "April", 
+                        "Year1": 11.98, 
+                        "Year2": 0.0 
+                    }, 
+                    { 
+                        "s": 2, 
+                        "Month": "May", 
+                        "Year1": 12.46, 
+                        "Year2": 0.0 
+                    }, 
+                    { 
+                        "s": 3, 
+                        "Month": "June", 
+                        "Year1": 11.7, 
+                        "Year2": 0.0 
+                    }, 
+                    { 
+                        "s": 4, 
+                        "Month": "July", 
+                        "Year1": 11.55, 
+                        "Year2": 0.0 
+                    }, 
+                    { 
+                        "s": 5, 
+                        "Month": "Aug", 
+                        "Year1": 11.72, 
+                        "Year2": 0.0 
+                    }, 
+                    { 
+                        "s": 6, 
+                        "Month": "Sep", 
+                        "Year1": 11.74, 
+                        "Year2": 0.0 
+                    }, 
+                    { 
+ULIP Integration Document   
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 5.0 Page 16 of 70 
+ 
+                        "s": 7, 
+                        "Month": "Oct", 
+                        "Year1": 51.1, 
+                        "Year2": 0.0 
+                    }, 
+                    { 
+                        "s": 8, 
+                        "Month": "Nov", 
+                        "Year1": 19.12, 
+                        "Year2": 0.0 
+                    }, 
+                    { 
+                        "s": 9, 
+                        "Month": "Dec", 
+                        "Year1": 19.5, 
+                        "Year2": 0.0 
+                    }, 
+                    { 
+                        "s": 10, 
+                        "Month": "Jan", 
+                        "Year1": 19.21, 
+                        "Year2": 0.0 
+                    }, 
+                    { 
+                        "s": 11, 
+                        "Month": "Feb", 
+                        "Year1": 18.01, 
+                        "Year2": 0.0 
+                    }, 
+                    { 
+                        "s": 12, 
+                        "Month": "Mar", 
+                        "Year1": 20.15, 
+                        "Year2": 0.0 
+                    } 
+                ], 
+                "message": null, 
+                "total_records": 0, 
+                "previous_page": null, 
+                "next_page": null 
+            }, 
+            "responseStatus": "SUCCESS", 
+            "message": null 
+        } 
+    ], 
+    "error": "false", 
+    "code": "200", 
+    "message": "Success"} 
+ 
+ULIP Integration Document   
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 5.0 Page 17 of 70 
+ 
+Status Code 200: success data response 
+Status Code 400: Bad request (Invalid json syntax, invalid json key) 
+Status Code 401 or 403: Unauthenticated or Unauthorized 
+Status Code 500: Some internal server errors occurred 
+Status Code 502: Server is not responding. 
+ 
+1.6 IWAI/04 
+ 
+This API will take FYEAR to connect with IWAI API to get data. 
+ 
+S. No. Field Name Field Description Format Required/Not 
+– Required 
+Length 
+1 fYear fYear as available 
+in IWAI system. 
+[a-zA-Z\d-\s]{8} Required 8 
+1.6.1 Technical Approach  
+5. All the data will be shared through rest web services. 
+6. ULIP system will provide FYEAR for which detail is required. 
+7. IWAI API will share details of cargo information which exist in IWAI system in JSON format. 
+8. ULIP system will provide the data in JSON Object format in response body. 
+ 
+Example: Data is shared by ULIP system, then IWAI-integration will make a request to 
+IWAI API. 
+ 
+Request: The request must be of the following format and passed within the URL body in 
+JSON format. 
+ 
+For Staging: https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/IWAI/04 
+ 
+{"fYear":""} 
+ 
+1.6.2 Curl URL 
+curl --location --request POST 'https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/IWAI/04' \ 
+--
+header 'Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1bGlwIiwiaWF0IjoxNjQ5MjIw
+NDA0LCJhcHBzIjoiZGF0YXB1c2gifQ.XG9zpDhZ0hqXFVHHtucnyYNJ4yQHXmTRWNAqHH1M
+M--Swd7_iJaKQ2zr0LKap-YKzLmq85SzkkPyh39KE0KR7w' \ 
+--header 'Content-Type: application/json' \ 
+--header 'Accept: application/json' \ 
+--data-raw '{     "fYear":"" }' 
+ 
+For Production: https://www.ulip.dpiit.gov.in/ulip/v1.0.0/IWAI/04 
+ 
+{     "fYear":"" } 
+ 
+ULIP Integration Document   
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 5.0 Page 18 of 70 
+ 
+1.6.3 Curl URL 
+curl --location --request POST 'https://www.ulip.dpiit.gov.in/ulip/v1.0.0/IWAI/04' \ 
+--
+header 'Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1bGlwIiwiaWF0IjoxNjQ5MjIw
+NDA0LCJhcHBzIjoiZGF0YXB1c2gifQ.XG9zpDhZ0hqXFVHHtucnyYNJ4yQHXmTRWNAqHH1M
+M--Swd7_iJaKQ2zr0LKap-YKzLmq85SzkkPyh39KE0KR7w' \ 
+--header 'Content-Type: application/json' \ 
+--header 'Accept: application/json' \ 
+--data-raw '{   "fYear":"" }' 
+ 
+For obtaining authentication token, refer Section 1.18 
+ 
+1.6.4 Response 
+ 
+To acknowledge the above request, ULIP will send the response below -  
+ 
+a) Success response 
+ 
+{    "response": [ 
+        { 
+            "response": { 
+                "status": "success", 
+                "data": [ 
+                    { 
+                        "nwtype_code": "NW-1", 
+                        "traffic": 8.478412518E7, 
+                        "month": "March", 
+                        "fyear": "FY 25-26" 
+                    }, 
+                    { 
+                        "nwtype_code": "NW-100", 
+                        "traffic": 3.474670898E7, 
+                        "month": "March", 
+                        "fyear": "FY 25-26" 
+                    }, 
+                    { 
+                        "nwtype_code": "NW-91", 
+                        "traffic": 3.441759214E7, 
+                        "month": "March", 
+                        "fyear": "FY 25-26" 
+                    }, 
+                    { 
+                        "nwtype_code": "NW-10", 
+                        "traffic": 3.106820453E7, 
+                        "month": "March", 
+                        "fyear": "FY 25-26" 
+                    }, 
+ULIP Integration Document   
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 5.0 Page 19 of 70 
+ 
+                    { 
+                        "nwtype_code": "Others", 
+                        "traffic": 3.322142268E7, 
+                        "month": "March", 
+                        "fyear": "FY 25-26" 
+                    } 
+                ], 
+                "message": null, 
+                "total_records": 0, 
+                "previous_page": null, 
+                "next_page": null 
+            }, 
+            "responseStatus": "SUCCESS", 
+            "message": null 
+        } 
+    ], 
+    "error": "false", 
+    "code": "200", 
+    "message": "Success" } 
+ 
+Status Code 200: success data response 
+Status Code 400: Bad request (Invalid json syntax, invalid json key) 
+Status Code 401 or 403: Unauthenticated or Unauthorized 
+Status Code 500: Some internal server error occurred 
+Status Code 502: Server is not responding. 
+1.7 IWAI/05 
+ 
+This API will take YEAR1 and YEAR2 to connect with IWAI API to get data. 
+ 
+S. No. Field Name Field Description Format Required/Not 
+– Required 
+Length 
+1 year1 year1 as available in 
+IWAI system. 
+[a-zA-Z\d-\s]{8} Required 8 
+2 year2 year2 as available in 
+IWAI system. 
+[a-zA-Z\d-\s]{8} Required 8 
+1.7.1 Technical Approach  
+9. All the data will be shared through rest web services. 
+10. ULIP system will provide YEAR1 and YEAR2 for which detail is required. 
+11. IWAI API will share details of cargo information which exist in IWAI system in JSON format. 
+12. ULIP system will provide the data in JSON Object format in response body. 
+ 
+Example: Data is shared by ULIP system, then IWAI-integration will make a request to 
+IWAI API. 
+ 
+ULIP Integration Document   
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 5.0 Page 20 of 70 
+ 
+Request: The request must be of the following format and passed within the URL body in 
+JSON format. 
+ 
+For Staging: https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/IWAI/05 
+ 
+{    "year1":"FY 20-21", 
+    "year2":"FY 21-22" } 
+ 
+1.7.2 Curl URL 
+curl --location --request POST 'https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/IWAI/05' \ 
+--
+header 'Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1bGlwIiwiaWF0IjoxNjQ5MjIw
+NDA0LCJhcHBzIjoiZGF0YXB1c2gifQ.XG9zpDhZ0hqXFVHHtucnyYNJ4yQHXmTRWNAqHH1M
+M--Swd7_iJaKQ2zr0LKap-YKzLmq85SzkkPyh39KE0KR7w' \ 
+--header 'Content-Type: application/json' \ 
+--header 'Accept: application/json' \ 
+--data-raw '{    "year1":"FY 20-21", 
+    "year2":"FY 21-22" }' 
+ 
+For Production: https://www.ulip.dpiit.gov.in/ulip/v1.0.0/IWAI/05 
+ 
+{    "year1":"FY 20-21", 
+    "year2":"FY 21-22" } 
+ 
+1.7.3 Curl URL 
+curl --location --request POST 'https://www.ulip.dpiit.gov.in/ulip/v1.0.0/IWAI/05' \ 
+--
+header 'Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1bGlwIiwiaWF0IjoxNjQ5MjIw
+NDA0LCJhcHBzIjoiZGF0YXB1c2gifQ.XG9zpDhZ0hqXFVHHtucnyYNJ4yQHXmTRWNAqHH1M
+M--Swd7_iJaKQ2zr0LKap-YKzLmq85SzkkPyh39KE0KR7w' \ 
+--header 'Content-Type: application/json' \ 
+--header 'Accept: application/json' \ 
+--data-raw '{   "year1":"FY 20-21", 
+    "year2":"FY 21-22" }' 
+ 
+For obtaining authentication token, refer Section 1.18 
+ 
+1.7.4 Response 
+To acknowledge the above request, ULIP will send the below response -  
+ 
+a) In case of invalid format 
+ 
+1. Invalid year1 and year2 
+ 
+{    "response": null, 
+ULIP Integration Document   
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 5.0 Page 21 of 70 
+ 
+    "error": "true", 
+    "code": "400", 
+    "message": "Data format failed OR wrong value entered at:    year1. Format should follow  [a-
+zA-Z\\d-\\s]{8} } 
+ 
+2. In case of year1 and year2 is null or not match in IWAI System 
+ 
+{    "response": [ 
+        { 
+            "response": { 
+                "status": "error", 
+                "data": null, 
+                "message": "No columns were selected", 
+                "total_records": 0, 
+                "previous_page": null, 
+                "next_page": null 
+            }, 
+            "responseStatus": "SUCCESS" 
+        } 
+    ], 
+    "error": "false", 
+    "code": "200", 
+    "message": "Success" } 
+ 
+b) In case of year1 and year2 Exist in IWAI System 
+ 
+{    "response": [ 
+        { 
+            "response": { 
+                "status": "success", 
+                "data": [ 
+                    { 
+                        "NW": "NW-100", 
+                        "Year1": 25.63, 
+                        "year2": 29.32, 
+                        "month": "March", 
+                        "toataly1": 83.61, 
+                        "totaly2": 108.79 
+                    }, 
+                    { 
+                        "NW": "NW-91", 
+                        "Year1": 9.23, 
+                        "year2": 22.45, 
+                        "month": "March", 
+                        "toataly1": 83.61, 
+                        "totaly2": 108.79 
+                    }, 
+                    { 
+                        "NW": "NW-10", 
+ULIP Integration Document   
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 5.0 Page 22 of 70 
+ 
+                        "Year1": 17.69, 
+                        "year2": 20.23, 
+                        "month": "March", 
+                        "toataly1": 83.61, 
+                        "totaly2": 108.79 
+                    }, 
+                    { 
+                        "NW": "NW-4", 
+                        "Year1": 6.83, 
+                        "year2": 11.23, 
+                        "month": "March", 
+                        "toataly1": 83.61, 
+                        "totaly2": 108.79 
+                    }, 
+                    { 
+                        "NW": "NW-1", 
+                        "Year1": 9.21, 
+                        "year2": 10.93, 
+                        "month": "March", 
+                        "toataly1": 83.61, 
+                        "totaly2": 108.79 
+                    }, 
+                    { 
+                        "NW": "NW-3", 
+                        "Year1": 0.73, 
+                        "year2": 1.7, 
+                        "month": "March", 
+                        "toataly1": 83.61, 
+                        "totaly2": 108.79 
+                    }, 
+                    { 
+                        "NW": "NW-44", 
+                        "Year1": 0.28, 
+                        "year2": 0.82, 
+                        "month": "March", 
+                        "toataly1": 83.61, 
+                        "totaly2": 108.79 
+                    }, 
+                    { 
+                        "NW": "NW-2", 
+                        "Year1": 0.31, 
+                        "year2": 0.43, 
+                        "month": "March", 
+                        "toataly1": 83.61, 
+                        "totaly2": 108.79 
+                    }, 
+                    { 
+                        "NW": "Others", 
+                        "Year1": 0.29, 
+ULIP Integration Document   
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 5.0 Page 23 of 70 
+ 
+                        "year2": 0.31, 
+                        "month": "March", 
+                        "toataly1": 83.61, 
+                        "totaly2": 108.79 
+                    } 
+                ], 
+                "message": null, 
+                "total_records": 0, 
+                "previous_page": null, 
+                "next_page": null 
+            }, 
+            "responseStatus": "SUCCESS" 
+        } 
+    ], 
+    "error": "false", 
+    "code": "200", 
+    "message": "Success" } 
+ 
+Status Code 200: success data response 
+Status Code 400: Bad request (Invalid json syntax, invalid json key) 
+Status Code 401 or 403: Unauthenticated or Unauthorized 
+Status Code 500: Some internal server errors occurred 
+Status Code 502: Server is not responding. 
+ 
+1.8 IWAI/06 
+ 
+This API will take YEAR1 and YEAR2 to connect with IWAI API to get data. 
+ 
+S. 
+No. 
+Field Name Field Description Format Required/Not 
+– Required 
+Length 
+1 year1 year1 as available in 
+IWAI system. 
+[a-zA-Z\d-\s]{8} Required 8 
+2 year2 year2 as available in 
+IWAI system. 
+[a-zA-Z\d-\s]{8} Required 8 
+1.8.1 Technical Approach  
+13. All the data will be shared through rest web services. 
+14. ULIP system will provide YEAR1 and YEAR2 for which detail is required. 
+15. IWAI API will share details of cargo information which exist in IWAI system in JSON format. 
+16. ULIP system will provide the data in JSON Object format in response body. 
+ 
+Example: Data is shared by ULIP system, then IWAI-integration will make a request to 
+IWAI API. 
+ 
+Request: The request must be of the following format and passed within the URL body in 
+JSON format. 
+ULIP Integration Document   
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 5.0 Page 24 of 70 
+ 
+For Staging: https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/IWAI/06 
+ 
+{   "year1":"FY 20-21", "year2":"FY 21-22" } 
+ 
+1.8.2 Curl URL 
+curl --location --request POST 'https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/IWAI/06' \ 
+--
+header 'Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1bGlwIiwiaWF0IjoxNjQ5MjIw
+NDA0LCJhcHBzIjoiZGF0YXB1c2gifQ.XG9zpDhZ0hqXFVHHtucnyYNJ4yQHXmTRWNAqHH1M
+M--Swd7_iJaKQ2zr0LKap-YKzLmq85SzkkPyh39KE0KR7w' \ 
+--header 'Content-Type: application/json' \ 
+--header 'Accept: application/json' \ 
+--data-raw '{    "year1":"FY 20-21", 
+    "year2":"FY 21-22" }' 
+ 
+For Production: https://www.ulip.dpiit.gov.in/ulip/v1.0.0/IWAI/06 
+ 
+{    "year1":"FY 20-21", "year2":"FY 21-22" } 
+ 
+1.8.3 Curl URL 
+curl --location --request POST 'https://www.ulip.dpiit.gov.in/ulip/v1.0.0/IWAI/06' \ 
+--
+header 'Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1bGlwIiwiaWF0IjoxNjQ5MjIw
+NDA0LCJhcHBzIjoiZGF0YXB1c2gifQ.XG9zpDhZ0hqXFVHHtucnyYNJ4yQHXmTRWNAqHH1M
+M--Swd7_iJaKQ2zr0LKap-YKzLmq85SzkkPyh39KE0KR7w' \ 
+--header 'Content-Type: application/json' \ 
+--header 'Accept: application/json' \ 
+--data-raw '{"year1":"FY 20-21", "year2":"FY 21-22"}' 
+ 
+For obtaining authentication token, refer Section 1.18 
+1.8.4 Response 
+To acknowledge the above request, ULIP will send the response below -  
+ 
+a) In case of invalid format 
+ 
+1. Invalid year1 and year2 
+ 
+{    "response": null, 
+    "error": "true", 
+    "code": "400", 
+    "message": "Data format failed OR wrong value entered at:    year1. Format should follow  [a-
+zA-Z\\d-\\s]{8} } 
+ 
+2. In case of year1 and year2 is null or not match in IWAI System 
+ 
+ULIP Integration Document   
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 5.0 Page 25 of 70 
+ 
+{    "response": [ 
+        { 
+            "response": { 
+                "status": "error", 
+                "data": null, 
+                "message": "No columns were selected", 
+                "total_records": 0, 
+                "previous_page": null, 
+                "next_page": null 
+            }, 
+            "responseStatus": "SUCCESS" 
+        } 
+    ], 
+    "error": "false", 
+    "code": "200", 
+    "message": "Success" } 
+ 
+b) In case of year1 and year2 Exist in IWAI System 
+ 
+{    "response": [ 
+        { 
+            "response": { 
+                "status": "success", 
+                "data": [ 
+                    { 
+                        "nw": "NW-1", 
+                        "Year1": 2330.94, 
+                        "Year2": 1060.46, 
+                        "month": "March", 
+                        "toataly1": 4460.89, 
+                        "totaly2": 3070.3 
+                    }, 
+                    { 
+                        "nw": "NW-97", 
+                        "Year1": 655.87, 
+                        "Year2": 1016.26, 
+                        "month": "March", 
+                        "toataly1": 4460.89, 
+                        "totaly2": 3070.3 
+                    }, 
+                    { 
+                        "nw": "NW-68", 
+                        "Year1": 181.18, 
+                        "Year2": 112.73, 
+                        "month": "March", 
+                        "toataly1": 4460.89, 
+                        "totaly2": 3070.3 
+                    }, 
+                    { 
+ULIP Integration Document   
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 5.0 Page 26 of 70 
+ 
+                        "nw": "NW-44", 
+                        "Year1": 0.97, 
+                        "Year2": 2.77, 
+                        "month": "March", 
+                        "toataly1": 4460.89, 
+                        "totaly2": 3070.3 
+                    }, 
+                    { 
+                        "nw": "Others", 
+                        "Year1": 21.63, 
+                        "Year2": 1.43, 
+                        "month": "March", 
+                        "toataly1": 4460.89, 
+                        "totaly2": 3070.3 
+                    } 
+                ], 
+                "message": null, 
+                "total_records": 0, 
+                "previous_page": null, 
+                "next_page": null 
+            }, 
+            "responseStatus": "SUCCESS" 
+        } 
+    ], 
+    "error": "false", 
+    "code": "200", 
+    "message": "Success" } 
+ 
+Status Code 200: success data response 
+Status Code 400: Bad request (Invalid json syntax, invalid json key) 
+Status Code 401 or 403: Unauthenticated or Unauthorized 
+Status Code 500: Some internal server errors occurred 
+Status Code 502: Server is not responding. 
+1.9 IWAI/07 
+ 
+This API will take FYEAR to connect with IWAI API to get data. 
+ 
+S. 
+No. 
+Field Name Field Description Format Required/Not – 
+Required 
+Length 
+1 fYear fYear as available in 
+IWAI system. 
+[a-zA-Z\d-\s]{8} Required 8 
+1.9.1 Technical Approach  
+17. All the data will be shared through rest web services. 
+18. ULIP system will provide FYEAR for which detail is required. 
+19. IWAI API will share details of cargo information which exist in IWAI system in JSON format. 
+20. ULIP system will provide the data in JSON Object format in response body. 
+ULIP Integration Document   
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 5.0 Page 27 of 70 
+ 
+ 
+Example: Data is shared by ULIP system, then IWAI-integration will make a request to 
+IWAI API. 
+ 
+Request: The request must be of the following format and passed within the URL body in 
+JSON format. 
+ 
+For Staging: https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/IWAI/07 
+ 
+{"fYear":"FY 20-21"} 
+ 
+1.9.2 Curl URL 
+curl --location --request POST 'https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/IWAI/07' \ 
+--
+header 'Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1bGlwIiwiaWF0IjoxNjQ5MjIw
+NDA0LCJhcHBzIjoiZGF0YXB1c2gifQ.XG9zpDhZ0hqXFVHHtucnyYNJ4yQHXmTRWNAqHH1M
+M--Swd7_iJaKQ2zr0LKap-YKzLmq85SzkkPyh39KE0KR7w' \ 
+--header 'Content-Type: application/json' \ 
+--header 'Accept: application/json' \ 
+--data-raw '{"fYear":"FY 20-21"}' 
+ 
+For Production: https://www.ulip.dpiit.gov.in/ulip/v1.0.0/IWAI/07 
+ 
+{"fYear":"FY 20-21"} 
+ 
+1.9.3 Curl URL 
+curl --location --request POST 'https://www.ulip.dpiit.gov.in/ulip/v1.0.0/IWAI/07' \ 
+--
+header 'Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1bGlwIiwiaWF0IjoxNjQ5MjIw
+NDA0LCJhcHBzIjoiZGF0YXB1c2gifQ.XG9zpDhZ0hqXFVHHtucnyYNJ4yQHXmTRWNAqHH1M
+M--Swd7_iJaKQ2zr0LKap-YKzLmq85SzkkPyh39KE0KR7w' \ 
+--header 'Content-Type: application/json' \ 
+--header 'Accept: application/json' \ 
+--data-raw '{"fYear":"FY 20-21"}' 
+ 
+For obtaining authentication token, refer Section 1.18 
+ 
+1.9.4 Response 
+To acknowledge the above request, ULIP will send the below response –  
+a) In case of invalid format 
+ 
+1. Invalid fYear 
+ 
+{   "response": null, 
+ULIP Integration Document   
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 5.0 Page 28 of 70 
+ 
+    "error": "true", 
+    "code": "400", 
+    "message": "Data format failed OR wrong value entered at:    fYear. Format should follow  [a-
+zA-Z\\d-\\s]{8} } 
+ 
+2. In case of fYear is null or not match in IWAI System 
+ 
+{    "response": [ 
+        { 
+            "response": { 
+                "status": "error", 
+                "data": null, 
+                "message": "No columns were selected", 
+                "total_records": 0, 
+                "previous_page": null, 
+                "next_page": null 
+            }, 
+            "responseStatus": "SUCCESS" 
+        } 
+    ], 
+    "error": "false", 
+    "code": "200", 
+    "message": "Success" } 
+ 
+ 
+ 
+b) In case of fYear Exist in IWAI System 
+ 
+{    "response": [ 
+        { 
+            "response": { 
+                "status": "success", 
+                "data": [ 
+                    [ 
+                        { 
+                            "value": "17b602fc-e2c3-11ea-a765-c809a8f74e0e", 
+                            "text": "Ashuganj", 
+                            "nw": "IBP" 
+                        }, 
+                        { 
+                            "value": "17b7b692-e2c3-11ea-a765-c809a8f74e0e", 
+                            "text": "Basirhat", 
+                            "nw": "NW-44" 
+                        }, 
+                        { 
+                            "value": "17b71982-e2c3-11ea-a765-c809a8f74e0e", 
+                            "text": "Bhomoraguri", 
+                            "nw": "NW-2" 
+                        }, 
+ULIP Integration Document   
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 5.0 Page 29 of 70 
+ 
+                        { 
+                            "value": "4f2c71d3-69fd-11eb-a9d3-005056883868", 
+                            "text": "Bolgatty", 
+                            "nw": "NW-3" 
+                        }, 
+                        { 
+                            "value": "1c40ca88-50bc-11eb-a9d3-005056883868", 
+                            "text": "BTP", 
+                            "nw": "NW-3" 
+                        }, 
+                        { 
+                            "value": "17b65b08-e2c3-11ea-a765-c809a8f74e0e", 
+                            "text": "Budge Budge", 
+                            "nw": "NW-1" 
+                        }, 
+                        { 
+                            "value": "ab3a6071-f0d9-11ea-84cf-005056883868", 
+                            "text": "Cochin Port", 
+                            "nw": "NW-3" 
+                        }, 
+                        { 
+                            "value": "17b7c643-e2c3-11ea-a765-c809a8f74e0e", 
+                            "text": "Dahej", 
+                            "nw": "NW-73" 
+                        }, 
+                        { 
+                            "value": "17b65d8a-e2c3-11ea-a765-c809a8f74e0e", 
+                            "text": "Dainhat", 
+                            "nw": "NW-1" 
+                        }, 
+                        { 
+                            "value": "17b728b8-e2c3-11ea-a765-c809a8f74e0e", 
+                            "text": "Dakkhin Path", 
+                            "nw": "NW-2" 
+                        }, 
+                        { 
+                            "value": "376c638f-6d21-11eb-a9d3-005056883868", 
+                            "text": "Dhaltitha", 
+                            "nw": "NW-44" 
+                        }, 
+                        { 
+                            "value": "17b70661-e2c3-11ea-a765-c809a8f74e0e", 
+                            "text": "Dharamtar", 
+                            "nw": "NW-10" 
+                        }, 
+                        { 
+                            "value": "17b72cd0-e2c3-11ea-a765-c809a8f74e0e", 
+                            "text": "Dhubri", 
+                            "nw": "NW-2" 
+ULIP Integration Document   
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 5.0 Page 30 of 70 
+ 
+                        }, 
+                        { 
+                            "value": "17b6602e-e2c3-11ea-a765-c809a8f74e0e", 
+                            "text": "Diamond Harbour", 
+                            "nw": "NW-1" 
+                        }, 
+                        { 
+                            "value": "17b79eaa-e2c3-11ea-a765-c809a8f74e0e", 
+                            "text": "FACT Ammonia jetty(W. Island)", 
+                            "nw": "NW-3" 
+                        }, 
+                        { 
+                            "value": "17b7a49e-e2c3-11ea-a765-c809a8f74e0e", 
+                            "text": "FACT, PD", 
+                            "nw": "NW-3" 
+                        }, 
+                        { 
+                            "value": "17b8bb3d-e2c3-11ea-a765-c809a8f74e0e", 
+                            "text": "Fine Arts Jetty", 
+                            "nw": "NW-3" 
+                        }, 
+                        { 
+                            "value": "17b66f50-e2c3-11ea-a765-c809a8f74e0e", 
+                            "text": "Garamghat (Sahibganj)", 
+                            "nw": "NW-1" 
+                        }, 
+                        { 
+                            "value": "17b6718f-e2c3-11ea-a765-c809a8f74e0e", 
+                            "text": "Guptipara", 
+                            "nw": "NW-1" 
+                        }, 
+                        { 
+                            "value": "17b7435b-e2c3-11ea-a765-c809a8f74e0e", 
+                            "text": "Guwahati", 
+                            "nw": "NW-2" 
+                        }, 
+                        { 
+                            "value": "17b67743-e2c3-11ea-a765-c809a8f74e0e", 
+                            "text": "Haldia", 
+                            "nw": "NW-1" 
+                        }, 
+                        { 
+                            "value": "17b8aacb-e2c3-11ea-a765-c809a8f74e0e", 
+                            "text": "Hathidah", 
+                            "nw": "NW-1" 
+                        }, 
+                        { 
+                            "value": "17b67c39-e2c3-11ea-a765-c809a8f74e0e", 
+                            "text": "HDC Fly Ash Jetty, Haldia", 
+ULIP Integration Document   
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 5.0 Page 31 of 70 
+ 
+                            "nw": "NW-1" 
+                        }, 
+                        { 
+                            "value": "17b6695a-e2c3-11ea-a765-c809a8f74e0e", 
+                            "text": "IWAI G.R. Jetty-2", 
+                            "nw": "NW-1" 
+                        }, 
+                        { 
+                            "value": "17b66c1e-e2c3-11ea-a765-c809a8f74e0e", 
+                            "text": "IWAI Gaighat (Patna)", 
+                            "nw": "NW-1" 
+                        }, 
+                        { 
+                            "value": "17b6825d-e2c3-11ea-a765-c809a8f74e0e", 
+                            "text": "IWAI Haldia Fly Ash Jetty", 
+                            "nw": "NW-1" 
+                        }, 
+                        { 
+                            "value": "17b7a8e7-e2c3-11ea-a765-c809a8f74e0e", 
+                            "text": "IWAI Kakkanad terminal", 
+                            "nw": "NW-3" 
+                        }, 
+                        { 
+                            "value": "17b8a7cf-e2c3-11ea-a765-c809a8f74e0e", 
+                            "text": "IWAI Sahibganj Ro-Ro Terminal", 
+                            "nw": "NW-1" 
+                        }, 
+                        { 
+                            "value": "17b7d3de-e2c3-11ea-a765-c809a8f74e0e", 
+                            "text": "Jaigad", 
+                            "nw": "NW-91" 
+                        }, 
+                        { 
+                            "value": "17b74d38-e2c3-11ea-a765-c809a8f74e0e", 
+                            "text": "Jogighopa", 
+                            "nw": "NW-2" 
+                        }, 
+                        { 
+                            "value": "17b68687-e2c3-11ea-a765-c809a8f74e0e", 
+                            "text": "Kalna", 
+                            "nw": "NW-1" 
+                        }, 
+                        { 
+                            "value": "17b8c5f2-e2c3-11ea-a765-c809a8f74e0e", 
+                            "text": "Kolaghat", 
+                            "nw": "NW-1" 
+                        }, 
+                        { 
+                            "value": "80273e9e-f672-11ea-a9d3-005056883868", 
+ULIP Integration Document   
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 5.0 Page 32 of 70 
+ 
+                            "text": "Kolaghat", 
+                            "nw": "NW-86" 
+                        }, 
+                        { 
+                            "value": "17b7fee9-e2c3-11ea-a765-c809a8f74e0e", 
+                            "text": "Kolkata", 
+                            "nw": "NW-1" 
+                        }, 
+                        { 
+                            "value": "2b1280bf-fbe4-11ea-a9d3-005056883868", 
+                            "text": "Kolkata Dock System", 
+                            "nw": "NW-1" 
+                        }, 
+                        { 
+                            "value": "17b8a0da-e2c3-11ea-a765-c809a8f74e0e", 
+                            "text": "KoPT", 
+                            "nw": "NW-1" 
+                        }, 
+                        { 
+                            "value": "17b68fb6-e2c3-11ea-a765-c809a8f74e0e", 
+                            "text": "KP Dock, Kolkata", 
+                            "nw": "NW-1" 
+                        }, 
+                        { 
+                            "value": "17b70b97-e2c3-11ea-a765-c809a8f74e0e", 
+                            "text": "Magdalla", 
+                            "nw": "NW-100" 
+                        }, 
+                        { 
+                            "value": "17b69735-e2c3-11ea-a765-c809a8f74e0e", 
+                            "text": "Manglahat (Rajmahal)", 
+                            "nw": "NW-1" 
+                        }, 
+                        { 
+                            "value": "17b61358-e2c3-11ea-a765-c809a8f74e0e", 
+                            "text": "Narayanganj", 
+                            "nw": "IBP" 
+                        }, 
+                        { 
+                            "value": "17b6a5bc-e2c3-11ea-a765-c809a8f74e0e", 
+                            "text": "Narkelbari", 
+                            "nw": "NW-1" 
+                        }, 
+                        { 
+                            "value": "309e316f-50bc-11eb-a9d3-005056883868", 
+                            "text": "NCB", 
+                            "nw": "NW-3" 
+                        }, 
+                        { 
+ULIP Integration Document   
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 5.0 Page 33 of 70 
+ 
+                            "value": "17b78500-e2c3-11ea-a765-c809a8f74e0e", 
+                            "text": "Phulani", 
+                            "nw": "NW-2" 
+                        }, 
+                        { 
+                            "value": "17b867ea-e2c3-11ea-a765-c809a8f74e0e", 
+                            "text": "Putimary Jetty", 
+                            "nw": "NW-1" 
+                        }, 
+                        { 
+                            "value": "6e67a16d-50bb-11eb-a9d3-005056883868", 
+                            "text": "Q-1 Berth Cochin Port Trust", 
+                            "nw": "NW-3" 
+                        }, 
+                        { 
+                            "value": "a7897080-50bb-11eb-a9d3-005056883868", 
+                            "text": "Q-4 Berth Cochin Port Trust", 
+                            "nw": "NW-3" 
+                        }, 
+                        { 
+                            "value": "17b7ad7f-e2c3-11ea-a765-c809a8f74e0e", 
+                            "text": "Q10 berth- Cochin Port Trust", 
+                            "nw": "NW-3" 
+                        }, 
+                        { 
+                            "value": "17b6eced-e2c3-11ea-a765-c809a8f74e0e", 
+                            "text": "Rajmahal", 
+                            "nw": "NW-1" 
+                        }, 
+                        { 
+                            "value": "17b7cf44-e2c3-11ea-a765-c809a8f74e0e", 
+                            "text": "Revdanda Salav Jetty", 
+                            "nw": "NW-85" 
+                        }, 
+                        { 
+                            "value": "55f9f5a5-53d3-11eb-a9d3-005056883868", 
+                            "text": "Sagar Anchorage", 
+                            "nw": "NW-1" 
+                        }, 
+                        { 
+                            "value": "17b6f3cc-e2c3-11ea-a765-c809a8f74e0e", 
+                            "text": "Sahibganj", 
+                            "nw": "NW-1" 
+                        }, 
+                        { 
+                            "value": "17b6faca-e2c3-11ea-a765-c809a8f74e0e", 
+                            "text": "Semaria", 
+                            "nw": "NW-1" 
+                        }, 
+ULIP Integration Document   
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 5.0 Page 34 of 70 
+ 
+                        { 
+                            "value": "17b8b5e6-e2c3-11ea-a765-c809a8f74e0e", 
+                            "text": "Sukhsena Ghat (Rajmahal)", 
+                            "nw": "NW-1" 
+                        }, 
+                        { 
+                            "value": "17b70075-e2c3-11ea-a765-c809a8f74e0e", 
+                            "text": "T.T. Shed", 
+                            "nw": "NW-1" 
+                        }, 
+                        { 
+                            "value": "17b4977b-e2c3-11ea-a765-c809a8f74e0e", 
+                            "text": "Egypt", 
+                            "nw": "Foreign Port" 
+                        }, 
+                        { 
+                            "value": "17b64f7c-e2c3-11ea-a765-c809a8f74e0e", 
+                            "text": "Revdanda Salav Jetty", 
+                            "nw": "NA" 
+                        } 
+                    ], 
+                    [ 
+                        { 
+                            "value": "17b7139a-e2c3-11ea-a765-c809a8f74e0e", 
+                            "text": "6 No Char", 
+                            "nw": "NW-2" 
+                        }, 
+                        { 
+                            "value": "17b602fc-e2c3-11ea-a765-c809a8f74e0e", 
+                            "text": "Ashuganj", 
+                            "nw": "IBP" 
+                        }, 
+                        { 
+                            "value": "17b71588-e2c3-11ea-a765-c809a8f74e0e", 
+                            "text": "Bagbor", 
+                            "nw": "NW-2" 
+                        }, 
+                        { 
+                            "value": "1c40ca88-50bc-11eb-a9d3-005056883868", 
+                            "text": "BTP", 
+                            "nw": "NW-3" 
+                        }, 
+                        { 
+                            "value": "17b72191-e2c3-11ea-a765-c809a8f74e0e", 
+                            "text": "Chapar", 
+                            "nw": "NW-2" 
+                        }, 
+                        { 
+                            "value": "17b723aa-e2c3-11ea-a765-c809a8f74e0e", 
+ULIP Integration Document   
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 5.0 Page 35 of 70 
+ 
+                            "text": "Chatalapara", 
+                            "nw": "NW-2" 
+                        }, 
+                        { 
+                            "value": "f10828c3-1f54-11eb-a9d3-005056883868", 
+                            "text": "Chilmari", 
+                            "nw": "IBP" 
+                        }, 
+                        { 
+                            "value": "17b725b7-e2c3-11ea-a765-c809a8f74e0e", 
+                            "text": "Chunari", 
+                            "nw": "NW-2" 
+                        }, 
+                        { 
+                            "value": "142ecd04-6d21-11eb-a9d3-005056883868", 
+                            "text": "Itinda", 
+                            "nw": "NW-44" 
+                        }, 
+                        { 
+                            "value": "17b6695a-e2c3-11ea-a765-c809a8f74e0e", 
+                            "text": "IWAI G.R. Jetty-2", 
+                            "nw": "NW-1" 
+                        }, 
+                        { 
+                            "value": "17b66c1e-e2c3-11ea-a765-c809a8f74e0e", 
+                            "text": "IWAI Gaighat (Patna)", 
+                            "nw": "NW-1" 
+                        }, 
+                        { 
+                            "value": "17b7d3de-e2c3-11ea-a765-c809a8f74e0e", 
+                            "text": "Jaigad", 
+                            "nw": "NW-91" 
+                        }, 
+                        { 
+                            "value": "17b74d38-e2c3-11ea-a765-c809a8f74e0e", 
+                            "text": "Jogighopa", 
+                            "nw": "NW-2" 
+                        }, 
+                        { 
+                            "value": "17b74ff7-e2c3-11ea-a765-c809a8f74e0e", 
+                            "text": "Kadamtala", 
+                            "nw": "NW-2" 
+                        }, 
+                        { 
+                            "value": "17b8c0f8-e2c3-11ea-a765-c809a8f74e0e", 
+                            "text": "Kalyani", 
+                            "nw": "NW-1" 
+                        }, 
+                        { 
+ULIP Integration Document   
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 5.0 Page 36 of 70 
+ 
+                            "value": "17b75217-e2c3-11ea-a765-c809a8f74e0e", 
+                            "text": "Kamalabari", 
+                            "nw": "NW-2" 
+                        }, 
+                        { 
+                            "value": "17b68b2f-e2c3-11ea-a765-c809a8f74e0e", 
+                            "text": "Karagola", 
+                            "nw": "NW-1" 
+                        }, 
+                        { 
+                            "value": "17b75425-e2c3-11ea-a765-c809a8f74e0e", 
+                            "text": "Karikhaiti", 
+                            "nw": "NW-2" 
+                        }, 
+                        { 
+                            "value": "17b499a6-e2c3-11ea-a765-c809a8f74e0e", 
+                            "text": "Foreign Port", 
+                            "nw": "Foreign Port" 
+                        }, 
+                        { 
+                            "value": "17b49fa2-e2c3-11ea-a765-c809a8f74e0e", 
+                            "text": "Gdynia", 
+                            "nw": "Foreign Port" 
+                        }, 
+                        { 
+                            "value": "17b4a389-e2c3-11ea-a765-c809a8f74e0e", 
+                            "text": "Haiphong", 
+                            "nw": "Foreign Port" 
+                        }, 
+                        { 
+                            "value": "17b4a60f-e2c3-11ea-a765-c809a8f74e0e", 
+                            "text": "Ho Chi Minh", 
+                            "nw": "Foreign Port" 
+                        }, 
+                        { 
+                            "value": "17b804b9-e2c3-11ea-a765-c809a8f74e0e", 
+                            "text": "Indonesia", 
+                            "nw": "Foreign Port" 
+                        }, 
+                        { 
+                            "value": "17b4a7e2-e2c3-11ea-a765-c809a8f74e0e", 
+                            "text": "Jabel Ali", 
+                            "nw": "Foreign Port" 
+                        }, 
+                        { 
+                            "value": "17b4aa70-e2c3-11ea-a765-c809a8f74e0e", 
+                            "text": "Jakiganj", 
+                            "nw": "Foreign Port" 
+                        }, 
+ULIP Integration Document   
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 5.0 Page 37 of 70 
+ 
+                        { 
+                            "value": "17b4af4e-e2c3-11ea-a765-c809a8f74e0e", 
+                            "text": "Jebel Ali", 
+                            "nw": "Foreign Port" 
+                        }, 
+                        { 
+                            "value": "17b4b4e2-e2c3-11ea-a765-c809a8f74e0e", 
+                            "text": "Kaohsiung", 
+                            "nw": "Foreign Port" 
+                        }, 
+                        { 
+                            "value": "17b4b7e8-e2c3-11ea-a765-c809a8f74e0e", 
+                            "text": "Karachi", 
+                            "nw": "Foreign Port" 
+                        }, 
+                        { 
+                            "value": "17b4f7a6-e2c3-11ea-a765-c809a8f74e0e", 
+                            "text": "Maura Berau", 
+                            "nw": "Foreign Port" 
+                        }, 
+                        { 
+                            "value": "17b4f9d1-e2c3-11ea-a765-c809a8f74e0e", 
+                            "text": "Merak", 
+                            "nw": "Foreign Port" 
+                        }, 
+                        { 
+                            "value": "17b4fc17-e2c3-11ea-a765-c809a8f74e0e", 
+                            "text": "Mesaieed", 
+                            "nw": "Foreign Port" 
+                        }, 
+                        { 
+                            "value": "17b4fe09-e2c3-11ea-a765-c809a8f74e0e", 
+                            "text": "Meulaboh", 
+                            "nw": "Foreign Port" 
+                        }, 
+                        { 
+                            "value": "17b50028-e2c3-11ea-a765-c809a8f74e0e", 
+                            "text": "Mina Saqr", 
+                            "nw": "Foreign Port" 
+                        }, 
+                        { 
+                            "value": "17b502ec-e2c3-11ea-a765-c809a8f74e0e", 
+                            "text": "Mina Zayed", 
+                            "nw": "Foreign Port" 
+                        }, 
+                        { 
+                            "value": "17b505c0-e2c3-11ea-a765-c809a8f74e0e", 
+                            "text": "Minasaqr", 
+                            "nw": "Foreign Port" 
+ULIP Integration Document   
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 5.0 Page 38 of 70 
+ 
+                        }, 
+                        { 
+                            "value": "17b5084a-e2c3-11ea-a765-c809a8f74e0e", 
+                            "text": "Muara Berau", 
+                            "nw": "Foreign Port" 
+                        }, 
+                        { 
+                            "value": "17b51750-e2c3-11ea-a765-c809a8f74e0e", 
+                            "text": "Philipines", 
+                            "nw": "Foreign Port" 
+                        }, 
+                        { 
+                            "value": "17b52c64-e2c3-11ea-a765-c809a8f74e0e", 
+                            "text": "Richards Bay", 
+                            "nw": "Foreign Port" 
+                        }, 
+                        { 
+                            "value": "17b52ef8-e2c3-11ea-a765-c809a8f74e0e", 
+                            "text": "Ruwais", 
+                            "nw": "Foreign Port" 
+                        }, 
+                        { 
+                            "value": "17b536cf-e2c3-11ea-a765-c809a8f74e0e", 
+                            "text": "S.Arabia", 
+                            "nw": "Foreign Port" 
+                        }, 
+                        { 
+                            "value": "17b53dfd-e2c3-11ea-a765-c809a8f74e0e", 
+                            "text": "Samarinda", 
+                            "nw": "Foreign Port" 
+                        }, 
+                        { 
+                            "value": "17b5494d-e2c3-11ea-a765-c809a8f74e0e", 
+                            "text": "Singapore", 
+                            "nw": "Foreign Port" 
+                        }, 
+                        { 
+                            "value": "17b54d1a-e2c3-11ea-a765-c809a8f74e0e", 
+                            "text": "Sohar", 
+                            "nw": "Foreign Port" 
+                        }, 
+                        { 
+                            "value": "17b5577a-e2c3-11ea-a765-c809a8f74e0e", 
+                            "text": "Swinoujscie", 
+                            "nw": "Foreign Port" 
+                        }, 
+                        { 
+                            "value": "17b55d47-e2c3-11ea-a765-c809a8f74e0e", 
+                            "text": "Taboneo", 
+ULIP Integration Document   
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 5.0 Page 39 of 70 
+ 
+                            "nw": "Foreign Port" 
+                        }, 
+                        { 
+                            "value": "17b56255-e2c3-11ea-a765-c809a8f74e0e", 
+                            "text": "Tarakan", 
+                            "nw": "Foreign Port" 
+                        }, 
+                        { 
+                            "value": "17b56d97-e2c3-11ea-a765-c809a8f74e0e", 
+                            "text": "Ust Luga", 
+                            "nw": "Foreign Port" 
+                        }, 
+                        { 
+                            "value": "17b574b8-e2c3-11ea-a765-c809a8f74e0e", 
+                            "text": "Vung Tau", 
+                            "nw": "Foreign Port" 
+                        }, 
+                        { 
+                            "value": "17b61cc7-e2c3-11ea-a765-c809a8f74e0e", 
+                            "text": "MAGDALLA", 
+                            "nw": "NA" 
+                        }, 
+                        { 
+                            "value": "17b6212e-e2c3-11ea-a765-c809a8f74e0e", 
+                            "text": "NA", 
+                            "nw": "NA" 
+                        }, 
+                        { 
+                            "value": "17b64f7c-e2c3-11ea-a765-c809a8f74e0e", 
+                            "text": "Revdanda Salav Jetty", 
+                            "nw": "NA" 
+                        }, 
+                        { 
+                            "value": "17b8c83f-e2c3-11ea-a765-c809a8f74e0e", 
+                            "text": "Silighat, Assam", 
+                            "nw": "NA" 
+                        } 
+                    ] 
+                ], 
+                "message": null, 
+                "total_records": 0, 
+                "previous_page": null, 
+                "next_page": null 
+            }, 
+            "responseStatus": "SUCCESS" 
+        } 
+    ], 
+    "error": "false", 
+    "code": "200", 
+ULIP Integration Document   
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 5.0 Page 40 of 70 
+ 
+    "message": "Success" } 
+ 
+Status Code 200: success data response 
+Status Code 400: Bad request (Invalid json syntax, invalid json key) 
+Status Code 401 or 403: Unauthenticated or Unauthorized 
+Status Code 500: Some internal server errors occurred 
+Status Code 502: Server is not responding. 
+1.10  IWAI/08 
+ 
+This API will take YEAR1, YEAR2, NWTYPE and TYPE to connect with IWAI API to get 
+data. 
+ 
+S. No. Field Name Field Description Format Required/Not 
+– Required 
+Length 
+1 year1 year1 as available in 
+IWAI system. 
+[a-zA-Z\d-\s]{8} Required 8 
+2 year2 year2 as available in 
+IWAI system. 
+[a-zA-Z\d-\s]{8} Required 8 
+3 nwtype nwtype as available 
+in IWAI system. 
+N/A Not Required N/A 
+4 type type as available in 
+IWAI system. 
+N/A Not Required N/A 
+1.10.1 Technical Approach  
+21. All the data will be shared through rest web services. 
+22. ULIP system will provide  YEAR1, YEAR2, NWTYPE and TYPE for which detail is 
+required. 
+23. IWAI API will share details of cargo information which exist in IWAI system in JSON format. 
+24. ULIP system will provide the data in JSON Object format in response body. 
+ 
+Example: Data is shared by ULIP system, then IWAI-integration will make a request to 
+IWAI API. 
+ 
+Request: The request must be of the following format and passed within the URL body in 
+JSON format. 
+ 
+For Staging: https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/IWAI/08 
+ 
+{   "year1":"FY 20-21", 
+    "year2":"FY 21-22", 
+    "nwtype": "", 
+    "type": "" } 
+ULIP Integration Document   
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 5.0 Page 41 of 70 
+ 
+1.10.2 Curl URL 
+curl --location --request POST 'https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/IWAI/08' \ 
+--
+header 'Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1bGlwIiwiaWF0IjoxNjQ5MjIw
+NDA0LCJhcHBzIjoiZGF0YXB1c2gifQ.XG9zpDhZ0hqXFVHHtucnyYNJ4yQHXmTRWNAqHH1M
+M--Swd7_iJaKQ2zr0LKap-YKzLmq85SzkkPyh39KE0KR7w' \ 
+--header 'Content-Type: application/json' \ 
+--header 'Accept: application/json' \ 
+--data-raw '{"year1":"FY 20-21",  "year2":"FY 21-22",   "nwtype": "",   "type": ""}' 
+ 
+For Production: https://www.ulip.dpiit.gov.in/ulip/v1.0.0/IWAI/08 
+ 
+{   "year1":"FY 20-21",   "year2":"FY 21-22",    "nwtype": "",    "type": "" } 
+ 
+1.10.3 Curl URL 
+curl --location --request POST 'https://www.ulip.dpiit.gov.in/ulip/v1.0.0/IWAI/08' \ 
+--
+header 'Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1bGlwIiwiaWF0IjoxNjQ5MjIw
+NDA0LCJhcHBzIjoiZGF0YXB1c2gifQ.XG9zpDhZ0hqXFVHHtucnyYNJ4yQHXmTRWNAqHH1M
+M--Swd7_iJaKQ2zr0LKap-YKzLmq85SzkkPyh39KE0KR7w' \ 
+--header 'Content-Type: application/json' \ 
+--header 'Accept: application/json' \ 
+--data-raw '{   "year1":"FY 20-21",  "year2":"FY 21-22",    "nwtype": "",    "type": "" }' 
+ 
+For obtaining authentication token, refer Section 1.18 
+ 
+1.10.4 Response 
+ 
+To acknowledge the above request, ULIP will send the response below -  
+ 
+a) In case of invalid format 
+ 
+1. Invalid year1 and year2 
+ 
+{   "response": null, 
+    "error": "true", 
+    "code": "400", 
+    "message": "Data format failed OR wrong value entered at:    year1. Format should follow  [a-
+zA-Z\\d-\\s]{8} } 
+ 
+2. In case of year1 and year2 is null or not match in IWAI System 
+ 
+{    "response": [ 
+        { 
+            "response": { 
+ULIP Integration Document   
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 5.0 Page 42 of 70 
+ 
+                "status": "error", 
+                "data": null, 
+                "message": "No columns were selected", 
+                "total_records": 0, 
+                "previous_page": null, 
+                "next_page": null 
+            }, 
+            "responseStatus": "SUCCESS" 
+        } 
+    ], 
+    "error": "false", 
+    "code": "200", 
+    "message": "Success" } 
+ 
+b) In case of year1, year2, nwtype and type Exist in IWAI System 
+ 
+{    "response": [ 
+        { 
+            "response": { 
+                "status": "success", 
+                "data": [ 
+                    { 
+                        "teminal": "Magdalla", 
+                        "year1": 25.63, 
+                        "year2": 29.32, 
+                        "month": "March" 
+                    }, 
+                    { 
+                        "teminal": "Jaigad", 
+                        "year1": 9.26, 
+                        "year2": 22.45, 
+                        "month": "March" 
+                    }, 
+                    { 
+                        "teminal": "MbPT Anchorage", 
+                        "year1": 12.07, 
+                        "year2": 11.98, 
+                        "month": "March" 
+                    }, 
+                    { 
+                        "teminal": "Dharamtar", 
+                        "year1": 5.62, 
+                        "year2": 8.35, 
+                        "month": "March" 
+                    }, 
+                    { 
+                        "teminal": "Goa", 
+                        "year1": 8.46, 
+                        "year2": 4.58, 
+ULIP Integration Document   
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 5.0 Page 43 of 70 
+ 
+                        "month": "March" 
+                    }, 
+                    { 
+                        "teminal": "Krishnapatnam Port", 
+                        "year1": 0.0, 
+                        "year2": 2.76, 
+                        "month": "March" 
+                    }, 
+                    { 
+                        "teminal": "Others", 
+                        "year1": 18.26, 
+                        "year2": 23.08, 
+                        "month": "March" 
+                    } 
+                ], 
+                "message": null, 
+                "total_records": 0, 
+                "previous_page": null, 
+                "next_page": null 
+            }, 
+            "responseStatus": "SUCCESS" 
+        } 
+    ], 
+    "error": "false", 
+    "code": "200", 
+    "message": "Success" } 
+ 
+Status Code 200: success data response 
+Status Code 400: Bad request (Invalid json syntax, invalid json key) 
+Status Code 401 or 403: Unauthenticated or Unauthorized 
+Status Code 500: Some internal server error occurred 
+Status Code 502: Server is not responding. 
+ 
+1.11  IWAI/09 
+ 
+This API will take NWTYPE and HISTORICAL to connect with IWAI API to get data. 
+ 
+ 
+S. No. Field Name Field Description Format Required/No
+t – Required 
+Length 
+1 nwtype 
+ 
+nwtype as available in 
+IWAI system. 
+N/A Not Required N/A 
+2 historical 
+ 
+historical as available 
+in IWAI system. 
+^(?i)(true|false)$ Required N/A 
+ULIP Integration Document   
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 5.0 Page 44 of 70 
+ 
+1.11.1 Technical Approach  
+25. All the data will be shared through rest web services. 
+26. ULIP system will provide NWTYPE and HISTORICAL for which detail is required. 
+27. IWAI API will share details of cargo information which exist in IWAI system in JSON format. 
+28. ULIP system will provide the data in JSON Object format in response body. 
+ 
+Example: Data is shared by ULIP system, then IWAI-integration will make a request to 
+IWAI API. 
+ 
+Request: The request must be of the following format and passed within the URL body in 
+JSON format. 
+ 
+For Staging: https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/IWAI/09 
+ 
+{   "nwtype": "",   "historical": "true" } 
+ 
+1.11.2 Curl URL 
+curl --location --request POST 'https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/IWAI/09' \ 
+--
+header 'Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1bGlwIiwiaWF0IjoxNjQ5MjIw
+NDA0LCJhcHBzIjoiZGF0YXB1c2gifQ.XG9zpDhZ0hqXFVHHtucnyYNJ4yQHXmTRWNAqHH1M
+M--Swd7_iJaKQ2zr0LKap-YKzLmq85SzkkPyh39KE0KR7w' \ 
+--header 'Content-Type: application/json' \ 
+--header 'Accept: application/json' \ 
+--data-raw '{ "nwtype": "", "historical": "true" }' 
+ 
+For Production: https://www.ulip.dpiit.gov.in/ulip/v1.0.0/IWAI/09 
+ 
+{"nwtype": "",  "historical": "true"} 
+ 
+1.11.3 Curl URL 
+ 
+curl --location --request POST 'https://www.ulip.dpiit.gov.in/ulip/v1.0.0/IWAI/09' \ 
+--
+header 'Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1bGlwIiwiaWF0IjoxNjQ5MjIw
+NDA0LCJhcHBzIjoiZGF0YXB1c2gifQ.XG9zpDhZ0hqXFVHHtucnyYNJ4yQHXmTRWNAqHH1M
+M--Swd7_iJaKQ2zr0LKap-YKzLmq85SzkkPyh39KE0KR7w' \ 
+--header 'Content-Type: application/json' \ 
+--header 'Accept: application/json' \ 
+--data-raw '{"nwtype": "","historical": "true"}' 
+ 
+For obtaining authentication token, refer Section 1.18 
+ 
+ULIP Integration Document   
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 5.0 Page 45 of 70 
+ 
+1.11.4 Response 
+ 
+To acknowledge the above request, ULIP will send the response below -  
+ 
+a) Success response 
+ 
+{    "response": [ 
+        { 
+            "response": { 
+                "status": "success", 
+                "data": [ 
+                    { 
+                        "Seq": 1, 
+                        "Fyear": "FY 90-91", 
+                        "Traffic": 0.36 
+                    }, 
+                    { 
+                        "Seq": 2, 
+                        "Fyear": "FY 91-92", 
+                        "Traffic": 0.27 
+                    }, 
+                    { 
+                        "Seq": 3, 
+                        "Fyear": "FY 92-93", 
+                        "Traffic": 0.29 
+                    }, 
+                    { 
+                        "Seq": 4, 
+                        "Fyear": "FY 93-94", 
+                        "Traffic": 0.7 
+                    }, 
+                    { 
+                        "Seq": 5, 
+                        "Fyear": "FY 94-95", 
+                        "Traffic": 1.17 
+                    }, 
+                    { 
+                        "Seq": 6, 
+                        "Fyear": "FY 95-96", 
+                        "Traffic": 0.0 
+                    }, 
+                    { 
+                        "Seq": 7, 
+                        "Fyear": "FY 96-97", 
+                        "Traffic": 16.8 
+                    }, 
+                    { 
+                        "Seq": 8, 
+ULIP Integration Document   
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 5.0 Page 46 of 70 
+ 
+                        "Fyear": "FY 97-98", 
+                        "Traffic": 20.05 
+                    }, 
+                    { 
+                        "Seq": 9, 
+                        "Fyear": "FY 98-99", 
+                        "Traffic": 17.26 
+                    }, 
+                    { 
+                        "Seq": 10, 
+                        "Fyear": "FY 99-00", 
+                        "Traffic": 16.72 
+                    }, 
+                    { 
+                        "Seq": 11, 
+                        "Fyear": "FY 00-01", 
+                        "Traffic": 22.23 
+                    }, 
+                    { 
+                        "Seq": 12, 
+                        "Fyear": "FY 01-02", 
+                        "Traffic": 19.77 
+                    }, 
+                    { 
+                        "Seq": 13, 
+                        "Fyear": "FY 02-03", 
+                        "Traffic": 26.9 
+                    }, 
+                    { 
+                        "Seq": 14, 
+                        "Fyear": "FY 03-04", 
+                        "Traffic": 32.48 
+                    }, 
+                    { 
+                        "Seq": 15, 
+                        "Fyear": "FY 04-05", 
+                        "Traffic": 45.58 
+                    }, 
+                    { 
+                        "Seq": 16, 
+                        "Fyear": "FY 05-06", 
+                        "Traffic": 50.41 
+                    }, 
+                    { 
+                        "Seq": 17, 
+                        "Fyear": "FY 06-07", 
+                        "Traffic": 55.82 
+                    }, 
+                    { 
+ULIP Integration Document   
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 5.0 Page 47 of 70 
+ 
+                        "Seq": 18, 
+                        "Fyear": "FY 07-08", 
+                        "Traffic": 55.72 
+                    }, 
+                    { 
+                        "Seq": 19, 
+                        "Fyear": "FY 08-09", 
+                        "Traffic": 60.03 
+                    }, 
+                    { 
+                        "Seq": 26, 
+                        "Fyear": "FY 15-16", 
+                        "Traffic": 41.54 
+                    }, 
+                    { 
+                        "Seq": 27, 
+                        "Fyear": "FY 16-17", 
+                        "Traffic": 55.48 
+                    }, 
+                    { 
+                        "Seq": 28, 
+                        "Fyear": "FY 17-18", 
+                        "Traffic": 55.04 
+                    }, 
+                    { 
+                        "Seq": 29, 
+                        "Fyear": "FY 18-19", 
+                        "Traffic": 72.3 
+                    }, 
+                    { 
+                        "Seq": 29, 
+                        "Fyear": "FY 19-20", 
+                        "Traffic": 73.64 
+                    }, 
+                    { 
+                        "Seq": 29, 
+                        "Fyear": "FY 20-21", 
+                        "Traffic": 83.61 
+                    }, 
+                    { 
+                        "Seq": 29, 
+                        "Fyear": "FY 21-22", 
+                        "Traffic": 96.31 
+                    } 
+                ], 
+ 
+                "message": null, 
+                "total_records": 0, 
+                "previous_page": null, 
+ULIP Integration Document   
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 5.0 Page 48 of 70 
+ 
+                "next_page": null 
+            }, 
+            "responseStatus": "SUCCESS" 
+        } 
+    ], 
+    "error": "false", 
+    "code": "200", 
+    "message": "Success" } 
+ 
+ 
+Status Code 200: success data response 
+Status Code 400: Bad request (Invalid json syntax, invalid json key) 
+Status Code 401 or 403: Unauthenticated or Unauthorized 
+Status Code 500: Some internal server errors occurred 
+Status Code 502: Server is not responding. 
+ 
+1.12  IWAI/10 
+ 
+This API will connect with IWAI API to get data. 
+ 
+S. No. Field Name Field Description Format Required/Not – 
+Required 
+Length 
+1 N/A N/A N/A N/A N/A 
+ 
+1.12.1 Technical Approach  
+9. All the data will be shared through rest web services. 
+10. ULIP system will provide detail is required. 
+11. IWAI API will share details of national waterways information which exist in IWAI system 
+in JSON format. 
+12. ULIP system will provide the data in JSON Object format in response body. 
+ 
+Example: Data is shared by ULIP system, then IWAI-integration will make a request to 
+IWAI API. 
+ 
+Request: The request must be of the following format and passed within the URL body in 
+JSON format. 
+ 
+For Staging: https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/IWAI/10 
+ 
+{} 
+ 
+ULIP Integration Document   
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 5.0 Page 49 of 70 
+ 
+1.12.2 Curl URL 
+ 
+curl --location --request POST 'https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/IWAI/10' \ 
+--
+header 'Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1bGlwIiwiaWF0IjoxNjQ5MjIw
+NDA0LCJhcHBzIjoiZGF0YXB1c2gifQ.XG9zpDhZ0hqXFVHHtucnyYNJ4yQHXmTRWNAqHH1M
+M--Swd7_iJaKQ2zr0LKap-YKzLmq85SzkkPyh39KE0KR7w' \ 
+--header 'Content-Type: application/json' \ 
+--header 'Accept: application/json' \ 
+--data-raw '{}' 
+ 
+For Production: https://www.ulip.dpiit.gov.in/ulip/v1.0.0/IWAI/10 
+ 
+{} 
+ 
+1.12.3 Curl URL 
+curl --location --request POST 'https://www.ulip.dpiit.gov.in/ulip/v1.0.0/IWAI/10' \ 
+--
+header 'Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1bGlwIiwiaWF0IjoxNjQ5MjIw
+NDA0LCJhcHBzIjoiZGF0YXB1c2gifQ.XG9zpDhZ0hqXFVHHtucnyYNJ4yQHXmTRWNAqHH1M
+M--Swd7_iJaKQ2zr0LKap-YKzLmq85SzkkPyh39KE0KR7w' \ 
+--header 'Content-Type: application/json' \ 
+--header 'Accept: application/json' \ 
+--data-raw '{}' 
+ 
+For obtaining authentication token, refer Section 1.18 
+ 
+1.12.4 Response 
+To acknowledge the above request, ULIP will send the response below -  
+ 
+ 
+a) Success response 
+ 
+{    "response": [ 
+        { 
+            "response": [ 
+                { 
+                    "_id": "63c8cee3b15d5e120d842c79", 
+                    "name": "IBP Route 1, 2", 
+                    "stretches": [ 
+                        { 
+                            "name": "SIRAJGANJ_DAIKHOWA", 
+                            "displayName": "Sirajganj - Daikhowa", 
+                            "utmZone": 45 
+                        }, 
+ULIP Integration Document   
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 5.0 Page 50 of 70 
+ 
+                        { 
+                            "name": "ANGTIHARA_SIRAJGANJ", 
+                            "displayName": "Angtihara to Sirajganj", 
+                            "utmZone": 45 
+                        } 
+                    ] 
+                }, 
+                { 
+                    "_id": "6540e04ddb593d6d4c8d2700", 
+                    "name": "IBP Route 5, 6", 
+                    "stretches": [ 
+                        { 
+                            "name": "BISWANATHPUR_KHANDUA", 
+                            "displayName": "Jot Biswanathpur to DS Khandua", 
+                            "utmZone": 45 
+                        }, 
+                        { 
+                            "name": "TIKLICHAR_NIRMALCHAR", 
+                            "displayName": "Tiklichar to Nirmalchar", 
+                            "utmZone": 45 
+                        } 
+                    ] 
+                }, 
+                { 
+                    "_id": "6916f48152f1096d311fe935", 
+                    "name": "rapti", 
+                    "stretches": [ 
+                        { 
+                            "name": "RAPTI", 
+                            "displayName": "rapti", 
+                            "utmZone": 44 
+                        } 
+                    ], 
+                    "__v": 0 
+                } 
+            ], 
+            "responseStatus": "SUCCESS", 
+            "message": null 
+        } 
+    ], 
+    "error": "false", 
+    "code": "200", 
+    "message": "Success" } 
+ 
+Status Code 200: success data response 
+Status Code 400: Bad request (Invalid json syntax, invalid json key) 
+Status Code 401 or 403: Unauthenticated or Unauthorized 
+Status Code 500: Some internal server errors occurred 
+Status Code 502: Server is not responding. 
+ULIP Integration Document   
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 5.0 Page 51 of 70 
+ 
+1.13  IWAI/11 
+ 
+This API will connect with IWAI API to get data. 
+ 
+S. No. Field Name Field Description Format Required/Not – 
+Required 
+Length 
+1 N/A N/A N/A N/A N/A 
+ 
+1.13.1 Technical Approach  
+1. All the data will be shared through rest web services. 
+2. ULIP system will provide detail is required. 
+3. IWAI API will share details of national waterways information which exist in IWAI 
+system in JSON format. 
+4. ULIP system will provide the data in JSON Object format in response body. 
+ 
+Example: Data is shared by ULIP system, then IWAI-integration will make a request to 
+IWAI API. 
+ 
+Request: The request must be of the following format and passed within the URL body in 
+JSON format. 
+ 
+For Staging: https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/IWAI/11 
+ 
+{} 
+ 
+1.13.2 Curl URL 
+ 
+curl --location --request POST 'https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/IWAI/11' \ 
+--
+header 'Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1bGlwIiwiaWF0IjoxNjQ5MjIw
+NDA0LCJhcHBzIjoiZGF0YXB1c2gifQ.XG9zpDhZ0hqXFVHHtucnyYNJ4yQHXmTRWNAqHH1M
+M--Swd7_iJaKQ2zr0LKap-YKzLmq85SzkkPyh39KE0KR7w' \ 
+--header 'Content-Type: application/json' \ 
+--header 'Accept: application/json' \ 
+--data-raw '{}' 
+ 
+For Production: https://www.ulip.dpiit.gov.in/ulip/v1.0.0/IWAI/11 
+ 
+{} 
+ 
+1.13.3 Curl URL 
+ 
+curl --location --request POST 'https://www.ulip.dpiit.gov.in/ulip/v1.0.0/IWAI/11' \ 
+ULIP Integration Document   
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 5.0 Page 52 of 70 
+ 
+--
+header 'Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1bGlwIiwiaWF0IjoxNjQ5MjIw
+NDA0LCJhcHBzIjoiZGF0YXB1c2gifQ.XG9zpDhZ0hqXFVHHtucnyYNJ4yQHXmTRWNAqHH1M
+M--Swd7_iJaKQ2zr0LKap-YKzLmq85SzkkPyh39KE0KR7w' \ 
+--header 'Content-Type: application/json' \ 
+--header 'Accept: application/json' \ 
+--data-raw '{}' 
+ 
+For obtaining authentication token, refer Section 1.18 
+ 
+1.13.4 Response 
+ 
+To acknowledge the above request, ULIP will send the response below -  
+ 
+a) Success response 
+ 
+{    "response": [ 
+        { 
+            "response": [ 
+                { 
+                    "id": "69e0d3fdc7b7fdd56b816b58", 
+                    "nationalWaterway": "NW-2", 
+                    "stretch": "Pandu - Neamati", 
+                    "updatedAt": "2026-04-16T12:20:13.420Z", 
+                    "fromDate": "2026-04-12T00:00:00.000Z", 
+                    "toDate": "2026-04-15T00:00:00.000Z" 
+                }, 
+                { 
+                    "id": "69ca0999c7b7fdd56b41ca61", 
+                    "nationalWaterway": "NW-40", 
+                    "stretch": "Ghaghra Confluence to Duha Bihra", 
+                    "updatedAt": "2026-03-30T05:26:49.044Z", 
+                    "fromDate": "2026-03-24T00:00:00.000Z", 
+                    "toDate": "2026-03-25T00:00:00.000Z" 
+                }, 
+                { 
+                    "id": "69ca0a8fc7b7fdd56b41d10c", 
+                    "nationalWaterway": "NW-40", 
+                    "stretch": "Duha Bihra to Guptar Ghat", 
+                    "updatedAt": "2026-03-30T05:30:55.524Z", 
+                    "fromDate": "2026-03-19T00:00:00.000Z", 
+                    "toDate": "2026-03-24T00:00:00.000Z" 
+                }, 
+                { 
+                    "id": "69df76a9c7b7fdd56b7b90b5", 
+                    "nationalWaterway": "NW-5", 
+                    "stretch": "Dhamara To Pankapal", 
+                    "updatedAt": "2026-04-15T11:29:45.763Z", 
+ULIP Integration Document   
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 5.0 Page 53 of 70 
+ 
+                    "fromDate": "2026-03-22T00:00:00.000Z", 
+                    "toDate": "2026-03-30T00:00:00.000Z" 
+                }, 
+                { 
+                    "id": "69d4af94c7b7fdd56b60be42", 
+                    "nationalWaterway": "NW-9", 
+                    "stretch": "Kottayam to Alappuzha", 
+                    "updatedAt": "2026-04-07T07:17:40.785Z", 
+                    "fromDate": "2026-03-17T00:00:00.000Z", 
+                    "toDate": "2026-03-17T00:00:00.000Z" 
+                }, 
+                { 
+                    "id": "69d4af0ac7b7fdd56b60b880", 
+                    "nationalWaterway": "NW-3", 
+                    "stretch": "Udyogmandal", 
+                    "updatedAt": "2026-04-07T07:15:22.115Z", 
+                    "fromDate": "2026-03-30T00:00:00.000Z", 
+                    "toDate": "2026-03-30T00:00:00.000Z" 
+                }, 
+                { 
+                    "id": "69d8d770c7b7fdd56b6c8183", 
+                    "nationalWaterway": "IBP Route 5, 6", 
+                    "stretch": "Tiklichar to Nirmalchar", 
+                    "updatedAt": "2026-04-10T10:56:48.904Z", 
+                    "fromDate": "2026-03-25T00:00:00.000Z", 
+                    "toDate": "2026-03-25T00:00:00.000Z" 
+                }, 
+                { 
+                    "id": "69bd17457f968eaa8e853591", 
+                    "nationalWaterway": "NW-44", 
+                    "stretch": "Bansjhari Mallikpur to ParNaihati", 
+                    "updatedAt": "2026-03-20T09:45:41.530Z", 
+                    "fromDate": "2026-03-19T00:00:00.000Z", 
+                    "toDate": "2026-03-19T00:00:00.000Z" 
+                }, 
+                { 
+                    "id": "69d4adcfc7b7fdd56b60ab67", 
+                    "nationalWaterway": "NW-3", 
+                    "stretch": "Kottapuram - Kollam", 
+                    "updatedAt": "2026-04-07T07:10:07.662Z", 
+                    "fromDate": "2026-03-16T00:00:00.000Z", 
+                    "toDate": "2026-03-26T00:00:00.000Z" 
+                } 
+            ], 
+            "responseStatus": "SUCCESS", 
+            "message": null 
+        } 
+    ], 
+    "error": "false", 
+ULIP Integration Document   
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 5.0 Page 54 of 70 
+ 
+    "code": "200", 
+    "message": "Success" } 
+ 
+Status Code 200: success data response 
+Status Code 400: Bad request (Invalid json syntax, invalid json key) 
+Status Code 401 or 403: Unauthenticated or Unauthorized 
+Status Code 500: Some internal server error occurred 
+Status Code 502: Server is not responding. 
+1.14  IWAI/12 
+ 
+This API will connect with IWAI API to get data. 
+ 
+S. 
+No. 
+Field Name Field Description Format Required/Not – 
+Required 
+Length 
+1 N/A N/A N/A N/A N/A 
+1.14.1 Technical Approach  
+1. All the data will be shared through rest web services. 
+2. ULIP system will provide detail is required. 
+3. IWAI API will share details of national waterways information which exist in IWAI 
+system in JSON format. 
+4. ULIP system will provide the data in JSON Object format in response body. 
+ 
+Example: Data is shared by ULIP system, then IWAI-integration will make a request to 
+IWAI API. 
+ 
+Request: The request must be of the following format and passed within the URL body in 
+JSON format. 
+ 
+For Staging: https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/IWAI/12 
+ 
+{} 
+ 
+1.14.2 Curl URL 
+curl --location --request POST 'https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/IWAI/12' \ 
+--
+header 'Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1bGlwIiwiaWF0IjoxNjQ5MjIw
+NDA0LCJhcHBzIjoiZGF0YXB1c2gifQ.XG9zpDhZ0hqXFVHHtucnyYNJ4yQHXmTRWNAqHH1M
+M--Swd7_iJaKQ2zr0LKap-YKzLmq85SzkkPyh39KE0KR7w' \ 
+--header 'Content-Type: application/json' \ 
+--header 'Accept: application/json' \ 
+--data-raw '{}' 
+ 
+ULIP Integration Document   
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 5.0 Page 55 of 70 
+ 
+For Production: https://www.ulip.dpiit.gov.in/ulip/v1.0.0/IWAI/12 
+ 
+{} 
+ 
+1.14.3 Curl URL 
+curl --location --request POST 'https://www.ulip.dpiit.gov.in/ulip/v1.0.0/IWAI/12' \ 
+--
+header 'Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1bGlwIiwiaWF0IjoxNjQ5MjIw
+NDA0LCJhcHBzIjoiZGF0YXB1c2gifQ.XG9zpDhZ0hqXFVHHtucnyYNJ4yQHXmTRWNAqHH1M
+M--Swd7_iJaKQ2zr0LKap-YKzLmq85SzkkPyh39KE0KR7w' \ 
+--header 'Content-Type: application/json' \ 
+--header 'Accept: application/json' \ 
+--data-raw '{}' 
+ 
+For obtaining authentication token, refer Section 1.18 
+ 
+1.14.4 Response 
+ 
+To acknowledge the above request, ULIP will send the below response -  
+ 
+a) Success response 
+ 
+{    "response": [ 
+        { 
+            "response": [ 
+                { 
+                    "_id": "692d4c7d4ad6c970ed1da71d", 
+                    "nw": 49, 
+                    "structure": "Road bridge", 
+                    "location": "BIMYAR", 
+                    "verticalClearance": 2.5, 
+                    "latitude ": "34.150444", 
+                    "longitude ": "74.200074" 
+                }, 
+                { 
+                    "_id": "692d4c7d4ad6c970ed1da71e", 
+                    "nw": 49, 
+                    "structure": "Road bridge", 
+                    "location": "Near Peernia Baramulla", 
+                    "verticalClearance": 2.0, 
+                    "latitude ": "34.170946", 
+                    "longitude ": "74.240899" 
+                }, 
+                { 
+                    "_id": "692d4c7d4ad6c970ed1da71f", 
+                    "nw": 49, 
+ULIP Integration Document   
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 5.0 Page 56 of 70 
+ 
+                    "structure": "Road bridge", 
+                    "location": "Peernia Foot Bridge", 
+                    "verticalClearance": 0.5, 
+                    "latitude ": "34.172606", 
+                    "longitude ": "74.243726" 
+                }, 
+                { 
+                    "_id": "692d4c7d4ad6c970ed1da720", 
+                    "nw": 49, 
+                    "structure": "Road bridge", 
+                    "location": "Gantamula bridge", 
+                    "verticalClearance": null, 
+                    "latitude ": "34.183396", 
+                    "longitude ": "74.272281" 
+                }, 
+                { 
+                    "_id": "692d4c7d4ad6c970ed1da721", 
+                    "nw": 49, 
+                    "structure": "Road bridge", 
+                    "location": "Suspension Bridge", 
+                    "verticalClearance": 0.5, 
+                    "latitude ": "34.194562", 
+                    "longitude ": "74.297606" 
+                }, 
+                { 
+                    "_id": "692d4c7d4ad6c970ed1da722", 
+                    "nw": 49, 
+                    "structure": "Road bridge", 
+                    "location": "new bridge between khanpora", 
+                    "verticalClearance": 2.5, 
+                    "latitude ": "34.208922", 
+                    "longitude ": "74.336426" 
+                }, 
+                { 
+                    "_id": "692d4c7d4ad6c970ed1da723", 
+                    "nw": 49, 
+                    "structure": "Road bridge", 
+                    "location": "baramulla old bridge", 
+                    "verticalClearance": null, 
+                    "latitude ": "34.209989", 
+                    "longitude ": "74.340226" 
+                }, 
+                { 
+                    "_id": "692d4c7d4ad6c970ed1da724", 
+                    "nw": 49, 
+                    "structure": "Road bridge", 
+                    "location": "Cement Bridge", 
+                    "verticalClearance": 2.5, 
+                    "latitude ": "34.210744", 
+ULIP Integration Document   
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 5.0 Page 57 of 70 
+ 
+                    "longitude ": "74.342642" 
+                }, 
+                { 
+                    "_id": "692d4c7d4ad6c970ed1da725", 
+                    "nw": 49, 
+                    "structure": "20.54", 
+                    "location": "Khanpura(Pipe Line)", 
+                    "verticalClearance": 2.5, 
+                    "latitude ": "34.210744", 
+                    "longitude ": "74.342642" 
+                }, 
+                { 
+                    "_id": "692d4c7d4ad6c970ed1da728", 
+                    "nw": 49, 
+                    "structure": "Road bridge", 
+                    "location": "LADOORA", 
+                    "verticalClearance": 2.0, 
+                    "latitude ": "34.253129", 
+                    "longitude ": "74.391134" 
+                }, 
+                { 
+                    "_id": "692d4c7d4ad6c970ed1da729", 
+                    "nw": 49, 
+                    "structure": "Road bridge", 
+                    "location": "Sopore Bypass Bridge", 
+                    "verticalClearance": 2.0, 
+                    "latitude ": "34.277043", 
+                    "longitude ": "74.454716" 
+                }, 
+                { 
+                    "_id": "692d4c7d4ad6c970ed1da72a", 
+                    "nw": 49, 
+                    "structure": "Road bridge", 
+                    "location": "Sopore New Bridge", 
+                    "verticalClearance": 3.0, 
+                    "latitude ": "34.276698", 
+                    "longitude ": "74.463448" 
+                }, 
+                { 
+                    "_id": "692d4c7d4ad6c970ed1da72b", 
+                    "nw": 49, 
+                    "structure": "Road bridge", 
+                    "location": "SOPOR old wood gridge (Pipe LINE)", 
+                    "verticalClearance": 3.0, 
+                    "latitude ": "34.276698", 
+                    "longitude ": "74.463448" 
+                }, 
+                { 
+                    "_id": "692d4c7d4ad6c970ed1da72c", 
+ULIP Integration Document   
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 5.0 Page 58 of 70 
+ 
+                    "nw": 49, 
+                    "structure": "Road bridge", 
+                    "location": "SOPOR 0ld wood gridge", 
+                    "verticalClearance": 3.0, 
+                    "latitude ": "34.276614", 
+                    "longitude ": "74.463824" 
+                }, 
+                { 
+                    "_id": "692d4c7d4ad6c970ed1da72d", 
+                    "nw": 49, 
+                    "structure": "Road bridge", 
+                    "location": "JAMIA QADEEM BRIDGE", 
+                    "verticalClearance": 1.5, 
+                    "latitude ": "34.282815", 
+                    "longitude ": "74.470835" 
+                }, 
+                { 
+                    "_id": "692d4c7d4ad6c970ed1da72e", 
+                    "nw": 49, 
+                    "structure": "Road bridge", 
+                    "location": "Ninglikul", 
+                    "verticalClearance": 0.5, 
+                    "latitude ": "34.28824", 
+                    "longitude ": "74.510583" 
+                }, 
+                { 
+                    "_id": "692d4c7d4ad6c970ed1da72f", 
+                    "nw": 49, 
+                    "structure": "Road bridge", 
+                    "location": "Hajin Bridge", 
+                    "verticalClearance": 1.91, 
+                    "latitude ": "34.296", 
+                    "longitude ": "74.624483" 
+                }, 
+                { 
+                    "_id": "692d4c7d4ad6c970ed1da738", 
+                    "nw": 49, 
+                    "structure": "Road bridge", 
+                    "location": "Weir Chattabal", 
+                    "verticalClearance": 0.0, 
+                    "latitude ": "34.089628", 
+                    "longitude ": "74.785058" 
+                }, 
+                { 
+                    "_id": "692d4c7d4ad6c970ed1da73e", 
+                    "nw": 49, 
+                    "structure": "Road bridge", 
+                    "location": "Old Fateh Kadal Bridge", 
+                    "verticalClearance": 4.17, 
+ULIP Integration Document   
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 5.0 Page 59 of 70 
+ 
+                    "latitude ": "34.089053", 
+                    "longitude ": "74.806256" 
+                }, 
+                { 
+                    "_id": "692d4c7d4ad6c970ed1da753", 
+                    "nw": 49, 
+                    "structure": "Road bridge", 
+                    "location": "Padgampora bridge", 
+                    "verticalClearance": 6.1, 
+                    "latitude ": "33.908631", 
+                    "longitude ": "75.008906" 
+                }, 
+                { 
+                    "_id": "692d4c7d4ad6c970ed1da99d", 
+                    "nw": 45, 
+                    "structure": "Electric Line ", 
+                    "location": null, 
+                    "verticalClearance": 12.0, 
+                    "latitude ": "29.152573", 
+                    "longitude ": "73.780357" 
+                } 
+            ], 
+            "responseStatus": "SUCCESS", 
+            "message": null 
+        } 
+    ], 
+    "error": "false", 
+    "code": "200", 
+    "message": "Success" } 
+ 
+Status Code 200: success data response 
+Status Code 400: Bad request (Invalid json syntax, invalid json key) 
+Status Code 401 or 403: Unauthenticated or Unauthorized 
+Status Code 500: Some internal server errors occurred 
+Status Code 502: Server is not responding. 
+1.15  IWAI/13 
+ 
+This API will connect with IWAI API to get data. 
+ 
+S. No. Field Name Field Description Format Required/Not – 
+Required 
+Length 
+1 NA NA NA NA NA 
+1.15.1 Technical Approach  
+5. All the data will be shared through rest web services. 
+6. IWAI API will share details of national waterways information which exist in IWAI 
+system in JSON format. 
+ULIP Integration Document   
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 5.0 Page 60 of 70 
+ 
+7. ULIP system will provide the data in JSON Object format in response body. 
+ 
+Example: Data is shared by ULIP system, then IWAI-integration will make a request to 
+IWAI API. 
+ 
+Request: The request must be of the following format and passed within the URL body in 
+JSON format. 
+ 
+For Staging: https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/IWAI/13 
+ 
+{} 
+ 
+1.15.2 Curl URL 
+curl --location --request POST 'https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/IWAI/13' \ 
+--header 'Accept: application/json' \ 
+--header 'Content-Type: application/json' \ 
+--header 'authorization: Bearer 
+eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZXN0MSIsImlhdCI6MTY1MTA1ODY0MCwiYXBwcyI6Im
+RhdGFwdXNoIn0.e4_ufYaZTD7Mr5cCKVUM2gUCv_78tR5O02ypRN34La2Pk1JSBUAJQ5mS
+AI8Eks0kji6Rndan8xK33rNo2eJTnQ ' \ 
+--data-raw '{}' 
+ 
+For Production: https://www.ulip.dpiit.gov.in/ulip/v1.0.0/IWAI/13 
+ 
+{} 
+ 
+1.15.3 Curl URL 
+curl --location --request POST 'https://www.ulip.dpiit.gov.in/ulip/v1.0.0/IWAI/13' \ 
+--header 'Accept: application/json' \ 
+--header 'Content-Type: application/json' \ 
+--header 'authorization: Bearer 
+eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZXN0MSIsImlhdCI6MTY1MTA1ODY0MCwiYXBwcyI6Im
+RhdGFwdXNoIn0.e4_ufYaZTD7Mr5cCKVUM2gUCv_78tR5O02ypRN34La2Pk1JSBUAJQ5mS
+AI8Eks0kji6Rndan8xK33rNo2eJTnQ ' \ 
+--data-raw '{}' 
+For obtaining authentication token, refer Section 1.18 
+ 
+1.15.4 Response 
+To acknowledge the above request, ULIP will send the below response –  
+ 
+a) Success response 
+ 
+{    "response": [ 
+        { 
+ULIP Integration Document   
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 5.0 Page 61 of 70 
+ 
+            "response": [ 
+                { 
+                    "_id": "692fdfcd6bc2041924e3f524", 
+                    "terminalJetty": "Panihati ferry ghat", 
+                    "nw": "1", 
+                    "office": "Kolkata", 
+                    "district": "Kolkata", 
+                    "state": "West Bengal", 
+                    "chainage": 157, 
+                    "latitude": 22.69579025, 
+                    "longitude": 88.36565392, 
+                    "stretch": "Panihati- Konnagar", 
+                    "stretchOrigin": "Panihati", 
+                    "stretchDestination": "Konnagar", 
+                    "stretchOriginChainage": 157, 
+                    "stretchDestinationChainage": 157, 
+                    "stretchOriginLatitude": 22.69579025, 
+                    "stretchOriginLongitude": 88.36565392, 
+                    "stretchDestinationLatitude": 22.70076378, 
+                    "stretchDestinationLogitude": 88.36025994, 
+                    "createdAt": "2026-04-27T04:28:14.692Z" 
+                }, 
+                { 
+                    "_id": "692fdfcd6bc2041924e3f690", 
+                    "terminalJetty": "Khagra ghat", 
+                    "nw": "2", 
+                    "office": "Kolkata", 
+                    "state": "Assam", 
+                    "chainage": 0, 
+                    "createdAt": "2026-04-27T04:28:14.713Z" 
+                }, 
+                { 
+                    "_id": "692fdfcd6bc2041924e3f691", 
+                    "terminalJetty": "CSL", 
+                    "nw": "3", 
+                    "office": "Kochi", 
+                    "state": "Assam", 
+                    "chainage": 4, 
+                    "createdAt": "2026-04-27T04:28:14.713Z" 
+                }, 
+                { 
+                    "_id": "692fdfcd6bc2041924e3f82d", 
+                    "terminalJetty": "Kottayam", 
+                    "nw": "9", 
+                    "office": "Kochi", 
+                    "district": "Kottayam", 
+                    "state": "Kerala", 
+                    "chainage": 38, 
+                    "latitude": 9.569183333, 
+ULIP Integration Document   
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 5.0 Page 62 of 70 
+ 
+                    "longitude": 76.48941944, 
+                    "stretch": "Allapuzha to Kottayam", 
+                    "stretchOrigin": "Alappuzha", 
+                    "stretchDestination": "Kottayam", 
+                    "stretchOriginChainage": 0, 
+                    "stretchDestinationChainage": 38, 
+                    "stretchOriginLatitude": 9.517030556, 
+                    "stretchOriginLongitude": 76.37893056, 
+                    "stretchDestinationLatitude": 9.569183333, 
+                    "stretchDestinationLogitude": 76.48941944, 
+                    "createdAt": "2026-04-27T04:28:14.721Z", 
+                    "waterway": "III" 
+                } 
+            ], 
+            "responseStatus": "SUCCESS", 
+            "message": null 
+        } 
+    ], 
+    "error": "false", 
+    "code": "200", 
+    "message": "Success"} 
+ 
+Status Code 200: success data response 
+Status Code 400: Bad request (Invalid json syntax, invalid json key) 
+Status Code 401 or 403: Unauthenticated or Unauthorized 
+Status Code 500: Some internal server error occurred 
+Status Code 502: Server is not responding. 
+1.16  IWAI/14 
+ 
+This API will connect with IWAI API to get data. 
+ 
+S. 
+No. 
+Field Name Field Description Format Require
+d/Not – 
+Require
+d 
+Length 
+1 surveyId 
+ 
+surveyId can be fetched 
+from IWAI_11 Api 
+^[a-z0-9]{24}$ 
+ 
+Required Min 24 
+Max 24 
+1.16.1 Technical Approach  
+8. All the data will be shared through rest web services. 
+9. ULIP system will provide surveyId for which detail is required. 
+10. IWAI API will share details of national waterways information which exist in IWAI 
+system in JSON format. 
+11. ULIP system will provide the data in JSON Object format in response body. 
+ 
+ULIP Integration Document   
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 5.0 Page 63 of 70 
+ 
+Example: Data is shared by ULIP system, then IWAI-integration will make a request to 
+IWAI API. 
+ 
+Request: The request must be of the following format and passed within the URL body in 
+JSON format. 
+ 
+For Staging: https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/IWAI/14 
+ 
+{"surveyId": “69e0d3fdc7b7fdd56b816b58”} 
+ 
+1.16.2 Curl URL 
+curl --location --request POST 'https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/IWAI/14' \ 
+--header 'Accept: application/json' \ 
+--header 'Content-Type: application/json' \ 
+--header 'authorization: Bearer 
+eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZXN0MSIsImlhdCI6MTY1MTA1ODY0MCwiYXBwcyI6Im
+RhdGFwdXNoIn0.e4_ufYaZTD7Mr5cCKVUM2gUCv_78tR5O02ypRN34La2Pk1JSBUAJQ5mS
+AI8Eks0kji6Rndan8xK33rNo2eJTnQ ' \ 
+--data-raw '{ 
+"surveyId": “69e0d3fdc7b7fdd56b816b58” 
+}' 
+ 
+For Production: https://www.ulip.dpiit.gov.in/ulip/v1.0.0/IWAI/14 
+ 
+{"surveyId": “69e0d3fdc7b7fdd56b816b58”} 
+ 
+1.16.3 Curl URL 
+curl --location --request POST 'https://www.ulip.dpiit.gov.in/ulip/v1.0.0/IWAI/14' \ 
+--header 'Accept: application/json' \ 
+--header 'Content-Type: application/json' \ 
+--header 'authorization: Bearer 
+eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZXN0MSIsImlhdCI6MTY1MTA1ODY0MCwiYXBwcyI6Im
+RhdGFwdXNoIn0.e4_ufYaZTD7Mr5cCKVUM2gUCv_78tR5O02ypRN34La2Pk1JSBUAJQ5mS
+AI8Eks0kji6Rndan8xK33rNo2eJTnQ ' \ 
+--data-raw '{"surveyId": “69e0d3fdc7b7fdd56b816b58”}' 
+ 
+For obtaining authentication token, refer Section 1.18 
+ 
+1.16.4 Response 
+To acknowledge the above request, ULIP will send the response below -  
+ 
+a) In case of invalid format 
+ 
+1. Invalid id 
+ULIP Integration Document   
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 5.0 Page 64 of 70 
+ 
+ 
+{ "response": [ 
+        { 
+            "response": "Something went wrong!", 
+            "responseStatus": "ERROR", 
+            "message": null 
+        } 
+    ], 
+    "error": "false", 
+    "code": "200", 
+    "message": "Success"} 
+ 
+2. In case of id is null  
+ 
+{   "response": null, 
+    "error": "true", 
+    "code": "400 BAD_REQUEST", 
+    "message": "surveyId:must not be Empty or null"}   
+ 
+b) Success response 
+ 
+{    "response": [ 
+        { 
+            "response": { 
+                "mime": "application/octet-stream", 
+                "data": 
+"Mzg0ODc0LjM3IDI5MDA4MTAuOTggNS40CjM4NDg0NS4wNCAyOTAwODAwLjI1IDUuMQoz
+ODQ4MTcuMzcgMjkwMDc4OS4xMSA1CjM4NDc4My40IDI5MDA3NzYuMzEgNS4xCjM4NDc0
+MC42MSAyOTAwNzY5LjM1IDMuOQozODQ3MDUuMDkgMjkwMDc1Ny4zNCAzLjkKMzg0NjY2
+LjQgMjkwMDc0OC41OSAzLjkKMzg0NjM2LjM4IDI5MDA3NDQuMTcgMy42CjM4NDU5NS4wO
+SAyOTAwNzQwLjQ3IDMuNAozODQ1NDYuNDcgMjkwMDczNS4xNCAyLjcKMzg0NTE5Ljc2IDI
+5MDA3MzQuNDIgMi43OAozODQ0OTMuOTIgMjkwMDczNi4xMiAyLjkKMzg0NDY2Ljg2IDI5MD
+A3NDIuODggMy4xCjM4NDQyMS44NSAyOTAwNzU5LjU0IDIuOAozODQzOTcuMzEgMjkwMDc
+2OS4zNSAzLjEKMzg0MzYzLjAyIDI5MDA3ODQuMzggMy45CjM4NDMzOS40MiAyOTAwNzk0L
+jk4IDQuNAozODQzMDEuMTUgMjkwMDgwNi4yNSA0LjIKMzg0MjcxLjc0IDI5MDA4MTEuNTQg
+NAozODQyMzcuMjMgMjkwMDgxNS45NSA0LjIKMzg0MjA3LjM3IDI5MDA4MTUuMzQgNC41Cj
+M4NDE2NS4wMSAyOTAwODExLjkyIDQuMQozODQxMjcuMzMgMjkwMDgwNC4zNiA0CjM4N
+DEwMiAyOTAwNzk3LjQyIDQuNwozODQwNzcuNjMgMjkwMDc4OS4xOSA0LjEKMzg0MDUzLj
+Q3IDI5MDA3NzguNzQgMy44CjM4NDAxOS42NSAyOTAwNzYzLjA4IDMuOAozODM5NzguMS
+AyOTAwNzM3LjkyIDMuOAozODM5NTIuMSAyOTAwNzIyLjExIDMuOQozODM5MjYuMzUgMjk
+wMDcwNy4xNyAzLjYKMzgzODg1LjY3IDI5MDA2ODIuNjcgMy4yCjM4Mzg1Ny45MiAyOTAwNjY
+xLjcyIDMuMQozODM4MzYuNzcgMjkwMDYzNi40MyAzLjIKMzgzODIwLjk5IDI5MDA2MTUuMD
+EgMi45CjM4MzgwNy41OSAyOTAwNTkwIDMKMzgzNzkzLjU5IDI5MDA1NDMuNDUgMi44CjM4
+Mzc0MS44MSAyOTAwNDk0Ljg0IDIuOQozODM3MTYuNDYgMjkwMDQ4Ni40NyAzLjEKMzgzN
+jkzLjAzIDI5MDA0NzUuNjkgMy40CjM4MzY2OS43NiAyOTAwNDY1LjE1IDMuOAozODM2NDAu
+MjggMjkwMDQ1MS4zOCA0LjIKMzgzNjA2LjQzIDI5MDA0MzkuMTQgNC43CjM4MzU3OS41OS
+AyOTAwNDMxLjM2IDUuMQozODM1NTAuNzkgMjkwMDQyNi45MiA1LjMKMzgzNTAzLjYgMjkw
+MDQxNi4xNiA1LjYKMzgzNDc2Ljc0IDI5MDA0MTIuNTkgNS44CjM4MzQ0OS43NCAyOTAwND
+EwLjk5IDUuOQozODM0MTkuMDUgMjkwMDQxMS4yNyA2LjEKMzgzMzkzLjczIDI5MDA0MTEu
+ULIP Integration Document   
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 5.0 Page 65 of 70 
+ 
+NjggNi4zCjM4MzM2OC42NyAyOTAwNDEzLjAxIDYuMwozODMzNDIuMzIgMjkwMDQxNS42M
+SA2LjMKMzgzMzA0LjIxIDI5MDA0MTkuMTMgNi4yCjM4MzI3NC45MyAyOTAwNDIxLjk0IDYuN
+AozODMyNDkuODEgMjkwMDQyMy44MyA2LjYKMzgzMjI0LjUzIDI5MDA0MjUuOSA2LjMKMzg
+zMTc4LjQzIDI5MDA0MjcuNjUgNi4yCjM4MzE0Ny43OSAyOTAwNDI5IDYuMgozODMxMTEuNj
+YgMjkwMDQzMC44IDUuOQozODMwODAuNzUgMjkwMDQzNC40IDUuNwozODMwNDIgMjkw
+MDQ0MS4yMSA1LjcKMzgzMDE1Ljc0IDI5MDA0NDYuMjEgNS43CjM4Mjk2Ni42NiAyOTAwND
+UwLjE2IDUuNAozODI5MTguMTcgMjkwMDQ1NS4wNyA1LjQKMzgyODc0Ljg3IDI5MDA0NTku
+NTIgNS4zCjM4MjgzNC45NiAyOTAwNDY1LjE5IDUuMwozODI4MDYuNyAyOTAwNDY5Ljg0ID
+UuNgozODI3NjkuNzggMjkwMDQ3Ny4xOSA1LjIKMzgyNzQ1LjE1IDI5MDA0ODIuOTIgNS4xCjM
+4MjcyMS4wNCAyOTAwNDkxLjI1IDUuMgozODI2OTcuNyAyOTAwNTAwLjI4IDUuMwozODI2Nz
+EuMzcgMjkwMDUwOS45IDUuNAozODI2NDQuODYgMjkwMDUxOS45NyA2LjMKMzgyNjE4LjM
+1IDI5MDA1MzAuMDMgNi43CjM4MjU3OS43OSAyOTAwNTQyLjY2IDYuNAozODI1NDkuNTkg
+MjkwMDU1MS4wNCA2LjQKMzgyNTI0LjI2IDI5MDA1NTUuMzMgNS43CjM4MjQ3OC4xMiAyOT
+AwNTY0LjYxIDUuNwozODI0MzEuNDMgMjkwMDU3MS44MyA1LjgKMzgyMzk2LjE1IDI5MDA1
+NzYuMjkgNS44CjM4MjM2NC42NyAyOTAwNTc5Ljg2IDUuNwozODIzMTcuNDggMjkwMDU4My
+42NSA1LjgKMzgyMjkyLjQ4IDI5MDA1ODUuNzMgNS41CjM4MjI0OS43OCAyOTAwNTkwLjE0I
+DUuMwozODIyMjQuMTYgMjkwMDU5Mi45NSA1CjM4MjE5NS4wNyAyOTAwNTk1LjQ3IDQuO
+QozODIxNjIgMjkwMDU5OC4zMiA0LjcKMzgyMTI5LjQ3IDI5MDA2MDEuNjUgNC45CjM4MjA4N
+y4xNyAyOTAwNjA0LjYyIDQuNQozODIwNDkuNzkgMjkwMDYwOC4wNiA0LjcKMzgyMDIxLjcxI
+DI5MDA2MTAuNDkgNC45CjM4MTk5NC4wMyAyOTAwNjEyLjA3IDMuOQozODE5NjcuNTMgMj
+kwMDYxMy42NSA0LjUKMzgxOTQxLjAzIDI5MDA2MTMuODUgNC4xCjM4MTkxNC4yNCAyOT
+AwNjEzLjQzIDUKMzgxODc0LjkyIDI5MDA2MTMuNTcgMy44CjM4MTg0Mi42NiAyOTAwNjEzLjU
+3IDQuMgozODE4MTMuNjkgMjkwMDYxMi42MSAzLjkKMzgxNzY2LjY1IDI5MDA2MTIuMzggMy
+40CjM4MTcyMy42NyAyOTAwNjEyLjM2IDIuOAozODE2ODMuMDUgMjkwMDYxMy4yOSAyLjkK
+uOAo0OTQ0ODEuNzcgMjk0NDU0Mi4xOCAxMi4yCjQ5NDQ1OC40NiAyOTQ0NTMyLjM0IDEz
+LjUKNDk0NDE1LjY4IDI5NDQ1MjAuMDQgMTIuMQo0OTQzOTIuMzcgMjk0NDUxMC43OCAxM
+MS4xCjM3MzMyNi40NiAyODk3MDA3LjczIDExLjEKMzczMjg2LjQxIDI4OTY5NzYuOTggMTAuO
+C41MiAyODk2ODc2Ljk2IDEwLjgKMzczMTA3LjA1IDI4OTY4NjIuNDIgMTIuMQozNzMwODMuNj
+EgMjg5Njg0OS43MyAxMC4yCjM3MzA0MS43MiAyODk2ODI0LjI5IDExCjM3MzAxNi42MiAyOD
+k2ODEzLjQ2IDkuOAozNzI5NzguMTUgMjg5Njc5Ny4yMiAODkgMjk0NDExMS4xNyA1LjgKNDkz
+MzgzLjY4IDI5NDQxMTYuMDcgNi4zCjQ5MzQxMy4xMSAyOTQ0MTIxLjggNy4zCjQ5MzUxNS4
+0MyAyOTQ0MTMyLjI0IDguNQo0OTM1NjAuOTIgMjk0NDEzOC4yMiA4LjI=", 
+                "filename": "PANDU_NEAMATI_20260416175013.xyz", 
+                "eTag": "W/\"3e69c-NnourI9FHeH0owc2ZgFMjOnEQf8\"" 
+            }, 
+            "responseStatus": "SUCCESS", 
+            "message": null 
+        } 
+    ], 
+    "error": "false", 
+    "code": "200", 
+    "message": "Success"} 
+ 
+Status Code 200: success data response 
+Status Code 400: Bad request (Invalid json syntax, invalid json key) 
+Status Code 401 or 403: Unauthenticated or Unauthorized 
+Status Code 500: Some internal server errors occurred 
+Status Code 502: Server is not responding. 
+ 
+ULIP Integration Document   
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 5.0 Page 66 of 70 
+ 
+ 
+The above response data is base 64 encoded. You have to decode this base 64 encoded string 
+to get the actual response which will be the file having xyz extension . 
+ 
+                                            
+BORDER_DHUBRI_20260327164901.xyz  
+1.17 IWAI/15 
+ 
+This API will connect with IWAI API to get data. 
+ 
+S. 
+No. 
+Field 
+Name 
+Field Description Format Required/Not – 
+Required 
+Length 
+1 surveyId This surveyId can be 
+fetched from IWAI_11 Api 
+^[a-z0-
+9]{24}$ 
+Required 24 
+ 
+1.17.1 Technical Approach  
+1. All the data will be shared through rest web services. 
+2. ULIP system will provide detail is required. 
+3. IWAI API will share details of national waterways information which exist in IWAI system 
+in JSON format. 
+4. ULIP system will provide the data in JSON Object format in response body. 
+ 
+Example: Data is shared by ULIP system, then IWAI-integration will make a request to 
+IWAI API. 
+ 
+Request: The request must be of the following format and passed within the URL body in 
+JSON format. 
+ 
+For Staging: https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/IWAI/15 
+ 
+{"surveyId": "69e0d3fdc7b7fdd56b816b58"} 
+ 
+1.17.2 Curl URL 
+curl --location --request POST 'https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/IWAI/15' \ 
+--
+header 'Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1bGlwIiwiaWF0IjoxNjQ5MjIw
+NDA0LCJhcHBzIjoiZGF0YXB1c2gifQ.XG9zpDhZ0hqXFVHHtucnyYNJ4yQHXmTRWNAqHH1M
+M--Swd7_iJaKQ2zr0LKap-YKzLmq85SzkkPyh39KE0KR7w' \ 
+--header 'Content-Type: application/json' \ 
+--header 'Accept: application/json' \ 
+--data-raw '{"surveyId": "69e0d3fdc7b7fdd56b816b58"}' 
+ 
+ULIP Integration Document   
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 5.0 Page 67 of 70 
+ 
+For Production: https://www.ulip.dpiit.gov.in/ulip/v1.0.0/IWAI/15 
+ 
+{"surveyId": "69e0d3fdc7b7fdd56b816b58"} 
+ 
+1.17.3 Curl URL 
+curl --location --request POST 'https://www.ulip.dpiit.gov.in/ulip/v1.0.0/IWAI/15' \ 
+--
+header 'Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1bGlwIiwiaWF0IjoxNjQ5MjIw
+NDA0LCJhcHBzIjoiZGF0YXB1c2gifQ.XG9zpDhZ0hqXFVHHtucnyYNJ4yQHXmTRWNAqHH1M
+M--Swd7_iJaKQ2zr0LKap-YKzLmq85SzkkPyh39KE0KR7w' \ 
+--header 'Content-Type: application/json' \ 
+--header 'Accept: application/json' \ 
+--data-raw '{"surveyId": "69e0d3fdc7b7fdd56b816b58"}' 
+ 
+For obtaining authentication token, refer Section 1.18 
+ 
+1.17.4 Response 
+To acknowledge the above request, ULIP will send the response below -  
+ 
+a) Success response 
+ 
+{    "response": [ 
+        { 
+            "response": { 
+                "mime": "application/octet-stream", 
+                "data": 
+"TE5TIDEKTElOIDEwNDk5ClBUUyAzNjc5MDIuMjggMjg5NTQ2Mi4zClBUUyAzNjc5MDIuMjgg
+Mjg5NTQ2Mi4zClBUUyAzNjc5MDIuMjggMjg5NTQ2Mi4zClBUUyAzNjc5MDIuMjggMjg5NTQ2Mi
+4zClBUUyAzNjc5MDIuMjggMjg5NTQ2Mi4zClBUUyAzNjc5MDIuMjggMjg5NTQ2Mi4zClBUUyAz
+Njc5MDIuMjggMjg5NTQ2Mi4zClBUUyAzNjc5MDIuMjggMjg5NTQ2Mi4zClBUUyAzNjc5MDIuMjg
+gMjg5NTQ2Mi4zClBUUyAzNjc5MDIuMjggMjg5NTQ2Mi4zClBUUyAzNjc5MDIuMjggMjg5NTQ2
+Mi4zClBUUyAzNjc5MDIuMjggMjg5NTQ2Mi4zClBUUyAzNjc5MDIuMjggMjg5NTQ2Mi4zClBUUy
+AzNjc5MDIuMjggMjg5NTQ2Mi4zClBUUyAzNjc5MDIuMjggMjg5NTQ2Mi4zClBUUyAzNjc5MDIu
+MjggMjg5NTQ2Mi4zClBUUyAzNjc5MDIuMjggMjg5NTQ2Mi4zClBUUyAzNjc5MDIuMjggMjg5NT
+Q2Mi4zClBUUyAzNjc5MDIuMjggMjg5NTQ2Mi4zClBUUyAzNjc5MDIuMjggMjg5NTQ2Mi4zClBU
+UyAzNjc5MDIuMjggMjg5NTQ2Mi4zClBUUyAzNjc5MDIuMjggMjg5NTQ2Mi4zClBUUyAzNjc5MD
+IuMjggMjg5NTQ2Mi4zClBUUyAzNjc5MDIuMjggMjg5NTQ2Mi4zClBUUyAzNjc5MDIuMjggMjg5N
+TQ2Mi4zClBUUyAzNjc5MDIuMjggMjg5NTQ2Mi4zClBUUyAzNjc5MDIuMjggMjg5NTQ2Mi4zClB
+UUyAzNjc5MDIuMjggMjg5NTQ2Mi4zClBUUyAzNjc5MDIuMjggMjg5NTQ2Mi4zClBUUyAzNjc5M
+DIuMjggMjg5NTQ2Mi4zClBUUyAzNjc5MDIuMjggMjg5NTQ2Mi4zClBUUyAzNjc5MDIuMjggMjg5
+NTQ2Mi4zClBUUyAzNjc5MDIuMjggMjg5NTQ2Mi4zClBUUyAzNjc5MDIuMjggMjg5NTQ2Mi4zCl
+BUUyAzNjc5MDIuMjggMjg5NTQ2Mi4zClBUUyAzNjc5MDIuMjggMjg5NTQ2Mi4zClBUUyAzNjc5
+MDIuMjggMjg5NTQ2Mi4zClBUUyAzNjc5MDIuMjggMjg5NTQ2Mi4zClBUUyAzNjc5MDIuMjggMj
+g5NTQ2Mi4zClBUUyAzNjc5MDIuMjggMjg5NTQ2Mi4zClBUUyAzNjc5MDIuMjggMjg5NTQ2Mi4z
+ClBUUyAzNjc5MDIuMjggMjg5NTQ2Mi4zClBUUyAzNjc5MDIuMjggMjg5NTQ2Mi4zClBUUyAzNj
+c5MDIuMjggMjg5NTQ2Mi4zClBUUyAzNjc5MDIuMjggMjg5NTQ2Mi4zClBUUyAzNjc5MDIuMjgg
+ULIP Integration Document   
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 5.0 Page 68 of 70 
+ 
+Mjg5NTQ2Mi4zClBUUyAzNjc5MDIuMjggMjg5NTQ2Mi4zClBUUyAzNjc5MDIuMjggMjg5NTQ2Mi
+4zClBUUyAzNjc5MDIuMjggMjg5NTQ2Mi4zClBUUyAzNjc5MDIuMjggMjg5NTQ2Mi4zClBUUyAz
+Njc5MDIuMjggMjg5NTQ2Mi4zClBUUyAzNjc5MDIuMjggMjg5NTQ2Mi4zClBUUyAzNjc5MDIuMjg
+gMjg5NTQ2Mi4zClBUUyAzNjc5MDIuMjggMjg5NTQ2Mi4zClBUUyAzNjc5MDIuMjggMjg5NTQ2
+Mi4zClBUUyAzNjc5MDIuMjggMjg5NTQ2Mi4zClBUUyAzNjc5MDIuMjggMjg5NTQ2Mi4zClBUUy
+AzNjc5MDIuMjggMjg5NTQ2Mi4zClBUUyAzNjc5MDIuMjggMjg5NTQ2Mi4zClBUUyAzNjc5MDIu
+MjggMjg5NTQ2Mi4zClBUUyAzNjc5MDIuMjggMjg5NTQ2Mi4zClBUUyAzNjc5MDIuMjggMjg5NT
+Q2Mi4zClBUUyAzNjc5MDIuMjggMjg5NTQ2Mi4zClBUUyAzNjc5MDIuMjggMjg5NTQ2Mi4zClBU
+UyAzNjc5MDIuMjggMjg5NTQ2Mi4zClBUUyAzNjc5MDIuMjggMjg5NTQ2Mi4zClBUUyAzNjc5MD
+IuMjggMjg5NTQ2Mi4zClBUUyAzNjc5MDIuMjggMjg5NTQ2Mi4zClBUUyAzNjc5MDIuMjggMjg5N
+TQ2Mi4zClBUUyAzNjc5MDIuMjggMjg5NTQ2Mi4zClBUUyAzNjc5MDIuMjggMjg5NTQ2Mi4zClB
+UUyAzNjc5MDIuMjggMjg5NTQ2Mi4zClBUUyAzNjc5MDIuMjggMjg5NTQ2Mi4zClBUUyAzNjc5M
+DIuMjggMjg5NTQ2Mi4zClBUUyAzNjc5MDIuMjggMjg5NTQ2Mi4zClBUUyAzNjc5MDIuMjggMjg5
+NTQ2Mi4zClBUUyAzNjc5MDIuMjggMjg5NTQ2Mi4zClBUUyAzNjc5MDIuMjggMjg5NTQ2Mi4zCl
+BUUyAzNjc5MDIuMjggMjg5NTQ2Mi4zClBUUyAzNjc5MDIuMjggMjg5NTQ2Mi4zClBUUyAzNjc5
+MDIuMjggMjg5NTQ2Mi4zClBUUyAzNjc5MDIuMjggMjg5NTQ2Mi4zClBUUyAzNjc5MDIuMjggMj
+g5NTQ2Mi4zClBUUyAzNjc5MDIuMjggMjg5NTQ2Mi4zClBUUyAzNjc5MDIuMjggMjg5NTQ2Mi4z
+ClBUUyAzNjc5MDIuMjggMjg5NTQ2Mi4zClBUUyAzNjc5MDIuMjggMjg5NTQ2Mi4zClBUUyAzNj
+c5MDIuMjggMjg5NTQ2Mi4zClBUUyAzNjc5MDIuMjggMjg5NTQ2Mi4zClBUUyAzNjc5MDIuMjgg
+Mjg5NTQ2Mi4zClBUUyAzNjc5MDIuMjggMjg5NTQ2Mi4zClBUUyAzNjc5MDIuMjggMjg5NTQ2Mi
+4zClBUUyAzNjc5MDIuMjggMjg5NTQ2Mi4zClBUUyAzNjc5MDIuMjggMjg5NTQ2Mi4zClBUUyAz
+Njc5MDIuMjggMjg5NTQ2Mi4zClBUUyAzNjc5MDIuMjggMjg5NTQ2Mi4zClBUUyAzNjc5MDIuMjg
+gMjg5NTQ2Mi4zClBUUyAzNjc5MDIuMjggMjg5NTQ2Mi4zClBUUyAzNjc5MDIuMjggMjg5NTQ2=
+", 
+                "filename": "PANDU_NEAMATI_20260416175013.lnw", 
+                "eTag": "W/\"3f1c4-AfbXBbMhP9T8OREGQekulvIWd+o\"" 
+            }, 
+            "responseStatus": "SUCCESS", 
+            "message": null 
+        } 
+    ], 
+    "error": "false", 
+    "code": "200", 
+    "message": "Success"} 
+ 
+Status Code 200: success data response 
+Status Code 400: Bad request (Invalid json syntax, invalid json key) 
+Status Code 401 or 403: Unauthenticated or Unauthorized 
+Status Code 500: Some internal server errors occurred 
+Status Code 502: Server is not responding. 
+ 
+ 
+The above response data is base 64 encoded. You have to decode this base 64 encoded string 
+to get the actual response which will be the file having lnw extension . 
+ 
+                                              
+PANDU_NEAMATI_20260416175013.lnw  
+ 
+ULIP Integration Document   
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 5.0 Page 69 of 70 
+ 
+1.18  Data Transmission & Authentication Mechanism 
+ 
+All data exchange would be done over secure HTTP (HTTPS). Request from ULIP's system would 
+be made in IWAI system through a data exchange URL that has following form: 
+ 
+For Production: https://www.ulip.dpiit.gov.in/ulip/v1.0.0/IWAI/01 
+ 
+Body:  
+ 
+{ } 
+ 
+Access to above data exchange URL would be authorized by use of a security mechanism 
+implemented by the ULIP system. It is as follows: 
+ 
+• First time access:  It would require a username and password [which would be shared with 
+user beforehand].  Once user hit with valid user id and password, ULIP system will return a 
+basic authorization token to  user, using that token user will communicate with ULIP system 
+until tokens will not get expired. 
+ 
+Brief summary of HTTP Basic Authentication is as follows: 
+ 
+First time User hits ULIP secured API through username and password for access token as follow- 
+ 
+curl --location --request POST 
+'https://www.ulip.dpiit.gov.in/ulip/v1.0.0/user/login' \ 
+--header 'Accept: application/json' \ 
+--header 'Content-Type: application/json' \ 
+--data-raw '{ 
+"username": "xxxx", 
+"password": "xxxx@123"}' 
+ 
+Authorization:   
+Bearer  
+eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZXN0MSIsImlhdCI6MTYyNTIzMDQyNywiYXBwcyI6I
+mRhdGFwdXNoIn0.rhumwWJ8BWeeHe9CYmIV1UKyJk-kLHA_ovX5Zi2OwxEv-td-
+KpxnfbKDI_8FZsOoggqx3Al-Du1y2qMoUD7uzA' 
+ 
+Upon successful authentication, the user would be logged into the ULIP system and get an access 
+token. Though this token user can communicate with  ULIP. This token has expiry time which 
+represents user session. The session time out for the same to be fixed hour, generally it is for 30 
+minutes. If there is no request coming from user for 30 minutes, then session (token) will be 
+expired, and user need to re authenticate. 
+ 
+Using The above token, users can request ULIP system for cargo details as follow - 
+ 
+curl -X POST \ 
+  https://www.ulip.dpiit.gov.in/ulip/v1.0.0/IWAI/01 
+\ 
+ULIP Integration Document   
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 5.0 Page 70 of 70 
+ 
+  -H 'accept: application/json' \ 
+  -H 'authorization: Bearer 
+eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZXN0MSIsImlhdCI6MTYyNTIzMDQyNywiYXBwcyI6I
+mRhdGFwdXNoIn0.rhumwWJ8BWeeHe9CYmIV1UKyJk-kLHA_ovX5Zi2OwxEv-td-
+KpxnfbKDI_8FZsOoggqx3Al-Du1y2qMoUD7uzA' \ 
+  -H 'cache-control: no-cache' \ 
+  -H 'content-type: application/json' \ 
+  -H 'postman-token: 8e8a19a4-ea1e-6373-f616-e2e4af9a1338' \ 
+  -d '{ }' 
+ 
+For Staging: 
+ 
+curl --location --request POST 
+'https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/user/login' \ 
+--header 'Accept: application/json' \ 
+--header 'Content-Type: application/json' \ 
+--data-raw '{ 
+"username": "xxxx", 
+"password": "xxxx@123"}' 
+ 
+Authorization:   
+Bearer  
+eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZXN0MSIsImlhdCI6MTYyNTIzMDQyNywiYXBwcyI6I
+mRhdGFwdXNoIn0.rhumwWJ8BWeeHe9CYmIV1UKyJk-kLHA_ovX5Zi2OwxEv-td-
+KpxnfbKDI_8FZsOoggqx3Al-Du1y2qMoUD7uzA' 
+ 
+Upon successful authentication, the user would be logged into the ULIP system and get an access 
+token. Though this token user can communicate with ULIP. This token has expiry time which 
+represents user session. The session time out for the same to be fixed hour, generally it is for 30 
+minutes. If there is no request coming from user for 30 minutes, then session (token) will be 
+expired, and user need to re authenticate. 
+ 
+Using The above token, users can request ULIP system for cargo details as follow - 
+ 
+curl -X POST \ 
+  https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/IWAI/01 
+\ 
+  -H 'accept: application/json' \ 
+  -H 'authorization: Bearer 
+eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZXN0MSIsImlhdCI6MTYyNTIzMDQyNywiYXBwcyI6I
+mRhdGFwdXNoIn0.rhumwWJ8BWeeHe9CYmIV1UKyJk-kLHA_ovX5Zi2OwxEv-td-
+KpxnfbKDI_8FZsOoggqx3Al-Du1y2qMoUD7uzA' \ 
+  -H 'cache-control: no-cache' \ 
+  -H 'content-type: application/json' \ 
+  -H 'postman-token: 8e8a19a4-ea1e-6373-f616-e2e4af9a1338' \ 
+  -d '{ }' 
+ 

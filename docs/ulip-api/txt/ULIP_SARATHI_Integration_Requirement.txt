@@ -1,0 +1,685 @@
+ULIP Integration Requirement Document 
+ 
+  
+                        
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+Version No.: 5.0 
+Date: 11/06/2026 
+Project Name: ULIP 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ULIP Integration Requirement Document 
+This document contains proprietary information of NLDSL. Unauthorized access, copying and replication are 
+prohibited. This document must not be copied in whole or part by any means, without the written authorization of 
+NLDSL, Noida, India. 
+ 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 5.0 Page 2 of 14 
+ 
+ 
+ 
+ 
+Revision History 
+Version Date Author Reviewer Significant 
+Changes 
+1.0 05/07/2021 Hasan Mhad Khan Nayab Ali Baseline Version 
+2.0 24/05/2022 Akshay Singh Nayab Ali Update response 
+3.0 04/08/2022 Akshay Singh Nayab Ali Update response 
+4.0 30/09/2024 Girish Chander Nayab Ali Updated 
+5.0 11/06/2026 Sudhanshu Singh Nayab Ali Sarathi/02 Api 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+  
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 5.0 Page 3 of 14 
+ 
+Table of Contents 
+ 
+Introduction ................................................................................................................................................. 4 
+1.1 Purpose .................................................................................................................................... 4 
+The Overall Description .............................................................................................................................. 4 
+1.2 Data Integration between SARATHI System and ULIP application ......................................... 4 
+1.3 SARATHI/01 ............................................................................................................................. 4 
+1.3.1 Technical Approach .................................................................................................... 5 
+1.4 SARATHI/02 ............................................................................................................................. 8 
+1.4.1 Technical Approach .................................................................................................... 8 
+1.5 Data Transmission & Authentication Mechanism .................................................................. 12 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 5.0 Page 4 of 14 
+ 
+Introduction 
+1.1 Purpose 
+ 
+The purpose of this document is to define and provide details for accessing API for driving license 
+information from ULIP system. 
+This document details the following points: 
+ 
+1. Data Integration between SARATHI and ULIP web service: Identification of operational 
+points where data integration between SARATHI and ULIP web service will be needed. 
+ 
+2. Technical Approach for performing Data Integration  
+ 
+The Overall Description 
+ 
+Users will share information such as driving license number and date of birth based on data 
+send by user ULIP system will call respective SARATHI API for accessing information. 
+ 
+Following is the point for accessing vehicle information: - 
+ 
+1. This API will share driving license data based on information provided by users. 
+ 
+2. ULIP will expose API for getting data from SARATHI API. 
+ 
+3. SARATHI/01 API will take driving license and date of birth from user and get data from 
+SARATHI API. 
+4. SARATHI/02 API will take driving license from user and get data from SARATHI API 
+ 
+1.2 Data Integration between SARATHI System and ULIP application 
+ 
+Users will share information to ULIP system based on data shared ULIP will provide data to 
+user. 
+1.3 SARATHI/01 
+ 
+This API will take driving license number and connect with SARATHI API to get data. 
+ 
+S. No. Field Name Field Description Format Require
+d/Not – 
+Require
+d 
+Length 
+1 dlnumber Driving license Number as 
+available in SARATHI 
+system. 
+(([A-Z]{2}(-)[0-
+9]{2})|([A-Z]{2}[0-
+Required 16 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 5.0 Page 5 of 14 
+ 
+9]{2} ))((19|20)[0-
+9][0-9])[0-9]{7}$ 
+ 
+ 
+2 dob Date of birth as available 
+in SARATHI system. 
+yyyy-mm-dd Require
+d 
+10 
+ 
+1.3.1 Technical Approach  
+1. All the data will be shared through rest web services. 
+2. ULIP system will provide driving license number and date of birth  for which detail is 
+required. 
+3. SARATHI API will share details of driving license information which exist in SARATHI 
+system in JSON format. 
+ 
+4. ULIP system will provide the data in JSON Object format in response body. 
+ 
+Example: 
+ 
+Driving license Number GJ04 20120005008 and date of birth 1987-05-26 is shared by ULIP 
+system, then SARATHI-integration will make a request to SARATHI API. 
+ 
+Request: 
+ 
+The request must be of the following format, where driving license number and date of birth is 
+passed within the URL body in JSON format. 
+ 
+For Production: 
+ 
+https://www.ulip.dpiit.gov.in/ulip/v1.0.0/SARATHI/01 
+ 
+ 
+{ 
+    "dlnumber": "GJ04 20120005008", 
+    "dob": "1987-05-26" 
+} 
+ 
+Curl URL 
+ 
+curl -X POST \ 
+  https://www.ulip.dpiit.gov.in/ulip/v1.0.0/SARATHI/01 \ 
+  -H 'accept: application/json' \ 
+  -H 'authorization: Bearer 
+eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZXN0MSIsImlhdCI6MTYyNTQ2Mjg0MCwiYXBwcyI6ImRh
+dGFwdXNoIn0.1trNBEuh-
+BGPjV_ooeY5Is2RkQK7tz41N4LEfbrV5cwTtiGfjq4tjwMBaUqyvHkeX6P7qPTgV5JDRu0SrTq7jg
+' \ 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 5.0 Page 6 of 14 
+ 
+  -H 'content-type: application/json' \ 
+  -d '{ 
+    "dlnumber": "GJ04 20120005008", 
+    "dob": "1987-05-26" 
+}' 
+ 
+ 
+For Staging: 
+ 
+https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/SARATHI/01 
+ 
+ 
+{ 
+    "dlnumber": "GJ04 20120005008", 
+    "dob": "1987-05-26" 
+} 
+ 
+Curl URL 
+ 
+curl -X POST \ 
+  https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/SARATHI/01 \ 
+  -H 'accept: application/json' \ 
+  -H 'authorization: Bearer 
+eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZXN0MSIsImlhdCI6MTYyNTQ2Mjg0MCwiYXBwcyI6ImRh
+dGFwdXNoIn0.1trNBEuh-
+BGPjV_ooeY5Is2RkQK7tz41N4LEfbrV5cwTtiGfjq4tjwMBaUqyvHkeX6P7qPTgV5JDRu0SrTq7jg
+' \ 
+  -H 'content-type: application/json' \ 
+  -d '{ 
+    "dlnumber": "GJ04 20120005008", 
+    "dob": "1987-05-26" 
+}' 
+ 
+ 
+ 
+For obtaining authentication token, refer Section 1.5 
+ 
+Response 
+ 
+To acknowledge the above request, ULIP will send the below response -  
+ 
+a) In case of invalid format 
+ 
+1. Invalid dl number 
+ 
+ 
+{ 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 5.0 Page 7 of 14 
+ 
+    "response": null, 
+    "error": "true", 
+    "code": "400", 
+    "message": "Data format failed OR wrong value entered at:  dlnumber. 
+Format should follow  (([A-Z]{2}(-)[0-9]{2})|([A-Z]{2}[0-9]{2} ))((19|20)[0-
+9][0-9])[0-9]{7}$" 
+} 
+ 
+ 
+2. Invalid dob 
+ 
+{ 
+    "response": null, 
+    "error": "true", 
+    "code": "400", 
+    "message": "Data format failed OR wrong value entered at:  dob. Format 
+should follow  ^\\d{4}\\-(0[1-9]|1[012])\\-(0[1-9]|[12][0-9]|3[01])$" 
+} 
+ 
+ 
+b) In case of DL does not exist in SARATHI system 
+ 
+{ 
+    "response": [ 
+        { 
+            "response": { 
+                "dldetobj": [ 
+                    { 
+                        "transReqObj": null, 
+                        "dlTest": null, 
+                        "dlEndorsementObj": null, 
+                        "objections": null, 
+                        "psvBadgeissued": null, 
+                        "dbLoc": "National Register", 
+                        "dlHzHillObj": null, 
+                        "errorcd": -1, 
+                        "dlCovHistObj": null, 
+                        "dlcovs": null, 
+                        "bioObj": null, 
+                        "idIdpIssuedpPojo": null, 
+                        "dlobj": null, 
+                        "erormsg": "No Details are available.", 
+                        "bioImgObj": null, 
+                        "dlHistObj": null 
+                    } 
+                ] 
+            }, 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 5.0 Page 8 of 14 
+ 
+            "responseStatus": "SUCCESS" 
+        } 
+    ], 
+    "error": "false", 
+    "code": "200", 
+    "message": "Success" 
+} 
+ 
+c) In case DL exist 
+ 
+For response format, please check the attached word file. 
+ 
+SARATHI - 
+Response.docx
+ 
+ 
+Status Code 200: vehicle data response 
+Status Code 400: Bad request (Invalid json syntax, invalid json key) 
+Status Code 401 or 403: Unauthenticated or Unauthorized 
+Status Code 500: Some internal server error occurred 
+Status Code 502: Server is not responding. 
+1.4 SARATHI/02 
+ 
+This API will take driving license number and connect with SARATHI API to get data. 
+ 
+S. No. Field Name Field Description Format Require
+d/Not – 
+Require
+d 
+Length 
+1 dlnumber Driving license Number as 
+available in SARATHI 
+system. 
+(([A-Z]{2}(-)[0-
+9]{2})|([A-Z]{2}[0-
+9]{2} ))((19|20)[0-
+9][0-9])[0-9]{7}$ 
+ 
+ 
+Required 16 
+ 
+1.4.1 Technical Approach  
+5. All the data will be shared through rest web services. 
+6. ULIP system will provide driving license number for which detail is required. 
+7. SARATHI API will share details of driving license information which exist in SARATHI 
+system in JSON format. 
+ 
+8. ULIP system will provide the data in JSON Object format in response body. 
+ 
+Example: 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 5.0 Page 9 of 14 
+ 
+ 
+Driving license Number UP9620110001440 is shared by ULIP system, then SARATHI-
+integration will make a request to SARATHI API. 
+ 
+Request: 
+ 
+The request must be of the following format, where driving license number is passed within the 
+URL body in JSON format. 
+ 
+For Production: 
+ 
+https://www.ulip.dpiit.gov.in/ulip/v1.0.0/SARATHI/02 
+ 
+ 
+{ 
+    "dlnumber": "UP9620110001440" 
+} 
+ 
+Curl URL 
+ 
+curl --location 'https://www.ulip.dpiit.gov.in/ulip/v1.0.0/SARATHI/02' \ 
+--header 'Authorization: Bearer 
+eyJhbGciOiJIUzUxMiJ9.eyJhcHBzIjoiYXBpR2F0ZXdheSIsInN1YiI6InVsaXAiLCJpYXQiOjE3
+ODEwNjkwMTV9.b1ReCxMiiIB2HepOvtlCKXCo3ecAiq2hTmd_mUHPBComCJ1e6gCNE-
+5ZQklVecV9oBXIbWIMYNl-d3_LLWiwDA' \ 
+--header 'Content-Type: application/json' \ 
+--header 'Accept: application/json' \ 
+--data '{ 
+    "dlnumber": "UP9620110001440" 
+}' 
+ 
+ 
+For Staging: 
+ 
+https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/SARATHI/02 
+ 
+ 
+{ 
+    "dlnumber": "AP01620210000019" 
+} 
+ 
+Curl URL 
+ 
+curl --location 'https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/SARATHI/02' 
+\ 
+--header 'Authorization: Bearer 
+eyJhbGciOiJIUzUxMiJ9.eyJhcHBzIjoiYXBpR2F0ZXdheSIsInN1YiI6InVsaXAiLCJpYXQiOjE3
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 5.0 Page 10 of 14 
+ 
+ODExNTIzNDR9.qqVP-x97eBOtj4yHjhDP-ywTYpRyp-
+Ch8Df4zmHgS6uuR6Wv_vcAtmgvq_8TBR0r4Lftp7fFjBpW6ukpXsUsow' \ 
+--header 'Accept: application/json' \ 
+--header 'Content-Type: application/json' \ 
+--data '{ 
+    "dlnumber": "AP01620210000019" 
+}' 
+ 
+ 
+ 
+For obtaining authentication token, refer Section 1.5 
+ 
+Response 
+ 
+To acknowledge the above request, ULIP will send the below response -  
+ 
+d) In case of invalid format 
+ 
+3. Invalid dl number 
+ 
+ 
+{ 
+    "response": null, 
+    "error": "true", 
+    "code": "400 BAD_REQUEST", 
+    "message": "Data format failed OR wrong value entered at:  dlnumber. 
+Format should follow  ^.{1,25}$" 
+} 
+ 
+ 
+ 
+ 
+ 
+e) In case of DL does not exist in SARATHI system 
+ 
+{ 
+    "response": [ 
+        { 
+            "response": { 
+                "errormessage": "Details not Found For Given DLNumber", 
+                "errorcode": -1 
+            }, 
+            "responseStatus": "SUCCESS", 
+            "message": null 
+        } 
+    ], 
+    "error": "false", 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 5.0 Page 11 of 14 
+ 
+    "code": "200", 
+    "message": "Success" 
+} 
+ 
+f) In case DL exist 
+ 
+{ 
+    "response": [ 
+        { 
+            "response": { 
+                "DLinformation": { 
+                    "Classofcovs": [ 
+                        { 
+                            "CovDiscription": "Motor Cycle with Gear(Non Transport)", 
+                            "CovCode": 3 
+                        }, 
+                        { 
+                            "CovDiscription": "LIGHT MOTOR VEHICLE", 
+                            "CovCode": 4 
+                        }, 
+                        { 
+                            "CovDiscription": "Transport Vehicle-M/HMV (Goods and Passenger)", 
+                            "CovCode": 10 
+                        } 
+                    ], 
+                    "NonTransportValidityTodate": "27-04-2031", 
+                    "TransportValidityTodate": "16-02-2028", 
+                    "DL_Holder_FullName": "RAMSANEHI", 
+                    "DL_status": "Active." 
+                } 
+            }, 
+            "responseStatus": "SUCCESS", 
+            "message": null 
+        } 
+    ], 
+    "error": "false", 
+    "code": "200", 
+    "message": "Success" 
+} 
+ 
+ 
+ 
+Status Code 200: vehicle data response 
+Status Code 400: Bad request (Invalid json syntax, invalid json key) 
+Status Code 401 or 403: Unauthenticated or Unauthorized 
+Status Code 500: Some internal server error occurred 
+Status Code 502: Server is not responding. 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 5.0 Page 12 of 14 
+ 
+1.5 Data Transmission & Authentication Mechanism 
+ 
+All data exchange would be done over secure HTTP (HTTPS). Request from ULIP's system would 
+be made in SARATHI system through a data exchange URL that has following form: 
+ 
+For Production: 
+ 
+https://www.ulip.dpiit.gov.in/ulip/v1.0.0/SARATHI/01 
+ 
+Body:  
+ 
+{ 
+    "dlnumber": "GJ04 20120005008", 
+    "dob": "1987-05-26"  
+} 
+ 
+Access to above data exchange URL would be authorized by use of a security mechanism 
+implemented by the ULIP system. It is as follows: 
+ 
+• First time access:  It would require a username and password [which would be shared with 
+user beforehand].  Once user hit with valid user id and password, ULIP system will return a 
+basic authorization token to  user, using that token user will communicate with ULIP system 
+until token will not get expired. 
+ 
+Brief summary of HTTP Basic Authentication is as follows: 
+ 
+First time when User will hit ULIP secured API through username and password for access token 
+as follow- 
+curl --location --request POST 
+'https://www.ulip.dpiit.gov.in/ulip/v1.0.0/user/login' \ 
+--header 'Accept: application/json' \ 
+--header 'Content-Type: application/json' \ 
+--data-raw '{ 
+    "username": "test1", 
+    "password": "ulip@123" 
+}' 
+ 
+Authorization:   
+Bearer  
+eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZXN0MSIsImlhdCI6MTYzMDU2MTc1NywiYXBwcyI6ImRh
+dGFwdXNoIn0.o6h4916Nwl81GPvjFDUgeEHLnMWhAh_NdW3okMOa6Q2ddw89RWmdDvDx4UYRoUeJ8
+yfPZyNBxhTPoQZ-uUzgTg' 
+ 
+Upon successful authentication, the user would be logged into the ULIP system and get an access 
+token. Though this token user can communicate with  ULIP. This token has expiry time which 
+represent user session. The session time out for the same to be fixed hour, generally it is for 30 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 5.0 Page 13 of 14 
+ 
+minutes. If there is no request coming from user for 30 minutes, then session (token) will be 
+expired and user need to re authenticate. 
+ 
+Using The above token, user can request ULIP system for vehicle details as follow - 
+ 
+curl --location --request POST 
+'https://www.ulip.dpiit.gov.in/ulip/v1.0.0/SARATHI/01' \ 
+--header 'Authorization: Bearer 
+eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZXN0MSIsImlhdCI6MTYzMDU2MTc1NywiYXBwcyI6ImRh
+dGFwdXNoIn0.o6h4916Nwl81GPvjFDUgeEHLnMWhAh_NdW3okMOa6Q2ddw89RWmdDvDx4UYRoUeJ8
+yfPZyNBxhTPoQZ-uUzgTg' \ 
+--header 'Accept: application/json' \ 
+--header 'Content-Type: application/json' \ 
+--data-raw '{ 
+    "dlnumber": "GJ04 20120005008", 
+    "dob": "1987-05-26" 
+}' 
+ 
+ 
+For Staging- 
+ 
+curl --location --request POST 
+'https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/user/login' \ 
+--header 'Accept: application/json' \ 
+--header 'Content-Type: application/json' \ 
+--data-raw '{ 
+    "username": "test1", 
+    "password": "ulip@123" 
+}' 
+ 
+Authorization:   
+Bearer  
+eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZXN0MSIsImlhdCI6MTYzMDU2MTc1NywiYXBwcyI6ImRh
+dGFwdXNoIn0.o6h4916Nwl81GPvjFDUgeEHLnMWhAh_NdW3okMOa6Q2ddw89RWmdDvDx4UYRoUeJ8
+yfPZyNBxhTPoQZ-uUzgTg' 
+ 
+Upon successful authentication, the user would be logged into the ULIP system and get an access 
+token. Though this token user can communicate with ULIP. This token has expiry time which 
+represent user session. The session time out for the same to be fixed hour, generally it is for 30 
+minutes. If there is no request coming from user for 30 minutes, then session (token) will be 
+expired and user need to re authenticate. 
+ 
+Using The above token, user can request ULIP system for vehicle details as follow - 
+ 
+curl --location --request POST 
+'https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/SARATHI/01' \ 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 5.0 Page 14 of 14 
+ 
+--header 'Authorization: Bearer 
+eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZXN0MSIsImlhdCI6MTYzMDU2MTc1NywiYXBwcyI6ImRh
+dGFwdXNoIn0.o6h4916Nwl81GPvjFDUgeEHLnMWhAh_NdW3okMOa6Q2ddw89RWmdDvDx4UYRoUeJ8
+yfPZyNBxhTPoQZ-uUzgTg' \ 
+--header 'Accept: application/json' \ 
+--header 'Content-Type: application/json' \ 
+--data-raw '{ 
+    "dlnumber": "GJ04 20120005008", 
+    "dob": "1987-05-26" 
+}' 
+ 

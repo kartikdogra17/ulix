@@ -1,0 +1,3423 @@
+ULIP Integration Requirement Document 
+ 
+  
+                        
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+Version No.: 4.0 
+Date: 08/11/2021 
+Project Name: ULIP 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ULIP Integration Requirement Document 
+This document contains proprietary information of NLDSL. Unauthorized access, copying and replication are 
+prohibited. This document must not be copied in whole or part by any means, without the written authorization of 
+NLDSL, Noida, India. 
+ 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 2 of 66 
+ 
+ 
+ 
+ 
+Revision History 
+Version Date Author Reviewer Significant Changes  
+1.0 08/11/2021 Hasan Mhad Khan  Nayab Ali Baseline Version 
+2.0 01/10/2024 Girish Chander Nayab Ali Updated 
+3.0 09/05/2025 Hasan Mhad Khan  Nayab Ali New API details 
+added 
+4.0 03/02/2025 Sudhanshu Singh Nayab Ali 
+Regex Updated 
+for Input 
+Parameter for 
+Icegate 13 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 3 of 66 
+ 
+ 
+Table of Contents 
+ 
+Introduction ................................................................................................................................................. 4 
+1.1 Purpose .................................................................................................................................... 4 
+The Overall Description .............................................................................................................................. 4 
+1.2 Data Integration between ICEGATE System and ULIP application ......................................... 5 
+1.3 ICEGATE/01 ............................................................................................................................. 5 
+1.3.1 Technical Approach .................................................................................................... 5 
+1.4 ICEGATE/02 ............................................................................................................................. 9 
+1.4.1 Technical Approach .................................................................................................... 9 
+1.5 ICEGATE/03 ........................................................................................................................... 13 
+1.5.1 Technical Approach .................................................................................................. 13 
+1.6 ICEGATE/04 ........................................................................................................................... 16 
+1.6.1 Technical Approach .................................................................................................. 17 
+1.7 ICEGATE/05 ........................................................................................................................... 21 
+1.7.1 Technical Approach .................................................................................................. 21 
+1.8 ICEGATE/06 ........................................................................................................................... 25 
+1.8.1 Technical Approach .................................................................................................. 25 
+1.9 ICEGATE/07 ........................................................................................................................... 29 
+1.9.1 Technical Approach .................................................................................................. 29 
+1.10 ICEGATE/08 ..................................................................................................................... 33 
+1.10.1 Technical Approach ................................................................................................. 33 
+1.11 ICEGATE/09 ..................................................................................................................... 38 
+1.11.1 Technical Approach ................................................................................................. 39 
+1.12 ICEGATE/10 ..................................................................................................................... 43 
+1.12.1 Technical Approach ................................................................................................. 43 
+1.13 ICEGATE/11 ..................................................................................................................... 47 
+1.13.1 Technical Approach ................................................................................................. 48 
+1.14 ICEGATE/12 ..................................................................................................................... 55 
+1.14.1 Technical Approach ................................................................................................. 56 
+1.15 ICEGATE/13 ..................................................................................................................... 60 
+1.15.1 Technical Approach ................................................................................................. 60 
+1.16 Data Transmission & Authentication Mechanism ............................................................. 64 
+ 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 4 of 66 
+ 
+ 
+Introduction 
+1.1 Purpose 
+ 
+The purpose of this document is to define and provide details for accessing API for the 
+ICEGATE (Indian Customs Electronic Data Interchange (EDI) Gateway) system 
+information (e-filing services) from the ULIP system. 
+ 
+This document details the following points: 
+ 
+1. Data Integration between ICEGATE and ULIP web service: Identification of 
+operational points where data integration between ICEGATE and ULIP web service will 
+be needed. 
+ 
+2. Technical Approach for Performing Data Integration  
+ 
+The Overall Description 
+ 
+User will share the information such as EGM number, BE number and shipping bill 
+number based on data send by user ULIP system will call respective ICEGATE API for 
+accessing information. 
+ 
+Following are the point for accessing vehicle information: - 
+ 
+This API will share data based on information provided by user. ULIP will expose API for getting 
+data from ICEGATE API. 
+ 
+1. ICEGATE/01  API will take IGM and IGM date number from user and get data from 
+ICEGATE API. 
+ 
+2. ICEGATE/02  API will take BE number and date from user and get data from ICEGATE 
+API. 
+ 
+3. ICEGATE/03  API will take BE number and date from user and get data from ICEGATE 
+API. 
+ 
+4. ICEGATE/04  API will take Site id, IMO code, Vessel code, arrival data from user and 
+get data from ICEGATE API. 
+ 
+5. ICEGATE/05  API will take shipping bill number & date from user and get data from 
+ICEGATE API. 
+ 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 5 of 66 
+ 
+6. ICEGATE/06  API will take shipping bill number & date from user and get data from 
+ICEGATE API. 
+ 
+ 
+7. ICEGATE/07  API will take the IGM number and IGM date from the user and get data 
+from the ICEGATE API. 
+8. ICEGATE/08  API will take the EGM number and EGM date from the user and get data 
+from the ICEGATE API. 
+9. ICEGATE/09 will provide MAWB details when Location and MAWB details are entered 
+as input  
+10. ICEGATE/10 will provide MAWB details when the Master Bill Number and House 
+Airway Bill no are entered as input 
+11. ICEGATE/11 will provide Air Export General Manifest & Air Import General Manifest Job 
+Status Details 
+12. ICEGATE/12 will provide Manual/Courier/Postal SB details 
+13. ICEGATE/13 will provide e-Seal details 
+ 
+1.2 Data Integration between the ICEGATE System and the ULIP 
+application 
+ 
+The user will share information with the ULIP system based on data shared ULIP will 
+provide data to the user. 
+1.3 ICEGATE/01 
+ 
+This API will take VCN number and connect with ICEGATE API to get data. 
+ 
+S. 
+No. 
+Field Name Field Description Format Require
+d/Not – 
+Require
+d 
+Length 
+1 igmNo vessel call number as 
+available in ICEGATE 
+system. 
+[0-9]{1,7} Required Min 1 
+Max 7 
+2 igmDt IGM date [0-9]{8} Required 
+ 
+Max 8 
+1.3.1 Technical Approach  
+1. All the data will be shared through rest web services. 
+2. ULIP system will provide IGM number for which detail is required. 
+3. ICEGATE API will share details of vessel information which exist in ICEGATE system in 
+JSON format. 
+4. ICEGATE Integration will add JSON in response key in response body. 
+5. ULIP system will provide the data in JSON Object format in response body. 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 6 of 66 
+ 
+ 
+Example: 
+ 
+IGM number 2001362 is shared by ULIP system, then ICEGATE-integration will make 
+a request to ICEGATE API. 
+ 
+Request: 
+ 
+The request must be of the following format 
+ 
+For Production: 
+ 
+https://www.ulip.dpiit.gov.in/ulip/v1.0.0/ICEGATE/01 
+ 
+ 
+{"igmNo":"2001362","igmDt":"11102018"} 
+ 
+Curl URL 
+ 
+  curl -X POST \ 
+  https://www.ulip.dpiit.gov.in/ulip/v1.0.0/ICEGATE/01 \ 
+  -H 'accept: application/json' \ 
+  -H 'authorization: Bearer 
+eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZXN0MSIsImlhdCI6MTYyNTczMzQ0NCwiYXBwcyI6ImRh
+dGFwdXNoIn0.-
+FTXGNLmro8bXz45XsfCWkz05u4fdnxpIYXK7HZ7ufbAtbXejm0rsYiv8rzjiUr0bjg1TAxp6vb838
+uxtet63g' \ 
+  -H 'cache-control: no-cache' \ 
+  -H 'content-type: application/json' \ 
+  -H 'postman-token: 62dad653-e293-dbff-983e-388f64ae1cd8' \ 
+  -d '{"igmNo":"2001362","igmDt":"11102018"}' 
+ 
+ 
+ 
+For Staging: 
+ 
+https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/ICEGATE/01 
+ 
+ 
+{"igmNo":"2001362","igmDt":"11102018"} 
+ 
+Curl URL 
+ 
+  curl -X POST \ 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 7 of 66 
+ 
+  https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/ICEGATE/01 \ 
+  -H 'accept: application/json' \ 
+  -H 'authorization: Bearer 
+eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZXN0MSIsImlhdCI6MTYyNTczMzQ0NCwiYXBwcyI6ImRh
+dGFwdXNoIn0.-
+FTXGNLmro8bXz45XsfCWkz05u4fdnxpIYXK7HZ7ufbAtbXejm0rsYiv8rzjiUr0bjg1TAxp6vb838
+uxtet63g' \ 
+  -H 'cache-control: no-cache' \ 
+  -H 'content-type: application/json' \ 
+  -H 'postman-token: 62dad653-e293-dbff-983e-388f64ae1cd8' \ 
+  -d '{"igmNo":"2001362","igmDt":"11102018"}' 
+ 
+ 
+ 
+ 
+For obtaining authentication token, refer Section 1.6 
+ 
+Response 
+ 
+To acknowledge the above request, ULIP will send the below response -  
+ 
+a) In case of invalid format 
+ 
+1. Invalid igm number 
+ 
+ 
+{ 
+    "response": null, 
+    "error": "true", 
+    "code": "400", 
+    "message": "Data format failed OR wrong value entered at:  igmNo. 
+Format should follow  [0-9]{1,10}" 
+} 
+ 
+ 
+2. Invalid date  
+ 
+ 
+{ 
+    "response": null, 
+    "error": "true", 
+    "code": "400", 
+    "message": "Data format failed OR wrong value entered 
+at:  igmDt. Format should follow  [0-9]{8}" 
+} 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 8 of 66 
+ 
+ 
+ 
+b) In case of igm number does not exist in ICEGATE system 
+ 
+ 
+{ 
+    "response": [ 
+        { 
+            "response": { 
+                "voyageNo": null, 
+                "vesselType": null, 
+                "containerNo": null, 
+                "expDtOfArrival": null, 
+                "portOfArrival": null, 
+                "imoCodeOfVessel": null, 
+                "igmDt": null, 
+                "igmNo": null, 
+                "vesselCode": null, 
+                "totalNoOfLines": null, 
+                "masterName": null 
+            }, 
+            "responseStatus": "SUCCESS" 
+        } 
+    ], 
+    "error": "false", 
+    "code": "200", 
+    "message": "Success" 
+} 
+ 
+ 
+c) In case IGM number exist 
+ 
+ 
+{ 
+    "response": [ 
+        { 
+            "response": { 
+                "voyageNo": "NILLL", 
+                "vesselType": "C", 
+                "containerNo": [ 
+                    "MLCU1234567", 
+                    "TRLU1234567", 
+                    "TTNU1234567", 
+                    "YMLU1234567" 
+                ], 
+                "expDtOfArrival": "12102018", 
+                "portOfArrival": "INCCU1", 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 9 of 66 
+ 
+                "imoCodeOfVessel": "-", 
+                "igmDt": "11102018", 
+                "igmNo": 2001362, 
+                "vesselCode": "394137", 
+                "totalNoOfLines": 4, 
+                "masterName": "." 
+            }, 
+            "responseStatus": "SUCCESS" 
+        } 
+    ], 
+    "error": "false", 
+    "code": "200", 
+    "message": "Success" 
+} 
+ 
+ 
+Status Code 200: vehicle data response 
+Status Code 400: Bad request (Invalid JSON syntax, invalid JSON key) 
+Status Code 401 or 403: Unauthenticated or Unauthorized 
+Status Code 500: Some internal server error occurred 
+Status Code 502: Server is not responding. 
+ 
+1.4 ICEGATE/02 
+ 
+This API will take BE number and BE date and connect with ICEGATE API to get data. 
+ 
+S. 
+No. 
+Field Name Field Description Format Require
+d/Not – 
+Require
+d 
+Length 
+1 beNo Bill of Entry Number as 
+available in ICEGATE 
+system. 
+[0-9]{1,7} Required 7 
+2 beDt BE date [0-9]{8}  
+Required 
+ 
+8 
+1.4.1 Technical Approach  
+1. All the data will be shared through rest web services. 
+2. ULIP system will provide BE number for which detail is required. 
+3. ICEGATE API will share details of cargo information which exist in ICEGATE system in 
+JSON format. 
+4. ICEGATE Integration will add JSON in response key in response body. 
+5. ULIP system will provide the data in JSON Object format in response body. 
+ 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 10 of 66 
+ 
+Example: 
+ 
+BE number 2002892 is shared by ULIP system, then ICEGATE-integration will make a 
+request to ICEGATE API. 
+ 
+Request: 
+ 
+The request must be of the following format 
+ 
+For Production: 
+ 
+https://www.ulip.dpiit.gov.in/ulip/v1.0.0/ICEGATE/02 
+ 
+ 
+{"beNo":"2002892","beDt":"16072011"} 
+ 
+ 
+Curl URL 
+ 
+  curl -X POST \ 
+  https://www.ulip.dpiit.gov.in/ulip/v1.0.0/ICEGATE/02 \ 
+  -H 'accept: application/json' \ 
+  -H 'authorization: Bearer 
+eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZXN0MSIsImlhdCI6MTYyNTczMzQ0NCwiYXBwcyI6ImRh
+dGFwdXNoIn0.-
+FTXGNLmro8bXz45XsfCWkz05u4fdnxpIYXK7HZ7ufbAtbXejm0rsYiv8rzjiUr0bjg1TAxp6vb838
+uxtet63g' \ 
+  -H 'cache-control: no-cache' \ 
+  -H 'content-type: application/json' \ 
+  -H 'postman-token: d0fa9f41-ec93-2b83-9b90-754b6ad24395' \ 
+  -d '{"beNo":"2002892","beDt":"16072011"}' 
+ 
+ 
+For Staging: 
+ 
+https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/ICEGATE/02 
+ 
+ 
+{"beNo":"2002892","beDt":"16072011"} 
+ 
+ 
+Curl URL 
+ 
+  curl -X POST \ 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 11 of 66 
+ 
+  https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/ICEGATE/02 \ 
+  -H 'accept: application/json' \ 
+  -H 'authorization: Bearer 
+eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZXN0MSIsImlhdCI6MTYyNTczMzQ0NCwiYXBwcyI6ImRh
+dGFwdXNoIn0.-
+FTXGNLmro8bXz45XsfCWkz05u4fdnxpIYXK7HZ7ufbAtbXejm0rsYiv8rzjiUr0bjg1TAxp6vb838
+uxtet63g' \ 
+  -H 'cache-control: no-cache' \ 
+  -H 'content-type: application/json' \ 
+  -H 'postman-token: d0fa9f41-ec93-2b83-9b90-754b6ad24395' \ 
+  -d '{"beNo":"2002892","beDt":"16072011"}' 
+ 
+ 
+ 
+For obtaining authentication token, refer Section 1.6 
+ 
+Response 
+ 
+To acknowledge the above request, ULIP will send the below response -  
+ 
+a) In case of invalid format 
+ 
+1. Invalid BE number 
+ 
+ 
+{ 
+    "response": null, 
+    "error": "true", 
+    "code": "400", 
+    "message": "Data format failed OR wrong value entered 
+at:  beNo. Format should follow [0-9]{7}" 
+} 
+ 
+2. Invalid date  
+ 
+ 
+{ 
+    "response": null, 
+    "error": "true", 
+    "code": "400", 
+    "message": "Data format failed OR wrong value entered 
+at:  beDt. Format should follow  [0-9]{8}" 
+} 
+ 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 12 of 66 
+ 
+ 
+b) In case of BE number does not exist in ICEGATE system 
+ 
+ 
+{ 
+    "response": [ 
+        { 
+            "response": { 
+                "boeDetails": [] 
+            }, 
+            "responseStatus": "SUCCESS" 
+        } 
+    ], 
+    "error": "false", 
+    "code": "200", 
+    "message": "Success" 
+} 
+ 
+ 
+c) In case BE number exist 
+ 
+ 
+{ 
+    "response": [ 
+        { 
+            "response": { 
+                "boeDetails": [ 
+                    { 
+                        "imoCode": "1000000", 
+                        "containerNo": [ 
+                            "MSCU7786602" 
+                        ], 
+                        "unitOfQt": "MTS", 
+                        "igmDt": "04072011", 
+                        "natureOfCargo": "C", 
+                        "countryOrig": "BR", 
+                        "grossWt": 25.99, 
+                        "totNoPkg": 56 
+                    } 
+                ] 
+            }, 
+            "responseStatus": "SUCCESS" 
+        } 
+    ], 
+    "error": "false", 
+    "code": "200", 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 13 of 66 
+ 
+    "message": "Success" 
+} 
+ 
+ 
+Status Code 200: vehicle data response 
+Status Code 400: Bad request (Invalid JSON syntax, invalid JSON key) 
+Status Code 401 or 403: Unauthenticated or Unauthorized 
+Status Code 500: Some internal server error occurred 
+Status Code 502: Server is not responding. 
+ 
+ 
+1.5 ICEGATE/03 
+ 
+This API will take shipping bill number and connect with ICEGATE API to get data. 
+ 
+S. 
+No. 
+Field Name Field Description Format Require
+d/Not – 
+Require
+d 
+Length 
+1 beNo Shipping Bill number as 
+available in ICEGATE 
+system. 
+[0-9]{1,7} Required 7 
+2 beDt BE date [0-9]{8}  
+Required 
+ 
+8 
+1.5.1 Technical Approach  
+1. All the data will be shared through rest web services. 
+2. ULIP system will provide BE number for which detail is required. 
+3. ICEGATE API will share details of cargo information which exist in ICEGATE system in 
+JSON format. 
+4. ICEGATE Integration will add JSON in response key in response body. 
+5. ULIP system will provide the data in JSON Object format in response body. 
+ 
+Example: 
+ 
+BE number 6330973 is shared by ULIP system, then ICEGATE-integration will make a 
+request to ICEGATE API. 
+ 
+Request: 
+ 
+The request must be of the following format 
+ 
+For Production: 
+ 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 14 of 66 
+ 
+https://www.ulip.dpiit.gov.in/ulip/v1.0.0/ICEGATE/03 
+ 
+ 
+{"beNo":"6330973","beDt":"22032012"} 
+ 
+ 
+Curl URL 
+ 
+  curl -X POST \ 
+  https://www.ulip.dpiit.gov.in/ulip/v1.0.0/ICEGATE/03 \ 
+  -H 'accept: application/json' \ 
+  -H 'authorization: Bearer 
+eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZXN0MSIsImlhdCI6MTYyNTczMzQ0NCwiYXBwcyI6ImRh
+dGFwdXNoIn0.-
+FTXGNLmro8bXz45XsfCWkz05u4fdnxpIYXK7HZ7ufbAtbXejm0rsYiv8rzjiUr0bjg1TAxp6vb838
+uxtet63g' \ 
+  -H 'cache-control: no-cache' \ 
+  -H 'content-type: application/json' \ 
+  -H 'postman-token: 74f68893-0e56-f20f-8581-827680413bb4' \ 
+  -d '{"beNo":"6330973","beDt":"22032012"}' 
+ 
+ 
+For Staging: 
+ 
+https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/ICEGATE/03 
+ 
+ 
+{"beNo":"6330973","beDt":"22032012"} 
+ 
+ 
+Curl URL 
+ 
+  curl -X POST \ 
+  https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/ICEGATE/03 \ 
+  -H 'accept: application/json' \ 
+  -H 'authorization: Bearer 
+eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZXN0MSIsImlhdCI6MTYyNTczMzQ0NCwiYXBwcyI6ImRh
+dGFwdXNoIn0.-
+FTXGNLmro8bXz45XsfCWkz05u4fdnxpIYXK7HZ7ufbAtbXejm0rsYiv8rzjiUr0bjg1TAxp6vb838
+uxtet63g' \ 
+  -H 'cache-control: no-cache' \ 
+  -H 'content-type: application/json' \ 
+  -H 'postman-token: 74f68893-0e56-f20f-8581-827680413bb4' \ 
+  -d '{"beNo":"6330973","beDt":"22032012"}' 
+ 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 15 of 66 
+ 
+ 
+ 
+ 
+For obtaining authentication token, refer Section 1.6 
+ 
+Response 
+ 
+To acknowledge the above request, ULIP will send the below response -  
+ 
+a) In case of invalid format 
+ 
+1. Invalid BE number 
+ 
+ 
+{ 
+    "response": null, 
+    "error": "true", 
+    "code": "400", 
+    "message": "Data format failed OR wrong value entered at:  beNo. Format 
+should follow [0-9]{7}" 
+} 
+ 
+ 
+2. Invalid date  
+ 
+ 
+{ 
+    "response": null, 
+    "error": "true", 
+    "code": "400", 
+    "message": "Data format failed OR wrong value entered 
+at:  beDt. Format should follow  [0-9]{8}" 
+} 
+ 
+b) In case of BE number does not exist in ICEGATE system 
+ 
+ 
+{ 
+    "response": [ 
+        { 
+            "response": { 
+                "oocNo": null, 
+                "oocDt": null 
+            }, 
+            "responseStatus": "SUCCESS" 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 16 of 66 
+ 
+        } 
+    ], 
+    "error": "false", 
+    "code": "200", 
+    "message": "Success" 
+} 
+ 
+ 
+c) In case BE number exist 
+ 
+ 
+{ 
+    "response": [ 
+        { 
+            "response": { 
+                "oocNo": 2004296615, 
+                "oocDt": "26032012" 
+            }, 
+            "responseStatus": "SUCCESS" 
+        } 
+    ], 
+    "error": "false", 
+    "code": "200", 
+    "message": "Success" 
+} 
+ 
+ 
+Status Code 200: vehicle data response 
+Status Code 400: Bad request (Invalid JSON syntax, invalid JSON key) 
+Status Code 401 or 403: Unauthenticated or Unauthorized 
+Status Code 500: Some internal server error occurred 
+Status Code 502: Server is not responding. 
+ 
+1.6 ICEGATE/04 
+ 
+This API will take shipping bill number and connect with ICEGATE API to get data. 
+ 
+S. 
+No. 
+Field Name Field Description Format Require
+d/Not – 
+Require
+d 
+Length 
+1 siteId Site ID as available in 
+ICEGATE system. 
+[0-9]{6} Required 6 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 17 of 66 
+ 
+2 imoCode Unique identifier for 
+ships / registered ship 
+management 
+companies. 
+ 
+[A-Z0-9]{1,25} Required  
+Min 1  
+Max 25 
+3 vesselCode Vessel Code as 
+available in ICEGATE 
+system. 
+[A-Z0-9]{1,25} Required Min 1  
+Max 25 
+4 arrivalDate The date when ship is 
+estimated to arrive at the 
+port of Call. 
+DATE 
+(DDMMYYYY) 
+Required 8 
+1.6.1 Technical Approach  
+1. All the data will be shared through rest web services. 
+2. ULIP system will provide data (site id, IMO code ,vessel code and arrival date) for 
+which detail is required. 
+3. ICEGATE API will share details of cargo information which exist in ICEGATE system in 
+JSON format. 
+4. ICEGATE Integration will add JSON in response key in response body. 
+5. ULIP system will provide the data in JSON Object format in response body. 
+ 
+Example: 
+ 
+site id, IMO code, vessel code and arrival date is shared by ULIP system, then 
+ICEGATE-integration will make a request to ICEGATE API. 
+ 
+Request: 
+ 
+The request must be of the following format 
+ 
+For Production: 
+ 
+https://www.ulip.dpiit.gov.in/ulip/v1.0.0/ICEGATE/04 
+ 
+ 
+{ 
+    "siteId": "INBOM1", 
+    "imoCode": "9241205", 
+    "vesselCode": "DCNT2", 
+    "arrivalDate": "15012020" 
+} 
+ 
+ 
+Curl URL 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 18 of 66 
+ 
+ 
+  curl -X POST \ 
+  https://www.ulip.dpiit.gov.in/ulip/v1.0.0/ICEGATE/04 \ 
+  -H 'accept: application/json' \ 
+  -H 'authorization: Bearer 
+eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZXN0MSIsImlhdCI6MTYyNTczMzQ0NCwiYXBwcyI6ImRh
+dGFwdXNoIn0.-
+FTXGNLmro8bXz45XsfCWkz05u4fdnxpIYXK7HZ7ufbAtbXejm0rsYiv8rzjiUr0bjg1TAxp6vb838
+uxtet63g' \ 
+  -H 'cache-control: no-cache' \ 
+  -H 'content-type: application/json' \ 
+  -H 'postman-token: 74f68893-0e56-f20f-8581-827680413bb4' \ 
+  -d ' { 
+    "siteId": "INBOM1", 
+    "imoCode": "9241205", 
+    "vesselCode": "DCNT2", 
+    "arrivalDate": "15012020" 
+} 
+' 
+ 
+For Staging: 
+ 
+https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/ICEGATE/04 
+ 
+ 
+{ 
+    "siteId": "INBOM1", 
+    "imoCode": "9241205", 
+    "vesselCode": "DCNT2", 
+    "arrivalDate": "15012020" 
+} 
+ 
+ 
+Curl URL 
+ 
+  curl -X POST \ 
+  https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/ICEGATE/04 \ 
+  -H 'accept: application/json' \ 
+  -H 'authorization: Bearer 
+eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZXN0MSIsImlhdCI6MTYyNTczMzQ0NCwiYXBwcyI6ImRh
+dGFwdXNoIn0.-
+FTXGNLmro8bXz45XsfCWkz05u4fdnxpIYXK7HZ7ufbAtbXejm0rsYiv8rzjiUr0bjg1TAxp6vb838
+uxtet63g' \ 
+  -H 'cache-control: no-cache' \ 
+  -H 'content-type: application/json' \ 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 19 of 66 
+ 
+  -H 'postman-token: 74f68893-0e56-f20f-8581-827680413bb4' \ 
+  -d ' { 
+    "siteId": "INBOM1", 
+    "imoCode": "9241205", 
+    "vesselCode": "DCNT2", 
+    "arrivalDate": "15012020" 
+} 
+' 
+ 
+ 
+For obtaining authentication token, refer Section 1.6 
+ 
+Response 
+ 
+To acknowledge the above request, ULIP will send the below response -  
+ 
+a) In case of invalid format 
+ 
+1. Invalid site id 
+ 
+ 
+{ 
+    "response": null, 
+    "error": "true", 
+    "code": "400", 
+    "message": "Data format failed OR wrong value entered at:  siteId. Format 
+should follow  [A-Z0-9]{6}" 
+} 
+ 
+ 
+ 
+2. Invalid IMO code 
+ 
+ 
+{ 
+    "response": null, 
+    "error": "true", 
+    "code": "400", 
+    "message": "Data format failed OR wrong value entered 
+at:  imoCode. Format should follow  [A-Z0-9]{1,25}" 
+} 
+ 
+ 
+3. Invalid vessel code 
+ 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 20 of 66 
+ 
+ 
+{ 
+    "response": null, 
+    "error": "true", 
+    "code": "400", 
+    "message": "Data format failed OR wrong value entered 
+at:  vesselCode. Format should follow  [A-Z0-9]{1,25}" 
+} 
+ 
+ 
+4. Invalid date  
+ 
+ 
+{ 
+    "response": null, 
+    "error": "true", 
+    "code": "400", 
+    "message": "Data format failed OR wrong value entered 
+at:  arrivalDate. Format should follow  [0-9]{8}" 
+} 
+ 
+ 
+ 
+b) In case of data does not exist in ICEGATE system 
+ 
+ 
+{ 
+    "response": [ 
+        { 
+            "response": {}, 
+            "responseStatus": "SUCCESS" 
+        } 
+    ], 
+    "error": "false", 
+    "code": "200", 
+    "message": "Success" 
+} 
+ 
+ 
+c) In case data exist 
+ 
+ 
+{ 
+    "response": [ 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 21 of 66 
+ 
+        { 
+            "response": { 
+                "shippingLineCode": "MSC", 
+                "shippingAgentCode": "JMB01", 
+                "rotationNumber": "1000045", 
+                "rotationDt": "24012020" 
+            }, 
+            "responseStatus": "SUCCESS" 
+        } 
+    ], 
+    "error": "false", 
+    "code": "200", 
+    "message": "Success" 
+} 
+ 
+ 
+ 
+Status Code 200: vehicle data response 
+Status Code 400: Bad request (Invalid JSON syntax, invalid JSON key) 
+Status Code 401 or 403: Unauthenticated or Unauthorized 
+Status Code 500: Some internal server error occurred 
+Status Code 502: Server is not responding. 
+ 
+1.7 ICEGATE/05 
+ 
+This API will take shipping bill number and connect with ICEGATE API to get data. 
+ 
+S. 
+No. 
+Field Name Field Description Format Require
+d/Not – 
+Require
+d 
+Length 
+1 sbNo Shipping Bill number as 
+available in ICEGATE 
+system. 
+[0-9]{7} Required 7 
+2 sbDt date [0-9]{8}  8 
+1.7.1 Technical Approach  
+1. All the data will be shared through rest web services. 
+2. ULIP system will provide shipping Bill number and date for which detail is required. 
+3. ICEGATE API will share information which exist in ICEGATE system in JSON format. 
+4. ICEGATE Integration will add JSON in response key in response body. 
+5. ULIP system will provide the data in JSON Object format in response body. 
+ 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 22 of 66 
+ 
+Example: 
+ 
+Shipping Bill number 4164154 is shared by ULIP system, then ICEGATE-integration will 
+make a request to ICEGATE API. 
+ 
+Request: 
+ 
+The request must be of the following format 
+ 
+For Production: 
+ 
+https://www.ulip.dpiit.gov.in/ulip/v1.0.0/ICEGATE/05 
+ 
+ 
+ 
+{ 
+    "sbNo": "6845161", 
+    "sbDt": "02042016" 
+} 
+ 
+ 
+Curl URL 
+ 
+  curl -X POST \ 
+  https://www.ulip.dpiit.gov.in/ulip/v1.0.0/ICEGATE/05 \ 
+  -H 'accept: application/json' \ 
+  -H 'authorization: Bearer 
+eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZXN0MSIsImlhdCI6MTYyNTczMzQ0NCwiYXBwcyI6ImRh
+dGFwdXNoIn0.-
+FTXGNLmro8bXz45XsfCWkz05u4fdnxpIYXK7HZ7ufbAtbXejm0rsYiv8rzjiUr0bjg1TAxp6vb838
+uxtet63g' \ 
+  -H 'cache-control: no-cache' \ 
+  -H 'content-type: application/json' \ 
+  -H 'postman-token: 74f68893-0e56-f20f-8581-827680413bb4' \ 
+  -d '{ 
+    "sbNo": "6845161", 
+    "sbDt": "02042016" 
+}' 
+ 
+ 
+For Staging: 
+ 
+https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/ICEGATE/05 
+ 
+ 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 23 of 66 
+ 
+ 
+{ 
+    "sbNo": "6845161", 
+    "sbDt": "02042016" 
+} 
+ 
+ 
+Curl URL 
+ 
+  curl -X POST \ 
+  https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/ICEGATE/05 \ 
+  -H 'accept: application/json' \ 
+  -H 'authorization: Bearer 
+eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZXN0MSIsImlhdCI6MTYyNTczMzQ0NCwiYXBwcyI6ImRh
+dGFwdXNoIn0.-
+FTXGNLmro8bXz45XsfCWkz05u4fdnxpIYXK7HZ7ufbAtbXejm0rsYiv8rzjiUr0bjg1TAxp6vb838
+uxtet63g' \ 
+  -H 'cache-control: no-cache' \ 
+  -H 'content-type: application/json' \ 
+  -H 'postman-token: 74f68893-0e56-f20f-8581-827680413bb4' \ 
+  -d '{ 
+    "sbNo": "6845161", 
+    "sbDt": "02042016" 
+}' 
+ 
+ 
+ 
+For obtaining authentication token, refer Section 1.6 
+ 
+Response 
+ 
+To acknowledge the above request, ULIP will send the below response -  
+ 
+a) In case of invalid format 
+ 
+1. Invalid shipping bill number 
+ 
+ 
+{ 
+    "response": null, 
+    "error": "true", 
+    "code": "400", 
+    "message": "Data format failed OR wrong value entered at:  sbNo. Format 
+should follow  [0-9]{1,7}" 
+} 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 24 of 66 
+ 
+ 
+ 
+2. Invalid shipping bill date 
+ 
+ 
+{ 
+    "response": null, 
+    "error": "true", 
+    "code": "400", 
+    "message": "Data format failed OR wrong value entered at:  sbDt. Format 
+should follow  [0-9]{8}" 
+} 
+ 
+ 
+ 
+b) In case of shipping bill number does not exist in ICEGATE system 
+ 
+ 
+{ 
+    "response": [ 
+        { 
+            "response": { 
+                "sbNo": null, 
+                "unitOfQt": null, 
+                "natureOfCargo": null, 
+                "noOfPkgs": null, 
+                "portOfDest": null, 
+                "sbDt": null, 
+                "grossQt": null 
+            }, 
+            "responseStatus": "SUCCESS" 
+        } 
+    ], 
+    "error": "false", 
+    "code": "200", 
+    "message": "Success" 
+} 
+ 
+ 
+c) In case SB number exist 
+ 
+ 
+{ 
+    "response": [ 
+        { 
+            "response": { 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 25 of 66 
+ 
+                "sbNo": "6845161", 
+                "unitOfQt": "null", 
+                "natureOfCargo": "C", 
+                "noOfPkgs": 287, 
+                "portOfDest": "LKCMB", 
+                "sbDt": "02042016", 
+                "grossQt": null 
+            }, 
+            "responseStatus": "SUCCESS" 
+        } 
+    ], 
+    "error": "false", 
+    "code": "200", 
+    "message": "Success" 
+} 
+ 
+ 
+ 
+Status Code 200: vehicle data response 
+Status Code 400: Bad request (Invalid json syntax, invalid json key) 
+Status Code 401 or 403: Unauthenticated or Unauthorized 
+Status Code 500: Some internal server error occurred 
+Status Code 502: Server is not responding. 
+ 
+1.8 ICEGATE/06 
+ 
+This API will take shipping bill number and connect with ICEGATE API to get data. 
+ 
+S. 
+No. 
+Field Name Field Description Format Require
+d/Not – 
+Require
+d 
+Length 
+1 sbNo Shipping Bill number as 
+available in ICEGATE 
+system. 
+[0-9]{7} Required 7 
+2 sbDt date [0-9]{8}  
+Required 
+8 
+1.8.1 Technical Approach  
+1. All the data will be shared through rest web services. 
+2. ULIP system will provide shipping Bill number for which detail is required. 
+3. ICEGATE API will share details of cargo information which exist in ICEGATE system in 
+JSON format. 
+4. ICEGATE Integration will add JSON in response key in response body. 
+5. ULIP system will provide the data in JSON Object format in response body. 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 26 of 66 
+ 
+ 
+Example: 
+ 
+Shipping Bill number 5444772 is shared by ULIP system, then ICEGATE-integration will 
+make a request to ICEGATE API. 
+ 
+Request: 
+ 
+The request must be of the following format 
+ 
+For Production: 
+ 
+https://www.ulip.dpiit.gov.in/ulip/v1.0.0/ICEGATE/06 
+ 
+ 
+ 
+{ 
+    "sbNo": "5444772", 
+    "sbDt": "16092011" 
+} 
+ 
+ 
+Curl URL 
+ 
+  curl -X POST \ 
+  https://www.ulip.dpiit.gov.in/ulip/v1.0.0/ICEGATE/06 \ 
+  -H 'accept: application/json' \ 
+  -H 'authorization: Bearer 
+eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZXN0MSIsImlhdCI6MTYyNTczMzQ0NCwiYXBwcyI6ImRh
+dGFwdXNoIn0.-
+FTXGNLmro8bXz45XsfCWkz05u4fdnxpIYXK7HZ7ufbAtbXejm0rsYiv8rzjiUr0bjg1TAxp6vb838
+uxtet63g' \ 
+  -H 'cache-control: no-cache' \ 
+  -H 'content-type: application/json' \ 
+  -H 'postman-token: 74f68893-0e56-f20f-8581-827680413bb4' \ 
+  -d '{ 
+    "sbNo": "5444772", 
+    "sbDt": "16092011" 
+}' 
+ 
+For Staging: 
+ 
+https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/ICEGATE/06 
+ 
+ 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 27 of 66 
+ 
+ 
+{ 
+    "sbNo": "5444772", 
+    "sbDt": "16092011" 
+} 
+ 
+ 
+Curl URL 
+ 
+  curl -X POST \ 
+  https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/ICEGATE/06 \ 
+  -H 'accept: application/json' \ 
+  -H 'authorization: Bearer 
+eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZXN0MSIsImlhdCI6MTYyNTczMzQ0NCwiYXBwcyI6ImRh
+dGFwdXNoIn0.-
+FTXGNLmro8bXz45XsfCWkz05u4fdnxpIYXK7HZ7ufbAtbXejm0rsYiv8rzjiUr0bjg1TAxp6vb838
+uxtet63g' \ 
+  -H 'cache-control: no-cache' \ 
+  -H 'content-type: application/json' \ 
+  -H 'postman-token: 74f68893-0e56-f20f-8581-827680413bb4' \ 
+  -d '{ 
+    "sbNo": "5444772", 
+    "sbDt": "16092011" 
+}' 
+ 
+ 
+ 
+For obtaining authentication token, refer Section 1.6 
+ 
+Response 
+ 
+To acknowledge the above request, ULIP will send the below response -  
+ 
+a) In case of invalid format 
+ 
+1. Invalid shipping bill number 
+ 
+ 
+{ 
+    "response": null, 
+    "error": "true", 
+    "code": "400", 
+    "message": "Data format failed OR wrong value entered at:  sbNo. Format 
+should follow  [0-9]{1,7}" 
+} 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 28 of 66 
+ 
+ 
+ 
+2. Invalid shipping bill date 
+ 
+ 
+{ 
+    "response": null, 
+    "error": "true", 
+    "code": "400", 
+    "message": "Data format failed OR wrong value entered at:  sbDt. Format 
+should follow  [0-9]{8}" 
+} 
+ 
+ 
+b) In case of shipping bill number does not exist in ICEGATE system 
+ 
+ 
+{ 
+    "response": [ 
+        { 
+            "response": { 
+                "leoDt": null 
+            }, 
+            "responseStatus": "SUCCESS" 
+        } 
+    ], 
+    "error": "false", 
+    "code": "200", 
+    "message": "Success" 
+} 
+ 
+ 
+c) In case SB number exist 
+ 
+ 
+{ 
+    "response": [ 
+        { 
+            "response": { 
+                "leoDt": "23092011" 
+            }, 
+            "responseStatus": "SUCCESS" 
+        } 
+    ], 
+    "error": "false", 
+    "code": "200", 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 29 of 66 
+ 
+    "message": "Success" 
+} 
+ 
+ 
+Status Code 200: vehicle data response 
+Status Code 400: Bad request (Invalid JSON syntax, invalid JSON key) 
+Status Code 401 or 403: Unauthenticated or Unauthorized 
+Status Code 500: Some internal server error occurred 
+Status Code 502: Server is not responding. 
+ 
+1.9 ICEGATE/07 
+ 
+This API will take IGM number and connect with ICEGATE API to get data. 
+ 
+S. 
+No. 
+Field Name Field Description Format Require
+d/Not – 
+Require
+d 
+Length 
+1 igmNo Import General Manifest 
+Number as available in 
+ICEGATE system. 
+[0-9]{1,7} Required Min 1 
+Max 10 
+2 igmDt IGM date [0-9]{8} Required 
+ 
+Max 8 
+ 
+1.9.1 Technical Approach  
+1. All the data will be shared through rest web services. 
+2. ULIP system will provide IGM number and IGM date for which detail is required. 
+3. ICEGATE API will share details of cargo information which exist in ICEGATE system in 
+JSON format. 
+4. ICEGATE Integration will add JSON in response key in response body. 
+5. ULIP system will provide the data in JSON Object format in response body. 
+ 
+Example: 
+ 
+IGM  2000690 is shared by ULIP system, then ICEGATE-integration will make a 
+request to ICEGATE API. 
+ 
+Request: 
+ 
+The request must be of the following format 
+ 
+For Production: 
+ 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 30 of 66 
+ 
+https://www.ulip.dpiit.gov.in/ulip/v1.0.0/ICEGATE/07 
+ 
+ 
+{ 
+    "igmNo": "2000690", 
+    "igmDt": "31012014" 
+} 
+ 
+ 
+Curl URL 
+ 
+  curl -X POST \ 
+  https://www.ulip.dpiit.gov.in/ulip/v1.0.0/ICEGATE/07 \ 
+  -H 'accept: application/json' \ 
+  -H 'authorization: Bearer 
+eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZXN0MSIsImlhdCI6MTYyNTczMzQ0NCwiYXBwcyI6ImRh
+dGFwdXNoIn0.-
+FTXGNLmro8bXz45XsfCWkz05u4fdnxpIYXK7HZ7ufbAtbXejm0rsYiv8rzjiUr0bjg1TAxp6vb838
+uxtet63g' \ 
+  -H 'cache-control: no-cache' \ 
+  -H 'content-type: application/json' \ 
+  -H 'postman-token: 74f68893-0e56-f20f-8581-827680413bb4' \ 
+  -d '{ 
+    "igmNo": "2000690", 
+    "igmDt": "31012014" 
+} 
+' 
+ 
+For Staging: 
+ 
+https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/ICEGATE/07 
+ 
+ 
+{ 
+    "igmNo": "2000690", 
+    "igmDt": "31012014" 
+} 
+ 
+ 
+Curl URL 
+ 
+  curl -X POST \ 
+  https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/ICEGATE/07 \ 
+  -H 'accept: application/json' \ 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 31 of 66 
+ 
+  -H 'authorization: Bearer 
+eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZXN0MSIsImlhdCI6MTYyNTczMzQ0NCwiYXBwcyI6ImRh
+dGFwdXNoIn0.-
+FTXGNLmro8bXz45XsfCWkz05u4fdnxpIYXK7HZ7ufbAtbXejm0rsYiv8rzjiUr0bjg1TAxp6vb838
+uxtet63g' \ 
+  -H 'cache-control: no-cache' \ 
+  -H 'content-type: application/json' \ 
+  -H 'postman-token: 74f68893-0e56-f20f-8581-827680413bb4' \ 
+  -d '{ 
+    "igmNo": "2000690", 
+    "igmDt": "31012014" 
+} 
+' 
+ 
+ 
+For obtaining authentication token, refer Section 1.6 
+ 
+Response 
+ 
+To acknowledge the above request, ULIP will send the below response -  
+ 
+a) In case of invalid format 
+ 
+1. Invalid IGM number 
+ 
+ 
+{ 
+    "response": null, 
+    "error": "true", 
+    "code": "400", 
+    "message": "Data format failed OR wrong value entered at:  beNo. Format 
+should follow  [0-9]{7}" 
+} 
+ 
+ 
+2. Invalid IGM date 
+ 
+ 
+{ 
+    "response": null, 
+    "error": "true", 
+    "code": "400", 
+    "message": "Data format failed OR wrong value entered at:  igmDt. Format 
+should follow  [0-9]{8}" 
+} 
+ 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 32 of 66 
+ 
+ 
+b) In case of IGM number does not exist in ICEGATE system 
+ 
+ 
+{ 
+    "response": [ 
+        { 
+            "response": { 
+                "imoCodeOfVessel": null, 
+                "vesselCode": null, 
+                "voyageNo": null, 
+                "portOfDest": null, 
+                "portOfShipment": null, 
+                "importerName": null, 
+                "modeOfTransport": null, 
+                "containerDetails": null 
+            }, 
+            "responseStatus": "SUCCESS" 
+        } 
+    ], 
+    "error": "false", 
+    "code": "200", 
+    "message": "Success" 
+} 
+ 
+ 
+ 
+c) In case IGM number exist 
+ 
+ 
+{ 
+    "response": [ 
+        { 
+            "response": { 
+                "imoCodeOfVessel": "12345", 
+                "vesselCode": "TETS1", 
+                "voyageNo": "03", 
+                "portOfDest": "INBOM1", 
+                "portOfShipment": "INPAV1", 
+                "importerName": "HINDUSTAN CARGO", 
+                "modeOfTransport": "T", 
+                "containerDetails": [ 
+                    { 
+                        "containerNo": "MMAU1162485", 
+                        "totNoPkg": 1 
+                    } 
+                ] 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 33 of 66 
+ 
+            }, 
+            "responseStatus": "SUCCESS" 
+        } 
+    ], 
+    "error": "false", 
+    "code": "200", 
+    "message": "Success" 
+} 
+ 
+ 
+Status Code 200: vehicle data response 
+Status Code 400: Bad request (Invalid JSON syntax, invalid JSON key) 
+Status Code 401 or 403: Unauthenticated or Unauthorized 
+Status Code 500: Some internal server error occurred 
+Status Code 502: Server is not responding. 
+ 
+ 
+1.10  ICEGATE/08 
+ 
+This API will take EGM number, EGM date and connect with ICEGATE API to get data. 
+ 
+S. 
+No. 
+Field Name Field Description Format Require
+d/Not – 
+Require
+d 
+Length 
+1 egmNo Export General Manifest 
+Number as available in 
+ICEGATE system. 
+[0-9]{7} Required 7 
+2 egmDt EGM date [0-9]{8} Required 8 
+ 
+1.10.1 Technical Approach  
+1. All the data will be shared through rest web services. 
+2. ULIP system will provide EGM number and EGM date for which detail is required. 
+3. ICEGATE API will share details of cargo information which exist in ICEGATE system in 
+JSON format. 
+4. ICEGATE Integration will add JSON in response key in response body. 
+5. ULIP system will provide the data in JSON Object format in response body. 
+ 
+Example: 
+ 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 34 of 66 
+ 
+EGM number 21889 and date 20112008 is shared by ULIP system, then ICEGATE-
+integration will make a request to ICEGATE API. 
+ 
+Request: 
+ 
+The request must be of the following format 
+ 
+For Production: 
+ 
+https://www.ulip.dpiit.gov.in/ulip/v1.0.0/ICEGATE/08 
+ 
+ 
+{ 
+    "egmNo": "103978", 
+    "egmDt": "29032016" 
+} 
+ 
+ 
+Curl URL 
+ 
+  curl -X POST \ 
+  https://www.ulip.dpiit.gov.in/ulip/v1.0.0/ICEGATE/08 \ 
+  -H 'accept: application/json' \ 
+  -H 'authorization: Bearer 
+eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZXN0MSIsImlhdCI6MTYyNTczMzQ0NCwiYXBwcyI6ImRh
+dGFwdXNoIn0.-
+FTXGNLmro8bXz45XsfCWkz05u4fdnxpIYXK7HZ7ufbAtbXejm0rsYiv8rzjiUr0bjg1TAxp6vb838
+uxtet63g' \ 
+  -H 'cache-control: no-cache' \ 
+  -H 'content-type: application/json' \ 
+  -H 'postman-token: 74f68893-0e56-f20f-8581-827680413bb4' \ 
+  -d '{ 
+    "egmNo": "103978", 
+    "egmDt": "29032016" 
+} 
+' 
+ 
+ 
+For Staging: 
+ 
+https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/ICEGATE/08 
+ 
+ 
+{ 
+    "egmNo": "103978", 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 35 of 66 
+ 
+    "egmDt": "29032016" 
+} 
+ 
+ 
+Curl URL 
+ 
+  curl -X POST \ 
+  https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/ICEGATE/08 \ 
+  -H 'accept: application/json' \ 
+  -H 'authorization: Bearer 
+eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZXN0MSIsImlhdCI6MTYyNTczMzQ0NCwiYXBwcyI6ImRh
+dGFwdXNoIn0.-
+FTXGNLmro8bXz45XsfCWkz05u4fdnxpIYXK7HZ7ufbAtbXejm0rsYiv8rzjiUr0bjg1TAxp6vb838
+uxtet63g' \ 
+  -H 'cache-control: no-cache' \ 
+  -H 'content-type: application/json' \ 
+  -H 'postman-token: 74f68893-0e56-f20f-8581-827680413bb4' \ 
+  -d '{ 
+    "egmNo": "103978", 
+    "egmDt": "29032016" 
+} 
+' 
+ 
+ 
+For obtaining authentication token, refer Section 1.6 
+ 
+Response 
+ 
+To acknowledge the above request, ULIP will send the below response -  
+ 
+a) In case of invalid format 
+ 
+1. Invalid shipping bill number 
+ 
+ 
+{ 
+    "response": null, 
+    "error": "true", 
+    "code": "400", 
+    "message": "Data format failed OR wrong value entered at:  beNo. Format 
+should follow  [0-9]{7}" 
+} 
+ 
+ 
+2. Invalid EGM date 
+ 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 36 of 66 
+ 
+ 
+{ 
+    "response": null, 
+    "error": "true", 
+    "code": "400", 
+    "message": "Data format failed OR wrong value entered at:  egmDt. Format 
+should follow  [0-9]{8}" 
+} 
+ 
+ 
+b) In case of EGM number does not exist in ICEGATE system 
+ 
+ 
+{ 
+    "response": [ 
+        { 
+            "response": { 
+                "egmNo": null, 
+                "egmDt": null, 
+                "sbNo": null, 
+                "portOfDest": null, 
+                "noOfPckgs": null, 
+                "containerNo": null 
+            }, 
+            "responseStatus": "SUCCESS" 
+        } 
+    ], 
+    "error": "false", 
+    "code": "200", 
+    "message": "Success" 
+} 
+ 
+ 
+c) In case EGM number exist 
+ 
+ 
+{ 
+    "response": [ 
+        { 
+            "response": { 
+                "sbDetails": [ 
+                    { 
+                        "containerNo": [ 
+                            "GESU5599051" 
+                        ], 
+                        "sbNo": 6825667, 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 37 of 66 
+ 
+                        "noOfPckgs": 25, 
+                        "portOfDest": "SAJED" 
+                    }, 
+                    { 
+                        "containerNo": [ 
+                            "TCKU1732080" 
+                        ], 
+                        "sbNo": 6828170, 
+                        "noOfPckgs": 33, 
+                        "portOfDest": "GBCHD" 
+                    }, 
+                    { 
+                        "containerNo": [ 
+                            "APHU6684925" 
+                        ], 
+                        "sbNo": 6832965, 
+                        "noOfPckgs": 127, 
+                        "portOfDest": "USPXX" 
+                    }, 
+                    { 
+                        "containerNo": [ 
+                            "APZU3219840" 
+                        ], 
+                        "sbNo": 6833000, 
+                        "noOfPckgs": 186, 
+                        "portOfDest": "GBCHD" 
+                    }, 
+                    { 
+                        "containerNo": [ 
+                            "APHU4645318" 
+                        ], 
+                        "sbNo": 6833796, 
+                        "noOfPckgs": 52, 
+                        "portOfDest": "GBNWY" 
+                    }, 
+                    { 
+                        "containerNo": [ 
+                            "APHU4645318" 
+                        ], 
+                        "sbNo": 6834068, 
+                        "noOfPckgs": 1, 
+                        "portOfDest": "GBNWY" 
+                    }, 
+                        { 
+                        "containerNo": [ 
+                            "APZU4319058" 
+                        ], 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 38 of 66 
+ 
+                        "sbNo": 6887160, 
+                        "noOfPckgs": 5225, 
+                        "portOfDest": "GBNWY" 
+                    }, 
+                    { 
+                        "containerNo": [ 
+                            "APZU3330134" 
+                        ], 
+                        "sbNo": 6887578, 
+                        "noOfPckgs": 1218, 
+                        "portOfDest": "GBNWY" 
+                    }, 
+                    { 
+                        "containerNo": [ 
+                            "CRXU3001523" 
+                        ], 
+                        "sbNo": 6887587, 
+                        "noOfPckgs": 1218, 
+                        "portOfDest": "USCHI" 
+                    } 
+                ], 
+                "egmNo": 21889, 
+                "egmDt": "20112008" 
+            }, 
+            "responseStatus": "SUCCESS" 
+        } 
+    ], 
+    "error": "false", 
+    "code": "200", 
+    "message": "Success" 
+} 
+ 
+ 
+Status Code 200: vehicle data response 
+Status Code 400: Bad request (Invalid JSON syntax, invalid JSON key) 
+Status Code 401 or 403: Unauthenticated or Unauthorized 
+Status Code 500: Some internal server error occurred 
+Status Code 502: Server is not responding. 
+ 
+1.11  ICEGATE/09 
+ 
+This API will provide MAWB details when the Location and MAWB details are entered as input  
+ 
+ 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 39 of 66 
+ 
+S. 
+No. 
+Field Name Field Description Format Require
+d/Not – 
+Require
+d 
+Length 
+1 mawbNumber MASTER AIRWAY BILL 
+NUMBER 
+ 
+^[0-9]{1,20} 
+ 
+Required 7 
+2 custSite 
+ 
+location ^[A-Za-z0-9]{6} 
+ 
+ 
+Required 
+ 
+8 
+ 
+1.11.1 Technical Approach  
+1. All the data will be shared through REST web services. 
+2. The ULIP system will provide the mawb number and location, which is required for 
+details. 
+3. ICEGATE API will share details of cargo information that exists in the ICEGATE system 
+in JSON format. 
+4. ICEGATE Integration will add JSON in the response key in the response body. 
+5. The ULIP system will provide the data in JSON Object format in the response body. 
+ 
+Example: 
+ 
+Mawb number 06536234962 is shared by the ULIP system, then ICEGATE-integration 
+will request the ICEGATE API. 
+ 
+Request: 
+ 
+The request must be of the following format 
+ 
+For Production: 
+ 
+https://www.ulip.dpiit.gov.in/ulip/v1.0.0/ICEGATE/09 
+ 
+ 
+{ 
+    "mawbNumber": "06536234962", 
+    "custSite": "INDEL42iio2oo21" 
+} 
+ 
+ 
+ 
+Curl URL 
+ 
+ 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 40 of 66 
+ 
+curl -L -X POST 'https://www.ulip.dpiit.gov.in/ulip/v1.0.0/ICEGATE/09' -H 
+'Authorization: Bearer 
+eyJhbGciOiJIUzUxMiJ9.eyJhcHBzIjoiYXBpR2F0ZXdheSIsInN1YiI6InVsaXAiLCJpYXQiOjE3
+NDY3ODIyODN9.jdfwyGaBeVMDxX1zNQPLxnMESZbnVJ_4_Kwwlc4QHekC5tezrjWQEOsr4gwn8TA3
+F2gbl2fwTGDfT8MqctzUoQ' -H 'Content-Type: application/json' -H 'Accept: 
+application/json' --data-raw '{ 
+    "mawbNumber": "06536234962", 
+    "custSite": "INDEL4" 
+}'   
+ 
+ 
+For Staging: 
+ 
+https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/ICEGATE/09 
+ 
+ 
+{ 
+    "mawbNumber": "06536234962", 
+    "custSite": "INDEL4" 
+} 
+ 
+ 
+ 
+Curl URL 
+ 
+ 
+curl -L -X POST 'https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/ICEGATE/09' 
+-H 'Authorization: Bearer 
+eyJhbGciOiJIUzUxMiJ9.eyJhcHBzIjoiYXBpR2F0ZXdheSIsInN1YiI6InVsaXAiLCJpYXQiOjE3
+NDY3ODIyODN9.jdfwyGaBeVMDxX1zNQPLxnMESZbnVJ_4_Kwwlc4QHekC5tezrjWQEOsr4gwn8TA3
+F2gbl2fwTGDfT8MqctzUoQ' -H 'Content-Type: application/json' -H 'Accept: 
+application/json' --data-raw '{ 
+    "mawbNumber": "06536234962", 
+    "custSite": "INDEL4" 
+}'   
+ 
+ 
+ 
+ 
+For obtaining an authentication token, refer Section 1.6 
+ 
+Response 
+ 
+To acknowledge the above request, ULIP will send the following response -  
+ 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 41 of 66 
+ 
+a) In case of invalid format 
+ 
+1. Invalid mawb number 
+ 
+ 
+{ 
+    "response": null, 
+    "error": "true", 
+    "code": "400 BAD_REQUEST", 
+    "message": "Data format failed OR wrong value entered a
+t:  mawbNumber. Format should follow  ^[0-9]{1,20}$" 
+} 
+ 
+ 
+ 
+2. Invalid custSite 
+ 
+ 
+ 
+{ 
+    "response": null, 
+    "error": "true", 
+    "code": "400 BAD_REQUEST", 
+    "message": "Data format failed OR wrong value entered a
+t:  custSite. Format should follow  ^[A-Za-z0-9]{6}$" 
+} 
+ 
+ 
+ 
+b) In case the mawb number & custSite does not exist in the ICEGATE system 
+ 
+ 
+{ 
+    "response": [ 
+        { 
+            "response": { 
+                "errCode": "ERROR0004", 
+                "errMsg": "No Records Available" 
+            }, 
+            "responseStatus": "ERROR", 
+            "message": null 
+        } 
+    ], 
+    "error": "false", 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 42 of 66 
+ 
+    "code": "200", 
+    "message": "Success" 
+} 
+  
+ 
+ 
+c) In case the mawb number exists 
+ 
+ 
+{ 
+    "response": [ 
+        { 
+            "response": [ 
+                { 
+                    "grossWeight": "100", 
+                    "flightDate": "15022025 12:02", 
+                    "igmRtn": "71074", 
+                    "dateOfIntegration": null, 
+                    "mawbNumber": "06536234962", 
+                    "totalPackage": "100", 
+                    "igmDate": "25022025 12:02", 
+                    "custSite": "INDEL4", 
+                    "remarks": null, 
+                    "flightNumber": "SV758", 
+                    "status": "C" 
+                } 
+            ], 
+            "responseStatus": "SUCCESS", 
+            "message": null 
+        } 
+    ], 
+    "error": "false", 
+    "code": "200", 
+    "message": "Success" 
+} 
+ 
+ 
+ 
+Status Code 200: vehicle data response 
+Status Code 400: Bad request (Invalid JSON syntax, invalid JSON key) 
+Status Code 401 or 403: Unauthenticated or Unauthorised 
+Status Code 500: Some internal server error occurred 
+Status Code 502: Server is not responding. 
+ 
+ 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 43 of 66 
+ 
+1.12  ICEGATE/10 
+ 
+This API will take the MAWB number and connect with the ICEGATE API to get data. 
+ 
+S. 
+No. 
+Field Name Field Description Format Require
+d/Not – 
+Require
+d 
+Length 
+1  mawbNumber MASTER AIRWAY BILL 
+NUMBER 
+^[0-9]{1,20} 
+ 
+Required 20 max 
+2 hawbNumber 
+ 
+ 
+HOUSE AIRWAY BILL 
+NUMBER  
+ 
+^[A-Za-z0-
+9]{1,15} 
+ 
+ 
+Required 
+ 
+15 max 
+ 
+1.12.1 Technical Approach  
+1. All the data will be shared through REST web services. 
+2. ULIP system will provide the mawb number and hawb number for which detail is 
+required. 
+3. ICEGATE API will share details of cargo information that exists in the ICEGATE system in 
+JSON format. 
+4. ICEGATE Integration will add JSON in the response key in the response body. 
+5. The ULIP system will provide the data in JSON Object format in the response body. 
+ 
+Example: 
+ 
+The MAWB and HAWB number are shared by the ULIP system, then ICEGATE 
+integration will request the ICEGATE API. 
+ 
+Request: 
+ 
+The request must be of the following format 
+ 
+For Production: 
+ 
+https://www.ulip.dpiit.gov.in/ulip/v1.0.0/ICEGATE/10 
+ 
+ 
+{ 
+    "mawbNumber": "15754138070", 
+    "hawbNumber": "15751033332m23322" 
+} 
+ 
+ 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 44 of 66 
+ 
+Curl URL 
+ 
+ 
+ 
+curl -L -X POST 'https://www.ulip.dpiit.gov.in/ulip/v1.0.0/ICEGATE/10' -H 
+'Authorization: Bearer 
+eyJhbGciOiJIUzUxMiJ9.eyJhcHBzIjoiYXBpR2F0ZXdheSIsInN1YiI6InVsaXAiLCJpYXQiOjE3
+NDY3ODIyODN9.jdfwyGaBeVMDxX1zNQPLxnMESZbnVJ_4_Kwwlc4QHekC5tezrjWQEOsr4gwn8TA3
+F2gbl2fwTGDfT8MqctzUoQ' -H 'Content-Type: application/json' -H 'Accept: 
+application/json' --data-raw '{ 
+    "mawbNumber": "15754138070", 
+    "hawbNumber": "1575103333" 
+}' 
+   
+ 
+ 
+For Staging: 
+ 
+https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/ICEGATE/10 
+ 
+ 
+ 
+{ 
+    "mawbNumber": "15754138070", 
+    "hawbNumber": "1575103333" 
+} 
+ 
+ 
+Curl URL 
+ 
+ 
+curl -L -X POST 'https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/ICEGATE/10' 
+-H 'Authorization: Bearer 
+eyJhbGciOiJIUzUxMiJ9.eyJhcHBzIjoiYXBpR2F0ZXdheSIsInN1YiI6InVsaXAiLCJpYXQiOjE3
+NDY3ODIyODN9.jdfwyGaBeVMDxX1zNQPLxnMESZbnVJ_4_Kwwlc4QHekC5tezrjWQEOsr4gwn8TA3
+F2gbl2fwTGDfT8MqctzUoQ' -H 'Content-Type: application/json' -H 'Accept: 
+application/json' --data-raw '{ 
+    "mawbNumber": "15754138070", 
+    "hawbNumber": "1575103333" 
+}'  
+ 
+ 
+ 
+ 
+For obtaining an authentication token, refer Section 1.6 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 45 of 66 
+ 
+ 
+Response 
+ 
+To acknowledge the above request, ULIP will send the following response -  
+ 
+a) In case of invalid format 
+ 
+1. Invalid mawb number 
+ 
+ 
+{ 
+    "response": null, 
+    "error": "true", 
+    "code": "400 BAD_REQUEST", 
+    "message": "Data format failed OR wrong value entered a
+t:  mawbNumber. Format should follow  ^[0-9]{1,20}$" 
+} 
+ 
+ 
+ 
+2. Invalid hawbNumber 
+ 
+ 
+ 
+{ 
+    "response": null, 
+    "error": "true", 
+    "code": "400 BAD_REQUEST", 
+    "message": "Data format failed OR wrong value entered a
+t:  hawbNumber. Format should follow  ^[A-Za-z0-9]{1,15}$" 
+} 
+ 
+ 
+ 
+b) In case the mawb number & hawb Number do not exist in the ICEGATE system 
+ 
+ 
+ 
+{ 
+    "response": [ 
+        { 
+            "response": { 
+                "errCode": "ERROR0004", 
+                "errMsg": "No Records Available" 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 46 of 66 
+ 
+            }, 
+            "responseStatus": "ERROR", 
+            "message": null 
+        } 
+    ], 
+    "error": "false", 
+    "code": "200", 
+    "message": "Success" 
+} 
+  
+ 
+ 
+ 
+ 
+ 
+c) In case the mawb number and hawb number exist 
+ 
+ 
+ 
+{ 
+    "response": [ 
+        { 
+            "response": { 
+                "icdBlStatusResponceDto": { 
+                    "subLineNo": "1", 
+                    "voyageNo": "null", 
+                    "mawbDT": "25052019", 
+                    "portDest": "INJJK6", 
+                    "uqc": "KGS", 
+                    "igmDT": "31072019", 
+                    "beLoc": "4", 
+                    "containerDtlsResponseDtos": [ 
+                        { 
+                            "subLineNo": "1", 
+                            "lineNo": "1", 
+                            "igmRTN": "2001935", 
+                            "errCode": "40|41", 
+                            "contNo": "MAEU4698704", 
+                            "contStatus": "FCL", 
+                            "arrDT": "null", 
+                            "arrStatus": "null" 
+                        }, 
+                        { 
+                            "subLineNo": "1", 
+                            "lineNo": "1", 
+                            "igmRTN": "2001935", 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 47 of 66 
+ 
+                            "errCode": "100", 
+                            "contNo": "MAEU4698704", 
+                            "contStatus": "FCL", 
+                            "arrDT": "null", 
+                            "arrStatus": "null" 
+                        } 
+                    ], 
+                    "getewayPort": "1", 
+                    "grossWeight": "21200", 
+                    "hawbDT": "25052019", 
+                    "lineNo": "1", 
+                    "igmRTN": "2001935", 
+                    "packageCode": "PCS", 
+                    "descOfGoods": "ROLLED WORK", 
+                    "totalPackage": "2", 
+                    "inwDT": "31072019", 
+                    "vesselCode": "null", 
+                    "cargoMovement": "LC" 
+                } 
+            }, 
+            "responseStatus": "SUCCESS", 
+            "message": null 
+        } 
+    ], 
+    "error": "false", 
+    "code": "200", 
+    "message": "Success" 
+} 
+ 
+ 
+ 
+ 
+ 
+Status Code 200: vehicle data response 
+Status Code 400: Bad request (Invalid JSON syntax, invalid JSON key) 
+Status Code 401 or 403: Unauthenticated or Unauthorised 
+Status Code 500: Some internal server error occurred 
+Status Code 502: Server is not responding. 
+ 
+ 
+ 
+1.13  ICEGATE/11 
+ 
+This API will provide Air Export General Manifest & Air Import General Manifest Job Status 
+Details.  
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 48 of 66 
+ 
+ 
+S. 
+No. 
+Field Name Field Description Format Require
+d/Not – 
+Require
+d 
+Length 
+1 location 
+ 
+Location ^[A-Za-z0-9]{6} 
+ 
+Required 6 
+2 flightDt 
+ 
+Flight Date ^((0[1-9]|[12][0-
+9]|3[01])(0[1-
+9]|1[012])\\d{4}) 
+ 
+ 
+Required 
+8 
+3 flightNo 
+ 
+Flight number ^[A-Za-z0-
+9]{1,30} 
+ 
+ 
+Required 
+1-30 
+4 flag 
+ 
+Flag ^[A-Za-z0-
+9]{1,15} 
+ 
+Required 1-15 
+ 
+1.13.1 Technical Approach  
+1. All the data will be shared through REST web services. 
+2. The ULIP system will provide the flight number and other information for which detail 
+is required. 
+3. ICEGATE API will share details of cargo information that exists in the ICEGATE system in 
+JSON format. 
+4. ICEGATE Integration will add JSON in the response key in the response body. 
+5. The ULIP system will provide the data in JSON Object format in the response body. 
+ 
+Example: 
+ 
+Flight number and other information are shared by the ULIP system, then ICEGATE-
+integration will request the ICEGATE API. 
+ 
+Request: 
+ 
+The request must be of the following format 
+ 
+For Production: 
+ 
+https://www.ulip.dpiit.gov.in/ulip/v1.0.0/ICEGATE/11 
+ 
+ 
+ 
+{ 
+    "location": "IMMUN1", 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 49 of 66 
+ 
+    "flightDt": "15042025", 
+    "flightNo": "123G", 
+    "flag": "EGM" 
+} 
+ 
+ 
+Curl URL 
+ 
+ 
+curl -L -X POST 'https://www.ulip.dpiit.gov.in/ulip/v1.0.0/ICEGATE/11' -H 
+'Authorization: Bearer 
+eyJhbGciOiJIUzUxMiJ9.eyJhcHBzIjoiYXBpR2F0ZXdheSIsInN1YiI6InVsaXAiLCJpYXQiOjE3
+NDY3ODIyODN9.jdfwyGaBeVMDxX1zNQPLxnMESZbnVJ_4_Kwwlc4QHekC5tezrjWQEOsr4gwn8TA3
+F2gbl2fwTGDfT8MqctzUoQ' -H 'Content-Type: application/json' -H 'Accept: 
+application/json' --data-raw '{ 
+    "location": "IMMUN1", 
+    "flightDt": "15042025", 
+    "flightNo": "123G", 
+    "flag": "EGM" 
+}'   
+ 
+ 
+For Staging: 
+ 
+https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/ICEGATE/11 
+ 
+ 
+ 
+ 
+{ 
+    "location": "IMMUN1", 
+    "flightDt": "15042025", 
+    "flightNo": "123G", 
+    "flag": "EGM" 
+} 
+ 
+ 
+ 
+Curl URL 
+ 
+ 
+curl -L -X POST 'https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/ICEGATE/11' 
+-H 'Authorization: Bearer 
+eyJhbGciOiJIUzUxMiJ9.eyJhcHBzIjoiYXBpR2F0ZXdheSIsInN1YiI6InVsaXAiLCJpYXQiOjE3
+NDY3ODIyODN9.jdfwyGaBeVMDxX1zNQPLxnMESZbnVJ_4_Kwwlc4QHekC5tezrjWQEOsr4gwn8TA3
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 50 of 66 
+ 
+F2gbl2fwTGDfT8MqctzUoQ' -H 'Content-Type: application/json' -H 'Accept: 
+application/json' --data-raw ' 
+{ 
+    "location": "IMMUN1", 
+    "flightDt": "15042025", 
+    "flightNo": "123G", 
+    "flag": "EGM" 
+} 
+ 
+'  
+ 
+ 
+ 
+ 
+For obtaining an authentication token, refer Section 1.6 
+ 
+Response 
+ 
+To acknowledge the above request, ULIP will send the following response -  
+ 
+a) In case of invalid format 
+ 
+1. Invalid location  
+ 
+ 
+{ 
+    "response": null, 
+    "error": "true", 
+    "code": "400 BAD_REQUEST", 
+    "message": "Data format failed OR wrong value entered at:  location. Form
+at should follow  ^[A-Za-z0-9]{6}$" 
+} 
+ 
+ 
+ 
+2. Invalid flight date (flightDt) 
+ 
+ 
+ 
+{ 
+    "response": null, 
+    "error": "true", 
+    "code": "400 BAD_REQUEST", 
+    "message": "Data format failed OR wrong value entered a
+t:  flightDt. Format should follow  ^((0[1-9]|[12][0-
+9]|3[01])(0[1-9]|1[012])\\d{4})$" 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 51 of 66 
+ 
+} 
+ 
+  
+ 
+ 
+ 
+3. Invalid flight number (flightNo) 
+ 
+ 
+ 
+{ 
+    "response": null, 
+    "error": "true", 
+    "code": "400 BAD_REQUEST", 
+    "message": "Data format failed OR wrong value entered a
+t:  flightNo. Format should follow  ^[A-Za-z0-9]{1,30}$" 
+} 
+ 
+ 
+  
+ 
+ 
+4. Invalid flag 
+ 
+ 
+{ 
+    "response": null, 
+    "error": "true", 
+    "code": "400 BAD_REQUEST", 
+    "message": "Data format failed OR wrong value entered a
+t:  flag. Format should follow  ^[A-Za-z0-9]{1,15}$" 
+} 
+ 
+ 
+ 
+ 
+b) In case the flight number does not exist in the ICEGATE system 
+ 
+ 
+{ 
+    "response": [ 
+        { 
+            "response": { 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 52 of 66 
+ 
+                "errCode": "ERROR0004", 
+                "errMsg": "No Records Available" 
+            }, 
+            "responseStatus": "ERROR", 
+            "message": null 
+        } 
+    ], 
+    "error": "false", 
+    "code": "200", 
+    "message": "Success" 
+} 
+  
+ 
+ 
+ 
+c) In case the flight number exists 
+ 
+ 
+ { 
+    "response": [ 
+        { 
+            "response": [ 
+                { 
+                    "ackSentTime": null, 
+                    "flightDate": "19012022", 
+                    "ackReceivedTime": null, 
+                    "receivedTime": "20/01/2025 12:06", 
+                    "sentTime": "20032025 12:03", 
+                    "customLocation": "INDEL4", 
+                    "flightNumber": "KU332", 
+                    "status": "Inserted Successfully in Database. Sent to ICE
+S for validation." 
+                }, 
+                { 
+                    "ackSentTime": null, 
+                    "flightDate": "19012022", 
+                    "ackReceivedTime": null, 
+                    "receivedTime": "17/01/2025 17:14", 
+                    "sentTime": "17032025 05:03", 
+                    "customLocation": "INDEL4", 
+                    "flightNumber": "KU332", 
+                    "status": "Inserted Successfully in Database. Sent to ICE
+S for validation." 
+                }, 
+                { 
+                    "ackSentTime": null, 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 53 of 66 
+ 
+                    "flightDate": "19012022", 
+                    "ackReceivedTime": null, 
+                    "receivedTime": "29/01/2025 15:40", 
+                    "sentTime": "29012025 03:01", 
+                    "customLocation": "INDEL4", 
+                    "flightNumber": "KU332", 
+                    "status": "Inserted Successfully in Database. Sent to ICE
+S for validation." 
+                }, 
+                { 
+                    "ackSentTime": null, 
+                    "flightDate": "19012022", 
+                    "ackReceivedTime": null, 
+                    "receivedTime": "27/01/2025 13:07", 
+                    "sentTime": "27012025 01:01", 
+                    "customLocation": "INDEL4", 
+                    "flightNumber": "KU332", 
+                    "status": "Inserted Successfully in Database. Sent to ICE
+S for validation." 
+                }, 
+                { 
+                    "ackSentTime": null, 
+                    "flightDate": "19012022", 
+                    "ackReceivedTime": null, 
+                    "receivedTime": "24/01/2025 17:21", 
+                    "sentTime": "24012025 05:01", 
+                    "customLocation": "INDEL4", 
+                    "flightNumber": "KU332", 
+                    "status": "Inserted Successfully in Database. Sent to ICE
+S for validation." 
+                }, 
+                { 
+                    "ackSentTime": null, 
+                    "flightDate": "19012022", 
+                    "ackReceivedTime": null, 
+                    "receivedTime": "23/01/2025 15:49", 
+                    "sentTime": "23012025 03:01", 
+                    "customLocation": "INDEL4", 
+                    "flightNumber": "KU332", 
+                    "status": "Inserted Successfully in Database. Sent to ICE
+S for validation." 
+                }, 
+                { 
+                    "ackSentTime": null, 
+                    "flightDate": "19012022", 
+                    "ackReceivedTime": null, 
+                    "receivedTime": "23/01/2025 15:48", 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 54 of 66 
+ 
+                    "sentTime": "23012025 03:01", 
+                    "customLocation": "INDEL4", 
+                    "flightNumber": "KU332", 
+                    "status": "Inserted Successfully in Database. Sent to ICE
+S for validation." 
+                }, 
+                { 
+                    "ackSentTime": null, 
+                    "flightDate": "19012022", 
+                    "ackReceivedTime": null, 
+                    "receivedTime": "22/01/2025 12:25", 
+                    "sentTime": "22012025 12:01", 
+                    "customLocation": "INDEL4", 
+                    "flightNumber": "KU332", 
+                    "status": "Inserted Successfully in Database. Sent to ICE
+S for validation." 
+                }, 
+                { 
+                    "ackSentTime": null, 
+                    "flightDate": "19012022", 
+                    "ackReceivedTime": null, 
+                    "receivedTime": "14/01/2025 16:28", 
+                    "sentTime": "14012025 04:01", 
+                    "customLocation": "INDEL4", 
+                    "flightNumber": "KU332", 
+                    "status": "Inserted Successfully in Database. Sent to ICE
+S for validation." 
+                }, 
+                { 
+                    "ackSentTime": null, 
+                    "flightDate": "19012022", 
+                    "ackReceivedTime": null, 
+                    "receivedTime": "13/01/2025 10:12", 
+                    "sentTime": "13012025 10:01", 
+                    "customLocation": "INDEL4", 
+                    "flightNumber": "KU332", 
+                    "status": "Inserted Successfully in Database. Sent to ICE
+S for validation." 
+                }, 
+                { 
+                    "ackSentTime": null, 
+                    "flightDate": "19012022", 
+                    "ackReceivedTime": null, 
+                    "receivedTime": "10/01/2025 13:09", 
+                    "sentTime": "10012025 01:01", 
+                    "customLocation": "INDEL4", 
+                    "flightNumber": "KU332", 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 55 of 66 
+ 
+                    "status": "Inserted Successfully in Database. Sent to ICE
+S for validation." 
+                } 
+            ], 
+            "responseStatus": "SUCCESS", 
+            "message": null 
+        } 
+    ], 
+    "error": "false", 
+    "code": "200", 
+    "message": "Success" 
+} 
+ 
+ 
+ 
+Status Code 200: vehicle data response 
+Status Code 400: Bad request (Invalid JSON syntax, invalid JSON key) 
+Status Code 401 or 403: Unauthenticated or Unauthorised 
+Status Code 500: Some internal server error occurred 
+Status Code 502: Server is not responding. 
+ 
+ 
+ 
+ 
+1.14  ICEGATE/12 
+ 
+This API will take the shipping bill number and connect with the ICEGATE API to get 
+data. 
+ 
+S. 
+No. 
+Field Name Field Description Format Require
+d/Not – 
+Require
+d 
+Length 
+1 location 
+ 
+Location ^[A-Za-z0-9]{6} 
+ 
+Required 6 
+2 sbNo Shipping Bill Number 
+ 
+^[0-9]{7} 
+ 
+ 
+ 
+Required 
+7 
+3 sbDate 
+ 
+ 
+Shipping Bill Date 
+ 
+^((0[1-9]|[12][0-
+9]|3[01])(0[1-
+9]|1[012])\\d{4}) 
+ 
+ 
+Required 
+8 
+ 
+ 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 56 of 66 
+ 
+1.14.1 Technical Approach  
+1. All the data will be shared through REST web services. 
+2. The ULIP system will provide S B number for which detail is required. 
+3. ICEGATE API will share details of cargo information which exist in ICEGATE system in 
+JSON format. 
+4. ICEGATE Integration will add JSON in response key in response body. 
+5. The ULIP system will provide the data in JSON Object format in response body. 
+ 
+Example: 
+ 
+The SB number is shared by the ULIP system, then ICEGATE-integration will make a 
+request to ICEGATE API. 
+ 
+Request: 
+ 
+The request must be of the following format 
+ 
+For Production: 
+ 
+https://www.ulip.dpiit.gov.in/ulip/v1.0.0/ICEGATE/12 
+ 
+ 
+ 
+{ 
+    "sbNo": "1340721", 
+    "sbDate": "23102024", 
+    "location": "INCCU5" 
+} 
+ 
+ 
+ 
+Curl URL 
+ 
+ 
+curl -L -X POST 'https://www.ulip.dpiit.gov.in/ulip/v1.0.0/ICEGATE/12' -H 
+'Authorization: Bearer 
+eyJhbGciOiJIUzUxMiJ9.eyJhcHBzIjoiYXBpR2F0ZXdheSIsInN1YiI6InVsaXAiLCJpYXQiOjE3
+NDY3ODIyODN9.jdfwyGaBeVMDxX1zNQPLxnMESZbnVJ_4_Kwwlc4QHekC5tezrjWQEOsr4gwn8TA3
+F2gbl2fwTGDfT8MqctzUoQ' -H 'Content-Type: application/json' -H 'Accept: 
+application/json' --data-raw '{ 
+    "sbNo": "1340721", 
+    "sbDate": "23102024", 
+    "location": "INCCU5" 
+}'   
+ 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 57 of 66 
+ 
+ 
+For Staging: 
+ 
+https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/ICEGATE/12 
+ 
+ 
+ 
+ 
+{ 
+    "sbNo": "1340721", 
+    "sbDate": "23102024", 
+    "location": "INCCU5" 
+} 
+ 
+ 
+ 
+Curl URL 
+ 
+ 
+curl -L -X POST 'https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/ICEGATE/11' 
+-H 'Authorization: Bearer 
+eyJhbGciOiJIUzUxMiJ9.eyJhcHBzIjoiYXBpR2F0ZXdheSIsInN1YiI6InVsaXAiLCJpYXQiOjE3
+NDY3ODIyODN9.jdfwyGaBeVMDxX1zNQPLxnMESZbnVJ_4_Kwwlc4QHekC5tezrjWQEOsr4gwn8TA3
+F2gbl2fwTGDfT8MqctzUoQ' -H 'Content-Type: application/json' -H 'Accept: 
+application/json' --data-raw '{ 
+    "sbNo": "1340721", 
+    "sbDate": "23102024", 
+    "location": "INCCU5" 
+} 
+'  
+ 
+ 
+ 
+For obtaining an authentication token, refer Section 1.6 
+ 
+Response 
+ 
+To acknowledge the above request, ULIP will send the following response -  
+ 
+a) In case of invalid format 
+ 
+1. Invalid SB number  
+ 
+ 
+{ 
+    "response": null, 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 58 of 66 
+ 
+    "error": "true", 
+    "code": "400 BAD_REQUEST", 
+    "message": "Data format failed OR wrong value entered at:  sbNo. Format s
+hould follow  ^[0-9]{7}$" 
+} 
+ 
+ 
+ 
+2. Invalid sb date  
+ 
+ 
+   
+{ 
+    "response": null, 
+    "error": "true", 
+    "code": "400 BAD_REQUEST", 
+    "message": "Data format failed OR wrong value entered a
+t:  sbDate. Format should follow  ^((0[1-9]|[12][0-
+9]|3[01])(0[1-9]|1[012])\\d{4})$" 
+} 
+ 
+ 
+ 
+ 
+3. Invalid location 
+ 
+ 
+{ 
+    "response": null, 
+    "error": "true", 
+    "code": "400 BAD_REQUEST", 
+    "message": "Data format failed OR wrong value entered a
+t:  location. Format should follow  ^[A-Za-z0-9]{6}$" 
+} 
+ 
+ 
+ 
+b) In case the sb number does not exist in the ICEGATE system 
+ 
+ 
+{ 
+    "response": [ 
+        { 
+            "response": { 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 59 of 66 
+ 
+                "errCode": "ERROR0004", 
+                "errMsg": "No Records Available" 
+            }, 
+            "responseStatus": "ERROR", 
+            "message": null 
+        } 
+    ], 
+    "error": "false", 
+    "code": "200", 
+    "message": "Success" 
+} 
+  
+ 
+ 
+ 
+c) In case the SB number exists 
+ 
+ 
+ { 
+    "response": [ 
+        { 
+            "response": { 
+                "expName": "Ni****ay", 
+                "sbType": "F", 
+                "egmNo": "3063019", 
+                "egmDt": "28102024", 
+                "iec": "AM****7A", 
+                "leoDt": "28102024", 
+                "chaNo": "SE****01" 
+            }, 
+            "responseStatus": "SUCCESS", 
+            "message": null 
+        } 
+    ], 
+    "error": "false", 
+    "code": "200", 
+    "message": "Success" 
+} 
+ 
+ 
+ 
+Status Code 200: vehicle data response 
+Status Code 400: Bad request (Invalid JSON syntax, invalid JSON key) 
+Status Code 401 or 403: Unauthenticated or Unauthorised 
+Status Code 500: Some internal server error occurred 
+Status Code 502: Server is not responding. 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 60 of 66 
+ 
+ 
+ 
+1.15  ICEGATE/13 
+ 
+This API will provide e-Seal details.  
+ 
+S. 
+No. 
+Field Name Field Description Format Require
+d/Not – 
+Require
+d 
+Length 
+1  esealNumber 
+ 
+Shipping Bill number 
+as available in 
+ICEGATE system. 
+^.{1,20}$ 
+ 
+Required 20 max 
+2 containerNumber 
+ 
+ 
+ 
+BE date ^[A-Za-z0-
+9]{1,10} 
+ 
+ 
+Required 
+ 
+15 max 
+ 
+1.15.1 Technical Approach  
+1. All the data will be shared through REST web services. 
+2. The ULIP system will provide an e-seal number for which detail is required. 
+3. ICEGATE API will share details of cargo information that exists in the ICEGATE system in 
+JSON format. 
+4. ICEGATE Integration will add JSON in the response key in the response body. 
+5. The ULIP system will provide the data in JSON Object format in the response body. 
+ 
+Example: 
+ 
+E seal number and other information are shared by the ULIP system, then 
+ICEGATE-integration will request the ICEGATE API. 
+ 
+Request: 
+ 
+The request must be of the following format 
+ 
+For Production: 
+ 
+https://www.ulip.dpiit.gov.in/ulip/v1.0.0/ICEGATE/13 
+ 
+ 
+{ 
+    "esealNumber": "000000000045", 
+    "containerNumber": "TU679" 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 61 of 66 
+ 
+} 
+ 
+ 
+ 
+Curl URL 
+ 
+ 
+ 
+curl -L -X POST 'https://www.ulip.dpiit.gov.in/ulip/v1.0.0/ICEGATE/13' -H 
+'Authorization: Bearer 
+eyJhbGciOiJIUzUxMiJ9.eyJhcHBzIjoiYXBpR2F0ZXdheSIsInN1YiI6InVsaXAiLCJpYXQiOjE3
+NDY3ODIyODN9.jdfwyGaBeVMDxX1zNQPLxnMESZbnVJ_4_Kwwlc4QHekC5tezrjWQEOsr4gwn8TA3
+F2gbl2fwTGDfT8MqctzUoQ' -H 'Content-Type: application/json' -H 'Accept: 
+application/json' --data-raw '{ 
+    "esealNumber": "000000000045", 
+    "containerNumber": "TU679" 
+}'  
+ 
+ 
+For Staging: 
+ 
+https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/ICEGATE/13 
+ 
+ 
+{ 
+    "esealNumber": "000000000045", 
+    "containerNumber": "TU679" 
+} 
+ 
+ 
+ 
+Curl URL 
+ 
+ 
+curl -L -X POST 'https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/ICEGATE/13' 
+-H 'Authorization: Bearer 
+eyJhbGciOiJIUzUxMiJ9.eyJhcHBzIjoiYXBpR2F0ZXdheSIsInN1YiI6InVsaXAiLCJpYXQiOjE3
+NDY3ODIyODN9.jdfwyGaBeVMDxX1zNQPLxnMESZbnVJ_4_Kwwlc4QHekC5tezrjWQEOsr4gwn8TA3
+F2gbl2fwTGDfT8MqctzUoQ' -H 'Content-Type: application/json' -H 'Accept: 
+application/json' --data-raw '{ 
+    "mawbNumber": "15754138070", 
+    "hawbNumber": "1575103333" 
+}'  
+ 
+ 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 62 of 66 
+ 
+ 
+ 
+For obtaining authentication token, refer Section 1.6 
+ 
+Response 
+ 
+To acknowledge the above request, ULIP will send the following response -  
+ 
+a) In case of invalid format 
+ 
+1. Invalid e-seal Number 
+ 
+ 
+{ 
+    "response": null, 
+    "error": "true", 
+    "code": "400 BAD_REQUEST", 
+    "message": "Data format failed OR wrong value entered a
+t:  esealNumber. Format should follow  ^[0-9]{1,20}$" 
+} 
+ 
+ 
+ 
+2. Invalid container Number 
+ 
+ 
+{ 
+    "response": null, 
+    "error": "true", 
+    "code": "400 BAD_REQUEST", 
+    "message": "Data format failed OR wrong value entered a
+t:  containerNumber. Format should follow  ^[A-Za-z0-
+9]{1,10}$" 
+} 
+ 
+ 
+ 
+b) In case the e seal number & container number does not exist in ICEGATE system 
+ 
+ 
+{ 
+    "response": [ 
+        { 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 63 of 66 
+ 
+            "response": { 
+                "errCode": "ERROR0004", 
+                "errMsg": "No Records Available" 
+            }, 
+            "responseStatus": "ERROR", 
+            "message": null 
+        } 
+    ], 
+    "error": "false", 
+    "code": "200", 
+    "message": "Success" 
+} 
+  
+ 
+ 
+ 
+c) In case the e-seal number & container number do exist in the ICEGATE system 
+ 
+ 
+{ 
+    "response": [ 
+        { 
+            "response": { 
+  "esealNumber" : "000000000045", 
+  "containerNumber" : "TU679", 
+  "sealDateTime" : "12042021 12:34", 
+  "sbNumber" : "2323134", 
+  "sbDate" : "12042021", 
+  "truckNumber" : "UP16380", 
+  "portCode" : null, 
+  "esealStatus" : "null", 
+  "verificationTime": "null" 
+}, 
+ 
+            "responseStatus": "SUCCESS", 
+            "message": null 
+        } 
+    ], 
+    "error": "false", 
+    "code": "200", 
+    "message": "Success" 
+} 
+ 
+ 
+ 
+Status Code 200: vehicle data response 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 64 of 66 
+ 
+Status Code 400: Bad request (Invalid JSON syntax, invalid JSON key) 
+Status Code 401 or 403: Unauthenticated or Unauthorized 
+Status Code 500: Some internal server error occurred 
+Status Code 502: Server is not responding. 
+ 
+ 
+ 
+ 
+ 
+1.16  Data Transmission & Authentication Mechanism 
+ 
+All data exchange would be done over secure HTTP (HTTPS). Request from ULIP's system 
+would be made in the ICEGATE system through a data exchange URL that has the following 
+form: 
+ 
+For Production: 
+ 
+https://www.ulip.dpiit.gov.in/ulip/v1.0.0/ICEGATE/01 
+ 
+Body:  
+ 
+{"igmNo":"1234","igmDt":"25102021"} 
+ 
+ 
+Access to the data exchange URL will be authorised through a security mechanism 
+implemented by the ULIP system. The process is as follows: 
+ 
+- First-Time Access: Users will need a username and password, which will be provided in 
+advance. Once the user enters a valid username and password, the ULIP system will return a 
+basic authorisation token. This token will allow the user to communicate with the ULIP system 
+until it expires. 
+ 
+Here is a summary of HTTP Basic Authentication: 
+ 
+During the initial access, the user will submit their username and password to the ULIP secured 
+API to obtain an access token. 
+ 
+ 
+ curl -X POST  
+‘https://www.ulip.dpiit.gov.in/ulip/v1.0.0/user/login  
+-H 'accept: application/json'  
+   -H 'content-type: application/json'  
+-data ‘{"username":"xxxxxx","password":"xxxxx"} ‘ 
+ 
+ 
+Authorization:   
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 65 of 66 
+ 
+Bearer 
+eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJpbnRlcmNvbnQiLCJpYXQiOjE1ODU1NjYyMzcsImFwcHMi
+OiJkYXRhcHVzaCJ9.jb-23DbkWpz-3ptsuuZofzH-
+ce7jd0xR5WlkFfBPO_Dzjop01dSx9OamqsjsgUAryLUPtUDiMX07oHG4L2AfFQ  
+ 
+Upon successful authentication, the user will be logged into the ULIP system and receive an 
+access token. This token allows the user to communicate with ULIP. The token has an expiry 
+time that represents the duration of the user session. The session timeout is typically set for 
+24 hours from the time the token is generated. 
+ 
+Using the above token, the user can request the ULIP system for vehicle details as follows - 
+ 
+curl -X POST \ 
+  https://www.ulip.dpiit.gov.in/ulip/v1.0.0/ICEGATE/01 \ 
+  -H 'accept: application/json' \ 
+  -H 'authorization: Bearer 
+eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZXN0MSIsImlhdCI6MTYyNTIzMDQyNywiYXBwcyI6ImRh
+dGFwdXNoIn0.rhumwWJ8BWeeHe9CYmIV1UKyJk-kLHA_ovX5Zi2OwxEv-td-
+KpxnfbKDI_8FZsOoggqx3Al-Du1y2qMoUD7uzA' \ 
+  -H 'cache-control: no-cache' \ 
+  -H 'content-type: application/json' \ 
+  -H 'postman-token: 8e8a19a4-ea1e-6373-f616-e2e4af9a1338' \ 
+  -d '{"igmNo":"1234","igmDt":"25102021"}' 
+ 
+ 
+For Staging: 
+ 
+curl -X POST  
+‘https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/user/login  
+-H 'accept: application/json'  
+   -H 'content-type: application/json'  
+-data ‘{"username": "xxxxxx","password":"xxxxx"} ‘ 
+ 
+ 
+Authorization:   
+Bearer 
+eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJpbnRlcmNvbnQiLCJpYXQiOjE1ODU1NjYyMzcsImFwcHMi
+OiJkYXRhcHVzaCJ9.jb-23DbkWpz-3ptsuuZofzH-
+ce7jd0xR5WlkFfBPO_Dzjop01dSx9OamqsjsgUAryLUPtUDiMX07oHG4L2AfFQ  
+ 
+Upon successful authentication, the user will be logged into the ULIP system and receive an 
+access token. This token allows the user to communicate with ULIP. The token has an expiry 
+time that represents the duration of the user session. The session timeout is typically set for 
+24 hours from the time the token is generated. 
+ 
+ 
+Using the above token, the user can request the ULIP system for vehicle details as follows - 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 66 of 66 
+ 
+ 
+curl -X POST \ 
+  https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/ICEGATE/01 \ 
+  -H 'accept: application/json' \ 
+  -H 'authorization: Bearer 
+eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZXN0MSIsImlhdCI6MTYyNTIzMDQyNywiYXBwcyI6ImRh
+dGFwdXNoIn0.rhumwWJ8BWeeHe9CYmIV1UKyJk-kLHA_ovX5Zi2OwxEv-td-
+KpxnfbKDI_8FZsOoggqx3Al-Du1y2qMoUD7uzA' \ 
+  -H 'cache-control: no-cache' \ 
+  -H 'content-type: application/json' \ 
+  -H 'postman-token: 8e8a19a4-ea1e-6373-f616-e2e4af9a1338' \ 
+  -d '{"igmNo":"1234","igmDt":"25102021"}' 
+ 
+ 

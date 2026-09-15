@@ -1,0 +1,677 @@
+LDB Integration Requirement Document 
+ 
+  
+                        
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+Version No.: 6.0 
+Date: 30/03/2026 
+Project Name: ULIP 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+DGFT Integration Document 
+This document contains proprietary information of NLDSL. Unauthorized access, copying and replication are 
+prohibited. This document must not be copied in whole or part by any means, without the written authorization of 
+NLDSL, Noida, India. 
+ 
+ 
+ 
+LDB Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No:  
+DGFT_Integration_Doc 
+Version No: 6.0 Page 2 of 13 
+ 
+ 
+ 
+ 
+Revision History 
+Version Date Author Reviewer Significant Changes 
+1.0 15/07/2021 Kush Tyagi Nayab Ali API Integration 
+2.0 07/10/2021 Hasan Mhad Khan Nayab Ali Updated 
+3.0 04/08/2022 Hasan Mhad Khan Nayab Ali Added V3 & itchs API 
+4.0 18/01/2023 Ayush Arya Nayab Ali Response Update 
+5.0 30/09/2024 Ayush Arya Nayab Ali Response Update 
+6.0 30/03/2026 Gaurav Tyagi Pranab Manna Response Update 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+LDB Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No:  
+DGFT_Integration_Doc 
+Version No: 6.0 Page 3 of 13 
+ 
+Table of Contents 
+ 
+Introduction ................................................................................................................................................. 4 
+1.1 Purpose .................................................................................................................................... 4 
+The Overall Description .............................................................................................................................. 4 
+1.2 Data Integration between DGFT System and ULIP application ............................................... 4 
+1.3 DGFT/01 ................................................................................................................................... 4 
+1.3.1 Technical Approach .................................................................................................... 5 
+1.4 DGFT/02 ................................................................................................................................... 7 
+1.4.1 Technical Approach .................................................................................................... 7 
+1.5 Data Transmission & Authentication Mechanism .................................................................. 12 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+LDB Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No:  
+DGFT_Integration_Doc 
+Version No: 6.0 Page 4 of 13 
+ 
+Introduction 
+1.1 Purpose 
+ 
+The purpose of this document is to define and provide details for accessing API for  
+Import/export details from DGFT system to ULIP system. 
+This document details the following points: 
+ 
+1. Data Integration between DGFT and ULIP web service : Identification of operational 
+points where data integration between DGFT and ULIP web service will be needed. 
+ 
+2. Technical Approach for performing Data Integration  
+ 
+The Overall Description 
+User will share the information such as Import export code number based on data send 
+by user, ULIP system will call DGFT API for accessing information. 
+ 
+Following are the point for accessing vehicle information: - 
+ 
+1. This API will share data based on information provided by user. 
+ 
+2. ULIP will expose API for getting data from DGFT API. 
+ 
+3. DGFT/01 API will take vehicle registration number from user and get data from DGFT 
+API. 
+1.2 Data Integration between DGFT System and ULIP application 
+ 
+User will share information to ULIP system based on data shared ULIP will provide data 
+to user. 
+1.3 DGFT/01 
+ 
+This API will take IEC number and connect with DGFT API to get data. 
+ 
+S. 
+No. 
+Field Name Field Description Format Require
+d/Not – 
+Require
+d 
+Length 
+1 iecnumber Import export code 
+number as available in 
+DGFT system. 
+[0-9]{10} Required 10 
+LDB Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No:  
+DGFT_Integration_Doc 
+Version No: 6.0 Page 5 of 13 
+ 
+1.3.1 Technical Approach  
+1. All the data will be shared through rest web services. 
+2. ULIP system will provide IEC number for which detail is required. 
+3. DGFT API will share details of exporter/importer information which exist in DGFT system 
+in JSON format. 
+4. ULIP system will provide the data in JSON Object format in response body. 
+ 
+Example: 
+ 
+IEC number 0388197021 is shared by ULIP system, then DGFT-integration will make a request 
+to DGFT API. 
+ 
+Request: 
+The request must be of the following format, where IEC number is passed within the URL body 
+in JSON format. 
+ 
+For staging - 
+https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/DGFT/01 
+ 
+{"iecnumber": "0515920797"} 
+ 
+Curl URL 
+curl --location 'https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/DGFT/01' \ 
+--header 'Authorization: Bearer 
+eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1bGlwMiIsImlhdCI6MTcyNzY5MDAwMCwiYXBwcyI6I
+mRhdGFwdXNoIn0.2BrY8dCCS_BAH5Y6faXPYAPJEV52bGuZZRtKXD04AOmAUtooBy9T
+C-wmWVvxyAWsqLR9ifBhYD9xfqGMDPH9_A' \ 
+--header 'Accept: application/json' \ 
+--header 'Content-Type: application/json' \ 
+--data '{"iecnumber": "0515920797"}' 
+ 
+For production - 
+https://www.ulip.dpiit.gov.in/ulip/v1.0.0/DGFT/01 
+ 
+{"iecnumber": "0388197021"} 
+ 
+Curl URL 
+curl --location --request POST 'https://www.ulip.dpiit.gov.in/ulip/v1.0.0/DGFT/01' \ 
+--header 'Authorization: Bearer 
+eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1bGlwIiwiaWF0IjoxNjMzNjAzMjYwLCJhcHBzIjoiZGF0
+YXB1c2gifQ.rZPEeDvC3yMHwhG_zCIb_Aby5is9_Kdd25eOEff7OH2Z0UC_Ew1WCTFaDj4z
+t9rpiHb1_d09cndKi1rs99AaxQ' \ 
+--header 'Accept: application/json' \ 
+--header 'Content-Type: application/json' \ 
+--data-raw '{"iecnumber": "0388197021"}' 
+LDB Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No:  
+DGFT_Integration_Doc 
+Version No: 6.0 Page 6 of 13 
+ 
+For obtaining authentication token, refer Section 1.6 
+ 
+Response 
+ 
+To acknowledge the above request, ULIP will send the below response -  
+ 
+a) In case of invalid format 
+1. Invalid IEC number 
+ 
+{ 
+ "response": null, 
+ "error": "true", 
+ "code": "400", 
+ "message": "Data format failed OR wrong value entered at:  iecnumber. Format 
+should follow [0-9]{10}" 
+} 
+ 
+b) In case of IEC number does not exist in DGFT system 
+ 
+{ 
+ "response": [ 
+  { 
+   "response": { 
+    "errorDescription": "No record found - IEC Not 
+Found", 
+    "error": "record_not_found" 
+   }, 
+   "responseStatus": "ERROR" 
+  } 
+ ], 
+ "error": "false", 
+ "code": "200", 
+ "message": "Success" 
+} 
+ 
+c) In case IEC number exist 
+ 
+{ 
+    "response": [ 
+        { 
+            "response": { 
+                "exporterType": 1, 
+                "address2": "S*c*o* 4* C*n*a*t N*: 9*9*9*1*5*6*", 
+                "city": "Gurugram", 
+                "address1": "1*1*", 
+                "responseTime": "09:53:34", 
+LDB Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No:  
+DGFT_Integration_Doc 
+Version No: 6.0 Page 7 of 13 
+ 
+                "iecIssueDate": "Jan 27, 2016 6:30:00 PM", 
+                "requestTime": "09:53:21", 
+                "natureOfConcern": 111000113, 
+                "entityName": "HAMLET E COMMERCE PRIVATE LIMITED", 
+                "pinCode": 122001, 
+                "iecStatus": 0, 
+                "state": "HARYANA", 
+                "pan": "A*D*H*6*1*", 
+                "iecNumber": "0515920797" 
+            }, 
+            "responseStatus": "SUCCESS" 
+        } 
+    ], 
+    "error": "false", 
+    "code": "200", 
+    "message": "Success" 
+} 
+ 
+Status Code 200: IEC data response 
+Status Code 400: Bad request (Invalid JSON syntax, invalid JSON key) 
+Status Code 401 or 403: Unauthenticated or Unauthorized 
+Status Code 500: Some internal server error occurred 
+Status Code 502: Server is not responding. 
+ 
+1.4 DGFT/02 
+ 
+This API will take ITC(HS) Code and connect with DGFT API to get data. 
+ 
+S. 
+No. 
+Field Name Field Description Format Require
+d/Not – 
+Require
+d 
+Length 
+1 itchs ITC(HS) Code [0-9]{8} Required 8 
+1.4.1 Technical Approach  
+5. All the data will be shared through rest web services. 
+6. ULIP system will provide itchs for which detail is required. 
+7. DGFT API will share import policies related to itchs code which exist in DGFT system in 
+JSON format. 
+8. ULIP system will provide the data in JSON Object format in response body. 
+ 
+Example: 
+IEC number 29035100 is shared by ULIP system, then DGFT-integration will make a request to 
+DGFT API. 
+LDB Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No:  
+DGFT_Integration_Doc 
+Version No: 6.0 Page 8 of 13 
+ 
+Request: 
+The request must be of the following format, where itchs code is passed within the URL body in 
+JSON format. 
+ 
+For staging - 
+https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/DGFT/02 
+ 
+{"itchs": "29035100"} 
+ 
+Curl URL 
+curl --location 'https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/DGFT/02' \ 
+--header 'Authorization: Bearer 
+eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1bGlwMiIsImlhdCI6MTcyNzY5MDAwMCwiYXBwcyI6I
+mRhdGFwdXNoIn0.2BrY8dCCS_BAH5Y6faXPYAPJEV52bGuZZRtKXD04AOmAUtooBy9T
+C-wmWVvxyAWsqLR9ifBhYD9xfqGMDPH9_A' \ 
+--header 'Accept: application/json' \ 
+--header 'Content-Type: application/json' \ 
+--data '{"itchs": "29035100"}' 
+ 
+For production - 
+https://www.ulip.dpiit.gov.in/ulip/v1.0.0/DGFT/02 
+ 
+{"itchs": "29035100"} 
+ 
+Curl URL 
+curl --location --request POST 'https://www.ulip.dpiit.gov.in/ulip/v1.0.0/DGFT/02' \ 
+--header 'Authorization: Bearer 
+eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1bGlwIiwiaWF0IjoxNjMzNjAzMjYwLCJhcHBzIjoiZGF0
+YXB1c2gifQ.rZPEeDvC3yMHwhG_zCIb_Aby5is9_Kdd25eOEff7OH2Z0UC_Ew1WCTFaDj4z
+t9rpiHb1_d09cndKi1rs99AaxQ' \ 
+--header 'Accept: application/json' \ 
+--header 'Content-Type: application/json' \ 
+--data-raw '{"itchs": "29035100"}' 
+ 
+For obtaining authentication token, refer Section 1.6 
+ 
+Response 
+To acknowledge the above request, ULIP will send the below response -  
+ 
+a) In case of invalid format 
+2. Invalid itchs code 
+{ 
+    "response": null, 
+    "error": "true", 
+    "code": "400", 
+LDB Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No:  
+DGFT_Integration_Doc 
+Version No: 6.0 Page 9 of 13 
+ 
+    "message": "Data format failed OR wrong value entered at:  itchs. Format should follo
+w  [0-9]{8}" 
+} 
+ 
+b) In case of itchs code does not exist in DGFT system 
+{ 
+    "response": [ 
+        { 
+            "response": { 
+                "errorDescription": "No record found", 
+                "error": "record_not_found" 
+            }, 
+            "responseStatus": "ERROR" 
+        } 
+    ], 
+    "error": "false", 
+    "code": "200", 
+    "message": "Success" 
+} 
+ 
+c) In case of a 3rd party error- 
+{ 
+    "response": [ 
+        { 
+            "response": { 
+                "chapter": null, 
+                "productDescriptionImportPolicy": null, 
+                "description": null, 
+                "error": "System exception while processing request", 
+                "main": null, 
+                "poliicyCondition": null 
+            }, 
+            "responseStatus": "SUCCESS" 
+        } 
+    ], 
+    "error": "false", 
+    "code": "200", 
+    "message": "Success" 
+} 
+ 
+d) In case itchs code exists 
+{ 
+    "response": [ 
+        { 
+            "response": { 
+                "chapter": "29", 
+                "productDescriptionImportPolicy": [ 
+                    { 
+LDB Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No:  
+DGFT_Integration_Doc 
+Version No: 6.0 Page 10 of 13 
+ 
+                        "hsCode": "29035100", 
+                        "description": "Unsaturated fluorinated derivatives of acyclic hydrocarbon
+s:\n- - 2,3,3,3-Tetrafluoropropene (HFO-1234yf), 1,3,3,3-tetrafluoropropene (HFO-
+1234ze) and (z)-1,1,1,4,4,4-hexafluoro-2-butene (HFO1336mzz)", 
+                        "notificationNumber": "08.11.2020" 
+                    } 
+                ], 
+                "description": "PRODUCTS OF THE CHEMICAL OR ALLIED INDUSTRIES", 
+                "main": [ 
+                    { 
+                        "notes": "Within any one heading of this Chapter, derivatives of a chemical
+ compound (or group of chemical compounds) are to be classified in the same sub-
+heading asthat compound (or group of compounds) provided that they are not more spec
+ially covered by any other sub-heading and that there is no residual sub-
+heading named \"other\" in the series of sub-headings concerned.", 
+                        "notificationNumber": "", 
+                        "slNo": "1", 
+                        "notificationDate": "" 
+                    }, 
+                    { 
+                        "notes": "Note 3 to this Chapter shall not be applicable to the sub-
+heading of this Chapter.", 
+                        "notificationNumber": "", 
+                        "slNo": "2", 
+                        "notificationDate": "" 
+                    } 
+                ], 
+                "poliicyCondition": [ 
+                    { 
+                        "notes": "Import is permitted by actual users against a licence from a coun
+try which is a party to the Montreal Protocol on Substances that Deplete the Ozone Layer
+. List of countries which are parties to the Montreal Protocol (details can be accessed fro
+m website: www.unep.org/ozone) is in Appendix IV to this Schedule. However, import fro
+m countries, which are not parties to the Montreal Protocol is —
+Prohibited.\r\n\r\n\r\n\r\n*Import of the Chemicals is allowed from State Parties and Non S
+tate Parties to the CWC subject to the condition that the importer shall, for each import c
+onsignment, within 30 days of import, notify the details to the National Authority, Chemic
+al Weapons Convention, Cabinet Secretariat ; Ministry of External Affairs (DandISA); Dep
+artment of Chemicals and Petrochemicals and the Directorate General of Foreign Trade a
+nd submit to the DGFT a copy of the bill of entry within 30 days of import.", 
+                        "notificationNumber": "", 
+                        "slNo": "1", 
+                        "notificationDate": "" 
+                    }, 
+                    { 
+                        "notes": "All Narcotic drugs and psychotropic substances covered under t
+his chapter will be subject to the following conditions\r\n\r\n(a) Any narcotic drug and ps
+ychotropic substance can be imported under the Special Provisions for medical and scie
+LDB Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No:  
+DGFT_Integration_Doc 
+Version No: 6.0 Page 11 of 13 
+ 
+ntific purposes as per Chapter VII-
+A of the NDPS Rules, 1985 after obtaining an import certificate under the proviso to Rule 
+53 of the NDPS Rules (details can be accessed from website of Central Bureau of Narcoti
+cs, Gwalior: http://cbn.nic.in) \r\n\r\n(b) Imports other than category (a) above will be gov
+erned by Appendix- I to this Schedule", 
+                        "notificationNumber": "", 
+                        "slNo": "2", 
+                        "notificationDate": "" 
+                    }, 
+                    { 
+                        "notes": "Import of the Chemicals is allowed from State Parties and Non St
+ate Parties to the CWC subject to the condition that the importer shall, for each import co
+nsignment, within 30 days of import, notify the details to the National Authority, Chemical
+ Weapons Convention, Cabinet Secretariat ; Ministry of External Affairs (DandISA); Depar
+tment of Chemicals and Petrochemicals and the Directorate General of Foreign Trade an
+d submit to the DGFT a copy of the bill of entry within 30 days of import\r\n\r\nNo Objecti
+on Certificate (NOC) is required from Narcotics Commissioner, Gwalior, before import of 
+the item.", 
+                        "notificationNumber": "", 
+                        "slNo": "3", 
+                        "notificationDate": "" 
+                    }, 
+                    { 
+                        "notes": "The importer shall, for, each consignment, submit a copy of the B
+ill of Entry within 30 days to the Ozone Cell, Ministry of Environment, Forest and Climate 
+Change, New Delhi.", 
+                        "notificationNumber": "08.11.2020", 
+                        "slNo": "4", 
+                        "notificationDate": "" 
+                    } 
+                ] 
+            }, 
+            "responseStatus": "SUCCESS" 
+        } 
+    ], 
+    "error": "false", 
+    "code": "200", 
+    "message": "Success" 
+} 
+ 
+Status Code 200: itchs data response 
+Status Code 400: Bad request (Invalid JSON syntax, invalid JSON key) 
+Status Code 401 or 403: Unauthenticated or Unauthorized 
+Status Code 500: Some internal server error occurred 
+Status Code 502: Server is not responding. 
+LDB Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No:  
+DGFT_Integration_Doc 
+Version No: 6.0 Page 12 of 13 
+ 
+1.5 Data Transmission & Authentication Mechanism 
+ 
+All data exchange would be done over secure HTTP (HTTPS). Request from ULIP's system would 
+be made in DGFT system through a data exchange URL that has following form: 
+ 
+For production - 
+https://www.ulip.dpiit.gov.in/ulip/v1.0.0/DGFT/01 
+ 
+Body:  
+{"iecnumber": "0388197021"} 
+ 
+Access to above data exchange URL would be authorized by use of a security mechanism 
+implemented by the ULIP system. It is as follows: 
+ 
+• First time access:  It would require a username and password [which would be shared with 
+user beforehand].  Once user hit with valid user id and password, ULIP system will return a 
+basic authorization token to  user, using that token user will communicate with ULIP system 
+until token will not get expired. 
+ 
+Brief summary of HTTP Basic Authentication is as follows: 
+ 
+First time when User will hit ULIP secured API through username and password for access token 
+as follow- 
+ 
+curl --location --request POST 'https://www.ulip.dpiit.gov.in/ulip/v1.0.0/user/login' \ 
+--header 'Accept: application/json' \ 
+--header 'Content-Type: application/json' \ 
+--data-raw '{ 
+"username": "xxxx", 
+"password": "xxxx@123"}' 
+ 
+Authorization:   
+Bearer  
+eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZXN0MSIsImlhdCI6MTYyNTIzMDQyNywiYXBwcyI6ImRhdGFwdXN
+oIn0.rhumwWJ8BWeeHe9CYmIV1UKyJk-kLHA_ovX5Zi2OwxEv-td-KpxnfbKDI_8FZsOoggqx3Al-
+Du1y2qMoUD7uzA' 
+ 
+Upon successful authentication, the user would be logged into the ULIP system and get an access 
+token. Though this token user can communicate with ULIP. This token has expiry time which 
+represent user session. The session time out for the same to be fixed hour, generally it is for 30 
+minutes. If there is no request coming from user for 30 minutes, then session (token) will be 
+expired and user need to re authenticate. 
+ 
+Using The above token, user can request ULIP system for vehicle details as follow - 
+ 
+curl -X POST \ 
+LDB Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No:  
+DGFT_Integration_Doc 
+Version No: 6.0 Page 13 of 13 
+ 
+  https://www.ulip.dpiit.gov.in/ulip/v1.0.0/DGFT/01 \ 
+  -H 'accept: application/json' \ 
+  -H 'authorization: Bearer 
+eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZXN0MSIsImlhdCI6MTYyNTIzMDQyNywiYXBwcyI6ImRhdGFwdXN
+oIn0.rhumwWJ8BWeeHe9CYmIV1UKyJk-kLHA_ovX5Zi2OwxEv-td-KpxnfbKDI_8FZsOoggqx3Al-
+Du1y2qMoUD7uzA' \ 
+  -H 'cache-control: no-cache' \ 
+  -H 'content-type: application/json' \ 
+  -H 'postman-token: 8e8a19a4-ea1e-6373-f616-e2e4af9a1338' \ 
+  -d '{"iecnumber": "0388197021"}' 
+ 
+For staging – 
+ 
+curl --location 'https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/user/login' \ 
+--header 'Accept: application/json' \ 
+--header 'Content-Type: application/json' \ 
+--data-raw '{ 
+    "username": "xxxx", 
+    "password": "xxxx@123"}' 
+ 
+Authorization:   
+Bearer  
+eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1bGlwIiwiaWF0IjoxNzI3MTYxMDgwLCJhcHBzIjoiZGF0YXB1c2gifQ.X
+hVZm7NiCD05-
+v9091WJQhYzdk1a0Shs_ley0T4R2MX63swRyxHbHxh6bVXtzqWvWiSLwwNGRQIcqGhr49hpGg 
+ 
+Upon successful authentication, the user would be logged into the ULIP system and get an access 
+token. Though this token user can communicate with  ULIP. This token has expiry time which 
+represent user session. The session time out for the same to be f ixed hour, generally it is for 30 
+minutes. If there is no request coming from user for 30 minutes, the n session (token) will be 
+expired, and user need to re authenticate. 
+ 
+Using The above token, user can request ULIP system for details as follow - 
+ 
+https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/DGFT/01 
+ 
+curl --location 'https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/DGFT/01' \ 
+--header 'Authorization: Bearer 
+eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1bGlwMiIsImlhdCI6MTcyNzY5MDAwMCwiYXBwcyI6ImRhdGFwdXN
+oIn0.2BrY8dCCS_BAH5Y6faXPYAPJEV52bGuZZRtKXD04AOmAUtooBy9TC-
+wmWVvxyAWsqLR9ifBhYD9xfqGMDPH9_A' \ 
+--header 'Accept: application/json' \ 
+--header 'Content-Type: application/json' \ 
+--data '{"iecnumber": "0515920797"}' 
+ 

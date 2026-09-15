@@ -1,0 +1,601 @@
+ULIP Integration Requirement Document 
+ 
+  
+                        
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+Version No.: 4.0 
+Date: 26/03/2026 
+Project Name: ULIP 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ULIP Integration Requirement Document 
+This document contains proprietary information of NLDSL. Unauthorized access, copying and replication are 
+prohibited. This document must not be copied in whole or part by any means, without the written authorization of 
+NLDSL, Noida, India. 
+ 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 2 of 12 
+ 
+ 
+ 
+ 
+Revision History 
+Version Date Author Reviewer Significant Changes 
+1.0 22/09/2023 Ayush Arya Nayab Ali Baseline Version 
+2.0 25/06/2024 Ayush Arya Nayab Ali Baseline Version 
+3.0 01/10/2024 Ayush Arya Nayab Ali Updated 
+4.0 26/03/2026 Abhilash Meena Pranab 
+Manna Updated 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+  
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 3 of 12 
+ 
+Table of Contents 
+ 
+Introduction ................................................................................................................................................. 4 
+1.1 Purpose .................................................................................................................................... 4 
+The Overall Description .............................................................................................................................. 4 
+1.2 Data Integration between E-Challan System and ULIP application ......................................... 4 
+1.3 ECHALLAN/01 ......................................................................................................................... 4 
+1.3.1 Technical Approach .................................................................................................... 5 
+1.4 Data Transmission & Authentication Mechanism .................................................................. 10 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 4 of 12 
+ 
+Introduction 
+1.1 Purpose 
+ 
+The purpose of this document is to define and provide details for accessing API for  E-
+Challan system information  (information about vehicle number  available in  E-Challan 
+system) from ULIP system. 
+This document details the following points: 
+ 
+1. Data Integration between E-Challan and ULIP web service: Identification of operational 
+points where data integration between E-Challan and ULIP web service will be needed. 
+ 
+2. Technical Approach for performing Data Integration  
+ 
+The Overall Description 
+ 
+User will share the information such as vehicle number based on data send by user 
+ULIP system will call respective E-Challan API for accessing information. 
+ 
+Following are the point for accessing vehicle information: - 
+ 
+1. This API will share data based on information provided by user. 
+ 
+2. ULIP will expose API for getting data from E-Challan API. 
+ 
+3. ECHALLAN/01 API will take vehicle number from user and get data from E-Challan 
+API. 
+1.2 Data Integration between E-Challan System and ULIP application 
+ 
+User will share information to ULIP system based on data shared ULIP will provide data 
+to user. 
+ 
+1.3 ECHALLAN/01 
+ 
+This API will take vehicle number and connect with E-Challan API to get data. 
+ 
+S. 
+No. 
+Field Name Field Description Format Require
+d/Not – 
+Require
+d 
+Length 
+1 vehicleNumb
+er 
+Enter the vehicleNumber 
+as available in E-Challan 
+system. 
+^[a-zA-Z0-
+9]{5,11}$ 
+Required Min 5 
+Max 11 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 5 of 12 
+ 
+1.3.1 Technical Approach  
+1. In this, on staging server we are fetching the data from 3 rd party E-Challan API directly 
+without hitting any 3rd party AUTH API. 
+2. In production server for get the data from 3 rd party E-Challan API, we have to first hit the 
+3rd party AUTH API for get the token and then we use the token in the 3rd party E-Challan 
+API, we are using the AUTH token API internally. 
+3. All the data will be shared through rest web services. 
+4. ULIP system will provide vehicle number for which detail is required. 
+5. E-Challan API will share details of vehicle details which exist in E-Challan system in JSON 
+format. 
+6. ECHALLAN Integration will add JSON in response key in response body. 
+7. ULIP system will provide the data in JSON Object format in response body. 
+ 
+Example: 
+ 
+Vehicle number KL150000 is shared by ULIP system, then ECHALLA-integration will 
+make a request to E-Challan API. 
+ 
+Request: 
+ 
+The request must be of the following format, where vehicle number is passed within the URL 
+body in JSON format. 
+ 
+For staging - 
+https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/ECHALLAN/01 
+ 
+{ 
+    "vehicleNumber": "UP93BK9110" 
+} 
+ 
+Curl URL 
+ 
+curl --location --
+request POST 'https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/ECHALLAN/01' \ 
+--
+header 'Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1bGlwIiwiaWF0IjoxNjk1Mzc
+1OTgyLCJhcHBzIjoiZGF0YXB1c2gifQ.2bntkTWUW7mIdSW2NklLa0cE7hOPwI37uS9FUcf3NDjAnMV3l_5SIO
+Ni50704RF39kYM9rVJ59KB2gh7gSheDg' \ 
+--header 'Content-Type: application/json' \ 
+--header 'Accept: application/json' \ 
+--header 'Cookie: __zlcmid=1DSlSDwigKpTJa2; _fw_crm_v=b6a11a26-11c3-4b74-d0d1-
+3b9c43a5b7c7' \ 
+--data-raw ' { 
+    "vehicleNumber": "UP93BK9110" 
+}' 
+ 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 6 of 12 
+ 
+For production - 
+https://www.ulip.dpiit.gov.in/ulip/v1.0.0/ECHALLAN/01 
+ 
+{ 
+    "vehicleNumber": "UP15AU1291" 
+} 
+ 
+Curl URL 
+ 
+curl --location 'https://www.ulip.dpiit.gov.in/ulip/v1.0.0/ECHALLAN/01' \ 
+--header 'Authorization: Bearer 
+eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1bGlwIiwiaWF0IjoxNzI3NzYyNzcxLCJhcHBzIjoiZGF0YXB1c2gif
+Q.9_kJwxuXfJYoMt0QeMgOSWi01EaxXQkZQ1JLevfNo-vJ5vjCY9oIemZ_B4hiiq2ZCog-yAbIUgL6YN-
+TVie3cA' \ 
+--header 'Content-Type: application/json' \ 
+--header 'Accept: application/json' \ 
+--data '{ 
+    "vehicleNumber": "UP15AU1291" 
+}' 
+ 
+ 
+For obtaining authentication token, refer Section 1.4 
+ 
+Response 
+ 
+To acknowledge the above request, ULIP will send the below response -  
+ 
+1. Invalid vehicle number format 
+ 
+{ 
+    "response": null, 
+    "error": "true", 
+    "code": "400", 
+    "message": "Data format failed OR wrong value entered at:  nhno. Format should fol
+low  [A-Z]{2}-[A-Z0-9]{1,4}" 
+} 
+ 
+2. In case vehicle number exist 
+ 
+{ 
+    "response": [ 
+        { 
+            "response": { 
+                "data": { 
+                    "Disposed_data": [ 
+                        { 
+                            "challan_place": "", 
+                            "sent_to_reg_court": "No", 
+                            "owner_name": "T**T P*T L*D", 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 7 of 12 
+ 
+                            "receipt_no": null, 
+                            "challan_date_time": "11-03-2022 11:38:21", 
+                            "document_impounded": "", 
+                            "received_amount": 1, 
+                            "sent_to_court_on": null, 
+                            "remark": "NA", 
+                            "fine_imposed": "1", 
+                            "amount_of_fine_imposed": null, 
+                            "challan_no": "KL48648220311113821", 
+                            "dl_no": null, 
+                            "name_of_violator": "T**T P*T L*D", 
+                            "sent_to_virtual_court": "No", 
+                            "date_of_proceeding": null, 
+                            "driver_name": "T**T P*T L*D", 
+                            "court_address": null, 
+                            "challan_status": "Disposed", 
+                            "department": "Traffic", 
+                            "state_code": "KL", 
+                            "court_name": null, 
+                            "offence_details": [ 
+                                { 
+                                    "act": "", 
+                                    "name": "test offence 1 rupee" 
+                                } 
+                            ] 
+                        }, 
+                        { 
+                            "challan_place": "", 
+                            "sent_to_reg_court": "No", 
+                            "owner_name": "T**T P*T L*D", 
+                            "receipt_no": null, 
+                            "challan_date_time": "25-02-2022 11:20:01", 
+                            "document_impounded": "", 
+                            "received_amount": 1, 
+                            "sent_to_court_on": null, 
+                            "remark": "NA", 
+                            "fine_imposed": "1", 
+                            "amount_of_fine_imposed": null, 
+                            "challan_no": "KL48648220225112001", 
+                            "dl_no": null, 
+                            "name_of_violator": "T**T P*T L*D", 
+                            "sent_to_virtual_court": "No", 
+                            "date_of_proceeding": null, 
+                            "driver_name": "T**T P*T L*D", 
+                            "court_address": null, 
+                            "challan_status": "Disposed", 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 8 of 12 
+ 
+                            "department": "Traffic", 
+                            "state_code": "KL", 
+                            "court_name": null, 
+                            "offence_details": [ 
+                                { 
+                                    "act": "", 
+                                    "name": "test offence 1 rupee" 
+                                } 
+                            ] 
+                        } 
+                    ], 
+                    "Pending_data": [ 
+                        { 
+                            "challan_place": "test", 
+                            "sent_to_reg_court": "No", 
+                            "owner_name": "T**T P*T L*D", 
+                            "challan_date_time": "01-09-2023 17:36:00", 
+                            "document_impounded": "", 
+                            "sent_to_court_on": null, 
+                            "remark": "gdgg", 
+                            "fine_imposed": "7750", 
+                            "amount_of_fine_imposed": null, 
+                            "challan_no": "KL548476230713105383", 
+                            "dl_no": null, 
+                            "name_of_violator": "T**T P*T L*D", 
+                            "sent_to_virtual_court": "No", 
+                            "date_of_proceeding": null, 
+                            "driver_name": null, 
+                            "court_address": null, 
+                            "rto_distric_name": "Thiruvananthapuram", 
+                            "challan_status": "Pending", 
+                            "department": "Traffic", 
+                            "state_code": "KL", 
+                            "court_name": null, 
+                            "offence_details": [ 
+                                { 
+                                    "act": "S130(4)", 
+                                    "name": "Fitness certificate (CF) of a transport v
+ehicle not produced on demand for examination by the officer authorised." 
+                                }, 
+                                { 
+                                    "act": "S66(1),S84(a) RW S192A(1)", 
+                                    "name": "Driving or causing or allowing to be driv
+en a vehicle as contract carriage without valid permit.(MMV and HMV)" 
+                                } 
+                            ] 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 9 of 12 
+ 
+                        }, 
+                        { 
+                            "challan_place": "", 
+                            "sent_to_reg_court": "No", 
+                            "owner_name": "T**T P*T L*D", 
+                            "challan_date_time": "11-03-2022 11:49:37", 
+                            "document_impounded": "", 
+                            "sent_to_court_on": null, 
+                            "remark": "NA", 
+                            "fine_imposed": "1", 
+                            "amount_of_fine_imposed": null, 
+                            "challan_no": "KL48648220311114937", 
+                            "dl_no": null, 
+                            "name_of_violator": "T**T P*T L*D", 
+                            "sent_to_virtual_court": "No", 
+                            "date_of_proceeding": null, 
+                            "driver_name": "T**T P*T L*D", 
+                            "court_address": null, 
+                            "rto_distric_name": "Palakkad", 
+                            "challan_status": "Pending", 
+                            "department": "Traffic", 
+                            "state_code": "KL", 
+                            "court_name": null, 
+                            "offence_details": [ 
+                                { 
+                                    "act": "", 
+                                    "name": "test offence 1 rupee" 
+                                } 
+                            ] 
+                        } 
+                    ] 
+                }, 
+                "message": "Record  finds successfully", 
+                "status": "200" 
+            }, 
+            "responseStatus": "SUCCESS" 
+        } 
+    ], 
+    "error": "false", 
+    "code": "200", 
+    "message": "Success" 
+} 
+ 
+ 
+ 
+ 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 10 of 12 
+ 
+3. In case vehicle number not exist 
+ 
+{ 
+    "response": [ 
+        { 
+            "response": { 
+                "code": "305", 
+                "message": "No Records Found!" 
+            }, 
+            "responseStatus": "SUCCESS" 
+        } 
+    ], 
+    "error": "false", 
+    "code": "200", 
+    "message": "Success" 
+} 
+ 
+ 
+Status Code 200: ECHALLAN data response 
+Status Code 400: Bad request (Invalid json syntax, invalid json key) 
+Status Code 401 or 403: Unauthenticated or Unauthorized 
+Status Code 500: Some internal server error occurred 
+Status Code 502: Server is not responding. 
+ 
+1.4 Data Transmission & Authentication Mechanism 
+ 
+All data exchange would be done over secure HTTP (HTTPS). Request from ULIP's system would 
+be made in ECHALLAN system through a data exchange URL that has following form: 
+ 
+For staging - 
+https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/ECHALLAN/01 
+ 
+{ 
+    "vehicleNumber": "KL150000" 
+} 
+ 
+Access to above data exchange URL would be authorized by use of a security mechanism 
+implemented by the ULIP system. It is as follows: 
+ 
+• First time access:  It would require a username and password [which would be shared with 
+user beforehand].  Once user hit with valid user id and password, ULIP system will return a 
+basic authorization token to  user, using that token user will communicate with ULIP system 
+until token will not get expired. 
+ 
+ 
+ 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 11 of 12 
+ 
+Brief summary of HTTP Basic Authentication is as follows: 
+ 
+First time when User will hit ULIP secured API through username and password for access token 
+as follow- 
+ 
+curl --location --request POST 
+'https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/user/login' \ 
+--header 'Accept: application/json' \ 
+--header 'Content-Type: application/json' \ 
+--data-raw '{ 
+"username": "xxxx", 
+"password": "xxxx@123" 
+}' 
+ 
+ 
+Authorization:   
+Bearer 
+ eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1bGlwIiwiaWF0IjoxNjk1Mzc5NzIyLCJhcHBzIjoiZGF0
+YXB1c2gifQ.d8gwtG3TkAPKKk4Gvz8Moi6nCtU3wQvZnJOA8eG2e2afY4TsTliy6uQERhFb
+D30WIiHlsTRo3LldgUctEa5Bdw'  
+ 
+Upon successful authentication, the user would be logged into the ULIP system and get an access 
+token. Though this token user can communicate with ULIP. This token has expiry time which 
+represent user session. The session time out for the same to be fixed hour, generally it is for 30 
+minutes. If there is no request coming from user for 30 minutes, then session (token) will be 
+expired and user need to re authenticate. 
+ 
+Using The above token, user can request ULIP system for cargo details as follow – 
+ 
+curl --location --
+request POST 'https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/ECHALLAN/01' \ 
+--
+header 'Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1bGlwIiwiaWF0IjoxNjk
+1Mzc5NzIyLCJhcHBzIjoiZGF0YXB1c2gifQ.d8gwtG3TkAPKKk4Gvz8Moi6nCtU3wQvZnJOA
+8eG2e2afY4TsTliy6uQERhFbD30WIiHlsTRo3LldgUctEa5Bdw' \ 
+--header 'Content-Type: application/json' \ 
+--header 'Accept: application/json' \ 
+--header 'Cookie: __zlcmid=1DSlSDwigKpTJa2; _fw_crm_v=b6a11a26-11c3-4b74-d0d1-
+3b9c43a5b7c7' \ 
+--data-raw ' { 
+    "vehicleNumber": "UP93BK9110" 
+}' 
+ 
+ 
+ 
+ 
+ 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 12 of 12 
+ 
+For production – 
+ 
+curl --location 'https://www.ulip.dpiit.gov.in/ulip/v1.0.0/user/login' \ 
+--header 'Accept: application/json' \ 
+--header 'Content-Type: application/json' \ 
+--data-raw '{ 
+    "username": "xxxx", 
+    "password": "xxxx@123" 
+}' 
+ 
+Authorization:   
+Bearer  
+eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1bGlwIiwiaWF0IjoxNzI3MTYxMDgwLCJhcHBzIjoiZGF0
+YXB1c2gifQ.XhVZm7NiCD05-
+v9091WJQhYzdk1a0Shs_ley0T4R2MX63swRyxHbHxh6bVXtzqWvWiSLwwNGRQIcqGhr49hpGg 
+ 
+Upon successful authentication, the user would be logged into the ULIP system and get an access 
+token. Though this token user can communicate with  ULIP. This token has expiry time which 
+represent user session. The session time out for the same to be f ixed hour, generally it is for 30 
+minutes. If there is no request coming from user for 30 minutes, the n session (token) will be 
+expired and user need to re authenticate. 
+ 
+Using The above token, user can request ULIP system for details as follow - 
+ 
+https://www.ulip.dpiit.gov.in/ulip/v1.0.0/ECHALLAN/01 
+ 
+curl --location 'https://www.ulip.dpiit.gov.in/ulip/v1.0.0/ECHALLAN/01' \ 
+--header 'Authorization: Bearer 
+eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1bGlwIiwiaWF0IjoxNzI3NzYyNzcxLCJhcHBzIjoiZGF0
+YXB1c2gifQ.9_kJwxuXfJYoMt0QeMgOSWi01EaxXQkZQ1JLevfNo-
+vJ5vjCY9oIemZ_B4hiiq2ZCog-yAbIUgL6YN-TVie3cA' \ 
+--header 'Content-Type: application/json' \ 
+--header 'Accept: application/json' \ 
+--data '{ 
+    "vehicleNumber": "UP15AU1291" 
+}' 
+ 

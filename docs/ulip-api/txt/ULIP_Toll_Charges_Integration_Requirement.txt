@@ -1,0 +1,1798 @@
+ULIP Integration Document 
+ 
+  
+                        
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+Version No.: 4.0 
+Date: 18/05/2026 
+Project Name: ULIP 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ULIP Integration Document 
+This document contains proprietary information of NLDSL. Unauthorized access, copying and replication are 
+prohibited. This document must not be copied in whole or part by any means, without the written authorization of 
+NLDSL, Noida, India. 
+ 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 2 of 40 
+ 
+ 
+ 
+ 
+Revision History 
+Version Date Author Reviewer Significant Changes 
+1.0 09/01/2025 Girish Chander Nayab Ali Baseline Version 
+2.0 04/03/2025 Girish Chander Nayab Ali Baseline Version 
+3.0 19/02/2026 Sudhanshu Singh Nayab Ali Baseline Version 
+4.0 18/05/2026 Gaurav Tyagi Pranab Manna Updated 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+  
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 3 of 40 
+ 
+Table of Contents 
+ 
+Introduction ................................................................................................................................................. 4 
+1.1 Purpose .................................................................................................................................... 4 
+1.2 Data Integration between other system and ULIP application ................................................. 4 
+1.3 TOLL/01 ................................................................................................................................... 4 
+1.3.1 Technical Approach .................................................................................................... 4 
+1.4 Data Transmission & Authentication Mechanism .................................................................. 39 
+ 
+  
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 4 of 40 
+ 
+Introduction 
+1.1 Purpose 
+ 
+The purpose of this document is to define and provide details for getting toll plaza rate 
+based on toll code or toll name or state name from ULIP system. 
+This document details the following points: 
+ 
+1. Data Integration between Other System  and ULIP web service : Identification of 
+operational points where data integration between other system and ULIP web service will 
+be needed. 
+ 
+2. Technical Approach for performing Data Integration  
+1.2 Data Integration between other system and ULIP application 
+ 
+Users will share information to ULIP system based on data shared ULIP will provide 
+data (toll plaza rate) to the user. 
+1.3 TOLL/01 
+ 
+This API will take tollCode, tollName , stateName and based on the user input data, 
+ULIP System will find the toll rate for the particular toll and send back the response to 
+the user. 
+ 
+Note: users can either tollCode ,tollName or stateName ,i.e. users can send only one 
+parameter at a time to the ulip system. 
+ 
+S. No. Field Name Field Description Format Required/Not 
+– Required 
+Length 
+1  tollCode  Toll code for the 
+toll ^\d{1,7}$ Not Required  Max 7 
+digit 
+2 tollName Toll Name for the 
+toll 
+^[A-Za-z0-
+9@#$%^&*()_+!.,":;?\
+-\s]{1,200}$ 
+Not Required  up to 200 
+characters  
+3 stateName State Name for 
+the toll 
+^[A-Za-z0-
+9@#$%^&*()_+!.,":;?\
+-\s]{1,200}$ 
+Not Required  up to 200 
+characters  
+ 
+1.3.1 Technical Approach  
+1. All the data will be shared through rest web services. 
+2. ULIP system will provide data (toll rate) for which data is shared. 
+3. ULIP system will provide the data in JSON Object format in response body. 
+ 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 5 of 40 
+ 
+Below is the list of toll code and state names that we have kept currently in our system. 
+ 
+Toll Plaza 
+Code Toll Name State 
+92001 Thakurtola (End Of Durg Bypass) CHHATTISGARH 
+111001 Hirebgewadi Toll plaza KARNATAKA 
+91001 Durg Bypass (Dhamdanaka) CHHATTISGARH 
+356021 Hattargi KARNATAKA 
+356018 Kognoli Toll Plaza KARNATAKA 
+180001 Tundla UTTAR PRADESH 
+356023 Brahmarakotlu Toll Plaza KARNATAKA 
+330095 Bassi RAJASTHAN 
+330096 Aroli RAJASTHAN 
+330097 Dhaneshwar RAJASTHAN 
+330080 Fatehpur RAJASTHAN 
+330079 Simliya RAJASTHAN 
+32001 Omalur (Kottagoundapatty) TAMIL NADU 
+58002 Nathakarai TAMIL NADU 
+58003 Veeracholapuram (West) TAMIL NADU 
+169001 L and T Krishnagiri Thopur (Palayam) Toll Plaza TAMIL NADU 
+57001 Rasampalayam TAMIL NADU 
+360031 Nemili (Sriperumbudur) TAMIL NADU 
+194001 Joya UTTAR PRADESH 
+131001 Jamli Toll Pllaza  (Sendhwa ) MADHYA PRADESH 
+360045 Boothakudi TAMIL NADU 
+360043 Chittampatti TAMIL NADU 
+116001 Banglaore-Nelamangala Plaza (Towards Bangalore) KARNATAKA 
+356019 Chalageri Toll Plaza KARNATAKA 
+125002 Choundha Toll Plaza MADHYA PRADESH 
+193001 Brijghat UTTAR PRADESH 
+320071 Usaka ( Chamari) UTTAR PRADESH 
+216001 Siwaya UTTAR PRADESH 
+33001 Daffi UTTAR PRADESH 
+33002 Mohania BIHAR 
+33003 Sasaram BIHAR 
+28002 Anantram UTTAR PRADESH 
+184001 Tendua  UTTAR PRADESH 
+28001 Barajore Toll Plaza UTTAR PRADESH 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 6 of 40 
+ 
+52002 Bharudi GUJARAT 
+52001 Pithadia GUJARAT 
+2004 Choryasi GUJARAT 
+61001 Anewadi MAHARASHTRA 
+58001 Mettupatti TAMIL NADU 
+118001 Nelamangala Toll Plaza (Doddakarenahalli ) KARNATAKA 
+19002 Thirumandurai TAMIL NADU 
+54001 Patas MAHARASHTRA 
+340020 Daroda MADHYA PRADESH 
+100001 Samakhiyali GUJARAT 
+340023 Kelapur MAHARASHTRA 
+23001 Nandgaon Peth MAHARASHTRA 
+330101 Mundiyar Toll Plaza MADHYA PRADESH 
+ 320074 Raksha Toll Plaza MADHYA PRADESH 
+ 345054 Ramnagar Toll Plaza MADHYA PRADESH 
+360030 Athur (Tindivanam) TAMIL NADU 
+360034 Vanagaram (Chennai Bypass) TAMIL NADU 
+186001 Mandawnagar UTTAR PRADESH 
+360028 Surapattu (Chennai Bypass II) TAMIL NADU 
+360049 Paranur (Chengalpet) TAMIL NADU 
+360032 Nallur TAMIL NADU 
+176002 Eliyarpathi TAMIL NADU 
+176003 Pudhurpandiyapuram TAMIL NADU 
+127001 Malthone Toll Plaza MADHYA PRADESH 
+127003 Titarpani MADHYA PRADESH 
+180002 Gurau (Semra Atikabad) UTTAR PRADESH 
+125003 Jajau (Old Baretha) MADHYA PRADESH 
+43001 Vaiguntham TAMIL NADU 
+336012 Makhel GUJARAT 
+42001 Vijayamangalam Toll Plaza TAMIL NADU 
+336013 Bhiladi GUJARAT 
+124001 Kumbalam KERALA 
+336011 Varahi GUJARAT 
+170001 Velanchettiyur TAMIL NADU 
+60001 Krishnagiri TAMIL NADU 
+18001 Vikravandi(Villupuram) TAMIL NADU 
+167002 Pallikonda TAMIL NADU 
+177001 Morattandi TAMIL NADU 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 7 of 40 
+ 
+167001 Vaniyambadi TAMIL NADU 
+360039 Nanguneri TAMIL NADU 
+163001 Ludhawai RAJASTHAN 
+360040 Etturvattam TAMIL NADU 
+360037 Kappalur TAMIL NADU 
+360038 Salaipudhur TAMIL NADU 
+123001 Paliyekkara KERALA 
+176001 Valavanthankottai TAMIL NADU 
+118002 Karabylu (Bellur Cross) KARNATAKA 
+360036 Pudukottai (Vagaikulam) TAMIL NADU 
+36001 Samayapuram TAMIL NADU 
+19001 Sengurichi TAMIL NADU 
+26001 Korai RAJASTHAN 
+27001 Khalghat Toll Plaza MADHYA PRADESH 
+380016 Parsoni Khem BIHAR 
+8002 Kishangarh (Badgaon) RAJASTHAN 
+87001 Maithi BIHAR 
+47001 Tatiyawas RAJASTHAN 
+314024 Chiddan PUNJAB 
+014001 Dappar (Ambala Chandigarh ) PUNJAB 
+330103 Gogunda (Jaswantgarh) RAJASTHAN 
+157001 Kurali (Behrampur) PUNJAB 
+10002 Jojro Ka Kheda RAJASTHAN 
+10006 Khandi Obari RAJASTHAN 
+10004 Narayanpura RAJASTHAN 
+330102 Malera RAJASTHAN 
+142002 Ghoti MAHARASHTRA 
+97001 Vaghasiya GUJARAT 
+318007 Lakhanpur 
+JAMMU AND 
+KASHMIR 
+ 99001 Dhumiyani GUJARAT 
+140001 Chandwad MAHARASHTRA 
+61002 Khed Shivapur MAHARASHTRA 
+340019 Baswant (Pimpalgaon) MAHARASHTRA 
+138001 Sendurwafa MADHYA PRADESH 
+139001 Shirpur CHHATTISGARH 
+53001 Gondhkhairi/ Kondhali MAHARASHTRA 
+155001 Chandimandir PUNJAB 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 8 of 40 
+ 
+103002 Dighal HARYANA 
+41001 Dhilwan PUNJAB 
+103001 Gangaycha Jatt HARYANA 
+41002 Nijjarpura PUNJAB 
+39001 Panipat Elevated HARYANA 
+154001 Gharaunda (Karnal) HARYANA 
+154002 Ghaggar (Sambhu) HARYANA 
+154003 Ladowal PUNJAB 
+25001 Karanja (Ghadge) MAHARASHTRA 
+62002 Mahuvan Toll Plaza UTTAR PRADESH 
+320062 Lalanagar UTTAR PRADESH 
+182001 Salemgarh UTTAR PRADESH 
+183001 Muziana Hetim UTTAR PRADESH 
+185001 Chaukadi UTTAR PRADESH 
+320063 Katoghan UTTAR PRADESH 
+375011 Gurapalli ODISHA 
+375013 Srirampur Toll plaza ODISHA 
+375016 Gudipada ( Gangapada) ODISHA 
+536096 Shergarh (Close Loop Toll  ) HARYANA 
+148001 Bandalo (Manguli )Toll Plaza ODISHA 
+70001 Krishnavaram ANDHRA PRADESH 
+350007 Rolmamda TELANGANA 
+350027 Manoharabad TELANGANA 
+350008 Gamjal TELANGANA 
+350028 Pippalwada TELANGANA 
+392014 Pundag  Toll Plaza JHARKHAND 
+164001 Sikandra RAJASTHAN 
+164002 Rajadhok RAJASTHAN 
+163002 Amoli RAJASTHAN 
+8001 Thikariya (Jaipur) RAJASTHAN 
+31001 Barkheda (Chandlai) RAJASTHAN 
+31002 Sonwa (Sonva) RAJASTHAN 
+330007 Lambia Kalan RAJASTHAN 
+119001 Hoskote Toll Plaza KARNATAKA 
+356017 Bagepalli Toll Plaza KARNATAKA 
+120001 Shantigrama  Toll Plaza KARNATAKA 
+318004 Bann 
+JAMMU AND 
+KASHMIR 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 9 of 40 
+ 
+158001 Harsa Mansar PUNJAB 
+142001 Arjunali MAHARASHTRA 
+24002 Khumari (Kamptee - Kanhan Bypass)/ Tekadi MAHARASHTRA 
+24004 Borkhedi (Nagpur Bypass) MADHYA PRADESH 
+140002 Laling (Dhule) MAHARASHTRA 
+98001 Vanana GUJARAT 
+189001 Ait UTTAR PRADESH 
+320068 Vighakhet UTTAR PRADESH 
+336005 Khemana GUJARAT 
+212001 Laxmipuram ANDHRA PRADESH 
+239900 Raje(Old Naraur) BIHAR 
+78001 Indalwai TELANGANA 
+54002 Sardewadi / Indapur MAHARASHTRA 
+196001 Itunja (Itaunja Karondi) UTTAR PRADESH 
+187002 Ahmadpur(Ahamadpur) UTTAR PRADESH 
+187003 Ronahi(Raunahi) UTTAR PRADESH 
+187001 Nawabganj (Lucknow) UTTAR PRADESH 
+9001 Shahjahanpur RAJASTHAN 
+9002 Manoharpur RAJASTHAN 
+570055 Daulatpura Fee Plaza (KOTA) RAJASTHAN 
+34001 Raikal TELANGANA 
+079001 Shakapur ANDHRA PRADESH 
+45001 Gudur (Hyd-Yadgiri) TELANGANA 
+350006 Pullur TELANGANA 
+69001 Vempadu ANDHRA PRADESH 
+15001 Panthangi TELANGANA 
+370014 Paschim Madati WEST BENGAL 
+29002 Rampura WEST BENGAL 
+392008 Rasoiya Dhamna JHARKHAND 
+392013 Ghanghri JHARKHAND 
+49001 Kaza ANDHRA PRADESH 
+48002 Budhanam Fee Plaza ANDHRA PRADESH 
+352024 Marur ANDHRA PRADESH 
+205002 Debra WEST BENGAL 
+208001 Sonapetya WEST BENGAL 
+63101 Karapadu (Old Bellupada) ANDHRA PRADESH 
+352030 Madapam ANDHRA PRADESH 
+352028 Aganampudi ANDHRA PRADESH 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 10 of 40 
+ 
+380019 Balgudar BIHAR 
+380012 Saukala BIHAR 
+55001 Ponnambalapatti TAMIL NADU 
+46001 Bijapur (Kasaba) Toll Plaza KARNATAKA 
+48003 Venkatachallam Fee Plaza ANDHRA PRADESH 
+330077 Undvariya RAJASTHAN 
+352022 Nathavalasa ANDHRA PRADESH 
+352039 Pottipadu ANDHRA PRADESH 
+352027 Kalaparru ANDHRA PRADESH 
+48001 Sullurpet ANDHRA PRADESH 
+73003 Sunambatti (Musunuru) ANDHRA PRADESH 
+73001 Bolapalli ANDHRA PRADESH 
+73002 Tangutur ANDHRA PRADESH 
+352025 Kasepalli ANDHRA PRADESH 
+352026 Amakathadu ANDHRA PRADESH 
+336014 Bhalgam GUJARAT 
+29001 Laxmannath ODISHA 
+51002 Varwade MAHARASHTRA 
+345055 Mehra (Gwalior Bypass) Toll Plaza MADHYA PRADESH 
+96001 Surajbari GUJARAT 
+51001 Sawaleshwar MAHARASHTRA 
+127002 Chitora Toll Plaza MADHYA PRADESH 
+17002 Guilalu Toll Plaza KARNATAKA 
+17001 Karjeevanhally Toll Plaza KARNATAKA 
+116003 Devanahalli ( Sadahalli) Toll Plaza KARNATAKA 
+115002 Chokkenahalli Toll Plaza KARNATAKA 
+7001 Kherki Daula DELHI 
+370020 Palsit WEST BENGAL 
+320060 Badauri UTTAR PRADESH 
+370021 Dankuni Toll Plaza WEST BENGAL 
+205001 Jaladhulagori (Dhulagarh) WEST BENGAL 
+370022 Surjapur WEST BENGAL 
+209001 Beliyad WEST BENGAL 
+84001 Hariabara BIHAR 
+380017 Barsoni BIHAR 
+380020 Kharik BIHAR 
+380015 Maranga BIHAR 
+2001 Boriach GUJARAT 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 11 of 40 
+ 
+2003 Bhagwada GUJARAT 
+2002 Charoti MAHARASHTRA 
+40001 Khaniwade MAHARASHTRA 
+104002 Dahar HARYANA 
+104001 Makrauli Kalan HARYANA 
+85001 Asanpur BIHAR 
+356020 Hebbalu KARNATAKA 
+360033 Chennasamudram TAMIL NADU 
+139002 Songir MAHARASHTRA 
+16002 Shahapur KARNATAKA 
+16001 Vanagari KARNATAKA 
+001002 Bhartana GUJARAT 
+379007 Deingposah MEGHALAYA 
+59001 Thiruparaithurai TAMIL NADU 
+59002 Manavasi TAMIL NADU 
+360051 Lechchumanapatti TAMIL NADU 
+336007 Vantada GUJARAT 
+336019 Kathpur GUJARAT 
+360050 Lembalakudi TAMIL NADU 
+2005 Ahmedabad Vadodra Expressways  GUJARAT 
+35002 Attibele (Betl) KARNATAKA 
+35001 Elevated Section/ Electronic City KARNATAKA 
+46002 Nagarhalla Toll Plaza KARNATAKA 
+330116 Bagaliya RAJASTHAN 
+345036 Baretha KM 21.120 MADHYA PRADESH 
+345037 Phoop (Barahi) KM 105.300 MADHYA PRADESH 
+63001 Bhatwada GUJARAT 
+159001 Chollang PUNJAB 
+15003 Chillakallu ANDHRA PRADESH 
+15002 Korlaphadu TELANGANA 
+16003 Hitnal KARNATAKA 
+201001 Madrak UTTAR PRADESH 
+201002 Baros UTTAR PRADESH 
+197001 Khairabad (Barabhari) UTTAR PRADESH 
+336016 Pithai GUJARAT 
+336017 Vavadikhurd GUJARAT 
+119002 Mulbagal Toll Plaza KARNATAKA 
+210001 Chandermore (Kishorpur  ) Toll Plaza WEST BENGAL 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 12 of 40 
+ 
+210002 Shibpur Toll Plaza WEST BENGAL 
+320067 Babina UTTAR PRADESH 
+378007 Dahalapar , Chirang ASSAM 
+50001 Niyamatpur Ekrotiya UTTAR PRADESH 
+50002 Thiriya Khetal Fee Plaza UTTAR PRADESH 
+370023 Guabari WEST BENGAL 
+345046 Fulara Toll Plaza MADHYA PRADESH 
+345067 Chikhlikala Toll Plaza MADHYA PRADESH 
+345044 Jungawani Toll Plaza MADHYA PRADESH 
+345045 Jaitpur Toll Plaza MADHYA PRADESH 
+320069 Dakhina Sekhpur UTTAR PRADESH 
+340025 Kelwad Toll Plaza MADHYA PRADESH 
+239700 Chullimada Hamlet (Pampampallam) KERALA 
+215001 Aliyapur UTTAR PRADESH 
+215002 Khanna UTTAR PRADESH 
+151001 Baragarh (Barhaguda) ODISHA 
+367004 Ponnarimangalam KERALA 
+30001 Ladpalwan PUNJAB 
+30002 Waryam Nangal PUNJAB 
+380001 Deederganj BIHAR 
+330100 Akhepura RAJASTHAN 
+345053 Milanpur MADHYA PRADESH 
+345043 Khambara MADHYA PRADESH 
+340021 Bhagemari  (Patanswangi ) Toll Plaza MAHARASHTRA 
+6001 Gegal RAJASTHAN 
+6002 Pipalaz RAJASTHAN 
+336015 Gadoi GUJARAT 
+336010 Dari GUJARAT 
+378008 Raha(Saragaon) ASSAM 
+378005 Nazirakhat Toll Plaza ASSAM 
+217002 Mandal (Vyara) GUJARAT 
+217001 Bhatia GUJARAT 
+239100 Luharali UTTAR PRADESH 
+239101 Gabhana (Somna Toll plaza UTTAR PRADESH 
+220001 Raipur RAJASTHAN 
+220002 Indranagar RAJASTHAN 
+220003 Birami RAJASTHAN 
+220004 Uthamam RAJASTHAN 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 13 of 40 
+ 
+239600 Nangli Toll Plaza (Gaddurur) KARNATAKA 
+137001 Mathani MAHARASHTRA 
+380018 Runni Shaidpur Toll Plaza BIHAR 
+352023 S V Puram TAMIL NADU 
+360029 Pattaraiperumbudur  TAMIL NADU 
+375015 Paat Sahanipur (Pipli) ODISHA 
+330107 Methoon RAJASTHAN 
+230001 IVRCL Chengapally Tollways Limited (Kaniyur) TAMIL NADU 
+336018 Mokha GUJARAT 
+239301 Eathakota ANDHRA PRADESH 
+239300 Unguturu ANDHRA PRADESH 
+234002 Chagalmarri ANDHRA PRADESH 
+379006 Pahammawlein MEGHALAYA 
+239400 Rohad HARYANA 
+330104 Kishorpura RAJASTHAN 
+235001 Mandawada (Gomati) RAJASTHAN 
+235002 Negadiya RAJASTHAN 
+350029 Bhiknoor TELANGANA 
+320075 Kunwarpur UTTAR PRADESH 
+320073 Nuruddinpur UTTAR PRADESH 
+241700 Chhuhipali CHHATTISGARH 
+241701 Dhank CHHATTISGARH 
+2012 Vasad Toll Plaza GUJARAT 
+2011 Radhvanaj (Kheda ) Toll Plaza GUJARAT 
+242000 Madina Korsan HARYANA 
+242001 Ramayana/Mayer HARYANA 
+345095 Para Fee Plaza (MP) MADHYA PRADESH 
+380014 Saidpur Patedha BIHAR 
+330090 Lilamba RAJASTHAN 
+320053 Aaini UTTAR PRADESH 
+320066 Gulalpurva UTTAR PRADESH 
+245001 Sonway Toll Plaza MADHYA PRADESH 
+341101 Chalakwadi MAHARASHTRA 
+341401 Hivargaon Pavsa MAHARASHTRA 
+330084 Nimbaniya Ki Dhani (Bayatu) RAJASTHAN 
+257001 Gundmi (Sasthan ) Toll Plaza KARNATAKA 
+257002 Hejmadi Toll Plaza KARNATAKA 
+257003 Talapady KARNATAKA 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 14 of 40 
+ 
+350005 Kadthal TELANGANA 
+350026 Konetipuram TELANGANA 
+350004 Chinthapally TELANGANA 
+244000 18th Mile (Lakshmipur ) Toll Plaza WEST BENGAL 
+284001 Mahanth Maniyari BIHAR 
+375022 Govindpur (Old Name Brajrajnagar) ODISHA 
+330071 Konder RAJASTHAN 
+330072 Chila Chond RAJASTHAN 
+320052 Raibha UTTAR PRADESH 
+318010 Mada  
+JAMMU AND 
+KASHMIR 
+318009 Nashri 
+JAMMU AND 
+KASHMIR 
+330069 Banthadi RAJASTHAN 
+330078 Doli RAJASTHAN 
+243000 Rupakheda RAJASTHAN 
+243001 Mujras RAJASTHAN 
+330113 6ML (Sixml) Toll Plaza RAJASTHAN 
+330002 Lasedi RAJASTHAN 
+330003 Dhadhar RAJASTHAN 
+330004 Shobhasar RAJASTHAN 
+352036 Rapur ANDHRA PRADESH 
+352033 Chinthalapalem ANDHRA PRADESH 
+352031 Badava ANDHRA PRADESH 
+360054 Shenbagampettai TAMIL NADU 
+330088 Jasnathnagar RAJASTHAN 
+330089 Motisar (Khanori) RAJASTHAN 
+330094 Morani (Pokaran) RAJASTHAN 
+352034 Mekalavaripalli Fee Plaza ANDHRA PRADESH 
+352035 Raviguntapalli ANDHRA PRADESH 
+352032 Brahmanapalli ANDHRA PRADESH 
+375017 Hasanpur (Sainkul) ODISHA 
+375018 Kantaghar (Dhenkikote) ODISHA 
+375019 Banajodi (Padmapur) ODISHA 
+345048 Khadda Toll Plaza MADHYA PRADESH 
+345050 Sonvarsha Toll Plaza MADHYA PRADESH 
+312023 Landhari HARYANA 
+312001 Narwana HARYANA 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 15 of 40 
+ 
+312002 Badopatti HARYANA 
+312003 Chaudhriwas HARYANA 
+314015 Badbar PUNJAB 
+312022 Bhagan HARYANA 
+392012 Sosokhurd JHARKHAND 
+392010 Tand Balidih JHARKHAND 
+360048 Palaya Gandharvakottai TAMIL NADU 
+356100 Mangalgi Toll Plaza KARNATAKA 
+350100 Kamkole Toll Plaza KARNATAKA 
+340003 Yedshi MAHARASHTRA 
+340002 Tamalwadi MAHARASHTRA 
+326002 Deoria UTTARAKHAND 
+345004 Jogipura MADHYA PRADESH 
+345003 Pagara Toll Plaza MADHYA PRADESH 
+330073 Kota Bypass (Sakatpura ) RAJASTHAN 
+336006 Mandva GUJARAT 
+352037 Basapuram ANDHRA PRADESH 
+352001 Nannuru ANDHRA PRADESH 
+345005 Purankhedi /Ircon Toll Plaza MADHYA PRADESH 
+370001 Banskopa WEST BENGAL 
+190001 Semri UTTAR PRADESH 
+326005 Banushi UTTARAKHAND 
+330085 Hathitala RAJASTHAN 
+330086 Bor Charnan RAJASTHAN 
+330076 Harimma RAJASTHAN 
+330075 Nimbi Jodha RAJASTHAN 
+320064 Jindpur UTTAR PRADESH 
+320065 Aihar UTTAR PRADESH 
+330082 Limdi GUJARAT 
+312024 Milk Majra PUNJAB 
+352038 Durgamvaripalli ANDHRA PRADESH 
+360044 Buchireddypalem ANDHRA PRADESH 
+360041 D C Palli ANDHRA PRADESH 
+314019 Zidda PUNJAB 
+314016 Lehrabega PUNJAB 
+314023 Paind PUNJAB 
+314020 Dhareri Jattan PUNJAB 
+314021 Azizpur PUNJAB 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 16 of 40 
+ 
+312017 Bhavdeen HARYANA 
+352047 Halaharvi ANDHRA PRADESH 
+330099 Ramdevra RAJASTHAN 
+330098 Lathi RAJASTHAN 
+345052 Mud Kheda Toll Plaza MADHYA PRADESH 
+345051 Panihaar MADHYA PRADESH 
+330019 Salasar RAJASTHAN 
+330020 Nokhra RAJASTHAN 
+312018 Khuian Malkan PUNJAB 
+379004 Pasyih MEGHALAYA 
+379005 Lomshinong MEGHALAYA 
+352040 Davuluru ANDHRA PRADESH 
+345063 Pandutala Toll Plaza MADHYA PRADESH 
+360047 Thiruppachethi TAMIL NADU 
+320085 Mohammad Ibrahimpur UTTAR PRADESH 
+340027 Dumberwadi MAHARASHTRA 
+380024 Sonho BIHAR 
+380025 Pokhraira BIHAR 
+320091 Belon UTTAR PRADESH 
+320092 Hadwa UTTAR PRADESH 
+320059 Chhajarsi UTTAR PRADESH 
+320070 Bara UTTAR PRADESH 
+320076 Asroga UTTAR PRADESH 
+345069 Kherwasani Toll Plaza MADHYA PRADESH 
+360046 Bogalur TAMIL NADU 
+340026 Dhoki MAHARASHTRA 
+345066 Majhgawan Toll Plaza MADHYA PRADESH 
+345059 Pathroundi Toll Plaza MADHYA PRADESH 
+345057 Shahdol Toll Plaza MADHYA PRADESH 
+345010 Chapra (Bioara - Dewas) MADHYA PRADESH 
+345011 Rojwas Toll Plaza MADHYA PRADESH 
+345007 Dattigaon Toll Plaza MADHYA PRADESH 
+345006 Methwada (Ghatabillod) Toll Plaza MADHYA PRADESH 
+350033 Muthojipet TELANGANA 
+320093 Amdi UTTAR PRADESH 
+340004 Pargaon MAHARASHTRA 
+340005 Padalshingi MAHARASHTRA 
+340006 Bhokarwadi (Maliwadi) MAHARASHTRA 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 17 of 40 
+ 
+349013 Jagtara CHHATTISGARH 
+349009 Masora CHHATTISGARH 
+349014 Badaiyiguda CHHATTISGARH 
+345062 Saliwada Toll Plaza MADHYA PRADESH 
+320090 Aksada UTTAR PRADESH 
+380027 Chhapwa UTTAR PRADESH 
+320084 Nainsar UTTAR PRADESH 
+345064 Mohtara Toll Plaza MADHYA PRADESH 
+345058 Odaki Pipkhar Toll Plaza MADHYA PRADESH 
+352048 Gollaprolu ANDHRA PRADESH 
+350034 Dilawarpur TELANGANA 
+330110 Mandana (Kota) RAJASTHAN 
+330087 Kair Fakir Ki Dhani RAJASTHAN 
+320072 Pidhi UTTAR PRADESH 
+320094 Aindhi UTTAR PRADESH 
+378009 Patgaon( Kokrajhar ) ASSAM 
+356026 Kannoli Toll Plaza KARNATAKA 
+356027 Harwal Toll Plaza KARNATAKA 
+340010 Talmod* MAHARASHTRA 
+340009 Phulwadi* MAHARASHTRA 
+345061 Sehatganj Toll Plaza MADHYA PRADESH 
+340029 Husnapur MAHARASHTRA 
+356006 Belekeri KARNATAKA 
+356007 Holegadde Toll Plaza  KARNATAKA 
+356008 Shirur Toll Plaza KARNATAKA 
+370013 Sali Bamandanga WEST BENGAL 
+199003 Nawabganj (Adampur) (Close Loop Toll ) UTTAR PRADESH 
+340030 Ashiv MAHARASHTRA 
+370024 Namkhana WEST BENGAL 
+349011 Mudipar CHHATTISGARH 
+349012 Bhojpuri CHHATTISGARH 
+340031 Haldgaon MAHARASHTRA 
+2009 Vadodara  (Close Loop Toll) GUJARAT 
+312032 Jalouli HARYANA 
+314025 Bhago Majra HARYANA 
+314026 Ghulal HARYANA 
+378004 Mikirati Hawgaon ASSAM 
+320089 Bharatkund UTTAR PRADESH 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 18 of 40 
+ 
+330030 Kadisahena RAJASTHAN 
+330031 Lal Ka Khera RAJASTHAN 
+330032 Pallai RAJASTHAN 
+326008 Lacchiwala UTTARAKHAND 
+350030 Gowraram TELANGANA 
+312025 Kitlana HARYANA 
+336008 Kuchadi GUJARAT 
+336009 Okhamadhi GUJARAT 
+314028 Bachhuan PUNJAB 
+314027 Behram PUNJAB 
+370016 Ghogarkuthi WEST BENGAL 
+378006 Madanpur (Assam) Toll ASSAM 
+352020 Mahasamudram ANDHRA PRADESH 
+370017 Rangalibazna WEST BENGAL 
+340032 Selu Ambu MAHARASHTRA 
+370019 Sulkhapara WEST BENGAL 
+370015 Balibhasa WEST BENGAL 
+378010 Manderdisa ASSAM 
+345072 Kachnaria MADHYA PRADESH 
+241900 Mandir Hasaud CHHATTISGARH 
+345071 Sonkacch MADHYA PRADESH 
+352044 Jelli Palli ANDHRA PRADESH 
+349010 Kumhari CHHATTISGARH 
+352043 Yerradoddi ANDHRA PRADESH 
+350036 Yerkaram TELANGANA 
+330108 Hingonia RAJASTHAN 
+330109 Sitarampura RAJASTHAN 
+340024 Bhamb Raja MAHARASHTRA 
+330115 Butati (Kuchera) RAJASTHAN 
+330114 Badighati RAJASTHAN 
+312026 Chhara HARYANA 
+350031 Komalla TELANGANA 
+350032 Komatipalli TELANGANA 
+380023 Bishunpurwa BIHAR 
+370018 Satbhaiya WEST BENGAL 
+336022 Gorsar GUJARAT 
+336020 Kobadi GUJARAT 
+336021 Nageshri GUJARAT 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 19 of 40 
+ 
+320078 Sherpur Chamaraha UTTAR PRADESH 
+349007 Chotiya CHHATTISGARH 
+349008 Pachira CHHATTISGARH 
+340034 Kharbi MAHARASHTRA 
+352045 Bandapalli ANDHRA PRADESH 
+370026 Kalapathar WEST BENGAL 
+345073 Khawasa MADHYA PRADESH 
+370025 Mejia WEST BENGAL 
+320096 Dularpur UTTAR PRADESH 
+314029 Gurhe(Chowikiman) PUNJAB 
+375020 Khamar Toll Plaza ODISHA 
+380022  Jichho Toll Plaza (Bhagalpur) BIHAR 
+320077 Kurana UTTAR PRADESH 
+340028 Badewadi MAHARASHTRA 
+312028 Peont HARYANA 
+345056 Dagrai Toll Plaza MADHYA PRADESH 
+345070 Joharia Shaikh Toll Plaza MADHYA PRADESH 
+320079 Sayed Majra UTTARAKHAND 
+320098 Chhapar UTTARAKHAND 
+320080 Sarsawa UTTARAKHAND 
+326006 Bhagwanpur UTTARAKHAND 
+320095 Ramnagar Gansiyari UTTAR PRADESH 
+345065 Madai Toll Plaza MADHYA PRADESH 
+356025 K N Huindy KARNATAKA 
+356024 Yeddore KARNATAKA 
+356028 Kannegala Toll Plaza KARNATAKA 
+320087 Harro Near Ganne UTTAR PRADESH 
+320082 Mungari UTTAR PRADESH 
+320097 Umapur UTTAR PRADESH 
+330074 Nimbasar RAJASTHAN 
+330120 Narsana RAJASTHAN 
+330092 Gumanpura RAJASTHAN 
+375026 Badeibadkudar Toll Plaza ODISHA 
+330093 Khachrol (Hoda) RAJASTHAN 
+352046 Millampalli ANDHRA PRADESH 
+330124 Gangajali RAJASTHAN 
+330126 Barsalpur RAJASTHAN 
+330125 Sawara (Seora) Toll Plaza RAJASTHAN 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 20 of 40 
+ 
+352051 Medapi ANDHRA PRADESH 
+352052 Pandillapalli ANDHRA PRADESH 
+320083 Shahabpur UTTAR PRADESH 
+350035 Singarajupally TELANGANA 
+392017 Kokpara Toll Plaza JHARKHAND 
+320099 Jiwana UTTAR PRADESH 
+312031 Khatkar HARYANA 
+317003 Sanwara HIMACHAL PRADESH 
+312029 Saini Majara HARYANA 
+312030 Thana HARYANA 
+314014 Chak Bamaniya PUNJAB 
+314022 Kot Karor PUNJAB 
+314018 Usma PUNJAB 
+392016 Kothiya JHARKHAND 
+320108 Puraini UTTARAKHAND 
+352055 Bathalapalli ANDHRA PRADESH 
+352053 Jodi Dharmapuram ANDHRA PRADESH 
+392015 Navasari JHARKHAND 
+312019 Jakhauli  (EPE Close Loop Toll) UTTAR PRADESH 
+312020 Maujpur (EPE Close Loop Toll) UTTAR PRADESH 
+320054 Mawikalan (EPE Close Loop Toll) UTTAR PRADESH 
+320055 Duhai (EPE Close Loop Toll) UTTAR PRADESH 
+320056 Dasna (EPE Close Loop Toll) UTTAR PRADESH 
+320057 Bilakbarpur (EPE Close Loop Toll) UTTAR PRADESH 
+320058 Fatehpur Rampur (EPE Close Loop Toll) UTTAR PRADESH 
+345074 Patariya Goyal Toll Plaza MADHYA PRADESH 
+320109 Aashapur UTTAR PRADESH 
+312027 Badarpur DELHI 
+345075 Pachwara MADHYA PRADESH 
+352054 Gadanki ANDHRA PRADESH 
+318012 Lamber 
+JAMMU AND 
+KASHMIR 
+318011 Ujroo 
+JAMMU AND 
+KASHMIR 
+370034 Panikauri WEST BENGAL 
+370035 Husludanga WEST BENGAL 
+320111 Gulhaura UTTAR PRADESH 
+345077 Mauhari Toll Plaza MADHYA PRADESH 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 21 of 40 
+ 
+345078 Devgaon Plaza MADHYA PRADESH 
+380030 Toda BIHAR 
+375024 Padmanavapur ODISHA 
+375025 Sukhuapada Toll Plaza ODISHA 
+536418 Mandawara ( Close Loop Toll ) RAJASTHAN 
+340037 Nashirabad MAHARASHTRA 
+318006 Kaichachkoot Toll Plaza 
+JAMMU AND 
+KASHMIR 
+352057 Vaddupalli ANDHRA PRADESH 
+320114 Semraraja UTTAR PRADESH 
+320130 Kaithi UTTAR PRADESH 
+378011 Balachera ASSAM 
+345079 Vishankheda Toll Plaza MADHYA PRADESH 
+545097 Bagwada Fee Plaza MADHYA PRADESH 
+349015 Paraghat CHHATTISGARH 
+326009 Jagatpur Patti UTTARAKHAND 
+392019 Edalhatu Toll Plaza JHARKHAND 
+350102 Chitlapalli TELANGANA 
+350101 Munnanur TELANGANA 
+350103 Gummadidala TELANGANA 
+326007 Bahadrabad UTTARAKHAND 
+360058 Keezhkuppam TAMIL NADU 
+340039 Karodi MAHARASHTRA 
+352058 Jawahar Nagar TELANGANA 
+550024 Kothagudem TELANGANA 
+350104 Dharmaram TELANGANA 
+375028 Khereitangiri ODISHA 
+375029 Jansanpur ODISHA 
+314033 Chahar PUNJAB 
+320132 Atraila Shiv Gulam No 3 UTTAR PRADESH 
+320081 Koyla UTTARAKHAND 
+330025 Rajorakhurd RAJASTHAN 
+320131 Tarwa Deva UTTAR PRADESH 
+340035 Hatnoor MAHARASHTRA 
+345080 Harshili Toll Plaza MADHYA PRADESH 
+330112 Tankla RAJASTHAN 
+330111 Netra RAJASTHAN 
+314037 Ferozeshah PUNJAB 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 22 of 40 
+ 
+392011 (Murma) Hesmi Mandar JHARKHAND 
+336025 Bhadbhid GUJARAT 
+378012 Galia ASSAM 
+312035 Sirohi Bahali DELHI 
+330119 Patroda RAJASTHAN 
+352013 Chapirevula ANDHRA PRADESH 
+375030 Kandra Toll Plaza ODISHA 
+360060 Kodikottai TAMIL NADU 
+360061 Vennathur TAMIL NADU 
+320133 Lohari Toll Plaza MADHYA PRADESH 
+320134 Belgada UTTAR PRADESH 
+345047 Mungwari Toll Plaza MADHYA PRADESH 
+345060 Ujara Toll Plaza MADHYA PRADESH 
+356106 Nalavadi Toll Plaza KARNATAKA 
+356107 Halligudi KARNATAKA 
+314035 Ludana HARYANA 
+356016 Bankapur Toll Plaza KARNATAKA 
+367006 Thiruvallam KERALA 
+356029 Hirehalli Toll Plaza KARNATAKA 
+356103 Thimmalapura Toll Plaza KARNATAKA 
+345082 Khiriya Toll Plaza MADHYA PRADESH 
+345083 Newli Toll Plaza MADHYA PRADESH 
+312048 Jharoti HARYANA 
+320116 Shrishikalan UTTAR PRADESH 
+313004 Bass HARYANA 
+320028 Andhiyari UTTAR PRADESH 
+320136 Hitouta UTTAR PRADESH 
+320135 Sarai Sundar UTTAR PRADESH 
+313003 Morwala HARYANA 
+313005 Bisalwas HARYANA 
+330127 Chhoti Villor RAJASTHAN 
+330121 Balana RAJASTHAN 
+330130 Binawas RAJASTHAN 
+330129 Biratiya Kalan RAJASTHAN 
+330081 Nekawala RAJASTHAN 
+330106 Rabawata RAJASTHAN 
+330105 Titoli RAJASTHAN 
+330122 Thirpali Bari RAJASTHAN 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 23 of 40 
+ 
+336024 Panthwada GUJARAT 
+336023 Bhordu GUJARAT 
+314036 Kala Tibba PUNJAB 
+314038 Balluana PUNJAB 
+380026 Chainwa (Chapraitha)  Fee Plaza BIHAR 
+380028 Thawe (Brindavan) BIHAR 
+320113 Itaura Bujurg UTTAR PRADESH 
+330128 Beermandi RAJASTHAN 
+330123 Kathuwas DELHI 
+345081 Shahpura Toll Plaza MADHYA PRADESH 
+320112 Kashi (DME Close Loop Toll) UTTAR PRADESH 
+320103 Bhojpur (DME Close Loop Toll) UTTAR PRADESH 
+320102 Rasoolpur (DME Close Loop Toll) DELHI 
+352060 Marripalem ANDHRA PRADESH 
+352059 Dukkavanipalem ANDHRA PRADESH 
+314039 Manan PUNJAB 
+345090 Sarasdol Toll Plaza MADHYA PRADESH 
+345091 Talen (Mirzapur) MADHYA PRADESH 
+340045 Dhumka Tondgaon MAHARASHTRA 
+44002 Kini MAHARASHTRA 
+44001 Tasawade MAHARASHTRA 
+314017 Kalajhar PUNJAB 
+392021 Pupunki JHARKHAND 
+312049 Karman DELHI 
+312050 Gadpuri DELHI 
+356030 Tidagundi** MAHARASHTRA 
+360062 Kallakudi TAMIL NADU 
+381000 Managethi TAMIL NADU 
+312047 Ghamroj DELHI 
+340047 Ichgaon MAHARASHTRA 
+330008 Khedi RAJASTHAN 
+056001 Kodai Road (Kozhinjipatti) TAMIL NADU 
+352064 Cholasamudram ANDHRA PRADESH 
+375023 Bolangir ODISHA 
+280001 Govindpur BIHAR 
+352049 Chinaganjam Toll Plaza ANDHRA PRADESH 
+352056 Veeravalli ANDHRA PRADESH 
+392020 Pata Toll Plaza JHARKHAND 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 24 of 40 
+ 
+545107 Limha CHHATTISGARH 
+352061 Thenepalli ANDHRA PRADESH 
+2008 Anand (Close Loop Toll) GUJARAT 
+2006 Ahmedabad (Ring Road)  (Entry Exit Toll) GUJARAT 
+2007 Nadiad GUJARAT 
+330070 Tamdoli RAJASTHAN 
+340049 Vaidyakinhi MAHARASHTRA 
+320137 Amipur Baleni UTTAR PRADESH 
+375031 Jharpokharia ODISHA 
+314034 Sheikhpura 
+PUNJAB AND 
+HARYANA 
+312061 Dadri (Close Loop Toll) HARYANA 
+312060 Kherari (Close Loop Toll ) HARYANA 
+312062 Buchawas( Close Loop Toll) HARYANA 
+312051 Chandlana (Entry Exit ) HARYANA 
+312064 Jat Guwana (Close Loop Toll) HARYANA 
+2010 Ahmedabad Ring Road 2 GUJARAT 
+330021 Kheerwa RAJASTHAN 
+356104 Kananakatte KARNATAKA 
+570041 Bahala RAJASTHAN 
+320101 Dasna (DME Close Loop Toll) UTTAR PRADESH 
+120002 Kadabhalli (Kirasave) Toll Plaza KARNATAKA 
+356108 Jajirakallu  Toll Plaza KARNATAKA 
+375032 Bhagada Narayanpur ODISHA 
+375033 Darjing Toll Plaza ODISHA 
+375027 Rangamatia Toll Plaza ODISHA 
+312072 Pudapada-Nildungri ODISHA 
+312066 Bamla HARYANA 
+360065 Vallam TAMIL NADU 
+360066 Enamkariyanandal TAMIL NADU 
+360067 Thennamadevi TAMIL NADU 
+312054 Bahri (Close Loop Toll) HARYANA 
+312053 Kheri Sharaf Ali (Close Loop Toll) HARYANA 
+312057 Kilazafargarh (Close Loop Toll) HARYANA 
+312065 Pabanawa (Close Loop Toll) HARYANA 
+312058 Bainsi (Close Loop Toll ) HARYANA 
+312059 Kharkhara (Close Loop Toll) HARYANA 
+312052 Mohna (Close Loop Toll ) HARYANA 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 25 of 40 
+ 
+312055 Amrawali Khera (Close Loop Toll) HARYANA 
+350040 Singarenipalli ANDHRA PRADESH 
+127004 Bakori MADHYA PRADESH 
+536057 Maigalganj UTTAR PRADESH 
+520036 Faridpur UTTAR PRADESH 
+320086 Sabli Powayan UTTAR PRADESH 
+320110 Badagawn UTTAR PRADESH 
+360064 Upparpatti TAMIL NADU 
+360068 Thirupathisaram TAMIL NADU 
+540032 Nandani* MAHARASHTRA 
+340044 Chachadgaon MAHARASHTRA 
+340036 Valsang MAHARASHTRA 
+340046 Anakdhal MAHARASHTRA 
+340040 Undri MAHARASHTRA 
+340043 Champa MAHARASHTRA 
+24001 Mansar (Kamptee - Kanhan Bypass)/ Tekadi MAHARASHTRA 
+545106 Mudiyapara CHHATTISGARH 
+545104 Tarpongi CHHATTISGARH 
+392023 Putru Toll Plaza JHARKHAND 
+367007 Panniyankara KERALA 
+520031 Pratappur UTTAR PRADESH 
+199001 Kokhraj (Sihori Uparhar) (Close Loop Toll ) UTTAR PRADESH 
+199005 Sahson (Bhopatpur)(Close Loop Toll ) UTTAR PRADESH 
+199002 Handia (Sujala) (Close Loop Toll ) UTTAR PRADESH 
+199004 Soraon (Rajapur Maksudan)(Close Loop Toll ) UTTAR PRADESH 
+520032 Jorwara UTTAR PRADESH 
+520034 Hauj (Sirakonee ) UTTAR PRADESH 
+352063 Bandlapalli ANDHRA PRADESH 
+352062 Danamaiahgaaripalli Toll Plaza ANDHRA PRADESH 
+352065 Dumpalagattu Paatimeeda Palli ANDHRA PRADESH 
+352041 Panchvati Colony(Vishakapatnam Port Connectivity) ANDHRA PRADESH 
+345034 Jognihai  MADHYA PRADESH 
+345035 Masuriha  MADHYA PRADESH 
+345041 Jhiriya Toll Plaza MADHYA PRADESH 
+345033 Heeran Khedi MADHYA PRADESH 
+330053 Nimbali RAJASTHAN 
+330055 Ochadi RAJASTHAN 
+330056 Nimbaheda RAJASTHAN 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 26 of 40 
+ 
+330059 Rashidpura RAJASTHAN 
+330060 Tidiayasar RAJASTHAN 
+330061 Lakhasar RAJASTHAN 
+330062 Udairamsar RAJASTHAN 
+330057 Narsingharh RAJASTHAN 
+330058 Sidhpura RAJASTHAN 
+536500 Madukkarai TAMIL NADU 
+375012 Sergarh ODISHA 
+48004 Keesara Fee Plaza ANDHRA PRADESH 
+312071 Tamsabad UTTAR PRADESH 
+340051 Salva Jaroda MAHARASHTRA 
+345068 Boharipar/Bahoripar (Khursi)  Fee Plaza MADHYA PRADESH 
+312021 Chhajju Nagar(EPE) Close Loop Toll DELHI 
+520039 Mirzapur  ( Kyampur ) UTTAR PRADESH 
+356109 Rajatadripura Toll Plaza KARNATAKA 
+352067 Annampalli ANDHRA PRADESH 
+314041 Bhagupur PUNJAB 
+340050 Pimparwadi MAHARASHTRA 
+314040 Karahewala PUNJAB 
+314042 Darapur PUNJAB 
+570047 Karel RAJASTHAN 
+345094 Bela (Baheliya) Toll Plaza MADHYA PRADESH 
+360059 U Ponnalagaram TAMIL NADU 
+340053 Shembal MAHARASHTRA 
+352066 Munjuluru ANDHRA PRADESH 
+340052 Taroda Kasba MAHARASHTRA 
+380032 Babhniyawan BIHAR 
+340058 Kiratpur UTTAR PRADESH 
+352068 Gorribanda ANDHRA PRADESH 
+204001 Rajchandrapur  (Howrah) Toll Plaza* WEST BENGAL 
+340038 Selu MAHARASHTRA 
+350046 Mudiveedu ANDHRA PRADESH 
+312063 Bhalkhi (Close Loop Toll) HARYANA 
+392018 Nagwan JHARKHAND 
+312067 Hilalpur (Close Loop Toll) HARYANA 
+312068 Khalilpur (NH -DVE Exit)  HARYANA 
+312069 Kalinger (Close Loop Toll) HARYANA 
+312070 Ghata Samsabad (Close Loop Toll) HARYANA 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 27 of 40 
+ 
+570042 Sheetal (Close Loop Toll ) RAJASTHAN 
+570043 Pinan (Close Loop Toll) RAJASTHAN 
+340065 Mopidevi ANDHRA PRADESH 
+520035 Bamhori Kurmin UTTAR PRADESH 
+340062 Karigawan BIHAR 
+570044 Bhandaraj (Entry Exit )Toll RAJASTHAN 
+570045 Dungarpur (Entry Exit ) Toll RAJASTHAN 
+380031 Shahpur BIHAR 
+345093 Palhan Toll Plaza MADHYA PRADESH 
+340048 Borgaon MAHARASHTRA 
+370036 Barai Toll Plaza WEST BENGAL 
+536207 Gopalpura (Close Loop Toll ) RAJASTHAN 
+380033 Kulhariya BIHAR 
+340056 Dalsagar BIHAR 
+345092 Goragaon Toll Plaza MADHYA PRADESH 
+546023 Rati Rampura Plaza MADHYA PRADESH 
+536198 Hulikunte KARNATAKA 
+536049 Baharagaon Toll Plaza MADHYA PRADESH 
+132002 IDTL Toll Plaza-B MADHYA PRADESH 
+536174 Chhegaon Makhan Toll Plaza MADHYA PRADESH 
+350045 Abul Khurana  PUNJAB 
+536236 Kurungudi ( Veerananallur ) TAMIL NADU 
+536066 Jagahedi UTTAR PRADESH 
+546042 Bhuni UTTAR PRADESH 
+536051 Patni Pratapur UTTAR PRADESH 
+536203 Rohisa GUJARAT 
+536052 Tarana GUJARAT 
+536337 Telipara ASSAM 
+536245 Patharahata Toll Plaza MADHYA PRADESH 
+536120 Jaswantpura RAJASTHAN 
+546025 Parwa RAJASTHAN 
+546007 Jaitpur TP4 (Jaipur) (Close Loop Toll) RAJASTHAN 
+546008 Malkisar  TP5 (Close Loop Toll) RAJASTHAN 
+546009 Uchharangdesar  TP6 (Close Loop Toll) RAJASTHAN 
+546010 Norangdesar  TP7 (Close Loop Toll) RAJASTHAN 
+546011 Deshnok TP8  (Close Loop Toll) RAJASTHAN 
+536328 Dangiyawas RAJASTHAN 
+536325 Manaklavo RAJASTHAN 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 28 of 40 
+ 
+536060 Chatrapatti  TAMIL NADU 
+340060 Penur Toll Palza MAHARASHTRA 
+536073 Kurankhed Toll Plaza MAHARASHTRA 
+536106 Medshi Sawarkhda MAHARASHTRA 
+536067 Sub Gavhan Kh (Sabgavhan ) MAHARASHTRA 
+340055 Wadgaon  MAHARASHTRA 
+536122 Routara BIHAR 
+536121 Jeerangachh Toll Plaza BIHAR 
+536213 Kauwakhoh (Hariharnath)Toll Plaza JHARKHAND 
+536081 Amora Moiddinpur UTTAR PRADESH 
+536078 Akwabad UTTAR PRADESH 
+356111 Kaniminike Toll Plaza KARNATAKA 
+356110 Sheshagirihalli Toll Plaza KARNATAKA 
+340057 Gananguru Plaza KARNATAKA 
+312073 Jita Kherli Kiranj Toll Plaza DELHI 
+350047 Baloh Fee Plaza HIMACHAL PRADESH 
+340067 Moura Toll Plaza HIMACHAL PRADESH 
+546041 Sarandi Toll Plaza ANDHRA PRADESH 
+536088 Ashta Toll Plaza MAHARASHTRA 
+536100 Undewadi (Supe) Toll Palza MAHARASHTRA 
+340061 Bhadeswar Toll Plaza BIHAR 
+536061 Rasulpur Mithegaon UTTAR PRADESH 
+536101 Malegaon Toll Plaza MAHARASHTRA 
+350044 Pudur TAMIL NADU 
+536102 Thiruvangad Toll Plaza KERALA 
+546026 Madanpur Toll Plaza CHHATTISGARH 
+545111 Maharajpur Toll Plaza CHHATTISGARH 
+545110 Lodam Toll Plaza CHHATTISGARH 
+545108 Jhalmala Toll Plaza CHHATTISGARH 
+355076 Jhamudihi Toll Plaza ODISHA 
+536087 Thuvakudi TAMIL NADU 
+520038 Basheerapur Toll Plaza UTTAR PRADESH 
+546021 Moothli  TP18  (Close Loop Toll) RAJASTHAN 
+546022 Sangana  TP19 (Close Loop Toll) RAJASTHAN 
+546020 Patau  TP17 (Close Loop Toll) RAJASTHAN 
+546019 Meghawas  TP 16 (Close Loop Toll) RAJASTHAN 
+546018 Deogarh TP15 (Close Loop Toll) RAJASTHAN 
+546017 Khudiyala TP 14 (Close Loop Toll) RAJASTHAN 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 29 of 40 
+ 
+546016 Sirmandi TP 13(Close Loop Toll) RAJASTHAN 
+546015 Jathon Ki Dhani ( Hanuman Sagar ) TP 12 (Close Loop Toll) RAJASTHAN 
+546013 Bungri  TP10 (Close Loop Toll) RAJASTHAN 
+546012 Panchu  TP9 (Close Loop Toll) RAJASTHAN 
+132001 IDTL Toll Plaza-A MADHYA PRADESH 
+536105 Mengaon Toll Plaza MADHYA PRADESH 
+350042 Taddanpally Toll Plaza TELANGANA 
+356112 Ganebail Toll Plaza KARNATAKA 
+536104 Velampatti Toll Plaza TAMIL NADU 
+536119 Dhulepura RAJASTHAN 
+536079 Hirapur Toll Plaza MAHARASHTRA 
+536184 Jonnada ANDHRA PRADESH 
+536099 Nipaniya Toll Plaza MADHYA PRADESH 
+546039 Palkhanda Toll Plaza MADHYA PRADESH 
+536083 Nunmath Toll Plaza ODISHA 
+536086 Kadaligarh Toll PLaza ODISHA 
+546006 Timarwani (Close Loop Toll ) MADHYA PRADESH 
+546005 Dhamnod (Close Loop Toll) MADHYA PRADESH 
+546004 Nayapura (Close Loop Toll)  MADHYA PRADESH 
+546003 Bhuteda (Close Loop Toll ) MADHYA PRADESH 
+546002 Dalavada (Close Loop Toll)  MADHYA PRADESH 
+546001 Garoth (Close Loop Toll ) MADHYA PRADESH 
+546000 Neemthur (Close Loop Toll ) MADHYA PRADESH 
+536063 Patrachauli Toll Plaza JHARKHAND 
+352042 Goshtani ANDHRA PRADESH 
+536069 Reddypalem Toll Plaza ANDHRA PRADESH 
+350043 Baiti Kala Toll Plaza UTTAR PRADESH 
+536091 Pagariya (Semalkhedi )Toll Plaza MADHYA PRADESH 
+536084 Chhotian PUNJAB 
+546024 Gogela fee Plaza RAJASTHAN 
+536043 Seetharampuram ANDHRA PRADESH 
+536048 Dasarkhed Toll Plaza MAHARASHTRA 
+340063 Labhera Toll plaza UTTAR PRADESH 
+536395 Turup Toll Plaza JHARKHAND 
+536780 Upputuru Toll Plaza ANDHRA PRADESH 
+536097 Abubshahar (Close Loop Toll  ) HARYANA 
+536095 Alikan (Close Loop Toll  ) HARYANA 
+536377 Ayeshpur Toll Plaza WEST BENGAL 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 30 of 40 
+ 
+330117 Baggad RAJASTHAN 
+536458 Balani toll Plaza ODISHA 
+536208 Balapura ( Close Loop Toll) RAJASTHAN 
+536076 Balenahalli Toll Plaza KARNATAKA 
+536492 Balleepur Toll Plaza UTTAR PRADESH 
+536200 Bhirandiyara Fee Plaza GUJARAT 
+536080 Bhitaha Toll Plaza UTTAR PRADESH 
+536398 Borvihir Toll Plaza MAHARASHTRA 
+536098 Chautala (Close Loop Toll  ) HARYANA 
+536217 Chota Mawana Toll Plaza UTTAR PRADESH 
+536383 Chowlaggere Toll plaza KARNATAKA 
+536094 Dabwali (Close Loop Toll  ) HARYANA 
+536310 DodakaToll Plaza (Close Loop Toll) GUJARAT 
+536426 Dondpur 
+JAMMU AND 
+KASHMIR 
+536311 Fajalpur Toll Plaza (Close Loop Toll) GUJARAT 
+536072 Gadha Toll Plaza MADHYA PRADESH 
+536103 Gangarampalayam TAMIL NADU 
+536237 Gantyada ANDHRA PRADESH 
+536434 H.Pudhupatti TAMIL NADU 
+536093 Jogewala (Close Loop Toll ) HARYANA 
+536206 Karadiya ( Close Loop Toll ) RAJASTHAN 
+536246 Kariyamangalam Fee Plaza TAMIL NADU 
+536109 Kothattai TAMIL NADU 
+536417 Laban ( Close Loop Toll ) RAJASTHAN 
+546014 Laxamannagar TP 11  (Close Loop Toll) RAJASTHAN 
+536374 Malhipur Toll Plaza BIHAR 
+314032 Mallian Toll Plaza PUNJAB 
+536089 Maroud Toll Plaza CHHATTISGARH 
+536397 Medipally Toll Plaza TELANGANA 
+536450 Mustapur Fee Plaza KARNATAKA 
+536382 Nagampatti Fee Plaza TAMIL NADU 
+536385 Nangilikondan Fee Plaza TAMIL NADU 
+536392 Painampalli Khalu ANDHRA PRADESH 
+536489 Pawangaon Plaza MAHARASHTRA 
+536336 Rolla ANDHRA PRADESH 
+536312 Samiyala (Close Loop Toll ) GUJARAT 
+536313 Sanpa (Close Loop Toll ) GUJARAT 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 31 of 40 
+ 
+536309 Sundarpara Toll Plaza GUJARAT 
+536329 Velva Toll Plaza GUJARAT 
+536205 Zalimpura (Close Loop Toll ) RAJASTHAN 
+536706 Katiyara Toll Plaza BIHAR 
+536138 Pardi Makta MAHARASHTRA 
+340054 Umred MAHARASHTRA 
+536307 Chechat (Entry Exit ) Toll Plaza   RAJASTHAN 
+536749 Medininagar Toll Plaza JHARKHAND 
+520033 Rasoolpur Sikrod (EPE Close Loop Toll) UTTAR PRADESH 
+536179 Tetla Toll Plaza  WEST BENGAL 
+536194 Belkuri Toll Plaza WEST BENGAL 
+536459 Nana Masera (Mota Masera) TP 24 (Close Loop Toll) GUJARAT 
+536460 Budhanpur TP25  (Close Loop Toll) GUJARAT 
+536461 Tharad TP26 (Close Loop Toll) GUJARAT 
+536441 Veeranjaneyapuram ANDHRA PRADESH 
+536372 Jhinjholi Toll Plaza HARYANA 
+536721 Shahpur Kalyanpur   
+536451 Dabhedi Toll Plaza UTTAR PRADESH 
+536469 Bijora MAHARASHTRA 
+536539 Bhartana HARYANA 
+536427 Barhima Toll Plaza BIHAR 
+536542 Kharsodkhurd Toll Plaza MADHYA PRADESH 
+536519 Somanahalli Toll Plaza KARNATAKA 
+536199 Shringverpur Toll Plaza (Close Loop Toll  ) UTTAR PRADESH 
+536482 Sathyagala Toll Plaza  KARNATAKA 
+536462 Jorawargadh  TP27 (Close Loop Toll) GUJARAT 
+536724 Dadal TP 20 (Close Loop Toll) RAJASTHAN 
+536463 Varnosari TP28 (Close Loop Toll) GUJARAT 
+536464 Bakutra TP29 (Close Loop Toll) GUJARAT 
+536238 Phulwariya toll plaza BIHAR 
+536386 Nimgaon Khalu Fee Plaza MAHARASHTRA 
+546028 Nalluru Devanahalli Toll Plaza KARNATAKA 
+536552 Mujhera Fee Plaza UTTAR PRADESH 
+536216 Bhaneda Toll Plaza UTTAR PRADESH 
+536431 Madangundi JHARKHAND 
+536413 Kovilvenni Toll Plaza TAMIL NADU 
+536419 Vembukudi Toll Plaza TAMIL NADU 
+536483 Kesla Toll Plaza CHHATTISGARH 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 32 of 40 
+ 
+536471 Garhdevi Toll Plaza JHARKHAND 
+336026 Dharampur-Danta GUJARAT 
+536493 Anjam Dham Fee Plaza JHARKHAND 
+536391 Asada Ki Beri RAJASTHAN 
+536498 Attigulipura Fee Plaza KARNATAKA 
+536332 Banpimpri Toll Plaza MAHARASHTRA 
+ 536490 Bawada Toll plaza MAHARASHTRA 
+24003 NAGPUR BYPASS CHECK TOLL PLAZA MAHARASHTRA 
+115001 Kulumapalya Toll Plaza KARNATAKA 
+311001 DME Akshardham Plaza  (Close Loop Toll ) DELHI 
+311002 DME Ghazipur Plaza  (Close Loop Toll ) DELHI 
+311003 Sarai Kale Khan (DME Close Loop Toll)  DELHI 
+311004 DME CWG Flyover Plaza (Close Loop Toll ) DELHI 
+311005 Indirapuram (DME Close Loop Toll) DELHI 
+312056 Chabri Toll Plaza (Close Loop Toll ) HARYANA 
+320100 Dundahera Plaza (DME Close Loop Toll) DELHI 
+320104 DME 52 Plaza (Close Loop Toll) DELHI 
+320106 DME Noida Plaza (Close Loop Toll) DELHI 
+320107 DME Mehrauli Plaza (Close Loop Toll) DELHI 
+330118 Thakri (Raisinghnagar) Toll plaza RAJASTHAN 
+340041 Osargaon Toll Plaza MAHARASHTRA 
+340042 Hativale Fee Plaza MAHARASHTRA 
+340066 Khuian Sarvar Plaza PUNJAB 
+350041 Mandamarri Toll Plaza TELANGANA 
+360069 Sevugampatti Toll Plaza TAMIL NADU 
+536068 Derhi Toll Plaza UTTAR PRADESH 
+536070 Dongrale Toll Plaza MAHARASHTRA 
+536071 Devikulam Plaza KERALA 
+536085 Tuptakli Toll Plaza MAHARASHTRA 
+536090 Pimparkhed Toll Plaza MAHARASHTRA 
+536123 Sangariya TP1 (Close Loop Toll) RAJASTHAN 
+536124 Chohilanwali TP3 (Close Loop Toll) RAJASTHAN 
+536722 Deora TP 21 (Close Loop Toll) RAJASTHAN 
+536707 Baiji Toll Plaza MADHYA PRADESH 
+536183 Linglapura KARNATAKA 
+536202 Khadaka  Toll Plaza MAHARASHTRA 
+536244 IVRCL ramp plaza (Dattigaon ,Authority's Part) MADHYA PRADESH 
+536308 Mamrejpur Fee Plaza BIHAR 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 33 of 40 
+ 
+536373 Ahilyanagar (Ahmednagar) Bypass Toll Plaza MAHARASHTRA 
+536393 Kakan Toll Plaza BIHAR 
+536400 Kundi Toll Plaza MADHYA PRADESH 
+536403 Khairamunda Toll Plaza ODISHA 
+536404 Kadhavani Toll Plaza TAMIL NADU 
+536410 Jamni (Close Loop Toll) HARYANA 
+536411 Alewa (Close Loop Toll ) HARYANA 
+536412 Kharak Pandwa (Close Loop Toll ) HARYANA 
+536423 Pipalwas Plaza RAJASTHAN 
+536424 Dakuamunda Toll Plaza ODISHA 
+536425 Hatibari Toll Plaza ODISHA 
+536430 Padla Hadliya Plaza RAJASTHAN 
+536432 Nimbhi  MAHARASHTRA 
+536744 Varshamedi Toll Plaza GUJARAT 
+536457 Alagapada Toll Plaza TELANGANA 
+536465 JamniNH152D (Close Loop Toll ) HARYANA 
+536467 Karagadahalli Toll Plaza TAMIL NADU 
+536470 Nagla Toll Plaza  UTTARAKHAND 
+536472 Badagaon (EPE Close Loop Toll) UTTAR PRADESH 
+536743 Kukma Toll Plaza GUJARAT 
+536473 Pelak (EPE Close Loop Toll) HARYANA 
+536475 Devkuli Toll Plaza BIHAR 
+536476 Jindapur Toll Plaza BIHAR 
+536480 Paithna BIHAR 
+536481 Kishanpura toll plaza MADHYA PRADESH 
+536484 Akhtiyari Kotila UTTAR PRADESH 
+536485 Ghatta Toll Plaza HIMACHAL PRADESH 
+536486 Mokhupura TP23 (Close Loop Toll) RAJASTHAN 
+536487 Jajoosan TP 22 (Close Loop Toll) RAJASTHAN 
+536497 Etaura Bujurg Toll Plaza UTTAR PRADESH 
+536510 Sundarpura (Close Loop Toll) RAJASTHAN 
+536511 Geela Ki Nangal (Close Loop Toll) RAJASTHAN 
+536512 Shyamsinghpura Virtual (Close Loop Toll) RAJASTHAN 
+536513 Bedoli (Close Loop Toll ) RAJASTHAN 
+536514 Khurikhud (Close Loop Toll) RAJASTHAN 
+536536 Jawr Toll Plaza UTTAR PRADESH 
+536544 Bhavaninagar MAHARASHTRA 
+546031 Newada kanthi Toll Plaza UTTAR PRADESH 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 34 of 40 
+ 
+340001 Nashik Sinner Tollways Limited MAHARASHTRA 
+330016 Khara RAJASTHAN 
+330017 Badhera(Bhadera ) Toll Plaza RAJASTHAN 
+330018 Hindore Toll Plaza RAJASTHAN 
+330054 Gajangarh Toll Plaza RAJASTHAN 
+9003 Daulatpura Toll Plaza (JAI) RAJASTHAN 
+244001 Gazole (Bagsarai )Toll Plaza WEST BENGAL 
+330091 Para Toll Plaza RAJASTHAN 
+536674 Pongalur Toll Plaza TAMIL NADU 
+320105 DME Partapur Plaza (Close Loop Toll) UTTAR PRADESH 
+345076 Mandwara Toll Plaza MADHYA PRADESH 
+570046 Badkapara (Close Loop Toll ) RAJASTHAN 
+520037 Gopalpur Toll Plaza UTTAR PRADESH 
+536058 Bonli (Close Loop Toll ) RAJASTHAN 
+536059 Kusthala  (Close Loop Toll ) RAJASTHAN 
+536075 Dakan Kotra RAJASTHAN 
+536314 Dahegam Toll Plaza (Close Loop Toll ) GUJARAT 
+536406 Hassangarh (Close Loop Toll) HARYANA 
+536407 Humanyupur (Close Loop Toll) HARYANA 
+536408 Puthi (Close Loop Toll) HARYANA 
+536409 Issapur Kheri (Close Loop Toll) HARYANA 
+536422 Mulawad Toll Plaza KARNATAKA 
+536402 3M Toll Plaza RAJASTHAN 
+536466 Merlapaka Fee Plaza ANDHRA PRADESH 
+536488 Pandane Toll Plaza MAHARASHTRA 
+536521 Arifke Fee Plaza PUNJAB 
+536515 Bagrana  (Close Loop Toll ) RAJASTHAN 
+536520 Manambadi Toll Plaza TAMIL NADU 
+540006 Shilphata  (Close Loop Toll ) MAHARASHTRA 
+540007 Shedung  (Close Loop Toll ) MAHARASHTRA 
+540008 Kusgaon (Close Loop Toll ) MAHARASHTRA 
+540009 Dehuroad  (Close Loop Toll ) MAHARASHTRA 
+536550 Sameerapalem Toll Plaza TAMIL NADU 
+536547 Mangapatnam Toll Plaza ANDHRA PRADESH 
+536537 Nayagaon Toll Plaza MAHARASHTRA 
+536612 Ena Toll Plaza  GUJARAT 
+536573 Basinenipalli Toll Plaza ANDHRA PRADESH 
+536627 Jamnipali Toll Plaza CHHATTISGARH 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 35 of 40 
+ 
+536548 Loni Toll Plaza MAHARASHTRA 
+536454 Chandi Toll Plaza PUNJAB 
+536587 Gandaboyanapalle Toll Plaza ANDHRA PRADESH 
+536618 Mundka-Bakkarwala Toll Plaza DELHI 
+536611 Sundrapalya (Close Loop Toll) KARNATAKA 
+536615 Krishnarajapura (Close Loop Toll ) KARNATAKA 
+536614 Agrahara (Close Loop Toll ) KARNATAKA 
+536613 Hedaginabele (Close Loop Toll) KARNATAKA 
+536634 Ramanathapuram Toll Plaza ANDHRA PRADESH 
+536602 Itapa Toll Plaza ODISHA 
+536629 Umri Toll Plaza MAHARASHTRA 
+536620 Mana Toll Plaza  MADHYA PRADESH 
+536575 Banaundi  HARYANA 
+536641 Rampura (NH-548 B) KARNATAKA 
+536671 Kothapalli ANDHRA PRADESH 
+536709 Paluvai ANDHRA PRADESH 
+  Rampei ODISHA 
+536517 Mormugao Port Toll Plaza GOA 
+536499 Pedagaruvu Toll Plaza ANDHRA PRADESH 
+536477 Manapuram Toll Plaza ANDHRA PRADESH 
+ 536664 Mohana Toll Plaza HARYANA 
+536626 Burakayalakota ANDHRA PRADESH 
+536748 Vettichira Toll Plaza KERALA 
+536625 Lanela Toll Plaza RAJASTHAN 
+536600 Ramgarh Toll Plaza RAJASTHAN 
+536599 Parewar Toll Plaza RAJASTHAN 
+536659 Sukekulan Mopa Toll Plaza MAHARASHTRA 
+536632 Akbarganj Simra (Tikri) UTTAR PRADESH 
+536801 Venkatapalem Toll Plaza ANDHRA PRADESH 
+536745 Bajheri Toll Plaza PUNJAB 
+  Belsar Toll Plaza MAHARASHTRA 
+536666 Rudravaram Toll Plaza ANDHRA PRADESH 
+536675 Kumbla Toll Plaza KERALA 
+536673 Kadarampalli Toll Plaza ANDHRA PRADESH 
+536647 Bijwasan Toll Plaza  DELHI 
+536681 Pusla Toll Plaza MAHARASHTRA 
+536601 Devghat  Toll Plaza MAHARASHTRA 
+536560 Barwaikheda Toll Plaza MADHYA PRADESH 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 36 of 40 
+ 
+536708 Seliyamedu Fee Plaza TAMIL NADU 
+536648 Tulheda (Close Loop Toll) MADHYA PRADESH 
+536649 Khedakhajuria (Close Loop Toll) MADHYA PRADESH 
+536650 Mundla Sondhiya (Close Loop Toll) MADHYA PRADESH 
+536651 Barkheda Barod (Close Loop Toll) MADHYA PRADESH 
+536652 Nayakheda ( Close Loop Toll) MADHYA PRADESH 
+536653 Antraliya (Close Loop Toll) MADHYA PRADESH 
+536654 Semli Kakad (Close Loop Toll) MADHYA PRADESH 
+536723 Rangamati Toll Plaza ASSAM 
+536619 Olavanna Fee Plaza KERALA 
+536702 Jassi Bagwali PUNJAB 
+536705 Pathrala Toll Plaza PUNJAB 
+536703 Gurthari (Pathrala -2) PUNJAB 
+536761 Sulung  Toll Plaza ASSAM 
+536665 Biharibigha Toll Plaza BIHAR 
+536682 Khadernagar Toll Plaza KARNATAKA 
+536752 R Kothapalli  ANDHRA PRADESH 
+536551 Bautha Toll Plaza UTTAR PRADESH 
+536561 Kudaiya Toll Plaza UTTAR PRADESH 
+536753 Yogini Mata JHARKHAND 
+536776 Bawani Khera HARYANA 
+536775 Kachwar TELANGANA 
+536762 Bakhtyarpur Toll Plaza UTTAR PRADESH 
+536791 Kingaon MAHARASHTRA 
+536719 Darwha Toll Plaza MAHARASHTRA 
+536628 Gulzarpur (Close Loop Toll) HARYANA 
+ 
+Request: The request must be of the following format, where either tollCode, tollName or 
+stateName is passed within the request body in JSON format. 
+ 
+For Production: https://www.ulip.dpiit.gov.in/ulip/v1.0.0/TOLL/01 
+ 
+{   "tollCode": "180001", 
+    "tollName":"", 
+    "stateName": "" } 
+ 
+Curl URL 
+ 
+curl --location 'https://www.ulip.dpiit.gov.in/ulip/v1.0.0/TOLL/01' \ 
+--header 'Authorization: Bearer 
+eyJhbGciOiJIUzUxMiJ9.eyJhcHBzIjoiYXBpR2F0ZXdheSIsInN1YiI6InVsaXAiLCJpYXQiOjE3Nz
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 37 of 40 
+ 
+E0MDQwOTB9.B2xh7ljo1Hc3LfOqBgX5Ak_jK9iBfd6f6Ud_QAmPYTO8laeLNUC8QKwLv8P5Cn
+CE1gVhfezILcjrOk9asIkRUg' \ 
+--header 'Accept: application/json' \ 
+--header 'Content-Type: application/json' \ 
+--data '{  "tollCode": "180001", 
+    "tollName":"", 
+    "stateName": "" }' 
+ 
+For Staging: https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/TOLL/01 
+ 
+{   "tollCode": "180001", 
+    "tollName":"", 
+    "stateName": "" } 
+ 
+Curl URL 
+ 
+curl --location 'https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/TOLL/01' \ 
+--header 'Authorization: Bearer 
+eyJhbGciOiJIUzUxMiJ9.eyJhcHBzIjoiYXBpR2F0ZXdheSIsInN1YiI6InVsaXAiLCJpYXQiOjE3Nz
+E0ODI5OTJ9.gJZcNvzbNe90ycpTIcGS_oqOpH6VXMsCMOEHThOOmp2WfWWWR421mK4M
+96uVJjoKcM7J_9-Vn-XGJ0-aKTSxLw' \ 
+--header 'Content-Type: application/json' \ 
+--header 'Accept: application/json' \ 
+--data '{   "tollCode": "180001", 
+    "tollName":"", 
+    "stateName": "" }' 
+ 
+For obtaining authentication token, refer Section 1.4 
+ 
+Response 
+ 
+To acknowledge the above request, ULIP will send the below response -  
+ 
+a) In case of invalid format 
+ 
+1. Invalid data 
+ 
+{    "response": [ 
+        { 
+            "response": "Input variable cannot be more than one it should be either tollCode or 
+tollName or stateName", 
+            "responseStatus": "ERROR" 
+        } 
+    ], 
+    "error": "false", 
+    "code": "200", 
+    "message": "Success" } 
+ 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 38 of 40 
+ 
+b) In case of valid data sent by the user 
+ 
+{    "response": [ 
+        {"response": [ 
+                { 
+                    "lcvRateMulti": 260, 
+                    "hcmEmeMonthly": 19085, 
+                    "latitude": 27.218247, 
+                    "multiAxlerateMulti": 595, 
+                    "sevenOrMoreExelSingle": 695, 
+                    "fourToSixExelCommReg": 285, 
+                    "sevenOrMoreExelReturn": 1045, 
+                    "dtEffectiveRates": "01-10-2025", 
+                    "fourToSixExelReturn": 860, 
+                    "lcvRateSingle": 175, 
+                    "hcmEmeSingle": 575, 
+                    "stateName": "UTTAR PRADESH", 
+                    "lcvRateMth": 5810, 
+                    "tollName": "Tundla", 
+                    "carRateMth": 3595, 
+                    "piu": "AGRA", 
+                    "longitude": 78.272821, 
+                    "lcvRateCommReg": 85, 
+                    "busRateMth": 12170, 
+                    "fourToSixExelMonthly": 19085, 
+                    "carRateCommReg": 55, 
+                    "fourToSixExelSingle": 575, 
+                    "hcmEmeReturn": 860, 
+                    "carRateMulti": 160, 
+                    "busRateCommReg": 185, 
+                    "busRateSingle": 365, 
+                    "hcmEmeCommReg": 285, 
+                    "multiAxlerateSingle": 400, 
+                    "sevenOrMoreExelMonthly": 23235, 
+                    "dtRateRevision": "31-03-2026", 
+                    "tollCode": 180001, 
+                    "multiAxlerateCommReg": 200, 
+                    "multiAxlerateMth": 13280, 
+                    "sevenOrMoreExelCommReg": 350, 
+                    "busRateMulti": 550, 
+                    "ro": "LUCKNOW (UP WEST)", 
+                    "carRateSingle": 110 
+                } 
+            ], 
+            "responseStatus": "SUCCESS"} 
+    ], 
+    "error": "false", 
+    "code": "200", 
+    "message": "Success"} 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 39 of 40 
+ 
+Status Code 200: corporate data response 
+Status Code 400: Bad request (Invalid json syntax, invalid json key) 
+Status Code 401 or 403: Unauthenticated or Unauthorized 
+Status Code 500: Some internal server errors occurred 
+Status Code 502: Server is not responding. 
+1.4 Data Transmission & Authentication Mechanism 
+ 
+All data exchange would be done over secure HTTP (HTTPS). Request from ULIP's system would 
+be made in IWAI system through a data exchange URL that has following form: 
+ 
+For Production: https://www.ulip.dpiit.gov.in/ulip/v1.0.0/TOLL/01 
+ 
+Body:  
+ 
+{   "tollCode": "180001", 
+    "tollName":"", 
+    "stateName": ""} 
+ 
+Access to above data exchange URL would be authorized by use of a security mechanism 
+implemented by the ULIP system. It is as follows: 
+ 
+• First time access:  It would require a username and password [which would be shared with 
+user beforehand].  Once user hit with valid user id and password, ULIP system will return a 
+basic authorization token to  user, using that token user will communicate with ULIP system 
+until tokens will not get expired. 
+ 
+Summary of HTTP Basic Authentication is as follows: 
+ 
+First time User hits ULIP secured API through username and password for access token as follow- 
+ 
+curl --location --request POST 'https://www.ulip.dpiit.gov.in/ulip/v1.0.0/user/login' \ 
+--header 'Accept: application/json' \ 
+--header 'Content-Type: application/json' \ 
+--data-raw '{"username": "xxxxxxxx","password": "xxxxxxxxx"}' 
+ 
+Authorization:   
+Bearer  
+eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZXN0MSIsImlhdCI6MTYyNTIzMDQyNywiYXBwcyI6I
+mRhdGFwdXNoIn0.rhumwWJ8BWeeHe9CYmIV1UKyJk-kLHA_ovX5Zi2OwxEv-td-
+KpxnfbKDI_8FZsOoggqx3Al-Du1y2qMoUD7uzA' 
+ 
+Upon successful authentication, the user would be logged into the ULIP system and get an access 
+token. Though this token user can communicate with  ULIP. This token has expiry time which 
+represents user session. The session time out for the same to be fixed hour, generally it is for 30 
+minutes. If there is no request coming from user for 30 minutes, then session (token) will be 
+expired, and user need to re authenticate. 
+ 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 40 of 40 
+ 
+Using The above token, user can request ULIP system for CIN details as follow - 
+ 
+curl -X POST \ 
+  https://www.ulip.dpiit.gov.in/ulip/v1.0.0/TOLL/01 
+\ 
+  -H 'accept: application/json' \ 
+  -H 'authorization: Bearer 
+eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZXN0MSIsImlhdCI6MTYyNTIzMDQyNywiYXBwcyI6I
+mRhdGFwdXNoIn0.rhumwWJ8BWeeHe9CYmIV1UKyJk-kLHA_ovX5Zi2OwxEv-td-
+KpxnfbKDI_8FZsOoggqx3Al-Du1y2qMoUD7uzA' \ 
+  -H 'cache-control: no-cache' \ 
+  -H 'content-type: application/json' \ 
+  -H 'postman-token: 8e8a19a4-ea1e-6373-f616-e2e4af9a1338' \ 
+  -d '{ }' 
+ 
+For Staging: 
+ 
+curl --location --request POST 'https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/user/login' \ 
+--header 'Accept: application/json' \ 
+--header 'Content-Type: application/json' \ 
+--data-raw '{"username": "xxxxxxx","password": "xxxxxxxx" }' 
+ 
+Authorization:   
+Bearer  
+eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZXN0MSIsImlhdCI6MTYyNTIzMDQyNywiYXBwcyI6I
+mRhdGFwdXNoIn0.rhumwWJ8BWeeHe9CYmIV1UKyJk-kLHA_ovX5Zi2OwxEv-td-
+KpxnfbKDI_8FZsOoggqx3Al-Du1y2qMoUD7uzA' 
+ 
+Upon successful authentication, the user would be logged into the ULIP system and get an access 
+token. Though this token user can communicate with ULIP. This token has expiry time which 
+represents user session. The session time out for the same to be fixed hour, generally it is for 30 
+minutes. If there is no request coming from user for 30 minutes, then session (token) will be 
+expired, and user need to re authenticate. 
+ 
+Using The above token, user can request ULIP system for CIN details as follow - 
+ 
+curl -X POST \ 
+  https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/TOLL/01 
+\ 
+  -H 'accept: application/json' \ 
+  -H 'authorization: Bearer 
+eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZXN0MSIsImlhdCI6MTYyNTIzMDQyNywiYXBwcyI6I
+mRhdGFwdXNoIn0.rhumwWJ8BWeeHe9CYmIV1UKyJk-kLHA_ovX5Zi2OwxEv-td-
+KpxnfbKDI_8FZsOoggqx3Al-Du1y2qMoUD7uzA' \ 
+  -H 'cache-control: no-cache' \ 
+  -H 'content-type: application/json' \ 
+  -H 'postman-token: 8e8a19a4-ea1e-6373-f616-e2e4af9a1338' \ 
+  -d '{ }' 

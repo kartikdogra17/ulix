@@ -1,0 +1,702 @@
+ULIP Integration Requirement Document 
+ 
+  
+                        
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+Version No.: 4.0 
+Date: 24/03/2026 
+Project Name: ULIP 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ULIP Integration Requirement Document 
+This document contains proprietary information of NLDSL. Unauthorized access, copying and replication are 
+prohibited. This document must not be copied in whole or part by any means, without the written authorization of 
+NLDSL, Noida, India. 
+ 
+ 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 2 of 14 
+ 
+ 
+ 
+ 
+Revision History 
+Version Date Author Reviewer Significant Changes 
+1.0 20/07/2021 Kush Tyagi Nayab Baseline Version 
+2.0 01/09/2021 Hasan Mhad Khan Nayab Updated 
+3.0 24/09/2021 Ayush Arya Nayab Updated 
+4.0 24/03/2026 Gaurav Tyagi Pranab 
+Manna Updated 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+  
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 3 of 14 
+ 
+Table of Contents 
+ 
+Introduction ................................................................................................................................................. 4 
+1.1 Purpose .................................................................................................................................... 4 
+The Overall Description .............................................................................................................................. 4 
+1.2 Data Integration between ACMES System and ULIP application ............................................ 4 
+1.3 ACMES/01 ................................................................................................................................ 4 
+1.3.1 Technical Approach .................................................................................................... 5 
+1.4 ACMES/02 ................................................................................................................................ 7 
+1.4.1 Technical Approach .................................................................................................... 8 
+1.5 Data Transmission & Authentication Mechanism .................................................................. 12 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 4 of 14 
+ 
+Introduction 
+1.1 Purpose 
+ 
+The purpose of this document is to define and provide details for accessing API for 
+ACMES system information from ULIP system. 
+This document details the following points: 
+ 
+1. Data Integration between ACMES and ULIP web service: Identification of operational 
+points where data integration between ACMES and ULIP web service will be needed. 
+ 
+2. Technical Approach for performing Data Integration  
+The Overall Description 
+User will share the information such as AWB number, HAWB number based on data 
+send by user ULIP system will call respective ACMES API for accessing information. 
+ 
+Following are the point for accessing cargo information: - 
+ 
+1. This API will share data based on information provided by user. 
+ 
+2. ULIP will expose API for getting data from ACMES API. 
+ 
+3. ACMES/01 API will take AWB number from user and get data from ACMES API. 
+ 
+4. ACMES/02 API will take AWB number and HAWB number from user and get data from 
+ACMES API. 
+1.2 Data Integration between ACMES System and ULIP application 
+ 
+User will share information to ULIP system based on data shared ULIP will provide data 
+to user. 
+1.3 ACMES/01 
+ 
+This API will take AWB number and connect with ACMES API to get data. 
+ 
+S. 
+No. 
+Field Name Field Description Format Require
+d/Not – 
+Require
+d 
+Length 
+1 awbnumber Master Airway bill Number 
+as available in ACMES 
+system. 
+[0-9]{11} Required Max 11 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 5 of 14 
+ 
+1.3.1 Technical Approach  
+1. All the data will be shared through rest web services. 
+2. ULIP system will provide AWB number for which detail is required. 
+3. ACMES API will share details of cargo information which exist in ACMES system in JSON 
+format. 
+4. ACMES Integration will add JSON in response key in response body. 
+5. ULIP system will provide the data in JSON Object format in response body. 
+ 
+Example: 
+ 
+AWB number 40689348000 is shared by ULIP system, then ACMES-integration will 
+make a request to ACMES API. 
+ 
+Request: 
+ 
+The request must be of the following format, where AWB number is passed within the URL body 
+in JSON format. 
+ 
+For staging - 
+ 
+https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/ACMES/01 
+ 
+{ 
+    "awbnumber": "40689348000" 
+} 
+ 
+Curl URL 
+ 
+curl --location 'https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/ACMES/01' \ 
+--header 'authorization: Bearer 
+eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1bGlwIiwiaWF0IjoxNzI3MTcwMzk5LCJhcHBzIjoiZ
+GF0YXB1c2gifQ.djxBNGSkC8c4Tzkml9NfOML-O40nG9ucN6Qj2QVgqxnY_j-
+c0A2asTehZo3IArGRtxCYECdrGpQduZwSaWiy4w' \ 
+--header 'accept: application/json' \ 
+--header 'content-type: application/json' \ 
+--data ' { 
+    "awbnumber": "40689348000" 
+}' 
+ 
+ 
+For production - 
+ 
+https://www.ulip.dpiit.gov.in/ulip/v1.0.0/ACMES/01 
+ 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 6 of 14 
+ 
+{ 
+    "awbnumber": "40689348000" 
+} 
+ 
+Curl URL 
+ 
+curl --location --request POST 
+'https://www.ulip.dpiit.gov.in/ulip/v1.0.0/ACMES/01' \ 
+--header 'authorization: Bearer 
+eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZXN0MSIsImlhdCI6MTYzMDQ5MTk0Miwi
+YXBwcyI6ImRhdGFwdXNoIn0.1NisXd9_2Vp7WpRCyqix7k6zvn9YuQS56PCZ6lvpU
+r8TRfrcbfprMdBeZT8vsWFD7ZYKsXMpf876N74uPgELhA' \ 
+--header 'accept: application/json' \ 
+--header 'content-type: application/json' \ 
+--data-raw '{ 
+    "awbnumber": "40689348000" 
+}' 
+ 
+For obtaining authentication token, refer Section 1.5 
+ 
+Response 
+ 
+To acknowledge the above request, ULIP will send the below response -  
+ 
+a) In case of invalid format 
+ 
+1. Invalid AWB number 
+ 
+{ 
+ "response": null, 
+ "error": "true", 
+ "code": "400", 
+ "message": "Data format failed OR wrong value entered at:  
+awbnumber. Format should follow  [0-9]{11}" 
+} 
+ 
+b) In case of AWB number does not exist in ACMES system 
+ 
+{ 
+ "response": [ 
+  { 
+   "response": { 
+    "ExportTrackingData": { 
+     "AWB": null, 
+     "SHIPPING_BILL": [], 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 7 of 14 
+ 
+     "LOCATION_DETAILS": [], 
+     "XRAY_DETAILS": [], 
+     "ULD_DETAILS": [], 
+     "EGM_DETAILS": [] 
+    } 
+   }, 
+   "responseStatus": "SUCCESS" 
+  } 
+ ], 
+ "error": "false", 
+ "code": "200", 
+ "message": "Success" 
+} 
+ 
+c) In case AWB number exist 
+ 
+{"response":[{"response":{"ExportTrackingData":{"AWB":{"Destination":"DXB","P
+ackages":"24","GrossWeight":"464","ChargeableWeight":"464","TDGDateTime":"08/
+03/2021 16:57:00","BAGDateTime":"08/03/2021 
+21:13:00","GatePassDateTime":"N/A","HandOverDateTime":""},"SHIPPING_BILL":[],
+"LOCATION_DETAILS":[],"XRAY_DETAILS":[{"XRayDate":"08/03/2021 
+20:33","XRayMachine":"40011512","XRayBy":"XRAY05"}],"ULD_DETAILS":[{"ULDNo":"
+BT07IND:","ULDType":"BT","Status":"A","FlightNo":"6E9602","FlightDate":"10/03
+/2021"}],"EGM_DETAILS":[{"EGMNo":"341511","EGMYear":"11/03/2021","FlightNo":"
+6E23","FlightDate":"11/03/2021","ATD":" ","Commodity":"CONSOL 
+COURIER","Packages":"24","GrossWeight":"464"}]}},"responseStatus":"SUCCESS"}]
+,"error":"false","code":"200","message":"Success"} 
+ 
+Status Code 200: cargo data response 
+Status Code 400: Bad request (Invalid json syntax, invalid json key) 
+Status Code 401 or 403: Unauthenticated or Unauthorized 
+Status Code 500: Some internal server error occurred 
+Status Code 502: Server is not responding. 
+ 
+1.4 ACMES/02 
+ 
+This API will take AWB number and HAWB number connect with ACMES API to get 
+data. 
+S. 
+No. 
+Field Name Field Description Format Required/Not – 
+Required 
+Length 
+1 awbnumber Master Airway bill Number as 
+available in ACMES system. 
+[0-9]{11} Required Max 11 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 8 of 14 
+ 
+2 hawb House Airway bill Number 
+as available in ACMES 
+system. 
+^[a-zA-Z0-
+9]{0,20}$ 
+Not-Required Max 20 
+1.4.1 Technical Approach  
+6. All the data will be shared through rest web services. 
+7. ULIP system will provide AWB number and HAWB number for which detail is required. 
+8. ACMES API will share details of cargo information which exist in ACMES system in JSON 
+format. 
+9. ACMES Integration will add JSON in response key in response body. 
+10. ULIP system will provide the data in JSON Object format in response body. 
+ 
+Example: 
+ 
+AWB number 23552194682 and HAWB number MUC75007115 is shared by ULIP 
+system, then ACMES-integration will make a request to ACMES API. 
+ 
+Request: 
+ 
+The request must be of the following format, where AWB number and HAWB number is passed 
+within the URL body in JSON format. 
+ 
+For staging - 
+ 
+https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/ACMES/02 
+ 
+{ 
+    "awbnumber": "23552194682", 
+    "hawb":"MUC75007115" 
+} 
+ 
+Curl URL 
+ 
+curl --location 'https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/ACMES/02' \ 
+--header 'Authorization: Bearer 
+eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1bGlwIiwiaWF0IjoxNzI3MTcwMzk5LCJhcHBzIjoiZGF0
+YXB1c2gifQ.djxBNGSkC8c4Tzkml9NfOML-O40nG9ucN6Qj2QVgqxnY_j-
+c0A2asTehZo3IArGRtxCYECdrGpQduZwSaWiy4w' \ 
+--header 'accept: application/json' \ 
+--header 'content-type: application/json' \ 
+--data '{ 
+    "awbnumber": "23552194682", 
+    "hawb":"MUC75007115" 
+}' 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 9 of 14 
+ 
+For production - 
+ 
+https://www.ulip.dpiit.gov.in/ulip/v1.0.0/ACMES/02 
+ 
+{ 
+ "awbnumber": "23552194682", 
+ "hawb":"MUC75007115" 
+} 
+ 
+Curl URL 
+ 
+curl --location --request POST 
+'https://www.ulip.dpiit.gov.in/ulip/v1.0.0/ACMES/02' \ 
+--header 'Authorization: Bearer 
+eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZXN0MSIsImlhdCI6MTYzMDU1MzM5NCwiYXBwcyI6ImRh
+dGFwdXNoIn0.GJP8YAJ5hpyMP7S0tgc5PpVz4tQyu3NUkTifrDwD5WWDF0QOlSrua5oi6tfYO4yCd
+MRiDVErD2nTn6fT5ByQog' \ 
+--header 'accept: application/json' \ 
+--header 'content-type: application/json' \ 
+--data-raw '{ 
+ "awbnumber": "23552194682", 
+ "hawb":"MUC75007115" 
+}' 
+ 
+For obtaining authentication token, refer Section 1.5 
+ 
+Response 
+ 
+To acknowledge the above request, ULIP will send the below response -  
+ 
+a) In case of invalid format 
+ 
+1. Invalid AWB number 
+ 
+{ 
+ "response": null, 
+ "error": "true", 
+ "code": "400", 
+ "message": "Data format failed OR wrong value entered 
+at:  awbnumber. Format should follow [0-9]{11}" 
+} 
+ 
+ 
+ 
+ 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 10 of 14 
+ 
+2. Invalid HAWB number 
+ 
+ 
+{ 
+ "response": null, 
+ "error": "true", 
+ "code": "400", 
+ "message": "Data format failed OR wrong value entered 
+at:  hawb. Format should follow  ^[a-zA-Z0-9]{0,20}$" 
+} 
+ 
+ 
+b) In case of AWB number does not exist in ACMES system 
+ 
+{ 
+ "response": [ 
+  { 
+   "response": { 
+    "ImportTrackingData": { 
+     "AWB_DETAILS": null, 
+     "IGM_DETAILS": [], 
+     "DO_DETAILS": [], 
+     "GP_DETAILS": [], 
+     "LOC_DETAILS": [] 
+    } 
+   }, 
+   "responseStatus": "SUCCESS" 
+  } 
+ ], 
+ "error": "false", 
+ "code": "200", 
+ "message": "Success" 
+} 
+ 
+c) In case HAWB number does not exist in ACMES system 
+ 
+{ 
+ "response": [ 
+  { 
+   "response": { 
+    "ImportTrackingData": { 
+     "AWB_DETAILS": null, 
+     "IGM_DETAILS": [], 
+     "DO_DETAILS": [], 
+     "GP_DETAILS": [], 
+     "LOC_DETAILS": [] 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 11 of 14 
+ 
+    } 
+   }, 
+   "responseStatus": "SUCCESS" 
+  } 
+ ], 
+ "error": "false", 
+ "code": "200", 
+ "message": "Success" 
+} 
+ 
+ 
+d) In case AWB number and HAWB number exist 
+ 
+{ 
+    "response": [ 
+        { 
+            "response": { 
+                "ImportTrackingData": { 
+                    "AWB_DETAILS": { 
+                        "IgmNo": "1896697", 
+                        "IgmYear": "2021", 
+                        "AwbNo": "23552194682", 
+                        "HawbNo": "MUC75007115", 
+                        "ArrivedPackages": "1", 
+                        "ArrivedWeight": "70", 
+                        "ChargeableWeight": "192", 
+                        "DamagedPackages": "0" 
+                    }, 
+                    "IGM_DETAILS": [ 
+                        { 
+                            "IgmNo": "1896697", 
+                            "IgmYear": "2021", 
+                            "FlightNo": "TK6448", 
+                            "FlightDate": "16/03/2021", 
+                            "SegregationDate": "16/03/2021 15:30", 
+                            "SegregationStatus": "DONE", 
+                            "ATA": "16/03/2021 04:45" 
+                        } 
+                    ], 
+                    "DO_DETAILS": [ 
+                        { 
+                            "DOIssuedBy": "TURKISH AIRLINES", 
+                            "DODate": "17/03/2021 12:02:21", 
+                            "HawbNo": "0", 
+                            "DOIssuedTo": "SUNRISE FREIGHT FORWARDERS PVT. 
+LTD." 
+                        }, 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 12 of 14 
+ 
+                        { 
+                            "DOIssuedBy": "SUNRISE FREIGHT FORWARDERS PVT. 
+LTD.", 
+                            "DODate": "17/03/2021 12:34:28", 
+                            "HawbNo": "MUC75007115", 
+                            "DOIssuedTo": "REGENT GARAGE (P) LTD." 
+                        }, 
+                        { 
+                            "DOIssuedBy": "SUNRISE FREIGHT FORWARDERS PVT. 
+LTD.", 
+                            "DODate": "17/03/2021 12:35:01", 
+                            "HawbNo": "MUC75007116", 
+                            "DOIssuedTo": "ASHWANI AUTOMOBILES PVT LTD." 
+                        } 
+                    ], 
+                    "GP_DETAILS": [ 
+                        { 
+                            "GatePassNo": "NN202103232098", 
+                            "DeliveryPackages": "1", 
+                            "GeneratedOn": "23/03/2021 11:48:00", 
+                            "DocStatus": "DELIVERED" 
+                        } 
+                    ], 
+                    "LOC_DETAILS": [] 
+                } 
+            }, 
+            "responseStatus": "SUCCESS" 
+        } 
+    ], 
+    "error": "false", 
+    "code": "200", 
+    "message": "Success" 
+} 
+ 
+Status Code 200: cargo data response 
+Status Code 400: Bad request (Invalid json syntax, invalid json key) 
+Status Code 401 or 403: Unauthenticated or Unauthorized 
+Status Code 500: Some internal server error occurred 
+Status Code 502: Server is not responding. 
+ 
+1.5 Data Transmission & Authentication Mechanism 
+ 
+All data exchange would be done over secure HTTP (HTTPS). Request from ULIP's system would 
+be made in ACMES system through a data exchange URL that has following form: 
+ 
+ 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 13 of 14 
+ 
+For production – 
+ 
+https://www.ulip.dpiit.gov.in/ulip/v1.0.0/ACMES/01 
+ 
+Body:  
+{ 
+ "awbnumber": "40689348000" 
+} 
+ 
+Access to above data exchange URL would be authorized by use of a security mechanism 
+implemented by the ULIP system. It is as follows: 
+ 
+• First time access:  It would require a username and password [which would be shared with 
+user beforehand].  Once user hit with valid user id and password, ULIP system will return a 
+basic authorization token to  user, using that token user will communicate with ULIP system 
+until token will not get expired. 
+ 
+Brief summary of HTTP Basic Authentication is as follows: 
+ 
+First time when User will hit ULIP secured API through username and password for access token 
+as follow- 
+ curl -X POST  
+‘https://www.ulip.dpiit.gov.in/ulip/v1.0.0/user/login’ 
+ -H 'accept: application/json'  
+   -H 'content-type: application/json'  
+-data ‘{"username":"xxxxxx","password":" XXxxx@12345"} ‘ 
+ 
+ 
+Authorization:   
+Bearer 
+eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJpbnRlcmNvbnQiLCJpYXQiOjE1ODU1NjYyMzcsImFwcHMi
+OiJkYXRhcHVzaCJ9.jb-23DbkWpz-3ptsuuZofzH-
+ce7jd0xR5WlkFfBPO_Dzjop01dSx9OamqsjsgUAryLUPtUDiMX07oHG4L2AfFQ  
+ 
+Upon successful authentication, the user would be logged into the ULIP system and get an access 
+token. Though this token user can communicate with ULIP. This token has expiry time which 
+represent user session. The session time out for the same to be fixed hour, generally it is for 30 
+minutes. If there is no request coming from user for 30 minutes, then session (token) will be 
+expired and user need to re authenticate. 
+ 
+Using The above token, user can request ULIP system for vehicle details as follow - 
+ 
+curl --location --request POST 
+'https://www.ulip.dpiit.gov.in/ulip/v1.0.0/ACMES/01' \ 
+--header 'authorization: Bearer 
+eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZXN0MSIsImlhdCI6MTYzMDU1MzM5NCwiYXBwcyI6ImRh
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 14 of 14 
+ 
+dGFwdXNoIn0.GJP8YAJ5hpyMP7S0tgc5PpVz4tQyu3NUkTifrDwD5WWDF0QOlSrua5oi6tfYO4yCd
+MRiDVErD2nTn6fT5ByQog' \ 
+--header 'accept: application/json' \ 
+--header 'content-type: application/json' \ 
+--data-raw '{ 
+ "awbnumber": "40689348000" 
+}' 
+ 
+For staging – 
+ 
+curl --location 'https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/user/login' \ 
+--header 'Accept: application/json' \ 
+--header 'Content-Type: application/json' \ 
+--data-raw '{ 
+    "username": "xxxx", 
+    "password": "xxxx@123" 
+}' 
+ 
+ 
+Authorization:   
+Bearer  
+eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1bGlwIiwiaWF0IjoxNzI3MTcwMzk5LCJhcHBzIjoiZGF0
+YXB1c2gifQ.djxBNGSkC8c4Tzkml9NfOML-O40nG9ucN6Qj2QVgqxnY_j-
+c0A2asTehZo3IArGRtxCYECdrGpQduZwSaWiy4w 
+ 
+Upon successful authentication, the user would be logged into the ULIP system and get an access 
+token. Though this token user can communicate with  ULIP. This token has expiry time which 
+represent user session. The session time out for the same to be f ixed hour, generally it is for 30 
+minutes. If there is no request coming from user for 30 minutes, the n session (token) will be 
+expired and user need to re authenticate. 
+ 
+Using The above token, user can request ULIP system for vehicle details as follow - 
+ 
+https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/ACMES/01 
+ 
+curl --location 'https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/ACMES/01' \ 
+--header 'authorization: Bearer 
+eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1bGlwIiwiaWF0IjoxNzI3MTcwMzk5LCJhcHBzIjoiZGF0
+YXB1c2gifQ.djxBNGSkC8c4Tzkml9NfOML-O40nG9ucN6Qj2QVgqxnY_j-
+c0A2asTehZo3IArGRtxCYECdrGpQduZwSaWiy4w' \ 
+--header 'accept: application/json' \ 
+--header 'content-type: application/json' \ 
+--data ' { 
+    "awbnumber": "40689348000" 
+}' 
+ 

@@ -1,0 +1,93 @@
+AAICLAS/01	This API will take AWB number and LOCATION and connect with AAICLAS API to get data.
+AAICLAS/02	This API will take AWB number, HAWB number and location connect with AAICLAS API to get data.
+ACMES/01	This API will take AWB number and connect with ACMES API to get data.
+ACMES/02	This API will take AWB number and HAWB number connect with ACMES API to get data.
+AUTHAPI/01	This API will take iec code data and connect with DGFT API to get data.
+AUTHAPI/02	This API will take vehicle number and connect with VAHAN API to get data.
+BLACKSPOT/01	This API will take stateCode and based on the user input data, ULIP System will find the BLACK spot data for the state code and send back the response to the user.
+BPCL/01	This API is designed to register the user to the BPCL system based on user information. The user will provide their information, and once the user successfully registers, they will get the reference number in the response. Doc Ref
+CARBON/01	This API will take Weight, Distance and Trip Count and based on the emission factor and user input data, ULIP System will calculate the total carbon emitted and send back the response to the user.
+CARBON/02	This API will take Distance, vehicle type , weight, fuel type and Trip Count and based on the emission factor and user input data, ULIP System will calculate the total carbon emitted and send back the response to the user.
+CARBON/03	This API will take Weight , Distance and No of Trips and based on the emission factor and user input data ,ULIP System will calculate the total carbon emitted and send back the response to the user.
+CARBON/04	This API will take Distance, vessel type , vessel size, weight and No of Trips and based on the emission factor and user input data, ULIP System will calculate the total carbon emitted and send back the response to the user.
+CFSICD/01	This API will take “port Code, destination Code, from and to” and connect with LDB API to get data.
+DGFT/01	This API will take IEC number and connect with DGFT API to get data.
+DGFT/02	This API will take ITC(HS) Code and connect with DGFT API to get data.
+ECHALLAN/01	This API will take vehicle number and connect with E-Challan API to get data.
+EVYATRA/01	This API is designed to retrieve information about electric vehicle (EV) charging stations. It can be used by providing either the state ID or the geolocation (latitude and longitude) of the desired location.
+EWAYBILL/01	This API will take EWB (e-way bill) number and connect with EWAYBILL API to get data.
+FASTAG/01	This API will take Vehicle registration number / Vehicle Chassis number and connect with FASTAG API to get data.
+FASTAG/02	This API will take Vehicle registration number / tagid and connect with FASTAG API to get data. We have to enter vehiclenumber or tagid to get the data.
+FCI/01	This API will connect with FCI API to get data.
+FOIS/01	This API will take the FNR number and connect with FOIS API to get data. Request Attribute.
+FOIS/02	This API will take the sttnfrom, sttnto, cmdt, wgontype and connect with FOIS API to get data. Request Attribute.
+FOIS/04	This API will take the lngpwbltno and connect with FOIS API to get data.
+GATISHAKTI/01	This API will take NH (national highway) number and connect with GATISHAKTI API to get data.
+GATISHAKTI/02	This API will take stateid number and connect with GATISHAKTI API to get data.
+GATISHAKTI/03	This API will take stateid number and connect with GATISHAKTI API to get data.
+GATISHAKTI/04	This API will take stateid number and connect with GATISHAKTI API to get data.
+GATISHAKTI/05	This API will connect with GATISHAKTI API to get data.
+HPCL/01	This API is designed to register the user to the HPCL system based on user information. User will provide the user information and once user successfully registers, then they will get the reference number in the response.
+HPCL/02	This API is designed to retrieve information about petroleum and natural gas stations. It can be used by providing either the take state Code or the geographical location (longitude, latitude, and radius) of the desired location.
+ICEGATE/01	This API will take VCN number and connect with ICEGATE API to get data.
+ICEGATE/02	This API will take BE number and BE date and connect with ICEGATE API to get data.
+ICEGATE/03	This API will take shipping bill number and connect with ICEGATE API to get data.
+ICEGATE/04	This API will take shipping bill number and connect with ICEGATE API to get data.
+ICEGATE/05	This API will take shipping bill number and connect with ICEGATE API to get data.
+ICEGATE/06	This API will take shipping bill number and connect with ICEGATE API to get data.
+ICEGATE/07	This API will take IGM number and connect with ICEGATE API to get data.
+ICEGATE/08	This API will take EGM number, EGM date and connect with ICEGATE API to get data.
+ICEGATE/09	This API will provide MAWB details when the Location and MAWB details are entered as input
+ICEGATE/10	This API will take the MAWB number and connect with the ICEGATE API to get data.
+ICEGATE/11	This API will provide Air Export General Manifest & Air Import General Manifest Job Status Details.
+ICEGATE/12	This API will take the shipping bill number and connect with the ICEGATE API to get data.
+ICEGATE/13	This API will provide e-Seal details.
+INDIAPOST/01	This API will take the field below mentioned and connect with INDIAPOST API to get data.
+INDIAPOST/02	This API will take below and connect with INDIAPOST API to get data.
+INDIAPOST/03	This API will take below fields and connect with INDIAPOST API to get data.
+INDIAPOST/04	This API will take bulk tracking ID and connect with INDIAPOST API to get data.
+IOCL/01	This API is designed to register the user to the IOCL system based on user information. User will provide the user information and once user successfully register, then they will get the reference number in the response.
+IOCL/02	This API is designed to retrieve information about petroleum and natural gas stations. It can be used by providing either the stateCode or geographical location (longitude, latitude, and radius) of the desired location.
+IWAI/01	This API will connect with IWAI API to get data.
+IWAI/02	This API will connect with IWAI API to get data.
+IWAI/03	This API will take YEAR1, YEAR2, NWTYPE and TERMINAL to connect with IWAI API to get data.
+IWAI/04	This API will take FYEAR to connect with IWAI API to get data.
+IWAI/05	This API will take YEAR1 and YEAR2 to connect with IWAI API to get data.
+IWAI/06	This API will take YEAR1 and YEAR2 to connect with IWAI API to get data.
+IWAI/07	This API will take FYEAR to connect with IWAI API to get data.
+IWAI/08	This API will take YEAR1, YEAR2, NWTYPE and TYPE to connect with IWAI API to get data.
+IWAI/09	This API will take NWTYPE and HISTORICAL to connect with IWAI API to get data.
+IWAI/10	This API will connect with IWAI API to get data.
+IWAI/11	This API will connect with IWAI API to get data.
+IWAI/12	This API will connect with IWAI API to get data.
+IWAI/13	This API will connect with IWAI API to get data.
+IWAI/14	This API will connect with IWAI API to get data.
+IWAI/15	This API will connect with IWAI API to get data.
+JIOBP/01	This API is designed to retrieve information about petroleum and natural gas stations. It can be used by providing either the take State Code, state name or the geographical Doc Ref. No:
+KALE/01	This API will take MAWB number and connect with KALE API to get data.
+KALE/02	This API will take AWB and HAWB number and connect with KALE API to get data.
+LDB/01	This API will take container number and connect with LDB API to get data.
+MCA/03	This API will take Corporate Identification Number and connect with MCA API to get data.
+MCA/04	This API will take Corporate Identification Number and connect with MCA API to get data.
+MCA/05	This API will take Director Identification Number and connect with MCA API to get data.
+NOENTRY/01	This API will take stateCode and based on the user input data, ULIP System will find the no entry data for the state code and send back the response to the user.
+PCS/01	This API will take below details and connect with PCS API to get data.
+PCS/02	This API will take below details and connect with PCS API to get data.
+PCS/03	This API will take the details below and connect with PCS API to get data.
+PCS/04	This API will take below details and connect with PCS API to get data.
+PCS/05	This API will take the details below and connect with PCS API to get data.
+PCS/06	This API will take below details and connect with PCS API to get data.
+PESO/01	This API will take Vehicle Registration Number and connect with PESO API to get data.
+SARATHI/01	This API will take driving license number and connect with SARATHI API to get data.
+SARATHI/02	This API will take driving license number and connect with SARATHI API to get data.
+TGSARATHI/01	This API will take the driver's license number and connect with the TGSARATHI API to get data.
+TGVAHAN/01	This API will take the vehicle number and connect with the TGVAHAN API to get data.
+TOLL/01	This API will take tollCode, tollName , stateName and based on the user input data, ULIP System will find the toll rate for the particular toll and send back the response to the user.
+UDYAM/01	This API will take UdyamNo and connect with UDYAM API to get data.
+VAHAN/01	This API will take vehicle number and connect with VAHAN API to get data.
+VAHAN/02	This API will take vehicle number and connect with VAHAN API to get data.
+VAHAN/03	This API will take engine number and connect with VAHAN API to get data.
+VAHAN/04	This API will take vehicle number and connect with VAHAN API to get data.
+VAHAN/05	This API will take vehicle number and connect with VAHAN API to get data.
+VAHAN/06	This API will take engine number and connect with VAHAN API to get data.
+WAREHOUSE/01	This API will take StateCode and connect with WAREHOUSE API to get data.

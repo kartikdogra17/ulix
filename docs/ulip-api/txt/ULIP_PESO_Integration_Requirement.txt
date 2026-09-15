@@ -1,0 +1,423 @@
+ULIP Integration Requirement Document 
+ 
+  
+                        
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+Version No.: 1.0 
+Date: 03/02/2026 
+Project Name: ULIP 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ULIP Integration Requirement Document 
+This document contains proprietary information of NLDSL. Unauthorized access, copying and replication are 
+prohibited. This document must not be copied in whole or part by any means, without the written authorization of 
+NLDSL, Noida, India. 
+ 
+ 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 1.0 Page 2 of 9 
+ 
+ 
+ 
+ 
+Revision History 
+Version Date Author Reviewer Significant Changes 
+1.0 03/02/2026 Sudhanshu Singh Nayab Ali Baseline Version 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+  
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 1.0 Page 3 of 9 
+ 
+Table of Contents 
+ 
+Introduction ................................................................................................................................................. 4 
+1.1 Purpose .................................................................................................................................... 4 
+The Overall Description .............................................................................................................................. 4 
+1.2 Data Integration between PESO System and ULIP application .............................................. 4 
+1.3 PESO/01 .................................................................................................................................. 4 
+1.3.1 Technical Approach .................................................................................................... 5 
+1.4 Data Transmission & Authentication Mechanism .................................................................... 7 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 1.0 Page 4 of 9 
+ 
+Introduction 
+1.1 Purpose 
+ 
+The purpose of this document is to define and provide details for accessing API for PESO 
+system information from ULIP system. 
+This document details the following points: 
+ 
+1. Data Integration between PESO and ULIP web service : Identification of operational 
+points where data integration between PESO and ULIP web service will be needed. 
+ 
+2. Technical Approach for performing Data Integration  
+ 
+The Overall Description 
+Users will share information such as Vehicle Registration Number 
+based on data sent by user ULIP system will call respective PESO API for accessing 
+information. 
+ 
+Following is the point for accessing vehicle information: - 
+ 
+1. This API will share data based on information provided by users. 
+ 
+2. ULIP will expose API for getting data from PESO API. 
+ 
+3. PESO/01 API will take Vehicle Registration Number from user and get data from PESO 
+API. 
+1.2 Data Integration between PESO System and ULIP application 
+ 
+Users will share information with the ULIP system based on data shared ULIP will 
+provide data to user. 
+1.3 PESO/01 
+ 
+This API will take Vehicle Registration Number and connect with PESO API to get 
+data. 
+ 
+S. No. Field Name Field Description Format Required/Not 
+– Required 
+Length 
+1 Vehicle 
+Registration 
+Number 
+ 
+Enter the Vehicle 
+Registration Number 
+as available in PESO 
+system. 
+^[A-Z0-
+9]{5,11}$ 
+ 
+Required 8 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 1.0 Page 5 of 9 
+ 
+1.3.1 Technical Approach  
+1. All the data will be shared through rest web services. 
+2. ULIP system will provide Vehicle Registration Number for which detail is required. 
+3. PESO API will share details  of CNG certificate details of vehicles  based on  Vehicle 
+Registration Number which exist in PESO system in JSON format. 
+4. PESO Integration will add JSON in response key in response body. 
+5. ULIP system will provide the data in JSON Object format in response body. 
+ 
+Example: Vehicle Registration Number is shared by ULIP system, then PESO-integration 
+will make a request to PESO API. 
+ 
+Request: The request must be of the following format, where Vehicle Registration Number is 
+passed within the URL body in JSON format. 
+ 
+For Staging: https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/PESO/01 
+ 
+{ " VehicleRegistrationNumber": " HR38AC7120"} 
+ 
+Curl URL 
+ 
+curl --location 'https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/PESO/01' \ 
+--header 'Authorization: Bearer 
+eyJhbGciOiJIUzUxMiJ9.eyJhcHBzIjoiYXBpR2F0ZXdheSIsInN1YiI6InVsaXAiLCJpYXQiOjE3Nz
+AwOTE4NTd9.3ku5gqG3yAwOazqC5EA69PEiiZzmDymndimvRfr1lCz6nFjvLHbRw2LrCCUz2e
+dQmZt_dZj0B8x-_jrth157OQ' \ 
+--header 'Content-Type: application/json' \ 
+--header 'Accept: application/json' \ 
+--data '{"VehicleRegistrationNumber": "HR38AC7120"}' 
+ 
+For Production: https://www.ulip.dpiit.gov.in/ulip/v1.0.0/PESO/01 
+ 
+{" VehicleRegistrationNumber": " HR38AC7120"} 
+ 
+Curl URL 
+ 
+curl --location 'https://www.ulip.dpiit.gov.in/ulip/v1.0.0/PESO/01' \ 
+--header 'authorization: Bearer 
+eyJhbGciOiJIUzUxMiJ9.eyJhcHBzIjoiYXBpR2F0ZXdheSIsInN1YiI6InVsaXAiLCJpYXQiOjE3Nz
+AwNDE2NDV9.iERfbuYgZbDbeuVOOUB89TfO3ttZnnaTB8_kSGj3R12gID8lVz0cLVL2EvADO
+mEu1hZtbn8P4ivymEJCDG9FAA' \ 
+--header 'accept: application/json' \ 
+--header 'content-type: application/json' \ 
+--data '{"VehicleRegistrationNumber": "HR38AC7120"}' 
+ 
+For obtaining authentication token, refer Section 1.4 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 1.0 Page 6 of 9 
+ 
+Response 
+ 
+To acknowledge the above request, ULIP will send the response below -  
+ 
+1. Invalid Vehicle Registration Number 
+ 
+{    "response": null, 
+    "error": "true", 
+    "code": "400 BAD_REQUEST", 
+    "message": "Data format failed OR wrong value entered at:  VehicleRegistrationNumber. 
+Format should follow  ^[A-Z0-9]{5,11}$" } 
+ 
+2. In case Vehicle Registration Number exists 
+ 
+{    "response": [ 
+        { 
+            "response": [ 
+                { 
+                    "ErrorMsg": "", 
+                    "Cylinder Manufacturing Date": "01/10/2021", 
+                    "Cylinder Make": "M/s. Zhejiang Jindun Pressure Vessel Co. Ltd., China", 
+                    "Cylinder capacity in water litre": 150.0, 
+                    "Number of cylinders": "Not Available at PESO", 
+                    "Cylinder ID/ Serial Number": "K-6834833", 
+                    "Hydro Test Date": "26/12/2025", 
+                    "Hydro Test Due Date": "25/12/2028", 
+                    "Test Result": "Pass", 
+                    "Cylinder Age valid till Date": "Not Available at PESO", 
+                    "Testing Company Name": "MAHADEV CNG CYLINDER TESTING COMPANY", 
+                    "Certificate No": "G145658/2025/2579", 
+                    "Vehicle Registration Number": "HR38AC7120" 
+                }, 
+                { 
+                    "ErrorMsg": "", 
+                    "Cylinder Manufacturing Date": "01/10/2021", 
+                    "Cylinder Make": "M/s. Zhejiang Jindun Pressure Vessel Co. Ltd., China", 
+                    "Cylinder capacity in water litre": 150.0, 
+                    "Number of cylinders": "Not Available at PESO", 
+                    "Cylinder ID/ Serial Number": "K-6834166", 
+                    "Hydro Test Date": "26/12/2025", 
+                    "Hydro Test Due Date": "25/12/2028", 
+                    "Test Result": "Pass", 
+                    "Cylinder Age valid till Date": "Not Available at PESO", 
+                    "Testing Company Name": "MAHADEV CNG CYLINDER TESTING COMPANY", 
+                    "Certificate No": "G145658/2025/2580", 
+                    "Vehicle Registration Number": "HR38AC7120" 
+                } 
+            ], 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 1.0 Page 7 of 9 
+ 
+            "responseStatus": "SUCCESS" 
+        } 
+    ], 
+    "error": "false", 
+    "code": "200", 
+    "message": "Success"} 
+ 
+3. In case VehicleRegistrationNumber not exist 
+ 
+{    "response": [ 
+        { 
+            "response": [ 
+                { 
+                    "ErrorMsg": "No Record found" 
+                } 
+            ], 
+            "responseStatus": "SUCCESS" 
+        } 
+    ], 
+    "error": "false", 
+    "code": "200", 
+    "message": "Success"} 
+ 
+Status Code 200: PESO data response 
+Status Code 400: Bad request (Invalid json syntax, invalid json key) 
+Status Code 401 or 403: Unauthenticated or Unauthorized 
+Status Code 500: Some internal server errors occurred 
+Status Code 502: Server is not responding. 
+1.4 Data Transmission & Authentication Mechanism 
+ 
+All data exchange would be done over secure HTTP (HTTPS). Request from ULIP's system would 
+be made in PESO system through a data exchange URL that has following form: 
+ 
+For Staging: https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/PESO/01 
+ 
+{" VehicleRegistrationNumber": " HR38AC7120"} 
+ 
+Access to above data exchange URL would be authorized by use of a security mechanism 
+implemented by the ULIP system. It is as follows: 
+ 
+• First time access:  It would require a username and password [which would be shared with 
+user beforehand].  Once user hit with valid user id and password, ULIP system will return a 
+basic authorization token to  user, using that token user will communicate with ULIP system 
+until tokens will not get expired. 
+ 
+Summary of HTTP Basic Authentication is as follows: 
+ 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 1.0 Page 8 of 9 
+ 
+First time User hits ULIP secured API through username and password for access token as 
+follows- 
+ 
+curl --location --request POST 
+'https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/user/login' \ 
+--header 'Accept: application/json' \ 
+--header 'Content-Type: application/json' \ 
+--data-raw'{ 
+"username": "xxxx", 
+"password": "xxxx@123"}' 
+ 
+Authorization:   
+Bearer 
+ eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1bGlwIiwiaWF0IjoxNjgyNDkyNzQ1LCJhcHBzIjoiZGF
+0YXB1c2gifQ.iNjO9ggx99yqkjJw65KKP7dZ9zVatpuQQP76rVBnxxArEYq8QZIn48_ihG8EC
+e34wKm3QTcokX7wrq9RDwZrbA'  
+ 
+Upon successful authentication, the user would be logged into the ULIP system and get an access 
+token. Though this token user can communicate with ULIP. This token has expiry time which 
+represents user session. The session time out for the same to be fixed hour, generally it is for 30 
+minutes. If there is no request coming from user for 30 minutes, then session (token) will be 
+expired, and user need to re authenticate. 
+ 
+Using The above token, users can request ULIP system for cng certificate details as follow - 
+ 
+curl --location 'https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/PESO/01' \ 
+--header 'Authorization: Bearer 
+eyJhbGciOiJIUzUxMiJ9.eyJhcHBzIjoiYXBpR2F0ZXdheSIsInN1YiI6InVsaXAiLCJpYXQiOjE
+3NDI3NDY0ODV9.vYb9i-
+tHSUe0RXjO2ETOywsBrhPQ4vN1f77HnqAODcLtsVlcUnLNcOEU25ZdVc15UI360Eh4NgIA
+wkwvui7BFA' \ 
+--header 'Content-Type: application/json' \ 
+--header 'Accept: application/json' \ 
+--data '{" VehicleRegistrationNumber": " HR38AC7120"}' 
+ 
+ 
+For Production: 
+ 
+curl --location --request POST 
+'https://www.ulip.dpiit.gov.in/ulip/v1.0.0/user/login' \ 
+--header 'Accept: application/json' \ 
+--header 'Content-Type: application/json' \ 
+--data-raw '{ 
+"username": "xxxx", 
+"password": "xxxx@123"}' 
+ 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 1.0 Page 9 of 9 
+ 
+ 
+Authorization:   
+Bearer 
+ eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1bGlwIiwiaWF0IjoxNjgyNDkyNzQ1LCJhcHBzIjoiZGF
+0YXB1c2gifQ.iNjO9ggx99yqkjJw65KKP7dZ9zVatpuQQP76rVBnxxArEYq8QZIn48_ihG8EC
+e34wKm3QTcokX7wrq9RDwZrbA'  
+ 
+Upon successful authentication, the user would be logged into the ULIP system and get an access 
+token. Though this token user can communicate with ULIP. This token has expiry time which 
+represents user session. The session time out for the same to be fixed hour, generally it is for 30 
+minutes. If there is no request coming from user for 30 minutes, then session (token) will be 
+expired, and user need to re authenticate. 
+ 
+Using The above token, users can request ULIP system for CNG certificate details as follow - 
+ 
+curl --location 'https://www.ulip.dpiit.gov.in/ulip/v1.0.0/PESO/01' \ 
+--header 'Authorization: Bearer 
+eyJhbGciOiJIUzUxMiJ9.eyJhcHBzIjoiYXBpR2F0ZXdheSIsInN1YiI6InVsaXAiLCJpYXQiOjE
+3NDI4NzU0MDN9.CknivakcbljKOUiGga6i1RHUX_nbL174BCrAIihZa6v8phn29IszkNRcXtLK
+dN2sSdkDHS3tqw2-aE0I9-r8XQ' \ 
+--header 'Accept: application/json' \ 
+--header 'Content-Type: application/json' \ 
+--data '{" VehicleRegistrationNumber": " HR38AC7120"}' 

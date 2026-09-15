@@ -1,0 +1,535 @@
+ULIP Integration Requirement Document 
+ 
+  
+                        
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+Version No.: 1.0 
+Date: 12/09/2023 
+Project Name: ULIP 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ULIP Integration Requirement Document 
+This document contains proprietary information of NLDSL. Unauthorized access, copying and replication are 
+prohibited. This document must not be copied in whole or part by any means, without the written authorization of 
+NLDSL, New Delhi, India. 
+ 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 1.0 Page 2 of 11 
+ 
+ 
+ 
+ 
+Revision History 
+Version Date Author Reviewer Significant Changes  
+1.0 12/09/2023 Ayush Arya Nayab Ali Baseline Version 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+  
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 1.0 Page 3 of 11 
+ 
+Table of Contents 
+ 
+Introduction ................................................................................................................................................. 4 
+1.1 Purpose .................................................................................................................................... 4 
+The Overall Description .............................................................................................................................. 4 
+1.2 Data Integration between VAHAN System and ULIP application ............................................ 4 
+1.3 AUTHAPI/02 ............................................................................................................................. 4 
+1.3.1 Technical Approach ..................................................................................................... 5 
+1.4 Data Transmission & Authentication Mechanism .................................................................... 9 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 1.0 Page 4 of 11 
+ 
+Introduction 
+1.1 Purpose 
+ 
+The purpose of this document is to define and provide details for accessing API for vehicle 
+information from ULIP system and check the given data is valid or not. 
+This document details the following points: 
+ 
+1. Data Integration between VAHAN and ULIP web service : Identification of operational 
+points where data integration between VAHAN and ULIP web service will be needed. 
+ 
+2. Technical Approach for performing Data Integration  
+ 
+The Overall Description 
+ 
+User will share the vehicle information such as vehicle number, chassis number, 
+engine number and owner name based on data send by user ULIP system will call 
+respective VAHAN APIs for check the entered information is valid or not. In this vehicle 
+number is a mandatory field and in chassis number, engine number and owner 
+name, we have to enter all or any of these field in request body. 
+ 
+Following are the point for accessing vehicle information: - 
+ 
+1. This API will share vehicle data based on information provided by user. 
+ 
+2. For AUTHAPI/02 ULIP will take vehicle number, chassis number, engine number 
+and owner name from user and get data from vahan API and check the given data is 
+valid or not. 
+ 
+ 
+1.2 Data Integration between VAHAN System and ULIP application 
+ 
+User will share information to ULIP system based on data shared ULIP will provide data 
+information to user. 
+ 
+ 
+ 
+1.3 AUTHAPI/02 
+ 
+This API will take vehicle number and connect with VAHAN API to get data. 
+ 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 1.0 Page 5 of 11 
+ 
+S. No. Field Name Field Description Format Require
+d/Not – 
+Require
+d 
+Length 
+1 vehiclenumber Vahicle Number as available 
+in VAHAN system 
+^[a-zA-Z0-
+9]{5,11}$ 
+Required Min 5 
+Max 11 
+2 chasisnumber Chassis Number as available 
+in VAHAN system 
+^[a-zA-Z0-
+9]{1,20}$ 
+Not 
+Required 
+Min 1 
+Max 20 
+3 enginenumber Engine Number as available 
+in VAHAN system 
+^[a-zA-Z0-
+9]{1,20}$ 
+Not 
+Required 
+Min 1 
+Max 20 
+4 ownername Owner Name as available in 
+Vahan system 
+^[a-zA-Z0-9\s]*$ Not 
+Required 
+ 
+ 
+1.3.1 Technical Approach  
+1. All the data will be shared through rest web services. 
+2. ULIP system will provide vehicle number, chasis number, engine number and owner 
+name for which detail is required.  
+3. VAHAN API will share details of vehicle which exist in VAHAN system in xml format. 
+4. Data receive from VAHAN is in XML format. ULIP system convert this data to string format 
+and assign it to key “response”. 
+5. ULIP system will provide the data in JSON Object format in response body. 
+ 
+Example: 
+ 
+User will share Vehicle Number and Chasis number or Engine number or Owner 
+name to ULIP system, then ULIP system will make a request to VAHAN API. 
+ 
+Request: 
+ 
+The request must be of the following format, where vehicle number is passed within the URL 
+body in JSON format. 
+ 
+For staging - 
+https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/AUTHAPI/02 
+ 
+{ 
+    "vehiclenumber": "UP15AU1291", 
+    "ownername": "SHADAB ALI", 
+    "chasisnumber": "MA3EWDE1S00242299", 
+    "enginenumber": "K10BN7017526" 
+} 
+ 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 1.0 Page 6 of 11 
+ 
+Curl URL 
+ 
+curl --location --
+request POST 'https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/AUTHAPI/02' \ 
+--
+header 'Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1bGlwIiwiaWF0IjoxNjk0Njg
+5OTEyLCJhcHBzIjoiZGF0YXB1c2gifQ.pp4HaM_j5mkHIqa0rb6BUCDEuRNBAxhUWAhIRM12qoSoioUr3IuGdu
+qlUMJth-kvLR1dZyan0sbL3Pwp0xOFow' \ 
+--header 'Content-Type: application/json' \ 
+--header 'Accept: application/json' \ 
+--header 'Cookie: __zlcmid=1DSlSDwigKpTJa2; _fw_crm_v=b6a11a26-11c3-4b74-d0d1-
+3b9c43a5b7c7' \ 
+--data-raw '{ 
+    "vehiclenumber": "UP15AU1291", 
+    "chasisnumber": "MA3EWDE1S00242299", 
+    "enginenumber": "K10BN7017526", 
+    "ownername": "SHADAB ALI" 
+}' 
+ 
+For production - 
+https://www.ulip.dpiit.gov.in/ulip/v1.0.0/AUTHAPI/02 
+ 
+{ 
+    "vehiclenumber": "UP15AU1291", 
+    "ownername": "SHADAB ALI", 
+    "chasisnumber": "MA3EWDE1S00242299", 
+    "enginenumber": "K10BN7017526" 
+} 
+ 
+Curl URL 
+ 
+curl --location --
+request POST 'https://www.ulip.dpiit.gov.in/ulip/v1.0.0/AUTHAPI/02' \ 
+--
+header 'Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1bGlwIiwiaWF0IjoxNjk0Njg
+5OTEyLCJhcHBzIjoiZGF0YXB1c2gifQ.pp4HaM_j5mkHIqa0rb6BUCDEuRNBAxhUWAhIRM12qoSoioUr3IuGdu
+qlUMJth-kvLR1dZyan0sbL3Pwp0xOFow' \ 
+--header 'Content-Type: application/json' \ 
+--header 'Accept: application/json' \ 
+--header 'Cookie: __zlcmid=1DSlSDwigKpTJa2; _fw_crm_v=b6a11a26-11c3-4b74-d0d1-
+3b9c43a5b7c7' \ 
+--data-raw '{ 
+    "vehiclenumber": "UP15AU1291", 
+    "chasisnumber": "MA3EWDE1S00242299", 
+    "enginenumber": "K10BN7017526", 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 1.0 Page 7 of 11 
+ 
+    "ownername": "SHADAB ALI" 
+}' 
+ 
+For obtaining authentication token, refer Section 1.4 
+ 
+Response 
+ 
+To acknowledge the above request, ULIP will send the below response -  
+ 
+a) In case of invalid format 
+ 
+{ 
+    "response": null, 
+    "error": "true", 
+    "code": "400", 
+    "message": "Data format failed OR wrong value entered at:  vehiclenumber. Format s
+hould follow  ^[A-Z0-9]{5,11}$" 
+} 
+ 
+b) In case of chasis number, engine number and owner name does not exist in VAHAN 
+system 
+ 
+{ 
+    "response": [ 
+        { 
+            "response": { 
+                "enginenumber": "Failed", 
+                "chasisnumber": "Failed", 
+                "ownername": "Failed" 
+            }, 
+            "responseStatus": "SUCCESS" 
+        } 
+    ], 
+    "error": "false", 
+    "code": "200", 
+    "message": "Success" 
+} 
+ 
+c) In case if we do not enter the vehicle number 
+ 
+{ 
+    "response": null, 
+    "error": "true", 
+    "code": "400", 
+    "message": "vehiclenumber:is mandatory field." 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 1.0 Page 8 of 11 
+ 
+} 
+ 
+d) In case if we do not enter the chasis number, engine number and owner name 
+ 
+{ 
+    "response": null, 
+    "error": "true", 
+    "code": "400", 
+    "message": "All the input field is missing!Please enter at least one of these: cha
+sisnumber,enginenumber,ownername" 
+} 
+ 
+e) In case if we enter wrong vehicle number 
+ 
+{ 
+    "response": [ 
+        { 
+            "response": { 
+                "errorDescription": "Vehicle Details not Found" 
+            }, 
+            "responseStatus": "SUCCESS" 
+        } 
+    ], 
+    "error": "false", 
+    "code": "200", 
+    "message": "Success" 
+} 
+ 
+f) In case vehicle exist 
+ 
+{ 
+    "response": [ 
+        { 
+            "response": { 
+                "enginenumber": "Verified", 
+                "chasisnumber": "Verified", 
+                "ownername": "Verified" 
+            }, 
+            "responseStatus": "SUCCESS" 
+        } 
+    ], 
+    "error": "false", 
+    "code": "200", 
+    "message": "Success" 
+} 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 1.0 Page 9 of 11 
+ 
+ 
+Status Code 200: vehicle data response 
+Status Code 400: Bad request (Invalid json syntax, invalid json key) 
+Status Code 401 or 403: Unauthenticated or Unauthorized 
+Status Code 500: Some internal server error occurred 
+Status Code 502: Server is not responding. 
+ 
+1.4 Data Transmission & Authentication Mechanism 
+ 
+All data exchange would be done over secure HTTP (HTTPS). Request from ULIP's system would 
+be made in VAHAN system through a data exchange URL that has following form: 
+ 
+For staging - 
+https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/AUTHAPI/02 
+ 
+Body:  
+ 
+{ 
+    "vehiclenumber": "UP15AU1291", 
+    "ownername": "SHADAB ALI", 
+    "chasisnumber": "MA3EWDE1S00242299", 
+    "enginenumber": "K10BN7017526" 
+} 
+ 
+Access to above data exchange URL would be authorized by use of a security mechanism 
+implemented by the ULIP system. It is as follows: 
+ 
+ First time access: It would require a username and password [which would be shared with 
+user beforehand].  Once user hit with valid user id and password, ULIP system will return a 
+basic authorization token to user, using that token user will communicate with ULIP system 
+until token will not get expired. 
+ 
+Brief summary of HTTP Basic Authentication is as follows: 
+ 
+First time when User will hit ULIP secured API through username and password for access token 
+as follow- 
+ 
+curl --location --request POST 'https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/user/login' \ 
+--header 'Accept: application/json' \ 
+--header 'Content-Type: application/json' \ 
+--data-raw '{ 
+    "username": "xxxx", 
+    "password": "xxxx@123" 
+}' 
+ 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 1.0 Page 10 of 11 
+ 
+ 
+Authorization:   
+Bearer  
+eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1bGlwIiwiaWF0IjoxNjk0Njg5OTEyLCJ
+hcHBzIjoiZGF0YXB1c2gifQ.pp4HaM_j5mkHIqa0rb6BUCDEuRNBAxhUWAhIRM12
+qoSoioUr3IuGduqlUMJth-kvLR1dZyan0sbL3Pwp0xOFow 
+ 
+Upon successful authentication, the user would be logged into the ULIP system and get an access 
+token. Though this token user can communicate with ULIP. This token has expiry time which 
+represent user session. The session time out for the same to be fixed hour, generally it is for 30 
+minutes. If there is no request coming from user for 30 minutes, then session (token) will be 
+expired and user need to re authenticate. 
+ 
+Using The above token, user can request ULIP system for vehicle details as follow - 
+ 
+curl --location --
+request POST 'https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/AUTHAPI
+/02' \ 
+--
+header 'Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1bGlwIiw
+iaWF0IjoxNjk0Njg5OTEyLCJhcHBzIjoiZGF0YXB1c2gifQ.pp4HaM_j5mkHIqa0rb6BUC
+DEuRNBAxhUWAhIRM12qoSoioUr3IuGduqlUMJth-kvLR1dZyan0sbL3Pwp0xOFow' \ 
+--header 'Content-Type: application/json' \ 
+--header 'Accept: application/json' \ 
+--header 'Cookie: __zlcmid=1DSlSDwigKpTJa2; _fw_crm_v=b6a11a26-11c3-
+4b74-d0d1-3b9c43a5b7c7' \ 
+--data-raw '{ 
+    "vehiclenumber": "UP15AU1291", 
+    "chasisnumber": "MA3EWDE1S00242299", 
+    "enginenumber": "K10BN7017526", 
+    "ownername": "SHADAB ALI" 
+}' 
+ 
+For Production – 
+ 
+curl --location 'https://www.ulip.dpiit.gov.in/ulip/v1.0.0/user/login' \ 
+--header 'Content-Type: application/json' \ 
+--header 'Accept: application/json' \ 
+--data-raw '{ 
+    "username": "xxxx", 
+    "password": "xxxx@123" 
+}' 
+ 
+Authorization:   
+Bearer  
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 1.0 Page 11 of 11 
+ 
+eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1bGlwIiwiaWF0IjoxNzI3MTYxMDgwLCJhcHBzIjoiZGF0
+YXB1c2gifQ.XhVZm7NiCD05-
+v9091WJQhYzdk1a0Shs_ley0T4R2MX63swRyxHbHxh6bVXtzqWvWiSLwwNGRQIcqGhr49hpGg 
+ 
+Upon successful authentication, the user would be logged into the ULIP system and get an access 
+token. Though this token user can communicate with ULIP. This token has expiry time which 
+represent user session. The session time out for the same to be fixed hour, generally it is for 30 
+minutes. If there is no request coming from user for 30 minutes, then session (token) will be 
+expired and user need to re authenticate. 
+ 
+Using The above token, user can request ULIP system for vehicle details as follow - 
+ 
+https://www.ulip.dpiit.gov.in/ulip/v1.0.0/AUTHAPI/02 
+ 
+curl --location --
+request POST 'https://www.ulip.dpiit.gov.in/ulip/v1.0.0/AUTHAPI/02' \ 
+--
+header 'Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1bGlwIiw
+iaWF0IjoxNjk0Njg5OTEyLCJhcHBzIjoiZGF0YXB1c2gifQ.pp4HaM_j5mkHIqa0rb6BUC
+DEuRNBAxhUWAhIRM12qoSoioUr3IuGduqlUMJth-kvLR1dZyan0sbL3Pwp0xOFow' \ 
+--header 'Content-Type: application/json' \ 
+--header 'Accept: application/json' \ 
+--header 'Cookie: __zlcmid=1DSlSDwigKpTJa2; _fw_crm_v=b6a11a26-11c3-
+4b74-d0d1-3b9c43a5b7c7' \ 
+--data-raw '{ 
+    "vehiclenumber": "UP15AU1291", 
+    "chasisnumber": "MA3EWDE1S00242299", 
+    "enginenumber": "K10BN7017526", 
+    "ownername": "SHADAB ALI" 
+}' 
+ 

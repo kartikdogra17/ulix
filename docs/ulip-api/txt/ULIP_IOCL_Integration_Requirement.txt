@@ -1,0 +1,1014 @@
+ULIP Integration Document 
+ 
+  
+                        
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+Version No.: 3.0 
+Date: 14/04/2026 
+Project Name: ULIP 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ULIP Integration Document 
+This document contains proprietary information of NLDSL. Unauthorized access, copying and replication are 
+prohibited. This document must not be copied in whole or part by any means, without the written authorization of 
+NLDSL, Noida, India. 
+ 
+ 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 3.0 Page 2 of 19 
+ 
+ 
+ 
+ 
+Revision History 
+Version Date Author Reviewer Significant Changes 
+1.0 09/01/2025 Ayush Arya Nayab Ali Baseline Version 
+2.0 08/01/2026 Hasan Mhad Khan Nayab Ali Payload Update 
+for IOCL/02 
+3.0 14/04/2026 Gaurav Tyagi Pranab 
+Manna Updated 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+  
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 3.0 Page 3 of 19 
+ 
+Table of Contents 
+ 
+Introduction ................................................................................................................................................. 4 
+1.1 Purpose .................................................................................................................................... 4 
+The Overall Description .............................................................................................................................. 4 
+1.2 Data Integration between IOCL System and ULIP application ................................................ 4 
+1.3 IOCL/01 .................................................................................................................................... 4 
+1.3.1 Technical Approach .................................................................................................... 6 
+1.4 IOCL/02 .................................................................................................................................... 9 
+1.4.1 Technical Approach .................................................................................................. 11 
+1.5 Data Transmission & Authentication Mechanism .................................................................. 17 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 3.0 Page 4 of 19 
+ 
+Introduction 
+1.1 Purpose 
+ 
+The purpose of this document is to define and provide details for accessing API for  
+IOCL system information  (information about Indian oil  and natural gas stations  based on  
+stateCode or geographical location (longitude, latitude, and radius) value from ULIP system 
+ 
+This document details the following points: 
+ 
+1. Data Integration between IOCL and ULIP web service : Identification of operational 
+points where data integration between IOCL and ULIP web service will be needed. 
+ 
+2. Technical Approach for performing Data Integration  
+ 
+The Overall Description 
+ 
+Users will need to share their stateCode or geographical location (longitude, latitude, and 
+radius) to access the list of public petroleum and natural gas stations through the rest API. 
+ 
+Here are some points to keep in mind when accessing IOCL API data information: 
+ 
+• The API will only share data that is based on the user's provided information. 
+• ULIP will expose API for getting data from IOCL API. 
+• The IOCL/01 API will take user information’s from user for register that user. And user 
+will receive ReferenceNo in response, from this ReferenceNo user will be able to access 
+the IOCL/02 API. 
+• The IOCL/02 API will take ReferenceNo and stateCode or geographical location 
+(longitude, latitude, and radius) to give the information about petroleum and natural gas 
+stations to the user. 
+ 
+1.2 Data Integration between IOCL System and ULIP application 
+ 
+The ULIP system will receive information from the user and provide data in return. 
+1.3 IOCL/01 
+ 
+This API is designed to register the user to the IOCL system based on user information. User will 
+provide the user information and once user successfully register, then they will get the reference 
+number in the response. 
+ 
+Please note that when making a request, all of the JSON keys are mandatory in the payload 
+ 
+ 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 3.0 Page 5 of 19 
+ 
+{ 
+    "customerName": "Ayush", 
+    "address": "Gautam Bhuda", 
+    "district": "Gautam Bhuda Nagar", 
+    "state": "Uttar Pradesh", 
+    "email": "test@paytm.com", 
+    "monthlyFuelConsumption": "10000", 
+    "userId": "test", 
+    "userIP": "193.2.2.2", 
+    "mobileNo": "9161666858" 
+} 
+ 
+ 
+ 
+ 
+Field Name Field 
+Description 
+Format Required/Not – 
+Required 
+Length 
+1 customerN
+ame 
+ 
+Customer 
+Name 
+^[a-zA-Z\s]{2,20}$ Required 2-20 
+2 address 
+ 
+Address ^[a-zA-Z][a-zA-Z0-
+9\s,:.-]{1,49}$ 
+Required 2-49 
+ 
+3 
+district 
+ 
+District ^[a-zA-Z\s]{2,20}$ Required  
+2-20 
+4 state 
+ 
+State ^[a-zA-Z\s]{1,30}$ Required 1-30 
+5 email 
+ 
+Email [A-Za-z0-9\._%+\-]+@[A-
+Za-z0-9\.\-]+\.[A-Za-z]{2,} 
+Required  
+6 monthlyFu
+elConsump
+tion 
+ 
+Monthly fuel 
+consumptio
+n 
+^[0-9]{1,10}$ Required 1-10 
+ 
+7 
+userId 
+ 
+User ID ^[a-zA-Z][a-zA-Z0-
+9\s._@]{1,20}$ 
+Required  
+2-20 
+ 
+8 userIP 
+ 
+User IP ^(25[0-5]|2[0-4][0-
+9]|[01]?[0-9][0-9]?)\.(25[0-
+5]|2[0-4][0-9]|[01]?[0-9][0-
+9]?)\.(25[0-5]|2[0-4][0-
+9]|[01]?[0-9][0-9]?)\.(25[0-
+5]|2[0-4][0-9]|[01]?[0-9][0-
+9]?)$ 
+Required  
+9 mobileNo 
+ 
+Mobile 
+number 
+^[0-9]\d{9}$ Required 10 
+ 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 3.0 Page 6 of 19 
+ 
+1.3.1 Technical Approach  
+ 
+1. All the data will be shared through REST web services. 
+2. The user will share the input for which information is required. 
+3. IOCL API will share details of IOCL API information that exists in the system in JSON 
+format. 
+4. The ULIP system will provide data in JSON Object format in the response body. 
+5. When we hit the IOCP/01 and the user successfully registers, a reference number 
+is returned. 
+ 
+Request: 
+ 
+The request must be of the following format: user information is passed within the URL post 
+request body in JSON format. 
+ 
+For staging - 
+https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/IOCL/01 
+ 
+{ 
+    "customerName": "Ayush", 
+    "address": "Gautam Bhuda", 
+    "district": "Gautam Bhuda Nagar", 
+    "state": "Uttar Pradesh", 
+    "email": "test@paytm.com", 
+    "monthlyFuelConsumption": "10000", 
+    "userId": "test", 
+    "userIP": "193.2.2.2", 
+    "mobileNo": "9161666858" 
+} 
+ 
+Curl URL 
+ 
+curl --location 'https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/IOCL/01' \ 
+--header 'Authorization: Bearer 
+eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1bGlwIiwiaWF0IjoxNzM2Mzk2NzgwLCJhcHBzIjoiZGF
+0YXB1c2gifQ.kV2pvPVlZtzrxJt_1crjumGutjk_WloCo-
+xPI8Vmx9vBuR0v3GPpWL11nSFFU60GprznpcgkiOQ-eNyePh_BwA' \ 
+--header 'Content-Type: application/json' \ 
+--header 'Accept: application/json' \ 
+--data-raw '{ 
+    "customerName": "Ayush", 
+    "address": "Gautam Bhuda", 
+    "district": "Gautam Bhuda Nagar", 
+    "state": "Uttar Pradesh", 
+    "email": "test@paytm.com", 
+    "monthlyFuelConsumption": "10000", 
+    "userId": "test", 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 3.0 Page 7 of 19 
+ 
+    "userIP": "193.2.2.2", 
+    "mobileNo": "9161666858" 
+}' 
+ 
+For production - 
+https://www.ulip.dpiit.gov.in/ulip/v1.0.0/IOCL/01 
+ 
+{ 
+    "customerName": "Ayush", 
+    "address": "Gautam Bhuda", 
+    "district": "Gautam Bhuda Nagar", 
+    "state": "Uttar Pradesh", 
+    "email": "test@paytm.com", 
+    "monthlyFuelConsumption": "10000", 
+    "userId": "test", 
+    "userIP": "193.2.2.2", 
+    "mobileNo": "9161666858" 
+} 
+ 
+Curl URL 
+ 
+curl --location 'https://www.ulip.dpiit.gov.in/ulip/v1.0.0/IOCL/01' \ 
+--header 'Authorization: Bearer 
+eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1bGlwIiwiaWF0IjoxNzM2Mzk2NzgwLCJhcHBzIjoiZGF
+0YXB1c2gifQ.kV2pvPVlZtzrxJt_1crjumGutjk_WloCo-
+xPI8Vmx9vBuR0v3GPpWL11nSFFU60GprznpcgkiOQ-eNyePh_BwA' \ 
+--header 'Content-Type: application/json' \ 
+--header 'Accept: application/json' \ 
+--data-raw '{ 
+    "customerName": "Ayush", 
+    "address": "Gautam Bhuda", 
+    "district": "Gautam Bhuda Nagar", 
+    "state": "Uttar Pradesh", 
+    "email": "test@paytm.com", 
+    "monthlyFuelConsumption": "10000", 
+    "userId": "test", 
+    "userIP": "193.2.2.2", 
+    "mobileNo": "9161666858" 
+}' 
+ 
+ 
+For obtaining an authentication token, refer to Section 1.5 
+ 
+Response 
+ 
+To acknowledge the above request, ULIP will send the response below -  
+ 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 3.0 Page 8 of 19 
+ 
+a) In case of an invalid format 
+ 
+1. Invalid email  
+ 
+{ 
+    "response": null, 
+    "error": "true", 
+    "code": "400", 
+    "message": "Data format failed OR wrong value entered at:  email. Format should 
+follow  [A-Za-z0-9\\._%+\\-]+@[A-Za-z0-9\\.\\-]+\\.[A-Za-z]{2,}" 
+} 
+ 
+2. Invalid userIP format 
+ 
+{ 
+    "response": null, 
+    "error": "true", 
+    "code": "400", 
+    "message": "Data format failed OR wrong value entered at:  userIP. Format should 
+follow  ^(((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-
+9]?),)*((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$" 
+} 
+ 
+3. Invalid mobile format 
+ 
+{ 
+    "response": null, 
+    "error": "true", 
+    "code": "400", 
+    "message": "Data format failed OR wrong value entered at:  mobileNo. Format should 
+follow  ^[0-9]\\d{9}$" 
+} 
+ 
+4. In case IOCL API data user information already exists in the IOCL system 
+ 
+{ 
+    "response": [ 
+        { 
+            "response": { 
+                "ReferenceNo": null, 
+                "StatusCode": 1, 
+                "Message": "mobileNo already exists." 
+            }, 
+            "responseStatus": "ERROR" 
+        } 
+    ], 
+    "error": "false", 
+    "code": "200", 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 3.0 Page 9 of 19 
+ 
+    "message": "Success" 
+} 
+ 
+5. In case IOCL API data user information does not exist in the IOCL system 
+ 
+{ 
+    "response": { 
+        "response": { 
+            "ReferenceNo": null, 
+            "StatusCode": 1, 
+            "Message": "mobileNo already exists." 
+        }, 
+        "responseStatus": "ERROR" 
+    }, 
+    "error": "false", 
+    "code": "200 OK", 
+    "message": "Success" 
+} 
+ 
+Status Code 200: IOCL API data response 
+Status Code 400: Bad request (Invalid JSON syntax, invalid JSON key) 
+Status Code 401 or 403: Unauthenticated or Unauthorized 
+Status Code 500: Some internal server error occurred 
+Status Code 502: The server is not responding. 
+1.4 IOCL/02 
+ 
+This API is designed to retrieve information about petroleum and natural gas stations. It can be 
+used by providing either the  stateCode or geographical location  (longitude, latitude, and 
+radius) of the desired location. 
+ 
+IOCL merchant(outlet) details are updated weekly, and retail selling prices (RSP) 
+are updated daily to ensure users always see the latest and accurate information. 
+ 
+Use the state code from the table below to inquire about the HPCL outlet in the respective 
+state. 
+ 
+Serial no. State Code State Name 
+1 AN Andaman & Nicobar 
+2 AP Andhra Pradesh 
+3 ARP Arunachal Pradesh 
+4 AS Assam 
+5 BH Bihar 
+6 CD Chandigarh 
+7 CSG Chhatisgarh 
+8 DDH UT OF D&NH AND D&D 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 3.0 Page 10 of 19 
+ 
+9 DDH UT OF D&NH AND D&D 
+10 DEL Delhi 
+11 GDD Goa 
+12 GJ Gujarat 
+13 HP Himachal Pradesh 
+14 HR Haryana 
+15 JK Jammu & Kashmir 
+16 JRK Jharkhand 
+17 KAR Karnataka 
+18 KER Kerala 
+19 LAK Lakshwadeep 
+20 LDK Ladakh 
+21 MAH Maharashtra 
+22 MGL Meghalaya 
+23 MNP Manipur 
+24 MP Madhya Pradesh 
+25 MZ Mizoram 
+26 NZ Nagaland 
+27 OR Odisha 
+28 PB Punjab 
+29 PY Pondicherry 
+30 RJ Rajasthan 
+31 SK Sikkim 
+32 TG Telangana 
+33 TN Tamil Nadu 
+34 TRP Tripura 
+35 UP Uttar Pradesh 
+36 UTK Uttarakhand 
+37 WB West Bengal 
+ 
+ 
+Please note that when making a request, all of the JSON keys are mandatory in the payload . 
+First, the user must enter the reference number. If this reference number exists on the IOCL side, 
+the user can then enter either the stateCode or geographical location  (longitude, latitude, and 
+radius). The reference number can be obtained when they hit the IOCL/01 API. 
+  
+If you choose to use the stateCode to access IOCL API data , then geographical location  
+(longitude, latitude, and radius) fields should be left empty. 
+ 
+ 
+{ 
+    "referenceNo":"9161666748", 
+    "stateCode": "WB", 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 3.0 Page 11 of 19 
+ 
+    "longitude": "", 
+    "latitude": "", 
+    "radius": "" 
+} 
+ 
+If you choose to use the geographical location to access IOCL API data, then stateCode field 
+should be left empty. 
+ 
+{ 
+    "referenceNo":"7878942650", 
+    "stateId": "", 
+    "longitude": "74.44155", 
+    "latitude": "20.25412", 
+    "radius": "2" 
+} 
+ 
+ 
+ 
+ 
+Field Name Field 
+Description 
+Format Required/Not – 
+Required 
+Length 
+1 referenceNo 
+ 
+Reference 
+number  
+^[0-9]\d{9}$ Required 10 
+2 stateCode 
+ 
+State ID ^[A-Z]{1,6}$ Required 1-6 
+ 
+4 longitude 
+ 
+Longitude ^[0-9]{2}\.{0,1}[0-
+9]{2,15}|[0-9]{0,2}$  
+Required 0-18 
+ 
+5 latitude 
+ 
+Latitude ^[0-9]{2}\.{0,1}[0-
+9]{2,15}|[0-9]{0,2}$ 
+Required 0-18 
+6 radius 
+ 
+Radius ^\d{0,3}(\.\d{1,10})?$ Required 1-10 
+ 
+1.4.1 Technical Approach  
+ 
+1. All the data will be shared through REST web services. 
+2. The user will share the input for which information is required. 
+3. IOCL API will share details of IOCL API station information that exists in the system in 
+JSON format. 
+4. The ULIP system will provide data in JSON Object format in the response body. 
+ 
+ 
+ 
+ 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 3.0 Page 12 of 19 
+ 
+Request: 
+ 
+The request must be of the following format, where stateCode or geographical location 
+(longitude, latitude, and radius) are passed within the URL post request body in JSON 
+format. 
+ 
+For staging - 
+https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/IOCL/02 
+ 
+{ 
+    "referenceNo":"9161666748", 
+    "stateCode": "WB", 
+    "longitude": "", 
+    "latitude": "", 
+    "radius": "" 
+} 
+ 
+Curl URL 
+ 
+curl --location 'https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/IOCL/02' \ 
+--header 'Authorization: Bearer 
+eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1bGlwIiwiaWF0IjoxNzM2Mzk2NzgwLCJhcHBzIjoiZGF
+0YXB1c2gifQ.kV2pvPVlZtzrxJt_1crjumGutjk_WloCo-
+xPI8Vmx9vBuR0v3GPpWL11nSFFU60GprznpcgkiOQ-eNyePh_BwA' \ 
+--header 'Content-Type: application/json' \ 
+--header 'Accept: application/json' \ 
+--data '{ 
+    "referenceNo":"9161666748", 
+    "stateCode": "WB", 
+    "longitude": "", 
+    "latitude": "", 
+    "radius": "" 
+}' 
+ 
+For production - 
+https://www.ulip.dpiit.gov.in/ulip/v1.0.0/IOCL/02 
+ 
+{ 
+    "referenceNo":"9161666748", 
+    "stateCode": "WB", 
+    "longitude": "", 
+    "latitude": "", 
+    "radius": "" 
+} 
+ 
+ 
+ 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 3.0 Page 13 of 19 
+ 
+Curl URL 
+ 
+curl --location 'https://www.ulip.dpiit.gov.in/ulip/v1.0.0/IOCL/02' \ 
+--header 'Authorization: Bearer 
+eyJhbGciOimIUzixMin9.eyJzdWIiOiJ1bGlwIiwiaWF0IjoxNzM2Mzk2NzgwLCJhcHBzIjoiZGF
+0YXB1c2gifQ.kV2pvPVlZtzrxJt_1crjumGutjk_WloCo-
+xPI8Vmx9vBuR0v3GPpWL11nSFFU60GprznpcgkiOQ-eNyePh_BwA' \ 
+--header 'Content-Type: application/json' \ 
+--header 'Accept: application/json' \ 
+--data '{ 
+    "referenceNo":"9161666748", 
+    "stateCode": "WB", 
+    "longitude": "", 
+    "latitude": "", 
+    "radius": "" 
+}' 
+ 
+For obtaining an authentication token, refer to Section 1.5 
+ 
+Response 
+ 
+To acknowledge the above request, ULIP will send the below response -  
+ 
+a) In case of an invalid format 
+ 
+1. Invalid referenceNo 
+ 
+{ 
+    "response": null, 
+    "error": "true", 
+    "code": "400 BAD_REQUEST", 
+    "message": "Data format failed OR wrong value entered at:  referenceNo. Format should 
+follow  ^[0-9]\\d{9}$" 
+} 
+ 
+2. Invalid latitude or longitude format 
+ 
+{ 
+    "response": null, 
+    "error": "true", 
+    "code": "400", 
+    "message": "Data format failed OR wrong value entered at:  longitude. Format should 
+follow  ^[0-9]{2}\\.{0,1}[0-9]{2,15}|[0-9]{0,2}$" 
+} 
+ 
+ 
+ 
+ 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 3.0 Page 14 of 19 
+ 
+3. Invalid radius format 
+ 
+{ 
+    "response": null, 
+    "error": "true", 
+    "code": "400", 
+    "message": "Data format failed OR wrong value entered at:  radius. Format should 
+follow  ^\\d{0,3}(\\.\\d{1,10})?$" 
+} 
+ 
+4. Invalid stateCode format  
+ 
+{ 
+    "response": null, 
+    "error": "true", 
+    "code": "400 BAD_REQUEST", 
+    "message": "Data format failed OR wrong value entered at:  stateCode. Format should 
+follow  ^[A-Z]{1,6}$" 
+} 
+ 
+5. In case IOCL API referenceNo does not exist in the IOCL system 
+ 
+{ 
+    "response": { 
+        "response": { 
+            "errorMsg": "referenceNo is not valid", 
+            "errorCode": "PAYLOAD_ERROR" 
+        }, 
+        "responseStatus": "ERROR" 
+    }, 
+    "error": "false", 
+    "code": "200 OK", 
+    "message": "Success" 
+} 
+ 
+6. In case IOCL API data exist 
+ 
+{ 
+    "response": { 
+        "response": [ 
+            { 
+                "CUSTOMER_CODE": 371451, 
+                "CUSTOMER_NAME": "ADHOC-SWARNALATA PETRO SEVA", 
+                "ADDRESS": "C/O- HALDAR SERVICE STATION,KHOLAPOTA TAKI 
+ROAD,BASIRHAT", 
+                "PIN_CODE": 743428, 
+                "LONGITUDE": 88.814714, 
+                "LATITUDE": 22.682907, 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 3.0 Page 15 of 19 
+ 
+                "STATE_CODE": "WB", 
+                "STATE_NAME": "West Bengal", 
+                "DISTRICT_CODE": "WB015", 
+                "DISTRICT_NAME": "NORTH 24 PARGANAS", 
+                "PRODUCT_NAMES": "Diesel,Petrol", 
+                "FACILITIES": "FREE AIR FACILITY,CLEAN DRINKING 
+WATER,WASHROOM,CREDIT CARD,AUTOMATED 
+OUTLET,XTRAPOWER,XTRAREWARD,RESTROOM FOR MEN AND WOMAN", 
+                "PRODUCT_DETAILS": [ 
+                    { 
+                        "EFFECTIVE_DATE": "08-01-2025", 
+                        "PRODUCT_NAME": "HSD", 
+                        "PRICE": 92.3 
+                    }, 
+                    { 
+                        "EFFECTIVE_DATE": "08-01-2025", 
+                        "PRODUCT_NAME": "MS", 
+                        "PRICE": 105.53 
+                    } 
+                ] 
+            }, 
+            { 
+                "CUSTOMER_CODE": 372542, 
+                "CUSTOMER_NAME": "Jirat Fuel Station", 
+                "ADDRESS": "INDIAN OIL RETAIL OUTLET,Plot No. 828 Mouza & Vill- 
+Mundukh,Hooghly", 
+                "PIN_CODE": 712501, 
+                "LONGITUDE": null, 
+                "LATITUDE": null, 
+                "STATE_CODE": "WB", 
+                "STATE_NAME": "West Bengal", 
+                "DISTRICT_CODE": "WB008", 
+                "DISTRICT_NAME": "HOOGHLY", 
+                "PRODUCT_NAMES": null, 
+                "FACILITIES": "FREE AIR FACILITY,CLEAN DRINKING WATER,WASHROOM", 
+                "PRODUCT_DETAILS": [ 
+                    { 
+                        "EFFECTIVE_DATE": "08-01-2025", 
+                        "PRODUCT_NAME": "HSD", 
+                        "PRICE": 92.3 
+                    }, 
+                    { 
+                        "EFFECTIVE_DATE": "08-01-2025", 
+                        "PRODUCT_NAME": "MS", 
+                        "PRICE": 105.53 
+                    } 
+                ] 
+            }, 
+            { 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 3.0 Page 16 of 19 
+ 
+                "CUSTOMER_CODE": 220851, 
+                "CUSTOMER_NAME": "BSS KISAN SEVA KENDRA", 
+                "ADDRESS": "VILL: BARDANGA,POST: SARAIDANGA PS: 
+GAZOLE,BARDANGA", 
+                "PIN_CODE": 732124, 
+                "LONGITUDE": null, 
+                "LATITUDE": null, 
+                "STATE_CODE": "WB", 
+                "STATE_NAME": "West Bengal", 
+                "DISTRICT_CODE": "WB011", 
+                "DISTRICT_NAME": "MALDA", 
+                "PRODUCT_NAMES": null, 
+                "FACILITIES": "FREE AIR FACILITY,CLEAN DRINKING WATER,WASHROOM", 
+                "PRODUCT_DETAILS": [] 
+            }, 
+            { 
+                "CUSTOMER_CODE": 366313, 
+                "CUSTOMER_NAME": "ADHOC SHIB NARAYAN FILLING STATION", 
+                "ADDRESS": "C/O KIRISTASWARI OIL TRADERS IOCL,VILL: BRAMHANI GRAM 
+PS: SAGARDIGHI,BRAHMANI GRAM", 
+                "PIN_CODE": 742226, 
+                "LONGITUDE": null, 
+                "LATITUDE": null, 
+                "STATE_CODE": "WB", 
+                "STATE_NAME": "West Bengal", 
+                "DISTRICT_CODE": "WB013", 
+                "DISTRICT_NAME": "MURSHIDABAD", 
+                "PRODUCT_NAMES": null, 
+                "FACILITIES": "FREE AIR FACILITY,CLEAN DRINKING WATER,WASHROOM", 
+                "PRODUCT_DETAILS": [] 
+            } 
+        ], 
+        "responseStatus": "SUCCESS" 
+    }, 
+    "error": "false", 
+    "code": "200 OK", 
+    "message": "Success" 
+} 
+ 
+7. In case IOCL API data do not exist 
+ 
+{ 
+    "response": { 
+        "response": [], 
+        "responseStatus": "SUCCESS" 
+    }, 
+    "error": "false", 
+    "code": "200 OK", 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 3.0 Page 17 of 19 
+ 
+    "message": "Success" 
+} 
+ 
+ 
+Status Code 200: IOCL API data response 
+Status Code 400: Bad request (Invalid JSON syntax, invalid JSON key) 
+Status Code 401 or 403: Unauthenticated or Unauthorized 
+Status Code 500: Some internal server error occurred 
+Status Code 502: The server is not responding. 
+1.5 Data Transmission & Authentication Mechanism 
+ 
+All data exchanges will be securely done with HTTPS. ULIP's system will request data from IOCL 
+through a URL with the following format: 
+ 
+For staging - 
+ 
+https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/IOCL/01 
+ 
+Body:  
+{ 
+    "customerName": "test", 
+    "address": "test address", 
+    "district": "Gautam Bhuda Nagar", 
+    "state": "Uttar Pradesh", 
+    "email": "test@paytm.com", 
+    "monthlyFuelConsumption": "10000", 
+    "userId": "test", 
+    "userIP": "193.2.2.2", 
+    "mobileNo": "7879877897" 
+} 
+ 
+To access the data exchange URL, you would need to use a security mechanism that is 
+implemented by the ULIP system. The process is as follows: 
+ 
+- First time access: you will require a username and password. The username and password 
+would be shared with you beforehand. Once you enter the valid username and password, the 
+ULIP system will return a basic authorization token to you. You can use this token to 
+communicate with the ULIP system until the token gets expired. 
+ 
+In brief, HTTP Basic Authentication works as follows: 
+ 
+When you hit the ULIP secured API for the first time, you need to provide a username and 
+password to get an access token. 
+ 
+curl --location 
+'https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/user/login' \ 
+--header 'Accept: application/json' \ 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 3.0 Page 18 of 19 
+ 
+--header 'Content-Type: application/json' \ 
+--data-raw '{ 
+    "username": "xxxx", 
+    "password": "xxxx" 
+}' 
+ 
+Authorization:   
+Bearer  
+eyshbGciqiJIazmxMiJ8.eyJzdWIiOiJ1bGlwIiwiaWF0IjoxNzI2NTU2ODk4LCJhcHBzIjoiZGF0
+YXB1c2gifQ.dqXUxA7agKxu9w961sr-QNG1g-
+9TWWpQQLUX6CsUO5drkwmny9hU4hIf6cOr8CXHlJ67Nv-HdGNtHtr2bH8Irg 
+ 
+After successfully authenticating, the user will be logged into the ULIP system and obtain 
+an access token. This token will be used by the user to communicate with the ULIP 
+system. The token has an expiry time that represents the user session, which is typically 
+set to 30 minutes. If there is no request from the user within this time frame, the session 
+(token) will expire, and the user will need to re-authenticate. 
+ 
+Using The above token, user can request ULIP system for IOCL API for details as follow - 
+ 
+curl --location 'https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/IOCL/01' \ 
+--header 'Authorization: Bearer 
+eyshbGciqiJIazmxMiJ8.eyJzdWIiOiJ1bGlwIiwiaWF0IjoxNzI2NTU2ODk4LCJhcHBzIjoiZGF0
+YXB1c2gifQ.dqXUxA7agKxu9w961sr-QNG1g-
+9TWWpQQLUX6CsUO5drkwmny9hU4hIf6cOr8CXHlJ67Nv-HdGNtHtr2bH8Irg 
+\ 
+--header 'Content-Type: application/json' \ 
+--header 'Accept: application/json' \ 
+--data-raw '{ 
+    "customerName": "test", 
+    "address": "S.", 
+    "district": "Gautam Bhuda Nagar", 
+    "state": "Uttar Pradesh", 
+    "email": "test@paytm.com", 
+    "monthlyFuelConsumption": "10000", 
+    "userId": "test", 
+    "userIP": "193.2.2.2", 
+    "mobileNo": "7878992650" 
+}' 
+ 
+For production – 
+ 
+curl --location 'https://www.ulip.dpiit.gov.in/ulip/v1.0.0/user/login' \ 
+--header 'Content-Type: application/json' \ 
+--header 'Accept: application/json' \ 
+--data-raw '{ 
+    "username": "xxxx", 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 3.0 Page 19 of 19 
+ 
+    "password": "xxxx" 
+}' 
+ 
+Authorization:   
+Bearer  
+eyshbGciqiJIazmxMiJ8.eyJzdWIiOiJ1bGlwIiwiaWF0IjoxNzI2NTU2ODk4LCJhcHBzIjoiZGF0
+YXB1c2gifQ.dqXUxA7agKxu9w961sr-QNG1g-
+9TWWpQQLUX6CsUO5drkwmny9hU4hIf6cOr8CXHlJ67Nv-HdGNtHtr2bH8Irg 
+ 
+Upon successful authentication, the user would be logged into the ULIP system and get an access 
+token. Though this token user can communicate with  ULIP. This token has expiry time which 
+represent user session. The session time out for the same to be f ixed hour, generally it is for 30 
+minutes. If there is no request coming from user for 30 minutes, the n session (token) will be 
+expired, and user need to re authenticate. 
+ 
+Using The above token, user can request ULIP system for details as follow - 
+ 
+https://www.ulip.dpiit.gov.in/ulip/v1.0.0/IOCL/01 
+ 
+curl --location 'https://www.ulip.dpiit.gov.in/ulip/v1.0.0/IOCL/01' \ 
+--header 'Authorization: Bearer 
+eyshbGciqiJIazmxMiJ8.eyJzdWIiOiJ1bGlwIiwiaWF0IjoxNzI2NTU2ODk4LCJhcHBzIjoiZGF0
+YXB1c2gifQ.dqXUxA7agKxu9w961sr-QNG1g-
+9TWWpQQLUX6CsUO5drkwmny9hU4hIf6cOr8CXHlJ67Nv-HdGNtHtr2bH8Irg 
+\ 
+--header 'Accept: application/json' \ 
+--header 'Content-Type: application/json' \ 
+--data-raw '{ 
+    "customerName": "test", 
+    "address": "S.", 
+    "district": "Gautam Bhuda Nagar", 
+    "state": "Uttar Pradesh", 
+    "email": "test@paytm.com", 
+    "monthlyFuelConsumption": "10000", 
+    "userId": "test", 
+    "userIP": "193.2.2.2", 
+    "mobileNo": "7878192650" 
+}' 
+ 
+ 

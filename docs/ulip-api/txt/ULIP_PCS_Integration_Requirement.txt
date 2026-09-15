@@ -1,0 +1,2280 @@
+ULIP Integration Requirement Document 
+ 
+  
+                        
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+Version No.: 4.0 
+Date: 26/03/2026 
+Project Name: ULIP 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ULIP Integration Requirement Document 
+This document contains proprietary information of NLDSL. Unauthorized access, copying and replication are 
+prohibited. This document must not be copied in whole or part by any means, without the written authorization of 
+NLDSL, Noida, India. 
+ 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 2 of 46 
+ 
+ 
+ 
+ 
+Revision History 
+Version Date Author Reviewer Significant Changes 
+1.0 05/08/2021 Anamol Kumar Nayab Ali Baseline Version 
+2.0 19/08/2021 Hasan Mhad Khan Nayab Ali Updated response 
+3.0 30/09/2024 Girish Chander Nayab Ali Updated 
+4.0 26/03/2026 Gaurav Tyagi Pranab 
+Manna Updated Response 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+  
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 3 of 46 
+ 
+Table of Contents 
+Introduction ................................................................................................................................................. 4 
+1.1 Purpose .................................................................................................................................... 4 
+The Overall Description .............................................................................................................................. 4 
+1.2 Data Integration between PCS System and ULIP application ................................................. 5 
+1.3 PCS/01 ..................................................................................................................................... 5 
+1.3.1 Technical Approach .................................................................................................... 5 
+1.4 PCS/02 ................................................................................................................................... 10 
+1.4.1 Technical Approach .................................................................................................. 10 
+1.5 PCS/03 ................................................................................................................................... 14 
+1.5.1 Technical Approach .................................................................................................. 14 
+1.6 PCS/04 ................................................................................................................................... 17 
+1.6.1 Technical Approach .................................................................................................. 18 
+1.7 PCS/05 ................................................................................................................................... 22 
+1.7.1 Technical Approach .................................................................................................. 22 
+1.8 PCS/06 ................................................................................................................................... 26 
+1.8.1 Technical Approach .................................................................................................. 27 
+1.8.2 Response 1: - ........................................................................................................... 30 
+1.8.3 Response 2: - ........................................................................................................... 32 
+1.8.4 Response 3: - ........................................................................................................... 34 
+1.8.5 Response 4: - ........................................................................................................... 35 
+1.8.6 Response 5: - ........................................................................................................... 36 
+1.8.7 Response 6: - ........................................................................................................... 38 
+1.8.8 Response 7: - ........................................................................................................... 40 
+1.8.9 Response 8: - ........................................................................................................... 40 
+1.8.10 Response 9: - ........................................................................................................... 42 
+1.8.11 Response 10: - ......................................................................................................... 42 
+1.8.12 Response 11: - ......................................................................................................... 44 
+1.9 Data Transmission & Authentication Mechanism .................................................................. 44 
+ 
+ 
+ 
+ 
+ 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 4 of 46 
+ 
+Introduction 
+1.1 Purpose 
+ 
+The purpose of this document is to define and provide details for accessing API for Vessel 
+Import export information using VCN number, b oe number, Shipping bill number from 
+ULIP system. 
+This document details the following points: 
+ 
+1. Data Integration between PCS and ULIP web service : Identification of operational 
+points where data integration between PCS and ULIP web service will be needed. 
+ 
+2. Technical Approach for performing Data Integration  
+ 
+The Overall Description 
+ 
+User will share information such as IGM number, BOE number and shipping bill 
+number based on data send by user ULIP system will call respective PCS API for 
+accessing information. 
+ 
+Following are the point for accessing vessel information:  
+ 
+1. This API will share vessel information and import and export data based on information 
+provided by user. 
+2. ULIP will expose API for getting data from PCS API. 
+ 
+3. PCS/01 API will take IGM Number and interface Name from user and get data from 
+PCS API. 
+4. PCS/02 API will take Shipping bill number and interface Name from user and get 
+data from PCS API. 
+5. PCS/03 API will take Shipping bill number and interface Name from user and get 
+data from PCS API. 
+6. PCS/04 API will take BOE number and interface Name from user and get data from 
+PCS API. 
+7. PCS/05 API will take BOE number and interface Name from user and get data from 
+PCS API. 
+8. PCS/06 API will take Message Identifier and message name from user and get data 
+from PCS API. 
+ 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 5 of 46 
+ 
+1.2 Data Integration between PCS System and ULIP application 
+ 
+User will share information to ULIP system based on data shared ULIP will provide data 
+to user. 
+1.3 PCS/01 
+ 
+This API will take below details and connect with PCS API to get data. 
+ 
+S. 
+No. 
+Field Name Field Description Format Require
+d/Not – 
+Require
+d 
+Length 
+1 interfaceName 
+ 
+The interface name in the 
+PCS system 
+\bCHPOI03\b 
+ 
+Required 7 
+2 igmNumber IGM number present in 
+PCS system 
+[0-9]{1,10} Required Min 1 
+Max 10 
+ 
+1.3.1 Technical Approach  
+1. All the data will be shared through rest web services. 
+2. ULIP system will provide IGM number and interface name for which detail is required. 
+3. We have to send secret key with header. 
+4. PCS API will share information which exist in PCS system in JSON format. 
+5. PCS Integration will add JSON in response key in response body. 
+6. ULIP system will provide the data in JSON Object format in response body. 
+ 
+Example: 
+ 
+IGM Number 2272354 and interface name CHPOI03 is shared by ULIP system, then 
+PCS-integration will make a request to PCS API. 
+ 
+Request: 
+ 
+The request must be of the following format, where IGM number and interface name is 
+passed within the URL parameters in JSON format. 
+ 
+For Production: 
+ 
+https://www.ulip.dpiit.gov.in/ulip/v1.0.0/PCS/01 
+ 
+ 
+ 
+ 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 6 of 46 
+ 
+Curl URL 
+ 
+ 
+curl --location --request POST 'https://www.ulip.dpiit.gov.in/ulip/v1.0.0/PCS/01' \ 
+--header 'Authorization: Bearer 
+eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZXN0MSIsImlhdCI6MTYyOTM1NDAzMC
+wiYXBwcyI6ImRhdGFwdXNoIn0.Fkq6c6RtsrQQZARkCu5WwJ5wY57anDDH-
+g8kGP8inyhaQmuvlysuFeb7ok0te2pFlu1j1m1QcS7Ly6ZnQaEPzg' \ 
+--header 'Accept: application/json' \ 
+--header 'Content-Type: application/json' \ 
+--data-raw '{ 
+    "interfaceName":"CHPOI03", 
+    "igmNumber": "2272354" 
+}' 
+ 
+ 
+For Staging: 
+ 
+https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/PCS/01 
+ 
+Curl URL 
+ 
+ 
+curl --location --request POST 
+'https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/PCS/01' \ 
+--header 'Authorization: Bearer 
+eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZXN0MSIsImlhdCI6MTYyOTM1NDAzMC
+wiYXBwcyI6ImRhdGFwdXNoIn0.Fkq6c6RtsrQQZARkCu5WwJ5wY57anDDH-
+g8kGP8inyhaQmuvlysuFeb7ok0te2pFlu1j1m1QcS7Ly6ZnQaEPzg' \ 
+--header 'Accept: application/json' \ 
+--header 'Content-Type: application/json' \ 
+--data-raw ' { 
+    "interfaceName":"CHPOI03", 
+    "igmNumber": "2336612" 
+}' 
+ 
+ 
+ 
+For obtaining secret key, refer Section 1.9 
+ 
+ 
+ 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 7 of 46 
+ 
+Response 
+ 
+To acknowledge the above request, ULIP will send the below response -  
+ 
+a) In case of invalid format 
+ 
+1. Invalid igm number 
+ 
+ 
+{ 
+    "response": null, 
+    "error": "true", 
+    "code": "400", 
+    "message": "Data format failed OR wrong value entered at:  igmNumber. 
+Format should follow [0-9]{1,10}" 
+} 
+ 
+ 
+2. Invalid interface name 
+ 
+{ 
+    "response": null, 
+    "error": "true", 
+    "code": "400", 
+    "message": "Data format failed OR wrong value entered at:  interfaceName. 
+Format should follow  \\bCHPOI03\\b" 
+} 
+ 
+ 
+3.  In case of IGM number not exist in PCS system 
+ 
+ 
+{ 
+    "response": [ 
+        { 
+            "response": [ 
+                { 
+                    "custom_house_code": null, 
+                    "igm_no": null, 
+                    "igm_date": null, 
+                    "voyage_no": null, 
+                    "shipping_line_code": null, 
+                    "shipping_agent_code": null, 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 8 of 46 
+ 
+                    "port_of_arrival": null, 
+                    "expected_date_and_time_of_arrival": null, 
+                    "terminal_operator_code": null, 
+                    "cargo_imo_code": null, 
+                    "line_no": null, 
+                    "sub_line_no": null, 
+                    "bill_no": null, 
+                    "bill_date": null, 
+                    "port_of_loading": null, 
+                    "port_of_destination": null, 
+                    "nature_of_cargo": null, 
+                    "port_of_discharge": null, 
+                    "grossWeight": null, 
+                    "number_of_packages": null, 
+                    "goods_description": null, 
+                    "mode_of_transport": null, 
+                    "container_no": null, 
+                    "line_number": null, 
+                    "sub_line_number": null, 
+                    "container_seal_no": null, 
+                    "total_no_of_packages": null, 
+                    "container_weight": null, 
+                    "iso_code": null, 
+                    "responseMsg": "not found" 
+                } 
+            ], 
+            "responseStatus": "SUCCESS" 
+        } 
+    ], 
+    "error": "false", 
+    "code": "200", 
+    "message": "Success" 
+} 
+ 
+b) In case IGM number exist 
+ 
+{ 
+    "response": [ 
+        { 
+            "response": [ 
+                { 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 9 of 46 
+ 
+                    "voyage_no": "909E", 
+                    "bill_date": "30012023", 
+                    "port_of_arrival": "INMUN1", 
+                    "goods_description": "P*A*T*C*R*G*I*D*H* *O*E*3*0*1*9* *5*(*I*T* 
+*I*E* *A*K*G*S*O*L* *E* * *A*F*7*2*L*5* *A*K*G*S", 
+                    "port_of_loading": "JPYOK", 
+                    "bill_no": "010DW06169", 
+                    "total_no_of_packages": "29", 
+                    "mode_of_transport": null, 
+                    "sub_line_number": "0", 
+                    "container_seal_no": "WHLU045961", 
+                    "line_number": "40", 
+                    "container_no": "WHSU6942383", 
+                    "number_of_packages": "55", 
+                    "container_weight": 25.65, 
+                    "terminal_operator_code": "INMUN1MCT1", 
+                    "nature_of_cargo": "C", 
+                    "responseMsg": "SUCCESS", 
+                    "shipping_line_code": "AAFCT5861J", 
+                    "port_of_destination": "INMUN1", 
+                    "line_no": "40", 
+                    "custom_house_code": "INMUN1", 
+                    "grossWeight": 50847, 
+                    "expected_date_and_time_of_arrival": "02032023:21:18", 
+                    "sub_line_no": "0", 
+                    "igm_date": "27022023", 
+                    "shipping_agent_code": "AAFCT5861J", 
+                    "cargo_imo_code": "ZZZ", 
+                    "igm_no": "2336612", 
+                    "iso_code": "4410", 
+                    "port_of_discharge": "INMUN1SMS1" 
+                } 
+            ], 
+            "responseStatus": "SUCCESS", 
+            "message": null 
+        } 
+ 
+Status Code 200: vessel data response 
+Status Code 400: Bad request (Invalid JSON syntax, invalid JSON key) 
+Status Code 401 or 403: Unauthenticated or Unauthorized 
+Status Code 500: Some internal server error occurred 
+Status Code 502: Server is not responding. 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 10 of 46 
+ 
+1.4 PCS/02 
+ 
+This API will take below details and connect with PCS API to get data. 
+ 
+S. 
+No. 
+Field Name Field Description Format Require
+d/Not – 
+Require
+d 
+Length 
+1 interfaceName 
+ 
+The interface name in the 
+PCS system 
+\bCHPOE05\b 
+ 
+Required 7 
+2 sbNumber SB number present in 
+PCS system 
+[0-9]{1,10} Required Min 1 
+Max 10 
+ 
+1.4.1 Technical Approach  
+1. All the data will be shared through rest web services. 
+2. ULIP system will provide SB number and interface name for which detail is required. 
+3. We have to send secret key with header. 
+4. PCS API will share information which exist in PCS system in JSON format. 
+5. PCS Integration will add JSON in response key in response body. 
+6. ULIP system will provide the data in JSON Object format in response body. 
+ 
+Example: 
+ 
+SB Number 7005705 and interface name CHPOE05 is shared by ULIP system, then 
+PCS-integration will make a request to PCS API. 
+ 
+Request: 
+ 
+The request must be of the following format, where SB number and interface name is 
+passed within the URL parameters in JSON format. 
+ 
+For Production: 
+ 
+https://www.ulip.dpiit.gov.in/ulip/v1.0.0/PCS/02 
+ 
+Curl URL 
+ 
+ 
+curl --location --request POST  
+'https://www. ulip.dpiit.gov.in/ulip/v1.0.0/PCS/02' \ 
+--header 'Authorization: Bearer 
+eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZXN0MSIsImlhdCI6MTYyOTM1NDAzMC
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 11 of 46 
+ 
+wiYXBwcyI6ImRhdGFwdXNoIn0.Fkq6c6RtsrQQZARkCu5WwJ5wY57anDDH-
+g8kGP8inyhaQmuvlysuFeb7ok0te2pFlu1j1m1QcS7Ly6ZnQaEPzg' \ 
+--header 'Accept: application/json' \ 
+--header 'Content-Type: application/json' \ 
+--data-raw '{ 
+    "interfaceName":"CHPOE05", 
+    "sbNumber": "7005705" 
+}' 
+ 
+ 
+For Staging: 
+ 
+https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/PCS/02 
+ 
+Curl URL 
+ 
+ 
+curl --location --request POST  
+'https://www. ulipstaging.dpiit.gov.in/ulip/v1.0.0/PCS/02' \ 
+--header 'Authorization: Bearer 
+eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZXN0MSIsImlhdCI6MTYyOTM1NDAzMC
+wiYXBwcyI6ImRhdGFwdXNoIn0.Fkq6c6RtsrQQZARkCu5WwJ5wY57anDDH-
+g8kGP8inyhaQmuvlysuFeb7ok0te2pFlu1j1m1QcS7Ly6ZnQaEPzg' \ 
+--header 'Accept: application/json' \ 
+--header 'Content-Type: application/json' \ 
+--data-raw ' { 
+    "interfaceName": "CHPOE05", 
+    "sbNumber": "9023937" 
+}' 
+ 
+ 
+ 
+ 
+For obtaining secret key, refer Section 1.9 
+ 
+Response 
+ 
+To acknowledge the above request, ULIP will send the below response -  
+ 
+a) In case of invalid format 
+ 
+1. Invalid sb number 
+ 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 12 of 46 
+ 
+{ 
+    "response": null, 
+    "error": "true", 
+    "code": "400", 
+    "message": "Data format failed OR wrong value entered at:  sbNumber. 
+Format should follow [0-9]{1,10}" 
+} 
+ 
+ 
+2. Invalid interface name 
+ 
+ 
+{ 
+    "response": null, 
+    "error": "true", 
+    "code": "400", 
+    "message": "Data format failed OR wrong value entered at:  interfaceName. 
+Format should follow  \\bCHPOE05\\b" 
+} 
+ 
+ 
+ 
+3.  In case of IGM number does not exist in PCS system 
+ 
+ 
+{ 
+    "response": [ 
+        { 
+            "response": [ 
+                { 
+                    "sbNo": null, 
+                    "sbDate": null, 
+                    "natureOfCargo": null, 
+                    "grossQuantity": null, 
+                    "unitOfQuantity": null, 
+                    "totalNoOfPackages": null, 
+                    "portOfDestination": null, 
+                    "portOfOrigin": null, 
+                    "responseMsg": "not found", 
+                    "chaCode": null 
+                } 
+            ], 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 13 of 46 
+ 
+            "responseStatus": "SUCCESS" 
+        } 
+    ], 
+    "error": "false", 
+    "code": "200", 
+    "message": "Success" 
+} 
+ 
+ 
+b) In case IGM number exist 
+ 
+     
+{ 
+    "response": [ 
+        { 
+            "response": [ 
+                { 
+                    "grossQuantity": 736.4, 
+                    "sbNo": "9023937", 
+                    "natureOfCargo": "P", 
+                    "portOfOrigin": "INNSA1", 
+                    "portOfDestination": "MXLZC", 
+                    "unitOfQuantity": "KGS", 
+                    "totalNoOfPackages": "263", 
+                    "chaCode": "AAECS5612BCH001", 
+                    "sbDate": "02042023", 
+                    "responseMsg": "SUCCESS" 
+                } 
+            ], 
+            "responseStatus": "SUCCESS", 
+            "message": null 
+        } 
+ 
+ 
+Status Code 200: vessel data response 
+Status Code 400: Bad request (Invalid JSON syntax, invalid JSON key) 
+Status Code 401 or 403: Unauthenticated or Unauthorized 
+Status Code 500: Some internal server error occurred 
+Status Code 502: Server is not responding. 
+ 
+ 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 14 of 46 
+ 
+1.5 PCS/03 
+ 
+This API will take the details below and connect with PCS API to get data. 
+ 
+S. 
+No. 
+Field Name Field Description Format Require
+d/Not – 
+Require
+d 
+Length 
+1 interfaceName 
+ 
+The interface name in the 
+PCS system 
+\bCHPOE07\b 
+ 
+Required 7 
+2 sbNumber SB number present in 
+PCS system 
+[0-9]{1,10} Required Min 1 
+Max 10 
+ 
+1.5.1 Technical Approach  
+1. All the data will be shared through rest web services. 
+2. ULIP system will provide SB number and interface name for which detail is required. 
+3. We have to send secret key with header. 
+4. PCS API will share information which exist in PCS system in JSON format. 
+5. PCS Integration will add JSON in response key in response body. 
+6. ULIP system will provide the data in JSON Object format in response body. 
+ 
+Example: 
+ 
+SB Number 2405125 and interface name CHPOE07 are shared by ULIP system, then 
+PCS-integration will make a request to PCS API. 
+ 
+Request: 
+ 
+The request must be of the following format, where SB number and interface name is 
+passed within the URL parameters in JSON format. 
+ 
+For Production: 
+ 
+https://www.ulip.dpiit.gov.in/ulip/v1.0.0/PCS/03 
+ 
+Curl URL 
+ 
+ 
+curl --location --request POST  
+'https://www. ulip.dpiit.gov.in/ulip/v1.0.0/PCS/03' \ 
+--header 'Authorization: Bearer 
+eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZXN0MSIsImlhdCI6MTYyOTM1NDAzMC
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 15 of 46 
+ 
+wiYXBwcyI6ImRhdGFwdXNoIn0.Fkq6c6RtsrQQZARkCu5WwJ5wY57anDDH-
+g8kGP8inyhaQmuvlysuFeb7ok0te2pFlu1j1m1QcS7Ly6ZnQaEPzg' \ 
+--header 'Accept: application/json' \ 
+--header 'Content-Type: application/json' \ 
+--data-raw '{ 
+    "interfaceName":"CHPOE07", 
+    "sbNumber": "2405125" 
+}' 
+ 
+ 
+For Staging: 
+ 
+https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/PCS/03 
+ 
+Curl URL 
+ 
+ 
+curl --location --request POST  
+'https://www. ulipstaging.dpiit.gov.in/ulip/v1.0.0/PCS/03' \ 
+--header 'Authorization: Bearer 
+eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZXN0MSIsImlhdCI6MTYyOTM1NDAzMC
+wiYXBwcyI6ImRhdGFwdXNoIn0.Fkq6c6RtsrQQZARkCu5WwJ5wY57anDDH-
+g8kGP8inyhaQmuvlysuFeb7ok0te2pFlu1j1m1QcS7Ly6ZnQaEPzg' \ 
+--header 'Accept: application/json' \ 
+--header 'Content-Type: application/json' \ 
+--data-raw ' { 
+    "interfaceName": "CHPOE07", 
+    "sbNumber": "8932488" 
+}' 
+ 
+ 
+For obtaining secret key, refer Section 1.9 
+ 
+Response 
+ 
+To acknowledge the above request, ULIP will send the below response -  
+ 
+a) In case of invalid format 
+ 
+1. Invalid sb number 
+ 
+{ 
+    "response": null, 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 16 of 46 
+ 
+    "error": "true", 
+    "code": "400", 
+    "message": "Data format failed OR wrong value entered at:  sbNumber. 
+Format should follow [0-9]{1,10}" 
+} 
+ 
+2. Invalid interface name 
+ 
+ 
+{ 
+    "response": null, 
+    "error": "true", 
+    "code": "400", 
+    "message": "Data format failed OR wrong value entered at:  interfaceName. 
+Format should follow \\bCHPOE07\\b" 
+} 
+ 
+ 
+3.  In case of IGM numbers do not exist in PCS system 
+ 
+ 
+{ 
+    "response": [ 
+        { 
+            "response": [ 
+                { 
+                    "sbNumber": null, 
+                    "sbDate": null, 
+                    "rotationNo": null, 
+                    "rotationDate": null, 
+                    "leoDate": null, 
+                    "natureOfCargo": null, 
+                    "responseMsg": "not found" 
+                } 
+            ], 
+            "responseStatus": "SUCCESS" 
+        } 
+    ], 
+    "error": "false", 
+    "code": "200", 
+    "message": "Success" 
+} 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 17 of 46 
+ 
+b) In case IGM number exists 
+ 
+ { 
+    "response": [ 
+        { 
+            "response": [ 
+                { 
+                    "leoDate": "03042023", 
+                    "rotationDate": "31032023", 
+                    "natureOfCargo": "C", 
+                    "rotationNo": "269212", 
+                    "sbNumber": "8932488", 
+                    "sbDate": "30032023", 
+                    "responseMsg": "SUCCESS" 
+                } 
+            ], 
+            "responseStatus": "SUCCESS", 
+            "message": null 
+        } 
+    ], 
+    "error": "false", 
+    "code": "200", 
+    "message": "Success" 
+} 
+ 
+Status Code 200: vessel data response 
+Status Code 400: Bad request (Invalid JSON syntax, invalid JSON key) 
+Status Code 401 or 403: Unauthenticated or Unauthorized 
+Status Code 500: Some internal server errors occurred 
+Status Code 502: Server is not responding. 
+1.6 PCS/04 
+ 
+This API will take below details and connect with PCS API to get data. 
+ 
+S. No. Field Name Field Description Format Require
+d/Not – 
+Require
+d 
+Length 
+1 interfaceName 
+ 
+The interface name in the 
+PCS system 
+\bCHPOI09\b 
+ 
+Required 7 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 18 of 46 
+ 
+2 boeNumber SB number present in 
+PCS system 
+[0-9]{1,10} Required Min 1 
+Max 10 
+ 
+1.6.1 Technical Approach  
+1. All the data will be shared through rest web services. 
+2. ULIP system will provide BOE number and interface name for which detail is required. 
+3. We have to send secret key with header. 
+4. PCS API will share information which exist in PCS system in JSON format. 
+5. PCS Integration will add JSON in response key in response body. 
+6. ULIP system will provide the data in JSON Object format in response body. 
+ 
+Example: 
+ 
+BOE Number 7274213 and interface name CHPOI09 is shared by ULIP system, then 
+PCS-integration will make a request to PCS API. 
+ 
+Request: 
+ 
+The request must be of the following format, where SB number and interface name is 
+passed within the URL parameters in JSON format. 
+ 
+For Production: 
+ 
+https://www.ulip.dpiit.gov.in/ulip/v1.0.0/PCS/04 
+ 
+Curl URL 
+ 
+ 
+curl --location --request POST  
+'https:// www.ulip.dpiit.gov.in/ulip/v1.0.0/PCS/04' \ 
+--header 'Authorization: Bearer 
+eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZXN0MSIsImlhdCI6MTYyOTM2MDk4MSw
+iYXBwcyI6ImRhdGFwdXNoIn0.fs56_-
+xeGND_d8OyRqomxrsBmbY9A4u8QtaoGs469YdQa_P5JC6kamKwuxwWbQkN
+X5WGe4WN9W88ptHfoFM3OA' \ 
+--header 'Accept: application/json' \ 
+--header 'Content-Type: application/json' \ 
+--data-raw '{ 
+    "interfaceName":"CHPOI09", 
+    "boeNumber": "7274213" 
+}' 
+ 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 19 of 46 
+ 
+For Staging: 
+ 
+https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/PCS/04 
+ 
+Curl URL 
+ 
+ 
+curl --location --request POST  
+'https:// www.ulip.dpiit.gov.in/ulipstaging/v1.0.0/PCS/04' \ 
+--header 'Authorization: Bearer 
+eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZXN0MSIsImlhdCI6MTYyOTM2MDk4MSw
+iYXBwcyI6ImRhdGFwdXNoIn0.fs56_-
+xeGND_d8OyRqomxrsBmbY9A4u8QtaoGs469YdQa_P5JC6kamKwuxwWbQkN
+X5WGe4WN9W88ptHfoFM3OA' \ 
+--header 'Accept: application/json' \ 
+--header 'Content-Type: application/json' \ 
+--data-raw ' { 
+    "boeNumber": "4940717", 
+    "interfaceName": "CHPOI09" 
+}' 
+ 
+For obtaining secret key, refer Section 1.9 
+ 
+Response 
+ 
+To acknowledge the above request, ULIP will send the below response -  
+ 
+a) In case of invalid format 
+ 
+1. Invalid boe number 
+ 
+ 
+{ 
+    "response": null, 
+    "error": "true", 
+    "code": "400", 
+    "message": "Data format failed OR wrong value entered at:  boeNumber. 
+Format should follow [0-9]{1,10}" 
+} 
+ 
+ 
+ 
+ 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 20 of 46 
+ 
+2. Invalid interface name 
+ 
+{ 
+    "response": null, 
+    "error": "true", 
+    "code": "400", 
+    "message": "Data format failed OR wrong value entered at:  interfaceName. 
+Format should follow \\bCHOI09\\b" 
+} 
+ 
+3.  In case of IGM number does not exist in PCS system 
+ 
+{ 
+    "response": [ 
+        { 
+            "response": [ 
+                { 
+                    "customHouseCode": null, 
+                    "igmDate": null, 
+                    "lineNo": null, 
+                    "sublineNo": null, 
+                    "billOfEntryNo": null, 
+                    "billOfEntryDate": null, 
+                    "chaCode": null, 
+                    "natureOfCargo": null, 
+                    "grossWeight": null, 
+                    "unitOfQuantity": null, 
+                    "numberOfPackages": null, 
+                    "countryOfOrigin": null, 
+                    "line_number": null, 
+                    "sub_line_number": null, 
+                    "container_no": null, 
+                    "items_IgmNo": null, 
+                    "items_IgmDate": null, 
+                    "items_line_number": null, 
+                    "items_sub_line_number": null, 
+                    "items_BillOfEntryNo": null, 
+                    "items_BillOfEntryDate": null, 
+                    "responseMsg": "not found" 
+                } 
+            ], 
+            "responseStatus": "SUCCESS" 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 21 of 46 
+ 
+        } 
+    ], 
+    "error": "false", 
+    "code": "200", 
+    "message": "Success" 
+} 
+ 
+b) In case IGM number exists 
+ 
+{ 
+    "response": [ 
+        { 
+            "response": [ 
+                { 
+                    "items_IgmNo": "2337849", 
+                    "items_BillOfEntryDate": "07032023", 
+                    "sublineNo": "1", 
+                    "igmNo": "2337849", 
+                    "natureOfCargo": "CP", 
+                    "items_IgmDate": "13032023", 
+                    "items_sub_line_number": "1", 
+                    "igmDate": "13032023", 
+                    "numberOfPackages": "10", 
+                    "sub_line_number": "1", 
+                    "grossWeight": 3600, 
+                    "lineNo": "89", 
+                    "customHouseCode": "INKAT1", 
+                    "line_number": "89", 
+                    "billOfEntryNo": "4940717", 
+                    "container_no": "BSIU2568595", 
+                    "countryOfOrigin": "CN", 
+                    "items_line_number": "89", 
+                    "chaCode": "AAKFG4453HCH001", 
+                    "unitOfQuantity": "KGS", 
+                    "items_BillOfEntryNo": "4940717", 
+                    "billOfEntryDate": "07032023", 
+                    "responseMsg": "SUCCESS" 
+                } 
+            ], 
+            "responseStatus": "SUCCESS", 
+            "message": null 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 22 of 46 
+ 
+        } 
+    ], 
+    "error": "false", 
+    "code": "200", 
+    "message": "Success" 
+} 
+ 
+Status Code 200: vessel data response 
+Status Code 400: Bad request (Invalid JSON syntax, invalid JSON key) 
+Status Code 401 or 403: Unauthenticated or Unauthorized 
+Status Code 500: Some internal server error occurred 
+Status Code 502: Server is not responding. 
+1.7 PCS/05 
+ 
+This API will take the details below and connect with PCS API to get data. 
+ 
+S. No. Field Name Field Description Format Require
+d/Not – 
+Require
+d 
+Length 
+1 interfaceName 
+ 
+The interface name in the 
+PCS system 
+\bCHPOI10\b 
+ 
+Required 7 
+2 boeNumber SB number present in 
+PCS system 
+[0-9]{1,10} Required Min 1 
+Max 10 
+ 
+1.7.1 Technical Approach  
+1. All the data will be shared through rest web services. 
+2. ULIP system will provide BOE number and interface name for which detail is required. 
+3. We have to send secret key with header. 
+4. PCS API will share information which exist in PCS system in JSON format. 
+5. PCS Integration will add JSON in response key in response body. 
+6. ULIP system will provide the data in JSON Object format in response body. 
+ 
+Example: 
+ 
+BOE Number 2219940 and interface name CHPOI10 is shared by ULIP system, then 
+PCS-integration will make a request to PCS API. 
+ 
+Request: 
+ 
+The request must be of the following format, where SB number and interface name is 
+passed within the URL parameters in JSON format. 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 23 of 46 
+ 
+For Production:  
+ 
+https://www.ulip.dpiit.gov.in/ulip/v1.0.0/PCS/05 
+ 
+Curl URL 
+ 
+curl --location --request POST  
+'https://www.ulip.dpiit.gov.in/ulip /v1.0.0/PCS/05' \ 
+--header 'Authorization: Bearer 
+eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZXN0MSIsImlhdCI6MTYyOTM2MDk4MSw
+iYXBwcyI6ImRhdGFwdXNoIn0.fs56_-
+xeGND_d8OyRqomxrsBmbY9A4u8QtaoGs469YdQa_P5JC6kamKwuxwWbQkN
+X5WGe4WN9W88ptHfoFM3OA' \ 
+--header 'Accept: application/json' \ 
+--header 'Content-Type: application/json' \ 
+--data-raw '{ 
+    "interfaceName":"CHPOI10", 
+    "boeNumber": "2219940" 
+}' 
+ 
+For Staging:  
+ 
+https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/PCS/05 
+ 
+Curl URL 
+ 
+curl --location --request POST  
+'https://www.ulipstaging.dpiit.gov.in/ulip /v1.0.0/PCS/05' \ 
+--header 'Authorization: Bearer 
+eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZXN0MSIsImlhdCI6MTYyOTM2MDk4MSw
+iYXBwcyI6ImRhdGFwdXNoIn0.fs56_-
+xeGND_d8OyRqomxrsBmbY9A4u8QtaoGs469YdQa_P5JC6kamKwuxwWbQkN
+X5WGe4WN9W88ptHfoFM3OA' \ 
+--header 'Accept: application/json' \ 
+--header 'Content-Type: application/json' \ 
+--data-raw ' { 
+    "boeNumber": "5159836", 
+    "interfaceName": "CHPOI10" 
+}' 
+ 
+For obtaining secret key, refer Section 1.9 
+ 
+ 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 24 of 46 
+ 
+Response 
+ 
+To acknowledge the above request, ULIP will send the below response -  
+ 
+a) In case of invalid format 
+ 
+1. Invalid Boe number 
+ 
+{ 
+    "response": null, 
+    "error": "true", 
+    "code": "400", 
+    "message": "Data format failed OR wrong value entered at:  boeNumber. 
+Format should follow [0-9]{1,10}" 
+} 
+ 
+2. Invalid interface name 
+{ 
+    "response": null, 
+    "error": "true", 
+    "code": "400", 
+    "message": "Data format failed OR wrong value entered at:  interfaceName. 
+Format should follow \\bCHOI10\\b" 
+} 
+ 
+3.  In case of Boe number does not exist in PCS system 
+ 
+{ 
+    "response": [ 
+        { 
+            "response": [ 
+                { 
+                    "customHouseCode": null, 
+                    "igmNo": null, 
+                    "igmDate": null, 
+                    "lineNo": null, 
+                    "subLineNo": null, 
+                    "billOfEntryNo": null, 
+                    "billOfEntryDate": null, 
+                    "chaCode": null, 
+                    "natureOfCargo": null, 
+                    "unitOfQuantity": null, 
+                    "numberOfPackages": null, 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 25 of 46 
+ 
+                    "countryOfOrigin": null, 
+                    "responseMsg": "not found", 
+                    "out_of_charge_date": null, 
+                    "out_of_charge_no": null, 
+                    "line_number": null, 
+                    "sub_line_number": null, 
+                    "container_no": null, 
+                    "items_CustomHouseCode": null, 
+                    "items_IgmNo": null, 
+                    "items_IgmDate": null, 
+                    "items_LineNumber": null, 
+                    "items_SubLineNo": null, 
+                    "items_BillOfEntryNo": null, 
+                    "items_BillOfEntryDate": null 
+                } 
+            ], 
+            "responseStatus": "SUCCESS" 
+        } 
+    ], 
+    "error": "false", 
+    "code": "200", 
+    "message": "Success" 
+}  
+ 
+b) In case BOE number exists 
+ 
+{ 
+    "response": [ 
+        { 
+            "response": [ 
+                { 
+                    "subLineNo": "1", 
+                    "items_BillOfEntryDate": "21032023", 
+                    "igmNo": "2338556", 
+                    "out_of_charge_no": "2050911362", 
+                    "igmDate": "21032023", 
+                    "numberOfPackages": "40", 
+                    "out_of_charge_date": "28032023", 
+                    "sub_line_number": "1", 
+                    "lineNo": "139", 
+                    "line_number": "139", 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 26 of 46 
+ 
+                    "billOfEntryNo": "5159836", 
+                    "container_no": "ESDU4016990", 
+                    "chaCode": "ABWPV2386DCH001", 
+                    "items_BillOfEntryNo": "5159836", 
+                    "responseMsg": "SUCCESS", 
+                    "items_SubLineNo": "1", 
+                    "items_IgmNo": "2338556", 
+                    "natureOfCargo": "C", 
+                    "items_IgmDate": "21032023", 
+                    "items_CustomHouseCode": "INNSA1", 
+                    "customHouseCode": "INNSA1", 
+                    "items_LineNumber": "139", 
+                    "countryOfOrigin": "VN", 
+                    "unitOfQuantity": "KGS", 
+                    "billOfEntryDate": "21032023" 
+                } 
+            ], 
+            "responseStatus": "SUCCESS", 
+            "message": null 
+        } 
+    ], 
+    "error": "false", 
+    "code": "200", 
+    "message": "Success" 
+} 
+ 
+Status Code 200: vessel data response 
+Status Code 400: Bad request (Invalid JSON syntax, invalid JSON key) 
+Status Code 401 or 403: Unauthenticated or Unauthorized 
+Status Code 500: Some internal server error occurred 
+Status Code 502: Server is not responding. 
+1.8 PCS/06 
+ 
+This API will take below details and connect with PCS API to get data. 
+ 
+S. 
+No. 
+Field Name Field Description Format Require
+d/Not – 
+Require
+d 
+Length 
+1 MSG_NAME 
+ 
+The interface name in the 
+PCS system (for message 
+name see Table -  ) 
+^[a-zA-Z0-9]{1,12}$ 
+ 
+Required Min 1  
+Max 12 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 27 of 46 
+ 
+2 MSG_IDENTIFI
+ER 
+Message identifier present 
+in PCS system 
+(for message identifier  
+see Table  -  ) 
+^[a-zA-Z0-9]{1,20}$ Required Min 1 
+Max 20 
+ 
+1.8.1 Technical Approach  
+1. All the data will be shared through rest web services. 
+2. ULIP system will provide Message Identifier and message name for which detail is 
+required. 
+3. We have to send secret key with header. 
+4. PCS API will share information which exist in PCS system in JSON format. 
+5. PCS Integration will add JSON in response key in response body. 
+6. ULIP system will provide the data in JSON Object format in response body. 
+ 
+Example: 
+ 
+Message Name and interface name is shared by ULIP system, then PCS-integration will 
+make a request to PCS API. 
+ 
+Request: 
+ 
+The request must be of the following format, where SB number and interface name is 
+passed within the URL parameters in JSON format. 
+ 
+For Production: 
+ 
+https://www.ulip.dpiit.gov.in/ulip/v1.0.0/PCS/06 
+ 
+Curl URL 
+ 
+curl --location --request POST  
+‘https://www.ulip.dpiit.gov.in/ulip/v1.0.0/PCS/06' \ 
+--header 'Authorization: Bearer 
+eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZXN0MSIsImlhdCI6MTYyOTM2MDk4MSw
+iYXBwcyI6ImRhdGFwdXNoIn0.fs56_-
+xeGND_d8OyRqomxrsBmbY9A4u8QtaoGs469YdQa_P5JC6kamKwuxwWbQkN
+X5WGe4WN9W88ptHfoFM3OA' \ 
+--header 'Accept: application/json' \ 
+--header 'Content-Type: application/json' \ 
+--data-raw ' { 
+"MSG_IDENTIFIER": "2240887", 
+"MSG_NAME":"COARRI" 
+}' 
+ 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 28 of 46 
+ 
+For Staging: 
+ 
+https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/PCS/06 
+ 
+Curl URL 
+ 
+curl --location --request POST  
+‘https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/PCS/06' \ 
+--header 'Authorization: Bearer 
+eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZXN0MSIsImlhdCI6MTYyOTM2MDk4MSw
+iYXBwcyI6ImRhdGFwdXNoIn0.fs56_-
+xeGND_d8OyRqomxrsBmbY9A4u8QtaoGs469YdQa_P5JC6kamKwuxwWbQkN
+X5WGe4WN9W88ptHfoFM3OA' \ 
+--header 'Accept: application/json' \ 
+--header 'Content-Type: application/json' \ 
+--data-raw ' { 
+    "MSG_IDENTIFIER": "5540021", 
+    "MSG_NAME":"CALINV" 
+}' 
+For obtaining secret key, refer Section 1.9 
+ 
+Response 
+ 
+To acknowledge the above request, ULIP will send the below response -  
+ 
+a) In case of invalid format 
+ 
+1. Invalid MSG_NAME 
+ 
+{ 
+    "response": null, 
+    "error": "true", 
+    "code": "400", 
+    "message": "Data format failed OR wrong value entered at:  MSG_NAME. 
+Format should follow  ^[a-zA-Z0-9]{1,12}$" 
+} 
+ 
+2. Invalid MSG_IDENTIFIER 
+ 
+{ 
+    "response": null, 
+    "error": "true", 
+    "code": "400", 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 29 of 46 
+ 
+    "message": "Data format failed OR wrong value entered at:  
+MSG_IDENTIFIER. Format should follow  ^[a-zA-Z0-9]{1,20}$" 
+} 
+ 
+3.  In case of MSG_IDENTIFIER number does not exist in PCS system 
+ 
+{ 
+    "response": [ 
+        { 
+            "response": { 
+                "Remarks": "Failure" 
+            }, 
+            "responseStatus": "SUCCESS" 
+        } 
+    ], 
+    "error": "false", 
+    "code": "200", 
+    "message": "Success" 
+} 
+ 
+b) In case MSG_IDENTIFIER exist 
+ 
+S. No. MSG_NAME MSG_IDENTIFIER MSG_IDENTIFIER type Response 
+1 VESPRO 5540000 IMO Number Response 1 
+2 COARRI 2240887 IGM Number Response 2 
+3 CALINV 5540021 IMO Number Response 3 
+4 VESDEP INBOM120210085 VCN Number Response 4 
+5 EICREP PCVUJK86441 Container Number Response 5 
+6 AGDORD AOPK9 BL Number Response 6 
+7 ETAETD INPRT120210044 VCN Number Response 7 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 30 of 46 
+ 
+8 CHPOI13 KOCU4351870 Container Number Response 8 
+9 CHSAE02 INCCU120210007 VCN Number Response 9 
+10 CODECO TRHU2911833 Container Number Response 10 
+11 GOCOFR INMAA120210438 VCN Number Response 11 
+ 
+Status Code 200: vessel data response 
+Status Code 400: Bad request (Invalid JSON syntax, invalid JSON key) 
+Status Code 401 or 403: Unauthenticated or Unauthorized 
+Status Code 500: Some internal server errors occurred 
+Status Code 502: Server is not responding. 
+ 
+1.8.2 Response 1: - 
+{ 
+    "response": [ 
+        { 
+            "response": { 
+                "map": { 
+                    "VesselProfile": { 
+                        "map": { 
+                            "DocumentSummary": { 
+                                "map": { 
+                                    "IssuedDateTime": "29072021165614" 
+                                } 
+                            }, 
+                            "DocumentDetails": { 
+                                "map": { 
+                                    "VesselProfileDetails": { 
+                                        "map": { 
+                                            "SatcomID": "91002", 
+                                            "VesselType": "1505", 
+                                            "HullInsurCompanyValidity": "07082021", 
+                                            "PropulsionType": "FIXED", 
+                                            "ISPSCompliance": "Y", 
+                                            "ClassificationSociety": "INDIAN REGISTER OF SHIPPING", 
+                                            "BowtoMainfold": "30.00", 
+                                            "MaxDraft": "12.00", 
+                                            "NRT": "37298.0", 
+                                            "NoOfHatchesorTanks": "1", 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 31 of 46 
+ 
+                                            "CAPCertificate": "N", 
+                                            "VesselBuildingPlace": "AE", 
+                                            "AgencyCode": "70002186", 
+                                            "VesselOwner": "RAKESH KUMAR", 
+                                            "EngineType": "MISUI-MAN B&W 6S5", 
+                                            "HullInsurCompanyName": "Bajaj Insurance company", 
+                                            "LBP": "75.00", 
+                                            "DateOfApproval": "29072021", 
+                                            "LOA": "120.00", 
+                                            "DWT": "56055.0", 
+                                            "Propellers": "2", 
+                                            "VesselHeight": "150.00", 
+                                            "NoOfBays": "2", 
+                                            "VesselName": "EVENOP", 
+                                            "MTMV": "MV", 
+                                            "ApprovedBy": "ptuser11", 
+                                            "ShipRegCertNumber": "5214563", 
+                                            "InsuranceDetails": { 
+                                                "map": { 
+                                                    "Insurance": { 
+                                                        "map": { 
+                                                            "RecordType": "N", 
+                                                            "PIInsuranceValidity": "07082021", 
+                                                            "PIClubName": "NavigatorsInsuranceCompan", 
+                                                            "RecordNumber": "1", 
+                                                            "PIClubLocalName": "Indian Insurance Company Delhi" 
+                                                        } 
+                                                    } 
+                                                } 
+                                            }, 
+                                            "SafetyMgmtCertValidityDate": "30092022", 
+                                            "VesselGearsDetails": { 
+                                                "map": { 
+                                                    "VesselGear": { 
+                                                        "map": { 
+                                                            "RecordType": "N", 
+                                                            "VesselGear": "1", 
+                                                            "RecordNumber": "1" 
+                                                        } 
+                                                    } 
+                                                } 
+                                            }, 
+                                            "BulbousBow": "N", 
+                                            "MaxManeuveringSpeed": "15.0", 
+                                            "NoOfEngines": "2", 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 32 of 46 
+ 
+                                            "GRT": "42888.0", 
+                                            "SatelliteID": "221088", 
+                                            "VesselFlag": "AE", 
+                                            "PermanentValidity": "N", 
+                                            "Beam": "30.00", 
+                                            "CallSign": "8KI9A", 
+                                            "RecordType": "N", 
+                                            "IMONumber": "5540000", 
+                                            "SBT": "N", 
+                                            "VesselEmailID": "AMANSHARMA@GMAIL.COM", 
+                                            "CarrierAgencyFunctionCode": "sa", 
+                                            "HatchCoverType": "0", 
+                                            "PortOfApproval": "INBOM1", 
+                                            "VesselDeliveryDate": "07082009", 
+                                            "BowThruster": "Y", 
+                                            "SafetyMgmtCertNumber": "88SJHSU7", 
+                                            "DateOfKeelLaying": "07072009", 
+                                            "RegPort": "AEAUH1" 
+                                        } 
+                                    } 
+                                } 
+                            } 
+                        } 
+                    } 
+                } 
+            }, 
+            "responseStatus": "SUCCESS", 
+            "message": null 
+        } 
+    ], 
+    "error": "false", 
+    "code": "200", 
+    "message": "Success" 
+} 
+ 
+1.8.3 Response 2: - 
+{ 
+    "response": [ 
+        { 
+            "response": { 
+                "ContLoadingNDischargeOder": { 
+                    "DocumentSummary": { 
+                        "IssuedDateTime": "22122020204100" 
+                    }, 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 33 of 46 
+ 
+                    "DocumentDetails": { 
+                        "COARRIHeader": { 
+                            "VCN": "INMUN120200819", 
+                            "VesselAgentCode": "AACCM7663AMUN103", 
+                            "IGMDate": "15122020", 
+                            "CallSign": "CLS56", 
+                            "NoOfContainer": "64", 
+                            "TOCode": "INMUN1MSE1", 
+                            "IMONumber": "IMO1808", 
+                            "IGMNumber": "2240887", 
+                            "VesselFlag": "AF" 
+                        }, 
+                        "COARRIDetails": { 
+                            "COARRIItem": [ 
+                                { 
+                                    "EquipmentStatusCode": "3", 
+                                    "CACode": "HYU01", 
+                                    "ICDIndicator": "N", 
+                                    "ContISOCode": "4510", 
+                                    "ContainerNumber": "BMOU4147774", 
+                                    "CLandDateTime": "27012017", 
+                                    "ContainerDamageIndicator": "N", 
+                                    "ContClasssificationCode": "8", 
+                                    "BerthingDateTime": "27012017:09:05", 
+                                    "CustomsContSealNumber": "G264153", 
+                                    "IGMLineNumber": "57", 
+                                    "SBNo": "HDMUNXAY0588134", 
+                                    "ContLineCode": "HYM", 
+                                    "SBDate": "12012017", 
+                                    "ShipperContainerSealNumber": "G264153", 
+                                    "SealStatus": "1" 
+                                }, 
+                                { 
+                                    "EquipmentStatusCode": "3", 
+                                    "CACode": "HYU01", 
+                                    "ICDIndicator": "N", 
+                                    "ContISOCode": "2210", 
+                                    "ContainerNumber": "BSIU2496052", 
+                                    "CLandDateTime": "28012017", 
+                                    "ContainerDamageIndicator": "N", 
+                                    "ContClasssificationCode": "8", 
+                                    "BerthingDateTime": "27012017:09:05", 
+                                    "CustomsContSealNumber": "G264989", 
+                                    "IGMLineNumber": "61", 
+                                    "SBNo": "HDMUNXAY0588166", 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 34 of 46 
+ 
+                                    "ContLineCode": "HYM", 
+                                    "SBDate": "12012017", 
+                                    "ShipperContainerSealNumber": "264989", 
+                                    "SealStatus": "1" 
+                                } 
+                            ] 
+                        } 
+                    } 
+                } 
+            }, 
+            "responseStatus": "SUCCESS", 
+            "message": null 
+        } 
+    ], 
+    "error": "false", 
+    "code": "200", 
+    "message": "Success" 
+} 
+1.8.4 Response 3: - 
+{ 
+    "response": [ 
+        { 
+            "response": { 
+                "VesselCallNumber": { 
+                    "DocumentSummary": { 
+                        "IssuedDateTime": "06082021000000" 
+                    }, 
+                    "DocumentDetails": { 
+                        "VoyageDetails": { 
+                            "VCN": "INBOM120210195", 
+                            "VesselType": "152", 
+                            "Portcode": "INBOM1", 
+                            "AllotmentDate": "06082021", 
+                            "EDTA": "06082021", 
+                            "SACode": "70002186", 
+                            "LineCode": "999", 
+                            "VoyageNumber": "76", 
+                            "EDTD": "08082021", 
+                            "RecordType": "N", 
+                            "CallSign": "8KI9A", 
+                            "ServiceName": null, 
+                            "DockORTOCode": "INBOM1", 
+                            "IMONumber": "5540021" 
+                        } 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 35 of 46 
+ 
+                    } 
+                } 
+            }, 
+            "responseStatus": "SUCCESS", 
+            "message": null 
+        } 
+    ], 
+    "error": "false", 
+    "code": "200", 
+    "message": "Success" 
+} 
+ 
+1.8.5 Response 4: - 
+{ 
+    "response": [ 
+        { 
+            "response": { 
+                "VesselMovement": { 
+                    "DocumentSummary": { 
+                        "IssuedDateTime": "22062021152154" 
+                    }, 
+                    "DocumentDetails": { 
+                        "VesselMovementDetails": { 
+                            "VCN": "INBOM120210085", 
+                            "AnchoringDateTime": "21062021:15:16", 
+                            "TerminalAR": "AECPN20004", 
+                            "NextPortOfCall": "NLZWN1", 
+                            "EDTA": "23062021:00:00", 
+                            "SACode": "70000053", 
+                            "TOOrDOckCode": "INBOM1", 
+                            "VesselName": "TORRONTO", 
+                            "VoyageNumber": "10001", 
+                            "RecordType": "A", 
+                            "CallSign": "TORRO111", 
+                            "DateTimeunberthing": "21062021:15:17", 
+                            "SLCode": "AAL", 
+                            "SailingDateTimeOfPort": "21062021:15:17", 
+                            "CountryOfVessel": "GB", 
+                            "CompletionOfCargoOper": "23062021:13:17", 
+                            "BerthNumber": "A", 
+                            "IMONumber": "3810001", 
+                            "ReadinessDateTime": "23062021:13:17" 
+                        } 
+                    } 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 36 of 46 
+ 
+                } 
+            }, 
+            "responseStatus": "SUCCESS", 
+            "message": null 
+        } 
+    ], 
+    "error": "false", 
+    "code": "200", 
+    "message": "Success" 
+} 
+ 
+ 
+1.8.6 Response 5: - 
+{ 
+    "response": [ 
+        { 
+            "response": { 
+                "map": { 
+                    "EICREPDetails": { 
+                        "map": { 
+                            "DocumentSummary": { 
+                                "map": { 
+                                    "IssuedDateTime": "27062019122100" 
+                                } 
+                            }, 
+                            "DocumentDetails": { 
+                                "map": { 
+                                    "EIRSummary": { 
+                                        "map": { 
+                                            "ContainerDetails": { 
+                                                "myArrayList": [ 
+                                                    { 
+                                                        "map": { 
+                                                            "VCN": "250236", 
+                                                            "EquipmentStatusCode": "3", 
+                                                            "CustomSealNo": "1821755", 
+                                                            "GrossWeight": "29.35", 
+                                                            "ContISOCode": "2270", 
+                                                            "TransporterName": "MUM", 
+                                                            "PortofDischarge": "INVTZ1", 
+                                                            "DriverName": "Mayur", 
+                                                            "ContainerNo": "PCVUJ47755", 
+                                                            "FinalDischargePort": "INVTZ1", 
+                                                            "TruckNo": "MH46H6632", 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 37 of 46 
+ 
+                                                            "CallSign": "LAIS7", 
+                                                            "MLOCode": "ABL1", 
+                                                            "ArrivalDateTime": "02102018:12:08", 
+                                                            "VoyageNo": "432", 
+                                                            "ContTypeClassificatinCode": "8", 
+                                                            "IMONumber": "9557111", 
+                                                            "RackPosition": "CY18A29.T" 
+                                                        } 
+                                                    }, 
+                                                    { 
+                                                        "map": { 
+                                                            "VCN": "362019", 
+                                                            "EquipmentStatusCode": "3", 
+                                                            "CustomSealNo": "1821756", 
+                                                            "GrossWeight": "25.00", 
+                                                            "ContISOCode": "2270", 
+                                                            "TransporterName": "MUM", 
+                                                            "PortofDischarge": "INVTZ1", 
+                                                            "DriverName": "Mayur", 
+                                                            "ContainerNo": "PCVUJK86441", 
+                                                            "FinalDischargePort": "INVTZ1", 
+                                                            "TruckNo": "MH46BF1984", 
+                                                            "CallSign": "A9KO", 
+                                                            "MLOCode": "ABL1", 
+                                                            "ArrivalDateTime": "03102018:05:23", 
+                                                            "VoyageNo": "V002", 
+                                                            "ContTypeClassificatinCode": "8", 
+                                                            "IMONumber": "9182552", 
+                                                            "RackPosition": "CY19C25.M" 
+                                                        } 
+                                                    } 
+                                                ] 
+                                            } 
+                                        } 
+                                    } 
+                                } 
+                            } 
+                        } 
+                    } 
+                } 
+            }, 
+            "responseStatus": "SUCCESS", 
+            "message": null 
+        } 
+    ], 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 38 of 46 
+ 
+    "error": "false", 
+    "code": "200", 
+    "message": "Success" 
+} 
+ 
+1.8.7 Response 6: - 
+{ 
+    "response": [ 
+        { 
+            "response": { 
+                "map": { 
+                    "ContainerDeliveryOrder": { 
+                        "map": { 
+                            "DocumentSummary": { 
+                                "map": { 
+                                    "IssuedDateTime": "08072021112430" 
+                                } 
+                            }, 
+                            "DocumentDetails": { 
+                                "map": { 
+                                    "ContainerDOHeader": { 
+                                        "map": { 
+                                            "AgencyName": "INTEROCEAN SHIPPING I PVT LTD", 
+                                            "VCN": "INPRT120210042", 
+                                            "CustodianType": "T", 
+                                            "IGMNumber": "2121988", 
+                                            "VoyageNumber": "24", 
+                                            "ForeignCoastalFlag": "F", 
+                                            "NotifyingPartyEmailID": "eamght@gmail.com", 
+                                            "IGMDate": "06072021", 
+                                            "CallSign": "3FFO4", 
+                                            "RecordType": "N", 
+                                            "CustodianCode": "INPRT1", 
+                                            "DeliveryOrderDate": "08072021", 
+                                            "DeliveryOrderExamination": "N", 
+                                            "DeliveryOrderNumber": "120210708882758", 
+                                            "IMONumber": "9512214", 
+                                            "DeliveryType": "DOC" 
+                                        } 
+                                    }, 
+                                    "ContainerDOSummary": { 
+                                        "map": { 
+                                            "ContainerDODetails": { 
+                                                "map": { 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 39 of 46 
+ 
+                                                    "MarksAndNumbers": "IN BULK", 
+                                                    "NameofConsignee": "JSW STEEL LIMITED,", 
+                                                    "NumberOfPackages": "1", 
+                                                    "PortOfDestination": "INPRT1", 
+                                                    "StampDuty": "Y", 
+                                                    "DirectOrTransit": "Y", 
+                                                    "Containerised": "N", 
+                                                    "BillLadingDate": "13062021", 
+                                                    "BillLadingNo": "AOPK9", 
+                                                    "CargoDescription": "MAULES CREEK SEMI SOFT COKING COAL", 
+                                                    "IGMLineNumber": "2", 
+                                                    "PortOfLoading": "AUNTL", 
+                                                    "ConsigneeAddress2": "TENTULMURI, KHARAGPUR- 721437", 
+                                                    "RecordType": "N", 
+                                                    "ConsigneeAddress1": "MOUZA, P.S. NARAYAGARH", 
+                                                    "FreightPaid": "Y", 
+                                                    "TotalGrossWeight": "5000.000", 
+                                                    "TotalGrossWeightUOM": "MTS", 
+                                                    "ConsigneeAddress3": "INDIA", 
+                                                    "IGMSubLineNumber": "0", 
+                                                    "PackageCode": "BLK", 
+                                                    "RecordNumber": "1" 
+                                                } 
+                                            } 
+                                        } 
+                                    } 
+                                } 
+                            } 
+                        } 
+                    } 
+                } 
+            }, 
+            "responseStatus": "SUCCESS", 
+            "message": null 
+        } 
+    ], 
+    "error": "false", 
+    "code": "200", 
+    "message": "Success" 
+} 
+ 
+ 
+ 
+ 
+ 
+ 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 40 of 46 
+ 
+1.8.8 Response 7: - 
+{ 
+    "response": [ 
+        { 
+            "response": { 
+                "ETAETD": { 
+                    "DocumentSummary": null, 
+                    "DocumentDetails": { 
+                        "ETAETDDetails": { 
+                            "VCN": "INPRT120210044", 
+                            "DraftAft": "11.00", 
+                            "RecordType": "N", 
+                            "CallSign": "5KKH7", 
+                            "IMONumber": "5578210", 
+                            "EDTA": "28072021:19:00", 
+                            "DraftFwd": "12.00", 
+                            "VesselName": "KOPCOP", 
+                            "EDTD": "31072021:18:00" 
+                        } 
+                    } 
+                } 
+            }, 
+            "responseStatus": "SUCCESS", 
+            "message": null 
+        } 
+    ], 
+    "error": "false", 
+    "code": "200", 
+    "message": "Success" 
+} 
+ 
+1.8.9 Response 8: - 
+{ 
+    "response": [ 
+        { 
+            "response": { 
+                "map": { 
+                    "CHPOI13Payload": { 
+                        "map": { 
+                            "manifest": { 
+                                "map": { 
+                                    "trans": { 
+                                        "map": { 
+                                            "GrossQtyVolume": "3.270", 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 41 of 46 
+ 
+                                            "SealNo": "HMM191732849", 
+                                            "NoofPackages": "32", 
+                                            "SMTPDate": "08062021", 
+                                            "ContainerType": "FCL", 
+                                            "DestinationCode": "INILP6", 
+                                            "CustomsHouseCode": "INKAT1", 
+                                            "BondNo": "2000483550", 
+                                            "ContainerNo": "KOCU4351870", 
+                                            "CargoDesc": "179 PACKAGES PARTS FOR TELEVISION", 
+                                            "LineNumber": "352", 
+                                            "UnitofPackages": "PKG", 
+                                            "IGMDate": "05062021", 
+                                            "SMTPNo": "2007968", 
+                                            "ConsigneeName": "C*M*E*I*I*N*T*A* *E*H*O*O*Y*(*N*I*)", 
+                                            "IGMNo": "2284364", 
+                                            "SubLineNumber": "0", 
+                                            "CarrierCode": "AABCC1756D", 
+                                            "TerminalOperatorCode": "INKAT1LSL1", 
+                                            "UnitofQty": "TON", 
+                                            "MessageType": "F" 
+                                        } 
+                                    } 
+                                } 
+                            } 
+                        } 
+                    } 
+                } 
+            }, 
+            "responseStatus": "SUCCESS", 
+            "message": null 
+        } 
+    ], 
+    "error": "false", 
+    "code": "200", 
+    "message": "Success" 
+} 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 42 of 46 
+ 
+1.8.10 Response 9: - 
+{ 
+    "response": [ 
+        { 
+            "response": { 
+                "CHSAE02Payload": { 
+                    "RotationNumberAllotmentDetails": { 
+                        "RotationNumber": "363598", 
+                        "ShipingAgentCode": "ZLINW002", 
+                        "VesselCode": "87e8", 
+                        "RotationDate": "19062021", 
+                        "VoyageNo": "89", 
+                        "IMOCode": "9876551", 
+                        "MessageType": "F", 
+                        "ShippingLineCode": "9HA259" 
+                    } 
+                } 
+            }, 
+            "responseStatus": "SUCCESS", 
+            "message": null 
+        } 
+    ], 
+    "error": "false", 
+    "code": "200", 
+    "message": "Success" 
+} 
+ 
+1.8.11 Response 10: - 
+{ 
+    "response": [ 
+        { 
+            "response": { 
+                "map": { 
+                    "CODECODetails": { 
+                        "map": { 
+                            "DocumentSummary": { 
+                                "map": { 
+                                    "IssuedDateTime": "29062018213014" 
+                                } 
+                            }, 
+                            "DocumentDetails": { 
+                                "map": { 
+                                    "CODECOHeader": { 
+                                        "map": { 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 43 of 46 
+ 
+                                            "VCN": "1806152", 
+                                            "CallSign": "BDR562", 
+                                            "TotNoContainer": "1", 
+                                            "IMONumber": "BDR562" 
+                                        } 
+                                    }, 
+                                    "ContainerDetails": { 
+                                        "map": { 
+                                            "Container": { 
+                                                "map": { 
+                                                    "EquipmentStatusCode": "3", 
+                                                    "CACode": "STA04", 
+                                                    "CustomSealNo": "ZGLP346131", 
+                                                    "VehicleNo": "MH46H5118", 
+                                                    "ContISOCode": "2210", 
+                                                    "GatePassNo": "1268724", 
+                                                    "DestPort": "INBOM", 
+                                                    "LoadingPort": "CNSHA", 
+                                                    "ContainerNO": "TRHU2911833", 
+                                                    "ContTypeClassificationCode": "4", 
+                                                    "GatePassDateTime": "26062018:20:50", 
+                                                    "GateNumber": "45", 
+                                                    "ArrivalDateTime": "12062018:00:01", 
+                                                    "ContLineCode": "GSS", 
+                                                    "DamageIndiaction": "N", 
+                                                    "DeliveryMode": "3", 
+                                                    "ConSealStatus": "9", 
+                                                    "FinalPortOfDischarge": "INBOM1", 
+                                                    "CargoType": "12", 
+                                                    "ReceiptDate": "26062018" 
+                                                } 
+                                            } 
+                                        } 
+                                    } 
+                                } 
+                            } 
+                        } 
+                    } 
+                } 
+            }, 
+            "responseStatus": "SUCCESS", 
+            "message": null 
+        } 
+    ], 
+    "error": "false", 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 44 of 46 
+ 
+    "code": "200", 
+    "message": "Success" 
+} 
+ 
+1.8.12 Response 11: - 
+{ 
+    "response": [ 
+        { 
+            "response": { 
+                "GateOpenReportDetails": { 
+                    "DocumentSummary": { 
+                        "IssuedDateTime": "17072021142300" 
+                    }, 
+                    "DocumentDetails": { 
+                        "VCN": "INMAA120210438", 
+                        "RotationNumber": "353501", 
+                        "PortFloatLineLengthDateTime": null, 
+                        "ShippingAgent": null, 
+                        "ETA": "31052021:15:35", 
+                        "RecordType": "1", 
+                        "CallSign": "373568", 
+                        "RotationNumberDate": "31052021", 
+                        "WINScheduleDate": null, 
+                        "CutOffDateandTime": "17072021:14:22", 
+                        "IMONumber": "6346725" 
+                    } 
+                } 
+            }, 
+            "responseStatus": "SUCCESS", 
+            "message": null 
+        } 
+    ], 
+    "error": "false", 
+    "code": "200", 
+    "message": "Success" 
+} 
+ 
+1.9 Data Transmission & Authentication Mechanism 
+ 
+All data exchange would be done over secure HTTP (HTTPS). Request from ULIP's system would 
+be made in MPT system through a data exchange URL that has following form: 
+ 
+For Production: 
+ 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 45 of 46 
+ 
+https://www.ulip.dpiit.gov.in/ulip/v1.0.0/PCS/01 
+ 
+Body:  
+{ 
+    "interfaceName":"CHPOI03", 
+    "igmNumber": "2272354" 
+} 
+ 
+Access to above data exchange URL would be authorized by use of a security mechanism 
+implemented by the ULIP system. It is as follows: 
+ 
+• First time access:  It would require a username and password [which would be shared with 
+user beforehand].  Once user hit with valid user id and password, ULIP system will return a 
+basic authorization token to  user, using that token user will communicate with ULIP system 
+until token will not get expired. 
+ 
+Brief summary of HTTP Basic Authentication is as follows: 
+ 
+First time when User will hit ULIP secured API through username and password for access token 
+as follow- 
+ 
+ 
+ curl -X POST  
+‘https://www.ulip.dpiit.gov.in/ulip/v1.0.0/user/login  
+-H 'accept: application/json'  
+   -H 'content-type: application/json'  
+-data ‘{"username":"xxxxxx","password":" XXxxx@12345"} ‘ 
+ 
+ 
+Authorization:   
+Bearer 
+eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJpbnRlcmNvbnQiLCJpYXQiOjE1ODU1NjYyMzcsImFwcHMi
+OiJkYXRhcHVzaCJ9.jb-23DbkWpz-3ptsuuZofzH-
+ce7jd0xR5WlkFfBPO_Dzjop01dSx9OamqsjsgUAryLUPtUDiMX07oHG4L2AfFQ  
+ 
+Upon successful authentication, the user would be logged into the ULIP system and get an access 
+token. Though this token user can communicate with ULIP. This token has expiry time which 
+represent user session. The session time out for the same to be fixed hour, generally it is for 30 
+minutes. If there is no request coming from user for 30 minutes, then session (token) will be 
+expired and user need to re authenticate. 
+ 
+Using The above token, user can request ULIP system for details as follow - 
+ 
+curl -X POST \ 
+  https://www.ulip.dpiit.gov.in/ulip/v1.0.0/PCS/01 \ 
+  -H 'accept: application/json' \ 
+  -H 'authorization: Bearer 
+eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZXN0MSIsImlhdCI6MTYyNTIzMDQyNywiYXBwcyI6ImRh
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 4.0 Page 46 of 46 
+ 
+dGFwdXNoIn0.rhumwWJ8BWeeHe9CYmIV1UKyJk-kLHA_ovX5Zi2OwxEv-td-
+KpxnfbKDI_8FZsOoggqx3Al-Du1y2qMoUD7uzA' \ 
+  -H 'cache-control: no-cache' \ 
+  -H 'content-type: application/json' \ 
+  -H 'postman-token: 8e8a19a4-ea1e-6373-f616-e2e4af9a1338' \ 
+  -d ' { 
+    "interfaceName":"CHPOI03", 
+    "igmNumber": "2272354" 
+} ' 
+ 
+For Staging: 
+ 
+curl -X POST  
+‘http://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/user/login  
+-H 'accept: application/json'  
+   -H 'content-type: application/json'  
+-data ‘{"username":"xxxxxx","password":" XXxxx@12345"} ‘ 
+ 
+Authorization:   
+Bearer 
+eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJpbnRlcmNvbnQiLCJpYXQiOjE1ODU1NjYyMzcsImFwcHMi
+OiJkYXRhcHVzaCJ9.jb-23DbkWpz-3ptsuuZofzH-
+ce7jd0xR5WlkFfBPO_Dzjop01dSx9OamqsjsgUAryLUPtUDiMX07oHG4L2AfFQ  
+ 
+Upon successful authentication, the user would be logged into the ULIP system and get an access 
+token. Though this token user can communicate with ULIP. This token has expiry time which 
+represent user session. The session time out for the same to be fixed hour, generally it is for 30 
+minutes. If there is no request coming from user for 30 minutes, then session (token) will be 
+expired and user need to re authenticate. 
+ 
+Using The above token, user can request ULIP system for details as follow - 
+ 
+curl -X POST \ 
+  http://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/PCS/01 \ 
+  -H 'accept: application/json' \ 
+  -H 'authorization: Bearer 
+eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZXN0MSIsImlhdCI6MTYyNTIzMDQyNywiYXBwcyI6ImRh
+dGFwdXNoIn0.rhumwWJ8BWeeHe9CYmIV1UKyJk-kLHA_ovX5Zi2OwxEv-td-
+KpxnfbKDI_8FZsOoggqx3Al-Du1y2qMoUD7uzA' \ 
+  -H 'cache-control: no-cache' \ 
+  -H 'content-type: application/json' \ 
+  -H 'postman-token: 8e8a19a4-ea1e-6373-f616-e2e4af9a1338' \ 
+  -d ' { 
+    "interfaceName":"CHPOI03", 
+    "igmNumber": "2336612" 
+}' 

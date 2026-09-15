@@ -1,0 +1,1087 @@
+ULIP Integration Document 
+ 
+  
+                        
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+Version No.: 3.0 
+Date: 26/03/2026 
+Project Name: ULIP 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ULIP Integration Document 
+This document contains proprietary information of NLDSL. Unauthorized access, copying and replication are 
+prohibited. This document must not be copied in whole or part by any means, without the written authorization of 
+NLDSL, Noida, India. 
+ 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 3.0 Page 2 of 20 
+ 
+ 
+ 
+ 
+Revision History 
+Version Date Author Reviewer Significant Changes 
+1.0 06/09/2024 Girish Chander Nayab Ali Baseline Version 
+2.0 06/09/2024 Girish Chander Nayab Ali 
+Added new 
+Emission Factor 
+Unit 
+3.0 26/03/2026 Abhilash Meena Pranab 
+Manna Updated 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+  
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 3.0 Page 3 of 20 
+ 
+Table of Contents 
+ 
+Introduction ................................................................................................................................................. 4 
+1.1 Purpose .................................................................................................................................... 4 
+1.2 Data Integration between other system and ULIP application ................................................. 4 
+1.3 CARBON/01 ............................................................................................................................. 4 
+1.3.1 Technical Approach .................................................................................................... 5 
+1.4 CARBON/02 ............................................................................................................................. 8 
+1.4.1 Technical Approach .................................................................................................... 9 
+1.5 CARBON/03 ................................................................................................................................. 9 
+1.5.1  Technical Approach ....................................................................................................... 9 
+1.6 CARBON/04 ............................................................................................................................... 12 
+1.6.1 Technical Approach .................................................................................................. 12 
+1.7 Data Transmission & Authentication Mechanism .................................................................. 18 
+ 
+  
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 3.0 Page 4 of 20 
+ 
+Introduction 
+1.1 Purpose 
+ 
+The purpose of this document is to define and provide details for accessing API for  
+calculating Carbon Emission factor for different mode of transportation from ULIP system. 
+This document details the following points: 
+ 
+1. Data Integration between Other System  and ULIP web service : Identification of 
+operational points where data integration between other system and ULIP web service will 
+be needed. 
+ 
+2. Technical Approach for performing Data Integration  
+ 
+ 
+1.2 Data Integration between other system and ULIP application 
+ 
+User will share information to ULIP system based on data shared ULIP will provide data 
+(carbon emission factor) to the user. 
+1.3 CARBON/01 
+ 
+This API will take Weight, Distance and Trip Count and based on the emission factor 
+and user input data, ULIP System will calculate the total carbon emitted and send back 
+the response to the user. 
+ 
+ 
+S. 
+No. 
+Field Name Field Description Format Required/
+Not – 
+Required 
+Length 
+1  distance  
+Distance travelled 
+by the rail (In 
+Km).  
+^(?!0$)(0|[1-
+9]\d{0,4})(\.\d{1,3})?$ Required  
+Max five 
+digit 
+before 
+decimal 
+and max 3 
+digit after 
+decimal 
+2 weight Weight carries by 
+the rail (In Tonne). 
+^(?!0$)(0|[1-
+9]\d{0,4})(\.\d{1,3})?$ Required 
+Max five 
+digit 
+before 
+decimal 
+and max 3 
+digit after 
+decimal 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 3.0 Page 5 of 20 
+ 
+3 tripCount Number of trip 
+made by the rail ^[1-9]\d{0,2}$ Required 
+minimum 
+value as 1 
+and max 
+value as 
+999 
+1.3.1 Technical Approach  
+1. All the data will be shared through rest web services. 
+2. ULIP system will provide data (carbon emitted ) for which data is shared. 
+3. ULIP system will provide the data in JSON Object format in response body. 
+ 
+ 
+Example: 
+ 
+Let Distance 182.3 Km, Weight 218.6 tonne and tripCount is 1 this is the data shared by the 
+user, then Ulip system will calculate the total carbon emitted in kg co2 based on the data shared 
+by the user. 
+ 
+Calculation Example: (distance * weight * tripCount * WTT Emission factor) + (distance * 
+weight * tripCount * TTW Emission factor) 
+ 
+ 
+Year WTT Emission factor in 
+Kg Co2e  / Ton -KM 
+TTW Emission 
+factor in Kg Co2e  
+/ Ton -KM 
+WTW Emission 
+factor in Kg 
+Co2e  / Ton -KM 
+  A B C=A+B 
+Rail - Domestic 0.0062 0.0041 0.0103 
+ 
+ 
+Request: 
+ 
+The request must be of the following format, where weight, distance and tripCount is passed 
+within the request body in JSON format. 
+ 
+For Production: 
+ 
+https://www.ulip.dpiit.gov.in/ulip/v1.0.0/CARBON/01 
+ 
+ 
+{"distance":182.3, 
+"weight":218.6, 
+"tripCount":1 
+} 
+ 
+ 
+ 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 3.0 Page 6 of 20 
+ 
+Curl URL 
+ 
+curl --location --request POST 'https://www.ulip.dpiit.gov.in/ulip /v1.0.0/CARBON/01' \ 
+--header 'Content-Type: application/json' \ 
+--header 'Authorization: Bearer 
+eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1bGlwIiwiaWF0IjoxNjU3NzAzMjMyLCJhcHBzIjoiZ
+GF0YXB1c2gifQ.woK64SnrOZKvW5Jevd-eJI6PtetLBQ5WNfumvG_bu-
+XyX3AdgAzau6Cy0jzqmZcPZpMWNHPzpPadB82bVLAG0g' \ 
+--header 'Accept: application/json' \ 
+--data-raw '{"distance":182.3, 
+"weight":218.6, 
+"tripCount":1 
+}' 
+ 
+For Staging: 
+ 
+https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/CARBON/01 
+ 
+ 
+{ 
+    "distance": "123", 
+    "weight": "2.3", 
+    "tripCount": "1" 
+} 
+ 
+ 
+Curl URL 
+ 
+curl --location --request POST 'https://www.ulipstaging.dpiit.gov.in/ulip 
+/v1.0.0/CARBON/01' \ 
+--header 'Content-Type: application/json' \ 
+--header 'Authorization: Bearer 
+eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1bGlwIiwiaWF0IjoxNjU3NzAzMjMyLCJhcHBzIjoiZ
+GF0YXB1c2gifQ.woK64SnrOZKvW5Jevd-eJI6PtetLBQ5WNfumvG_bu-
+XyX3AdgAzau6Cy0jzqmZcPZpMWNHPzpPadB82bVLAG0g' \ 
+--header 'Accept: application/json' \ 
+--data-raw '{ 
+    "distance": "123", 
+    "weight": "2.3", 
+    "tripCount": "1" 
+} 
+' 
+ 
+ 
+ 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 3.0 Page 7 of 20 
+ 
+ 
+For obtaining authentication token, refer Section 1.7 
+ 
+Response 
+ 
+To acknowledge the above request, ULIP will send the below response -  
+ 
+a) In case of invalid format 
+ 
+1. Invalid data 
+{ 
+    "response": null, 
+    "error": "true", 
+    "code": "400", 
+    "message": "Data format failed OR wrong value entered at:  distance. Format should f
+ollow  ^(?!0$)(0|[1-9]\\d{0,4})(\\.\\d{1,3})?$" 
+} 
+ 
+b) In case of valid data sent by the user 
+ 
+{ 
+    "response": [ 
+        { 
+            "response": { 
+                "Carbon Emission Factor": "2.9139 Kg co2" 
+            }, 
+            "responseStatus": "SUCCESS" 
+        } 
+    ], 
+    "error": "false", 
+    "code": "200", 
+    "message": "Success" 
+} 
+ 
+Status Code 200: corporate data response 
+Status Code 400: Bad request (Invalid json syntax, invalid json key) 
+Status Code 401 or 403: Unauthenticated or Unauthorized 
+Status Code 500: Some internal server error occurred 
+Status Code 502: Server is not responding. 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 3.0 Page 8 of 20 
+ 
+1.4 CARBON/02 
+ 
+This API will take Distance, vehicle type , weight, fuel type and Trip Count and 
+based on the emission factor and user input data, ULIP System will calculate the total 
+carbon emitted and send back the response to the user. 
+ 
+ 
+S. 
+No. 
+Field Name Field Description Format Required/
+Not – 
+Required 
+Length 
+1  distance  
+Distance travelled 
+by the vehicle (In 
+Km).  
+^(?!0$)(0|[1-
+9]\d{0,4})(\.\d{1,3})?$ Required  
+Max 
+five 
+digit 
+before 
+decimal 
+and 
+max 3 
+digit 
+after 
+decimal 
+2 vehicleType Type of vehicle ^.{1,150}$ Required 
+From 
+below 
+vehicle 
+type 
+table 
+3 fuelType Type of fuel ^.{1,150}$ Required 
+From 
+below 
+fuel 
+type 
+table 
+4 weight 
+Weight carries by 
+the vehicle (In 
+Tonne). 
+^(?!0$)(0|[1-
+9]\d{0,4})(\.\d{1,3})?$ Required 
+Max 
+five 
+digit 
+before 
+decimal 
+and 
+max 3 
+digit 
+after 
+decimal 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+noOfTrips 
+ 
+Number of trip 
+made by the 
+vehicle 
+^[1-9]\d{0,2}$ Required 
+minimu
+m value 
+as 1 
+and 
+max 
+value 
+as 999 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 3.0 Page 9 of 20 
+ 
+1.4.1 Technical Approach  
+1.5 CARBON/03 
+ 
+This API will take Weight , Distance and No of Trips and based on the emission factor 
+and user input data ,ULIP System will calculate the total carbon emitted and send back 
+the response to the user. 
+ 
+S. 
+No. 
+Field Name Field Description Format Required/
+Not – 
+Required 
+Length 
+1  distance  Distance travelled 
+(In Km).  
+^(?!0$)(0|[1-
+9]\d{0,4})(\.\d{1,3})?$ Required  
+Max five 
+digit 
+before 
+decimal 
+and max 3 
+digit after 
+decimal 
+2 weight Weight (In 
+Tonne). 
+^(?!0$)(0|[1-
+9]\d{0,4})(\.\d{1,3})?$ Required 
+Max five 
+digit 
+before 
+decimal 
+and max 3 
+digit after 
+decimal 
+3 noOfTrips Number of trip 
+made by the rail ^[1-9]\d{0,2}$ Required 
+minimum 
+value as 1 
+and max 
+value as 
+999 
+ 
+1.5.1  Technical Approach 
+1. All the data will be shared through rest web services. 
+2. ULIP system will provide data (carbon emitted ) for which data is shared. 
+3. ULIP system will provide the data in JSON Object format in response body. 
+ 
+ 
+Example: 
+ 
+Let Distance 182.3 Km, Weight 218.6 tonne and noOfTrips is 1 this is the data shared by the 
+user, then Ulip system will calculate the total carbon emitted in kg co2 based on the data shared 
+by the user. 
+ 
+Calculation Example: (distance * weight * tripCount * WTT Emission factor) + (distance * 
+weight * tripCount * TTW Emission factor) 
+ 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 3.0 Page 10 of 20 
+ 
+Year WTT Emission factor in 
+Kg Co2e  / Ton -KM 
+TTW Emission factor in 
+Kg Co2e  / Ton -KM 
+WTW Emission factor in Kg 
+Co2e  / Ton -KM 
+  A B                         C=A+B 
+Air - Domestic 0.2444 1.5080 1.7524 
+ 
+ 
+Request: 
+ 
+The request must be of the following format, where weight, distance and noOfTrips is passed 
+within the request body in JSON format. 
+ 
+For Production: 
+ 
+https://www.ulip.dpiit.gov.in/ulip/v1.0.0/CARBON/03 
+ 
+{ 
+    "distance": "182.3", 
+    "weight": "218.6", 
+    "noOfTrips": "1" 
+} 
+ 
+Curl URL 
+ 
+curl --location --request POST ‘https://www.ulip.dpiit.gov.in/ulip/v1.0.0/CARBON/03' \ 
+--
+header 'Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1bGlwIiwiaWF0IjoxNzI2MTE
+4NzgwLCJhcHBzIjoiZGF0YXB1c2gifQ.n5qKgFlkSsxX8JTFWF8ns6gkdlUpb3HIoSidNRFVtGOf3
+qpTq_ls57gqgjkEsyvxs1DHwkGe8e-i-FAgPT7Aww' \ 
+--header 'Content-Type: application/json' \ 
+--header 'Accept: application/json' \ 
+--data-raw '{ 
+    "distance": "182.3", 
+    "weight": "218.6", 
+    "noOfTrips": "1" 
+}' 
+ 
+ 
+For Staging: 
+https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/CARBON/03 
+ 
+{ 
+    "distance": "182.3", 
+    "weight": "218.6", 
+    "noOfTrips": "1" 
+} 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 3.0 Page 11 of 20 
+ 
+Curl URL 
+ 
+curl --location --request POST ‘https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/CARBON/03' \ 
+--
+header 'Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1bGlwIiwiaWF0IjoxNzI2MTE
+4NzgwLCJhcHBzIjoiZGF0YXB1c2gifQ.n5qKgFlkSsxX8JTFWF8ns6gkdlUpb3HIoSidNRFVtGOf3
+qpTq_ls57gqgjkEsyvxs1DHwkGe8e-i-FAgPT7Aww' \ 
+--header 'Content-Type: application/json' \ 
+--header 'Accept: application/json' \ 
+--data-raw '{ 
+    "distance": "182.3", 
+    "weight": "218.6", 
+    "noOfTrips": "1" 
+}' 
+ 
+ 
+For obtaining authentication token, refer Section 1.7 
+ 
+Response 
+ 
+To acknowledge the above request, ULIP will send the below response -  
+ 
+a) In case of invalid format 
+ 
+ 
+{ 
+    "response": null, 
+    "error": "true", 
+    "code": "400", 
+    "message": "Data format failed OR wrong value entered at:  distance. Format should f
+ollow  ^(?!0$)(0|[1-9]\\d{0,4})(\\.\\d{1,3})?$" 
+} 
+ 
+b) In case of valid data sent by the user 
+ 
+{ 
+    "response": [ 
+        { 
+            "response": { 
+                "Carbon Emission Factor": "69834.5069 Kg co2" 
+            }, 
+            "responseStatus": "SUCCESS" 
+        } 
+    ], 
+    "error": "false", 
+    "code": "200", 
+    "message": "Success" 
+} 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 3.0 Page 12 of 20 
+ 
+Status Code 200: corporate data response 
+Status Code 400: Bad request (Invalid json syntax, invalid json key) 
+Status Code 401 or 403: Unauthenticated or Unauthorized 
+Status Code 500: Some internal server error occurred 
+Status Code 502: Server is not responding. 
+ 
+1.6 CARBON/04 
+ 
+This API will take Distance, vessel type , vessel size, weight and No of Trips and 
+based on the emission factor and user input data, ULIP System will calculate the total 
+carbon emitted and send back the response to the user. 
+ 
+ 
+S. 
+No. 
+Field 
+Name 
+Field Description Format Required/No
+t – Required 
+Length 
+1  distance  
+Distance travelled 
+(In Nautical 
+miles).  
+^(?!0$)(0|[1-
+9]\d{0,4})(\.\d{1,3}
+)?$ 
+Required  
+Max five digit 
+before 
+decimal and 
+max 3 digit 
+after decimal 
+2 vesselTyp
+e Type of vessel ^.{1,150}$ Required 
+From below 
+vessel type 
+table 
+3 vesselSize Size of vessel ^.{1,150}$ Required 
+From below 
+vessel size 
+table 
+4 weight Weight (In 
+Tonne). 
+^(?!0$)(0|[1-
+9]\d{0,4})(\.\d{1,3}
+)?$ 
+Required 
+Max five digit 
+before 
+decimal and 
+max 3 digit 
+after decimal 
+5 
+noOfTrips 
+ 
+ 
+ 
+Number of trip 
+made by the 
+vehicle 
+^[1-9]\d{0,2}$ Required 
+minimum 
+value as 1 
+and max 
+value as 999 
+1.6.1 Technical Approach  
+1. All the data will be shared through rest web services. 
+2. ULIP system will provide data (carbon emitted) for which data is shared. 
+3. ULIP system will provide the data in JSON Object format in response body. 
+ 
+ 
+ 
+ 
+ 
+ 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 3.0 Page 13 of 20 
+ 
+Example: 
+ 
+Let Distance 182.3 Nautical Miles, vessel type is Products tanker, vessel Size is 20,000–
+59,999 dwt , weight is 218.6 kg 
+and noOfTrips is 1 this is the data shared by the user, then Ulip system will calculate the total 
+carbon emitted in kg co2 based on the data shared by the user. 
+ 
+Request: 
+ 
+The request must be of the following format, where distance,vesselType,VesselSize, weight 
+and noOfTrips is passed within the request body in JSON format. 
+ 
+Vessel Type should be of following type only. 
+ 
+Sr.  Vessel Type 
+1 Crude tanker 
+2 Chemical tanker  
+3 Container ship 
+4 General 
+5 LPG Tanker 
+6 Oil Tanker 
+7 Other Liquid Tankers 
+8 Ferry - Pax Only 
+9 Cruise 
+10 Ferry Ro-Pax 
+11 Refrigerated 
+12 Ro-Ro 
+13 Vehicle 
+ 
+Vessel Size should be of following type only. 
+ 
+Type Size Unit 
+TTW Emission 
+factor in Kg Co2e  
+/ Ton -KM 
+WTT Emission 
+factor in Kg 
+Co2e  / Ton -
+KM  
+WTW Emission 
+factor in Kg 
+Co2e  / Ton -
+KM 
+Crude tanker 
+0-9999 dwt tonne.km 0.0242 0.0049 0.0291 
+10000-34999 dwt tonne.km 0.0069 0.0014 0.0083 
+35000-59999 dwt tonne.km 0.0051 0.0010 0.0062 
+60000-99999 dwt tonne.km 0.0042 0.0008 0.0051 
+100000-199999 dwt tonne.km 0.0029 0.0006 0.0034 
+200000+ dwt tonne.km 0.0026 0.0005 0.0031 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 3.0 Page 14 of 20 
+ 
+Chemical tanker  
+0-4999 dwt tonne.km 0.0447 0.0089 0.0536 
+5000-9999 dwt tonne.km 0.0215 0.0043 0.0259 
+10000-19999 dwt tonne.km 0.0147 0.0029 0.0176 
+20000-39999 dwt tonne.km 0.0091 0.0018 0.0109 
+40000+ dwt tonne.km 0.0070 0.0014 0.0084 
+Container Ship 
+0-999 TEU tonne.km 0.0198 0.0040 0.0238 
+1000-1999 TEU tonne.km 0.0148 0.0030 0.0178 
+2000-2999 TEU tonne.km 0.0105 0.0021 0.0126 
+3000-4999 TEU tonne.km 0.0092 0.0019 0.0111 
+5000-7999 TEU tonne.km 0.0088 0.0018 0.0106 
+8000-11999 TEU tonne.km 0.0073 0.0015 0.0088 
+12000-14499 TEU tonne.km 0.0058 0.0012 0.0069 
+14500-19999 TEU tonne.km 0.0046 0.0009 0.0055 
+20000+ TEU tonne.km 0.0043 0.0009 0.0052 
+General 
+0-4999 dwt tonne.km 0.0210 0.0042 0.0252 
+5000-9999 dwt tonne.km 0.0172 0.0034 0.0206 
+10000-19999 dwt tonne.km 0.0153 0.0031 0.0184 
+20000+ dwt tonne.km 0.0079 0.0016 0.0095 
+LPG Tanker 
+0-49999 cbm tonne.km 0.0362 0.0073 0.0435 
+50000-99999 cbm tonne.km 0.0112 0.0023 0.0135 
+100000-199999 cbm tonne.km 0.0089 0.0018 0.0106 
+200000+ cbm tonne.km 0.0091 0.0018 0.0110 
+Oil Tanker 
+0-4999 dwt tonne.km 0.0619 0.0124 0.0743 
+5000-9999 dwt tonne.km 0.0349 0.0070 0.0419 
+10000-19999 dwt tonne.km 0.0282 0.0056 0.0338 
+20000-59999 dwt tonne.km 0.0144 0.0029 0.0172 
+60000-79999 dwt tonne.km 0.0083 0.0017 0.0100 
+80000-119999 dwt tonne.km 0.0065 0.0013 0.0078 
+120000-199999 dwt tonne.km 0.0048 0.0010 0.0058 
+200000+ dwt tonne.km 0.0030 0.0006 0.0036 
+Other Liquid 
+Tankers 
+0-999 dwt tonne.km 1.0003 0.2001 1.2004 
+1000+ dwt tonne.km 0.0218 0.0043 0.0261 
+Ferry - Pax Only 2000+ gt tonne.km 0.0721 0.0144 0.0866 
+0-1999 gt tonne.km 0.8084 0.1617 0.9700 
+Cruise 
+2000-9999 gt tonne.km 0.2829 0.0566 0.3395 
+10000-59999 gt tonne.km 0.0860 0.0172 0.1032 
+60000-99999 gt tonne.km 0.0923 0.0185 0.1108 
+100000-149999 gt tonne.km 0.0814 0.0163 0.0977 
+150000+ gt tonne.km 0.0665 0.0133 0.0798 
+Ferry Ro-Pax 2000-4999 gt tonne.km 0.1921 0.0384 0.2305 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 3.0 Page 15 of 20 
+ 
+5000-9999 gt tonne.km 0.1480 0.0296 0.1775 
+10000-19999 gt tonne.km 0.0978 0.0196 0.1174 
+20000+ gt tonne.km 0.0759 0.0152 0.0911 
+Refrigerated 
+0-1999 dwt tonne.km 0.1178 0.0236 0.1413 
+2000-5999 dwt tonne.km 0.0615 0.0123 0.0738 
+6000-9999 dwt tonne.km 0.0464 0.0093 0.0557 
+10000+ dwt tonne.km 0.0341 0.0068 0.0410 
+Ro-Ro 
+0-4999 dwt tonne.km 0.1453 0.0291 0.1743 
+5000-9999 dwt tonne.km 0.0358 0.0072 0.0429 
+10000-14999 dwt tonne.km 0.0299 0.0060 0.0359 
+15000+ dwt tonne.km 0.0151 0.0030 0.0181 
+Vehicle 
+0-29999 gt tonne.km 0.0792 0.0158 0.0951 
+30000-49999 gt tonne.km 0.0386 0.0077 0.0463 
+50000+ gt tonne.km 0.0312 0.0062 0.0375 
+ 
+ 
+Calculation Example: (distance * weight * tripCount * WTT Emission factor) + (distance * 
+weight * tripCount * TTW Emission factor) 
+ 
+NOTE: WTT and TTW Emission factor will be based on vessel type and vessel size from the 
+values given in the above table. 
+ 
+For Production: 
+ 
+https://www.ulip.dpiit.gov.in/ulip/v1.0.0/CARBON/04 
+ 
+{ 
+    "distance": "1822.3", 
+    "vesselType": "Products tanker", 
+    "vesselSize": "20,000–59,999 dwt", 
+    “weight”:218.6 
+    "noOfTrips": "1" 
+} 
+ 
+Curl URL 
+ 
+curl --location --request POST ‘https://www.ulip.dpiit.gov.in/ulip/v1.0.0/CARBON/04' \ 
+--
+header 'Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1bGlwIiwiaWF0IjoxNzI3MTc
+0NDgyLCJhcHBzIjoiZGF0YXB1c2gifQ.Prg1fvNfSz8tBGjCtNs6ySDs4tn5pIJm5cs40ZGmd1XxZ-
+UIJ2M-8E0C5_x5Zf9z51AaXh6SWg80JNh_RgEH_A' \ 
+--header 'Content-Type: application/json' \ 
+--header 'Accept: application/json' \ 
+--data-raw '{ 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 3.0 Page 16 of 20 
+ 
+    "distance": "1822.3", 
+    "vesselType": "Products tanker", 
+    "vesselSize": "20,000–59,999 dwt", 
+     “weight”:218.6 
+    "noOfTrips": "1" 
+}' 
+ 
+For Staging: 
+ 
+https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/CARBON/04 
+ 
+{ 
+    "distance": "1822.3", 
+    "vesselType": "Oil Tanker", 
+    "vesselSize": "200000+ dwt", 
+    "weight": "218.6", 
+    "noOfTrips": "1" 
+} 
+ 
+ 
+Curl URL 
+ 
+curl --location --request POST ‘https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/CARBON/04' \ 
+--
+header 'Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1bGlwIiwiaWF0IjoxNzI3MTc
+0NDgyLCJhcHBzIjoiZGF0YXB1c2gifQ.Prg1fvNfSz8tBGjCtNs6ySDs4tn5pIJm5cs40ZGmd1XxZ-
+UIJ2M-8E0C5_x5Zf9z51AaXh6SWg80JNh_RgEH_A' \ 
+--header 'Content-Type: application/json' \ 
+--header 'Accept: application/json' \ 
+--data-raw '{ 
+    "distance": "1822.3", 
+    "vesselType": "Oil Tanker", 
+    "vesselSize": "200000+ dwt", 
+    "weight": "218.6", 
+    "noOfTrips": "1" 
+}' 
+ 
+ 
+For obtaining authentication token, refer Section 1.7 
+ 
+Response 
+ 
+To acknowledge the above request, ULIP will send the below response -  
+ 
+a) In case of invalid format 
+ 
+Invalid corporate identification number 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 3.0 Page 17 of 20 
+ 
+ 
+{ 
+    "response": null, 
+    "error": "true", 
+    "code": "400", 
+    "message": "Data format failed OR wrong value entered at:  distance. Format should follow  ^
+(?!0$)(0|[1-9]\\d{0,4})(\\.\\d{1,3})?$" 
+} 
+ 
+b) In case of valid data sent by the user 
+ 
+{ 
+    "response": [ 
+        { 
+            "response": { 
+                "Carbon Emission Factor": "1434.0772 Kg co2" 
+            }, 
+            "responseStatus": "SUCCESS" 
+        } 
+    ], 
+    "error": "false", 
+    "code": "200", 
+    "message": "Success" 
+} 
+ 
+ 
+c) In case of invalid vessel type 
+ 
+{ 
+    "response": [ 
+        { 
+            "response": "vesselType is not valid", 
+            "responseStatus": "ERROR" 
+        } 
+    ], 
+    "error": "false", 
+    "code": "200", 
+    "message": "Success" 
+} 
+ 
+ 
+ 
+d) In case of invalid vessel size 
+ 
+{ 
+    "response": [ 
+        { 
+            "response": "vesselSize is not valid", 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 3.0 Page 18 of 20 
+ 
+            "responseStatus": "ERROR" 
+        } 
+    ], 
+    "error": "false", 
+    "code": "200", 
+    "message": "Success" 
+} 
+ 
+ 
+ 
+Status Code 200: corporate data response 
+Status Code 400: Bad request (Invalid json syntax, invalid json key) 
+Status Code 401 or 403: Unauthenticated or Unauthorized 
+Status Code 500: Some internal server error occurred 
+Status Code 502: Server is not responding. 
+ 
+1.7 Data Transmission & Authentication Mechanism 
+ 
+All data exchange would be done over secure HTTP (HTTPS). Request from ULIP's system would 
+be made in IWAI system through a data exchange URL that has following form: 
+ 
+For Production 
+ 
+https://www.ulip.dpiit.gov.in/ulip/v1.0.0/CARBON/01 
+ 
+ 
+Body:  
+ 
+{ 
+    "distance": "18233.7", 
+    "weight": "0.0", 
+    "tripCount": "1" 
+} 
+ 
+Access to above data exchange URL would be authorized by use of a security mechanism 
+implemented by the ULIP system. It is as follows: 
+ 
+• First time access:  It would require a username and password [which would be shared with 
+user beforehand].  Once user hit with valid user id and password, ULIP system will return a 
+basic authorization token to  user, using that token user will communicate with ULIP system 
+until token will not get expired. 
+ 
+Brief summary of HTTP Basic Authentication is as follows: 
+ 
+First time when User will hit ULIP secured API through username and password for access token 
+as follow- 
+ 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 3.0 Page 19 of 20 
+ 
+curl --location --request POST 'https://www.ulip.dpiit.gov.in/ulip/v1.0.0/user/login' \ 
+--header 'Accept: application/json' \ 
+--header 'Content-Type: application/json' \ 
+--data-raw '{ 
+"username": "xxxx", 
+"password": "xxxx@123" 
+}' 
+ 
+ 
+Authorization:   
+Bearer  
+eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZXN0MSIsImlhdCI6MTYyNTIzMDQyNywiYXBwcyI6I
+mRhdGFwdXNoIn0.rhumwWJ8BWeeHe9CYmIV1UKyJk-kLHA_ovX5Zi2OwxEv-td-
+KpxnfbKDI_8FZsOoggqx3Al-Du1y2qMoUD7uzA' 
+ 
+Upon successful authentication, the user would be logged into the ULIP system and get an access 
+token. Though this token user can communicate with  ULIP. This token has expiry time which 
+represent user session. The session time out for the same to be fixed hour, generally it is for 30 
+minutes. If there is no request coming from user for 30 minutes, then session (token) will be 
+expired and user need to re authenticate. 
+ 
+Using The above token, user can request ULIP system for CIN details as follow - 
+ 
+curl -X POST \ 
+  https://www.ulip.dpiit.gov.in/ulip/v1.0.0/CARBON/01 
+\ 
+  -H 'accept: application/json' \ 
+  -H 'authorization: Bearer 
+eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZXN0MSIsImlhdCI6MTYyNTIzMDQyNywiYXBwcyI6I
+mRhdGFwdXNoIn0.rhumwWJ8BWeeHe9CYmIV1UKyJk-kLHA_ovX5Zi2OwxEv-td-
+KpxnfbKDI_8FZsOoggqx3Al-Du1y2qMoUD7uzA' \ 
+  -H 'cache-control: no-cache' \ 
+  -H 'content-type: application/json' \ 
+  -H 'postman-token: 8e8a19a4-ea1e-6373-f616-e2e4af9a1338' \ 
+  -d '{ }' 
+ 
+ 
+For Staging: 
+ 
+curl --location --request POST 'https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/user/login' \ 
+--header 'Accept: application/json' \ 
+--header 'Content-Type: application/json' \ 
+--data-raw '{ 
+"username": "xxxx", 
+"password": "xxxx@123" 
+}' 
+ 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 3.0 Page 20 of 20 
+ 
+Authorization:   
+Bearer  
+eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZXN0MSIsImlhdCI6MTYyNTIzMDQyNywiYXBwcyI6I
+mRhdGFwdXNoIn0.rhumwWJ8BWeeHe9CYmIV1UKyJk-kLHA_ovX5Zi2OwxEv-td-
+KpxnfbKDI_8FZsOoggqx3Al-Du1y2qMoUD7uzA' 
+ 
+Upon successful authentication, the user would be logged into the ULIP system and get an access 
+token. Though this token user can communicate with ULIP. This token has expiry time which 
+represent user session. The session time out for the same to be fixed hour, generally it is for 30 
+minutes. If there is no request coming from user for 30 minutes, then session (token) will be 
+expired and user need to re authenticate. 
+ 
+Using The above token, user can request ULIP system for CIN details as follow - 
+ 
+curl -X POST \ 
+  https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/CARBON/01 
+ 
+curl --location 'https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/CARBON/01' \ 
+--header 'Authorization: Bearer 
+eyJhbGciOiJIUzUxMiJ9.eyJhcHBzIjoiYXBpR2F0ZXdheSIsInN1YiI6ImhlbHBkZXNrX3VzciIs
+ImlhdCI6MTc3NDQxMzg2OX0.rePutiZabpnQea7lWyfxsizTjInFeM3qtZqxCyfpEoq133BOfEx
+zW-om5LgkBL9fLq1lbbjrZEn_PLnU2UlRdg' \ 
+--header 'Content-Type: application/json' \ 
+--header 'Accept: application/json' \ 
+--data '{ 
+    "distance": "123", 
+    "weight": "2.3", 
+    "tripCount": "1" 
+}' 

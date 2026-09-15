@@ -1,0 +1,967 @@
+ULIP Integration Document 
+ 
+  
+                        
+  
+ 
+ 
+ 
+ 
+ 
+ 
+ULIP Integration Document 
+ 
+ 
+ 
+ 
+Version No.: 3.0 
+ 
+Date: 24/03/2026 
+ 
+Project Name: ULIP 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+This document contains proprietary information of  NLDSL. Unauthorized access, copying and replication are 
+prohibited. This document must not be copied in whole or part by any means, without the written authorization of 
+NLDSL, New Delhi, India. 
+Doc Ref. No: ULIP Integration Doc 
+ Version No: 3.0 Page 2 of 20 
+ULIP Integration Document 
+ 
+  
+                        
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+Revision History 
+ 
+Version Date Author Reviewer Significant Changes 
+1.0 03/03/2025 Ayush Arya Nayab Ali Baseline Version 
+2.0 08/01/2026 Hasan Mhad Khan Nayab Ali Payload Update 
+for BPCL/02 
+3.0 24/03/2026 Gaurav Tyagi Pranab Manna Update 
+Doc Ref. No: ULIP Integration Doc 
+ Version No: 3.0 Page 3 of 20 
+ULIP Integration Document 
+ 
+  
+                        
+ 
+ 
+Table of Contents 
+ 
+Contents 
+Introduction .........................................................................................................................................................4 
+1.1 Purpose ..........................................................................................................................................4 
+The Overall Description .....................................................................................................................................4 
+1.2 Data Integration between BPCL System and ULIP application .................................................4 
+1.3 BPCL/01 ..........................................................................................................................................4 
+1.3.1 Technical Approach ......................................................................................................................6 
+1.4 BPCL/02 ....................................................................................................................................... 10 
+1.4.1 Technical Approach ................................................................................................................... 12 
+1.5 Data Transmission & Authentication Mechanism .................................................................... 18 
+ 
+Doc Ref. No: ULIP Integration Doc 
+ Version No: 3.0 Page 4 of 20 
+ULIP Integration Document 
+ 
+  
+                        
+ 
+ 
+Introduction 
+1.1 Purpose 
+ 
+ 
+The purpose of this document is to define and provide details for accessing API for 
+BPCL system information (information about oil and natural gas stations based on 
+StateCode or geographical location (longitude, latitude, and radius) value from ULIP 
+system 
+ 
+This document details the following points: 
+ 
+1. Data Integration between BPCL and ULIP web service: Identification of operational 
+points where data integration between BPCL and ULIP web service will be needed. 
+ 
+2. Technical Approach for performing Data Integration 
+ 
+The Overall Description 
+ 
+Users will need to share their State Code or geographical location (longitude, latitude, 
+and radius) to access the list of public petroleum and natural gas stations through the rest 
+API. 
+ 
+Here are some points to keep in mind when accessing BPCL API data information: 
+ 
+• The API will only share data that is based on the user's provided information. 
+• ULIP will expose an API for getting data from the BPCL API. 
+• The BPCL/01 API will take the user information from the user to register that user. 
+And the user will receive ReferenceNo in response, from this ReferenceNo user will 
+be able to access the BPCL/02 API. 
+• The BPCL/02 API will take ReferenceNo and State Code or geographical location 
+(longitude, latitude, and radius) to give information about petroleum and natural gas 
+stations to the user. 
+ 
+1.2 Data Integration between BPCL System and ULIP application 
+The ULIP system will receive information from the user and provide data in return. 
+1.3 BPCL/01 
+This API is designed to register the user to the BPCL system based on user information. The user 
+will provide their information, and once the user successfully registers, they will get the reference 
+number in the response. 
+Doc Ref. No: ULIP Integration Doc 
+ Version No: 3.0 Page 5 of 20 
+ULIP Integration Document 
+ 
+  
+                        
+ 
+ 
+{ 
+"customerName": "Ayush", 
+"address": "Aligarh UP", "district": 
+"Gautam Bhuda Nagar", 
+"stateName": "Uttar Pradesh", 
+"email": "test@paytm.com", 
+"monthlyFuelConsumption": 
+"10000", "userId": "test", 
+"userIP": "193.2.2.2", 
+"mobileNo": "9161666615" 
+} 
+Please note that when making a request, all of the JSON keys are mandatory in the payload 
+ 
+ 
+ 
+ Field Name Field 
+Description 
+Format Required/Not – 
+Required 
+Length 
+1 customerN 
+ame 
+Customer 
+Name 
+^[a-zA-Z\s]{2,20}$ Required 
+2-20 
+2 Address Address ^[a-zA-Z0-9\s,:.-]{2,49}$ Required 
+2-49 
+3 
+District District ^[a-zA-Z\s]{2,20}$ Required 
+2-20 
+4 StateCode State Name ^[a-zA-Z\s]{1,30}$ Required 1-30 
+5 Email Email [A-Za-z0-9\._%+\-]+@[A-
+Za-z0-9\.\-]+\.[A-Za-z]{2,} 
+Required  
+6 monthlyFu 
+elConsump 
+tion 
+Monthly fuel 
+consumptio 
+n 
+^\d{1,10}$ Required 
+1-10 
+ 
+7 
+userId User ID ^[a-zA-Z][a-zA-Z0- 
+9\s._@]{1,20}$ 
+Required  
+2-20 
+8 userIP User IP ^(?:\d{1,3}.){3}\d{1,3}$ Required  
+9 mobileNo Mobile 
+number 
+^[6-9]\d{9}$ Required 10 
+Doc Ref. No: ULIP Integration Doc 
+ Version No: 3.0 Page 6 of 20 
+ULIP Integration Document 
+ 
+  
+                        
+ 
+ 
+{ 
+    "customerName": "Ayush", 
+    "address": "Aligarh UP", 
+    "district": "Gautam Bhuda Nagar", 
+    "stateName": "Uttar Pradesh", 
+    "email": "test@paytm.com", 
+    "monthlyFuelConsumption": "10000", 
+    "userId": "test", 
+    "userIP": "193.2.2.2", 
+    "mobileNo": "9161999629" 
+} 
+ 
+curl --location 'https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/BPCL/01' \ 
+--header 'Authorization: Bearer 
+eyshbGciqiJIazmxMiJ8.eyJzdWIiOiJ1bGlwIiwiaWF0IjoxNzI2NTU2ODk4LCJhcHB
+zIjoiZGF0YXB1c2gifQ.dqXUxA7agKxu9w961sr-QNG1g-
+9TWWpQQLUX6CsUO5drkwmny9hU4hIf6cOr8CXHlJ67Nv-HdGNtHtr2bH8Irg\ 
+--header 'Content-Type: application/json' \ 
+--header 'Accept: application/json' \ 
+--data-raw '{ 
+1.3.1 Technical Approach 
+ 
+1. All the data will be shared through REST web services. 
+2. The user will share the input for which information is required. 
+3. BPCL API will share details of BPCL API information that exists in the system in JSON 
+format. 
+4. The ULIP system will provide the data in JSON Object format in the response body. 
+5. When we hit the BPCL/01, and the user successfully registers, the user will get a 
+reference number in return. 
+ 
+Request: 
+The request must be of the following format: user information is passed within the URL post 
+request body in JSON format. 
+ 
+For staging - 
+https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/BPCL/01 
+ 
+ 
+Curl URL 
+ 
+Doc Ref. No: ULIP Integration Doc 
+ Version No: 3.0 Page 7 of 20 
+ULIP Integration Document 
+ 
+  
+                        
+ 
+ 
+{ 
+"customerName": "Ayush", 
+"address": "Aligarh UP", 
+"district": "Gautam Bhuda Nagar", 
+"stateName": "Uttar Pradesh", 
+"email": "test@paytm.com", 
+"monthlyFuelConsumption": "10000", 
+"userId": "test", 
+"userIP": "193.2.2.2", 
+"mobileNo": "9161666615" 
+} 
+curl --location 'https://www.ulip.dpiit.gov.in/ulip/v1.0.0/BPCL/01' \ 
+--header 'Authorization: Bearer 
+eyshbGciqiJIazmxMiJ8.eyJzdWIiOiJ1bGlwIiwiaWF0IjoxNzI2NTU2ODk4LCJhcH
+BzIjoiZGF0YXB1c2gifQ.dqXUxA7agKxu9w961sr-QNG1g-
+9TWWpQQLUX6CsUO5drkwmny9hU4hIf6cOr8CXHlJ67Nv-HdGNtHtr2bH8Irg \ 
+--header 'Content-Type: application/json' \ 
+--header 'Accept: application/json' \ 
+--data-raw '{ 
+"customerName": "Ayush", 
+"address": "Aligarh UP", 
+"district": "Gautam Bhuda Nagar", 
+"stateName": "Uttar Pradesh", 
+"email": "test@paytm.com", 
+"monthlyFuelConsumption": "10000", 
+ 
+ 
+ 
+      For production - 
+ 
+https://www.ulip.dpiit.gov.in/ulip/v1.0.0/BPCL/01 
+ 
+ 
+     Curl URL 
+ 
+    "customerName": "Ayush", 
+    "address": "Aligarh UP", 
+    "district": "Gautam Bhuda Nagar", 
+    "stateName": "Uttar Pradesh", 
+    "email": "test@paytm.com", 
+    "monthlyFuelConsumption": "10000", 
+    "userId": "test", 
+    "userIP": "193.2.2.2", 
+    "mobileNo": "9161999629" 
+} 
+' 
+Doc Ref. No: ULIP Integration Doc 
+ Version No: 3.0 Page 8 of 20 
+ULIP Integration Document 
+ 
+  
+                        
+ 
+ 
+{ 
+"response": null, 
+"error": "true", 
+"code": "400 BAD_REQUEST", 
+"message": "Data format failed OR wrong value entered at: email. Format 
+should follow [A-Za-z0-9\\._%+\\-]+@[A-Za-z0-9\\.\\-]+\\.[A-Za-z]{2,}" 
+} 
+{ 
+"response": null, 
+"error": "true", 
+"code": "400 BAD_REQUEST", 
+"message": "Data format failed OR wrong value entered at: userIP. Format 
+should follow ^(?:\\d{1,3}.){3}\\d{1,3}$" 
+} 
+{ 
+"response": null, 
+"error": "true", 
+"code": "400 BAD_REQUEST", 
+"message": "Data format failed OR wrong value entered at: mobileNo. Format should 
+follow ^[6-9]\\d{9}$" 
+} 
+ 
+ 
+ 
+For obtaining an authentication token, refer to Section 1.5 
+ 
+Response 
+ 
+To acknowledge the above request, ULIP will send the below response - 
+ 
+In case of an invalid format 
+ 
+1. Invalid email 
+ 
+ 
+2. Invalid userIP format 
+ 
+ 
+3. Invalid mobile format 
+ 
+"userId": "test", 
+"userIP": "193.2.2.2", 
+"mobileNo": "9161666615" 
+}' 
+Doc Ref. No: ULIP Integration Doc 
+ Version No: 3.0 Page 9 of 20 
+ULIP Integration Document 
+ 
+  
+                        
+ 
+ 
+{ 
+"response": [ 
+{ 
+"response": { 
+"ReferenceNo": "9161666616", 
+"Status": 1, 
+"Reason": "Data Inserted Successfully." 
+}, 
+"responseStatus": "SUCCESS" 
+} 
+], 
+"error": "false", 
+"code": "200", 
+"message": "Success" 
+} 
+ 
+1. In case BPCL API data user information already exists in the BPCL system 
+ 
+ 
+ 
+2. In case the BPCL API data user information does not exist in the BPCL system 
+ 
+ 
+Status Code 200: BPCL API data response 
+Status Code 400: Bad request (Invalid JSON syntax, invalid JSON key) 
+Status Code 401 or 403: Unauthenticated or Unauthorized 
+Status Code 500: Some internal server error occurred 
+Status Code 502: The server is not responding. 
+ 
+ 
+ 
+{ 
+"response": [ 
+{ 
+"response": { 
+"ReferenceNo": null, 
+"Status": 0, 
+"Reason": "Mobile No. already exists" 
+}, 
+"responseStatus": "ERROR" 
+} 
+], 
+"error": "false", 
+"code": "200", 
+"message": "Success" 
+} 
+Doc Ref. No: ULIP Integration Doc 
+ Version No: 3.0 Page 10 of 20 
+ULIP Integration Document 
+ 
+  
+                        
+ 
+ 
+1.4 BPCL/02 
+This API is designed to retrieve information about petroleum and natural gas stations. It can be 
+used by providing either the take State Code or the geographical location (longitude, 
+latitude, and radius) of the desired location. 
+BPCL merchant(outlet) details are updated weekly, and retail selling prices (RSP) are 
+updated daily to ensure users always see the latest and accurate information. 
+Please note that when making a request, all of the JSON keys are mandatory in the payload . 
+First, the user must enter the reference number. If this reference number exists on the BPCL side, 
+the user can then enter either the State Code or the geographical location (longitude, latitude, 
+and radius). The reference number can be obtained when they hit the BPCL/01 API. 
+ 
+If you choose to use the State Code to access BPCL API data, then the geographical 
+location (longitude, latitude, and radius) fields should be left empty. 
+ 
+Use the state code from the table below to inquire about the BPCL outlet in the 
+respective state. 
+ 
+Serial no. State Code State Name 
+1 AN Andaman & Nicobar 
+2 AP Andhra Pradesh 
+3 ARP Arunachal Pradesh 
+4 AS Assam 
+5 BH Bihar 
+6 CD Chandigarh 
+7 CSG Chhatisgarh 
+8 DDH UT OF D&NH AND D&D 
+9 DDH UT OF D&NH AND D&D 
+10 DEL Delhi 
+11 GDD Goa 
+12 GJ Gujarat 
+13 HP Himachal Pradesh 
+14 HR Haryana 
+15 JK Jammu & Kashmir 
+16 JRK Jharkhand 
+17 KAR Karnataka 
+18 KER Kerala 
+19 LAK Lakshwadeep 
+20 LDK Ladakh 
+21 MAH Maharashtra 
+Doc Ref. No: ULIP Integration Doc 
+ Version No: 3.0 Page 11 of 20 
+ULIP Integration Document 
+ 
+  
+                        
+ 
+ 
+{ 
+"referenceNo":"9161666615
+", "stateCode":"DEL", 
+"longitude": "", 
+"latitude": "", 
+"radius": "" 
+} 
+{ 
+"referenceNo":"9161666615
+", "stateCode": "", 
+"longitude": "13.080487", 
+"latitude": "80.267044", 
+"radius": "10" 
+} 
+ 
+ 
+ 
+ 
+If you choose to use the geographical location to access BPCL API data, then State code field 
+should be left empty. 
+ 
+ 
+ Field Name Field 
+Description 
+Format Required/Not – 
+Required 
+Length 
+1 referenceNo Reference 
+number 
+^[0-9]\d{9}$ Required 10 
+22 MGL Meghalaya 
+23 MNP Manipur 
+24 MP Madhya Pradesh 
+25 MZ Mizoram 
+26 NZ Nagaland 
+27 OR Odisha 
+28 PB Punjab 
+29 PY Pondicherry 
+30 RJ Rajasthan 
+31 SK Sikkim 
+32 TG Telangana 
+33 TN Tamil Nadu 
+34 TRP Tripura 
+35 UP Uttar Pradesh 
+36 UTK Uttarakhand 
+37 WB West Bengal 
+Doc Ref. No: ULIP Integration Doc 
+ Version No: 3.0 Page 12 of 20 
+ULIP Integration Document 
+ 
+  
+                        
+ 
+ 
+{ 
+    "referenceNo":"9161666748", 
+    "stateCode": "WB", 
+    "longitude": "", 
+    "latitude": "", 
+    "radius": "" 
+} 
+ 
+2 StateCode State Name ^[A-Z]{1,6}$" 
+ 
+Required 1-6 
+4 longitude Longitude ^[0-9]{2}\.{0,1}[0- 
+9]{2,15}|[0-9]{0,2}$ 
+Required 0-18 
+5 latitude Latitude ^[0-9]{2}\.{0,1}[0- 
+9]{2,15}|[0-9]{0,2}$ 
+Required 0-18 
+6 radius Radius ^\d{0,3}(\.\d{1,10})?$ Required 1-10 
+ 
+1.4.1 Technical Approach 
+1. All the data will be shared through REST web services. 
+2. The user will share the input for which information is required. 
+3. BPCL API will share details of BPCL API station information that exists in the system in 
+JSON format. 
+4. The ULIP system will provide the data in JSON Object format in the response body. 
+ 
+Request: 
+ 
+The request must be of the following format, where State Code or geographical location 
+(longitude, latitude, and radius) are passed within the URL post request body in JSON 
+format. 
+ 
+For staging - 
+https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/BPCL/02 
+ 
+ 
+Doc Ref. No: ULIP Integration Doc 
+ Version No: 3.0 Page 13 of 20 
+ULIP Integration Document 
+ 
+  
+                        
+ 
+ 
+curl --location 'https://www.ulip.dpiit.gov.in/ulip/v1.0.0/BPCL/02' \ 
+--header 'Authorization: Bearer 
+eyshbGciqiJIazmxMiJ8.eyJzdWIiOiJ1bGlwIiwiaWF0IjoxNzI2NTU2ODk4LCJhcHBzIjoiZGF0
+YXB1c2gifQ.dqXUxA7agKxu9w961sr-QNG1g-
+9TWWpQQLUX6CsUO5drkwmny9hU4hIf6cOr8CXHlJ67Nv-HdGNtHtr2bH8Irg\ 
+--header 'Content-Type: application/json' \ 
+--header 'Accept: application/json' \ 
+--data '{ 
+"referenceNo":"9161666615", 
+"stateCode": "", 
+"longitude": "13.080487", 
+"latitude": "80.267044", 
+"radius": "10" 
+}' 
+curl --location 'https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/BPCL/02' \ 
+--header 'Authorization: Bearer 
+eyshbGciqiJIazmxMiJ8.eyJzdWIiOiJ1bGlwIiwiaWF0IjoxNzI2NTU2ODk4LCJhcHBzIjoiZGF0
+YXB1c2gifQ.dqXUxA7agKxu9w961sr-QNG1g-
+9TWWpQQLUX6CsUO5drkwmny9hU4hIf6cOr8CXHlJ67Nv-HdGNtHtr2bH8Irg\ 
+--header 'Content-Type: application/json' \ 
+--header 'Accept: application/json' \ 
+--data '{ 
+    "referenceNo":"9161666748", 
+    "stateCode": "WB", 
+    "longitude": "", 
+    "latitude": "", 
+    "radius": "" 
+}’ 
+Curl URL 
+ 
+For production - 
+https://www.ulip.dpiit.gov.in/ulip/v1.0.0/BPCL/02 
+ 
+ 
+Curl URL 
+ 
+{ 
+"referenceNo":"9161666615", 
+"stateCode": "", 
+"longitude": "13.080487", 
+"latitude": "80.267044", 
+"radius": "10" 
+} 
+Doc Ref. No: ULIP Integration Doc 
+ Version No: 3.0 Page 14 of 20 
+ULIP Integration Document 
+ 
+  
+                        
+ 
+ 
+{ 
+"response": null, "error": 
+"true", 
+"code": "400 BAD_REQUEST", 
+"message": "Data format failed OR wrong value entered at: referenceNo. 
+Format should follow ^[0-9]\\d{9}$" 
+} 
+{ 
+"response": null, "error": 
+"true", 
+"code": "400", 
+"message": "Data format failed OR wrong value entered at: longitude. Format should 
+follow ^[0-9]{2}\\.{0,1}[0-9]{2,15}|[0-9]{0,2}$" 
+} 
+{ 
+"response": 
+null, "error": 
+"true", 
+"code": "400", 
+"message": "Data format failed OR wrong value entered at: radius. Format 
+should follow ^\\d{0,3}(\\.\\d{1,10})?$" 
+} 
+ 
+For obtaining an authentication token, refer to Section 1.5 
+ 
+Response 
+ 
+To acknowledge the above request, ULIP will send the following response - 
+ 
+In case of an invalid format 
+1. Invalid referenceNo 
+ 
+ 
+2. Invalid latitude or longitude format 
+ 
+ 
+3. Invalid radius format 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+Doc Ref. No: ULIP Integration Doc 
+ Version No: 3.0 Page 15 of 20 
+ULIP Integration Document 
+ 
+  
+                        
+ 
+ 
+{ 
+"response": { 
+"response": { 
+"errorMsg": "referenceNo is not 
+valid", "errorCode": 
+"PAYLOAD_ERROR" 
+}, 
+"responseStatus": "ERROR" 
+}, 
+"error": "false", 
+"code": "200 OK", 
+"message": "Success" 
+} 
+4. Invalid StateCode format 
+ 
+ 
+ 
+5. In case the BPCL API referenceNo number does not exist in the BPCL system 
+ 
+6. In case BPCL API data exists 
+{ 
+    "response": [ 
+        { 
+            "response": [ 
+                { 
+                    "CUSTOMER_CODE": 383051, 
+                    "CUSTOMER_NAME": "RANJAN SERVICE CENTRE", 
+                    "ADDRESS": "INDIAN OIL RETAIL OUTLET,Plot No 406 407 408,Other", 
+                    "PIN_CODE": 711404, 
+                    "LONGITUDE": 88.14868, 
+                    "LATITUDE": 22.66246, 
+                    "STATE_CODE": "WB", 
+                    "STATE_NAME": "West Bengal", 
+                    "DISTRICT_CODE": "WB009", 
+                    "DISTRICT_NAME": "HOWRAH", 
+                    "PRODUCT_NAMES": null, 
+                    "FACILITIES": "FREE AIR FACILITY,CLEAN DRINKING 
+WATER,WASHROOM,AUTOMATED OUTLET,RESTROOM FOR MEN AND WOMAN", 
+                    "PRODUCT_DETAILS": [ 
+                        { 
+{ 
+"response": null, 
+"error": "true", 
+"code": "400 BAD_REQUEST", 
+"message": "Data format failed OR wrong value entered at: stateName. Format 
+should follow ^[a-zA-Z\\s]{1,30}$" 
+} 
+Doc Ref. No: ULIP Integration Doc 
+ Version No: 3.0 Page 16 of 20 
+ULIP Integration Document 
+ 
+  
+                        
+ 
+ 
+                            "EFFECTIVE_DATE": "24-03-2026", 
+                            "PRODUCT_NAME": "HSD", 
+                            "PRICE": 92.04 
+                        }, 
+                        { 
+                            "EFFECTIVE_DATE": "24-03-2026", 
+                            "PRODUCT_NAME": "MS", 
+                            "PRICE": 105.43 
+                        } 
+                    ] 
+                }, 
+                { 
+                    "CUSTOMER_CODE": 383106, 
+                    "CUSTOMER_NAME": "SRO ASANSOL - VINAY ENTERPRISE", 
+                    "ADDRESS": "NH2- BYPASS JUBILEE MORE KANYAPUR,ASANSOL,Asansol", 
+                    "PIN_CODE": 713341, 
+                    "LONGITUDE": 86.953191, 
+                    "LATITUDE": 23.71638, 
+                    "STATE_CODE": "WB", 
+                    "STATE_NAME": "West Bengal", 
+                    "DISTRICT_CODE": "WB023", 
+                    "DISTRICT_NAME": "PASCHIM BARDHAMAN", 
+                    "PRODUCT_NAMES": "Petrol,XP95,Xtra Green", 
+                    "FACILITIES": "FREE AIR FACILITY,CLEAN DRINKING 
+WATER,WASHROOM,AUTOMATED OUTLET,XTRAPOWER,XTRAREWARD,RESTROOM FOR 
+MEN AND WOMAN", 
+                    "PRODUCT_DETAILS": [ 
+                        { 
+                            "EFFECTIVE_DATE": "24-03-2026", 
+                            "PRODUCT_NAME": "HSD", 
+                            "PRICE": 92.25 
+                        }, 
+                        { 
+                            "EFFECTIVE_DATE": "24-03-2026", 
+                            "PRODUCT_NAME": "XP95", 
+                            "PRICE": 115.2 
+                        }, 
+                        { 
+                            "EFFECTIVE_DATE": "24-03-2026", 
+                            "PRODUCT_NAME": "XG", 
+                            "PRICE": 96.03 
+                        }, 
+                        { 
+                            "EFFECTIVE_DATE": "24-03-2026", 
+Doc Ref. No: ULIP Integration Doc 
+ Version No: 3.0 Page 17 of 20 
+ULIP Integration Document 
+ 
+  
+                        
+ 
+ 
+                            "PRODUCT_NAME": "MS", 
+                            "PRICE": 105.66 
+                        } 
+                    ] 
+                }, 
+                { 
+                    "CUSTOMER_CODE": 349620, 
+                    "CUSTOMER_NAME": "HOQUE FUEL STATION", 
+                    "ADDRESS": "Vill & PO: Singimari,PS: Maynaguri,Singimari", 
+                    "PIN_CODE": 735302, 
+                    "LONGITUDE": 88.785774, 
+                    "LATITUDE": 26.610614, 
+                    "STATE_CODE": "WB", 
+                    "STATE_NAME": "West Bengal", 
+                    "DISTRICT_CODE": "WB010", 
+                    "DISTRICT_NAME": "JALPAIGURI", 
+                    "PRODUCT_NAMES": "Petrol,XP95,Xtra Green", 
+                    "FACILITIES": "FREE AIR FACILITY,CLEAN DRINKING 
+WATER,WASHROOM,AUTOMATED OUTLET,RESTROOM FOR MEN AND WOMAN", 
+                    "PRODUCT_DETAILS": [ 
+                        { 
+                            "EFFECTIVE_DATE": "24-03-2026", 
+                            "PRODUCT_NAME": "MS", 
+                            "PRICE": 105.54 
+                        }, 
+                        { 
+                            "EFFECTIVE_DATE": "24-03-2026", 
+                            "PRODUCT_NAME": "XP95", 
+                            "PRICE": 115.08 
+                        }, 
+                        { 
+                            "EFFECTIVE_DATE": "24-03-2026", 
+                            "PRODUCT_NAME": "XG", 
+                            "PRICE": 95.91 
+                        }, 
+                        { 
+                            "EFFECTIVE_DATE": "24-03-2026", 
+                            "PRODUCT_NAME": "HSD", 
+                            "PRICE": 92.13 
+                }, 
+            ], 
+            "responseStatus": "SUCCESS" 
+        } 
+    ], 
+Doc Ref. No: ULIP Integration Doc 
+ Version No: 3.0 Page 18 of 20 
+ULIP Integration Document 
+ 
+  
+                        
+ 
+ 
+{ 
+"response": [ 
+{ 
+"response": [], 
+"responseStatus": "SUCCESS" 
+} 
+], 
+"error": "false", 
+"code": "200", 
+"message": "Success" 
+} 
+    "error": "false", 
+    "code": "200", 
+    "message": "Success" 
+ 
+7. In case the BPCL API data does not exist 
+ 
+Status Code 200: BPCL API data response 
+Status Code 400: Bad request (Invalid JSON syntax, invalid JSON key) 
+Status Code 401 or 403: Unauthenticated or Unauthorized 
+Status Code 500: Some internal server error occurred 
+Status Code 502: The server is not responding. 
+1.5 Data Transmission & Authentication Mechanism 
+All data exchanges will be securely done with HTTPS. ULIP's system will request data from BPCL 
+through a URL with the following format: 
+For staging - https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/BPCL/01 
+ 
+Body: 
+ 
+To access the data exchange URL, you would need to use a security mechanism that is 
+implemented by the ULIP system. The process is as follows: 
+{ 
+    "customerName": "Ayush", 
+    "address": "Aligarh UP", 
+    "district": "Gautam Bhuda Nagar", 
+    "stateName": "Uttar Pradesh", 
+    "email": "test@paytm.com", 
+    "monthlyFuelConsumption": "10000", 
+    "userId": "test", 
+    "userIP": "193.2.2.2", 
+    "mobileNo": "9161999629" 
+} 
+ 
+ 
+Doc Ref. No: ULIP Integration Doc 
+ Version No: 3.0 Page 19 of 20 
+ULIP Integration Document 
+ 
+  
+                        
+ 
+ 
+ 
+- First time access: you will require a username and password. The username and password 
+would be shared with you beforehand. Once you enter the valid username and password, the 
+ULIP system will return a basic authorization token to you. You can use this token to 
+communicate with the ULIP system until the token gets expired. 
+ 
+In brief, HTTP Basic Authentication works as follows: 
+ 
+When you hit the ULIP secured API for the first time, you need to provide a username and 
+password to get an access token. 
+curl -- location 
+’https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/user/login’ \ 
+-- header ’Accept: application/json’ \ 
+-- header ’Content - Type: application/json’ \ 
+-- data - raw ’{ 
+"username": "xxxx", 
+"password": "xxxx"}’ 
+ 
+Authorization: 
+Bearer 
+eyshbGciqiJIazmxMiJ8.eyJzdWIiOiJ1bGlwIiwiaWF0IjoxNzI2NTU2ODk4LCJhcHBzIj
+oiZGF0YXB1c2gifQ.dqXUxA7agKxu9w961sr-QNG1g-
+9TWWpQQLUX6CsUO5drkwmny9hU4hIf6cOr8CXHlJ67Nv-HdGNtHtr2bH8Irg 
+     After successfully authenticating, the user will be logged into the ULIP system and obtain an  
+access token. This token will be used by the user to communicate with the ULIP system. The token 
+has an expiry  time that represents the user session, which is typically  set to 24 hours. After 24 
+hours, the session (token) will expire, and the user will need to re-authenticate. 
+Using the above token, the user can request the ULIP system for the BPCL API for details as follows  
+ 
+curl --location  ’https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/BPCL/01’ \ 
+--header ’Authorization: Bearer 
+eyshbGciqiJIazmxMiJ8.eyJzdWIiOiJ1bGlwIiwiaWF0IjoxNzI2NTU2ODk4LCJhcHBzIjoiZGF0
+YXB1c2gifQ.dqXUxA7agKxu9w961sr-QNG1g-
+9TWWpQQLUX6CsUO5drkwmny9hU4hIf6cOr8CXHlJ67Nv-HdGNtHtr2bH8Irg  
+\ 
+--header  ’Content -Type: application/json’ \ 
+--header  ’Accept: application/json’ \ 
+--data -raw ’ { 
+    "customerName": "Ayush", 
+    "address": "Aligarh UP", 
+    "district": "Gautam Bhuda Nagar", 
+    "stateName": "Uttar Pradesh", 
+    "email": "test@paytm.com", 
+Doc Ref. No: ULIP Integration Doc 
+ Version No: 3.0 Page 20 of 20 
+ULIP Integration Document 
+ 
+  
+                        
+ 
+ 
+    "monthlyFuelConsumption": "10000", 
+    "userId": "test", 
+    "userIP": "193.2.2.2", 
+    "mobileNo": "9161999629" 
+}’ 
+ 
+For production – 
+curl --location ’https://www.ulip.dpiit.gov.in/ulip/v1.0.0/user/login’ \ 
+--header ’Content -Type: application/json’ \ 
+--header ’Accept: application/json’ \ 
+--data -raw ’{ 
+"username": "xxx", 
+"password": "xxx" 
+}’ 
+ 
+Authorization: 
+Bearer 
+eyshbGciqiJIazmxMiJ8.eyJzdWIiOiJ1bGlwIiwiaWF0IjoxNzI2NTU2ODk4LCJhcHBzIjoi
+ZGF0YXB1c2gifQ.dqXUxA7agKxu9w961sr-QNG1g-
+9TWWpQQLUX6CsUO5drkwmny9hU4hIf6cOr8CXHlJ67Nv-HdGNtHtr2bH8Irg 
+ 
+Upon successful authentication, the user would be logged into the ULIP system and get an access 
+token. Though this token user can communicate with ULIP. This token has an expiry time that 
+represents the user session. The session time out for the same to be fixed hour generally it is for 
+24 hours. After 24 hours, the session (token) will expire, and the user needs to reauthenticate. 
+Using the above token, the user can request the ULIP system for details as follows - 
+ 
+https://www.ulip.dpiit.gov.in/ulip/v1.0.0/BPCL/01 
+curl --location ’https://www.ulip.dpiit.gov.in/ulip/v1.0.0/BPCL /01’ \ 
+--header ’Authorization: Bearer 
+eyshbGciqiJIazmxMiJ8.eyJzdWIiOiJ1bGlwIiwiaWF0IjoxNzI2NTU2ODk4LCJhcHBzIjoiZGF0YXB
+1c2gifQ.dqXUxA7agKxu9w961sr-QNG1g-
+9TWWpQQLUX6CsUO5drkwmny9hU4hIf6cOr8CXHlJ67Nv-HdGNtHtr2bH8Irg \ 
+--header ’Accept: application/json’ \ 
+--header ’Content -Type: application/json’ \ 
+--data -raw ’{ 
+"customerName":"Ayush", 
+"address": "Aligarh UP", 
+"district": "Gautam BhudaNagar", 
+"StateCode": "Uttar Pradesh", 
+"email": "test@paytm.com", 
+"monthlyFuelConsumption":"10000", 
+"userId": "test", 
+"userIP": "193.2.2.2", 
+"mobileNo": "9161666616"}’ 

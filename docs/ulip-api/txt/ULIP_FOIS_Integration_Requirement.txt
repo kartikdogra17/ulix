@@ -1,0 +1,779 @@
+ULIP Integration Requirement Document 
+ 
+  
+                        
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+Version No.: 8.0 
+Date: 19/05/2026 
+Project Name: ULIP 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ULIP Integration Requirement Document 
+This document contains proprietary information of NLDSL. Unauthorized access, copying and replication are 
+prohibited. This document must not be copied in whole or part by any means, without the written authorization of 
+NLDSL, Noida, India. 
+ 
+ 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 8.0 Page 2 of 15 
+ 
+ 
+ 
+ 
+Revision History 
+Version Date Author Reviewer Significant Changes 
+1.0 15/07/2021 Ravindra Singh 
+Parihar Nayab Ali Baseline Version 
+2.0 01/09/2021 Hasan Mhad Khan Nayab Ali Updated 
+3.0 29/11/2023 Ayush Arya Nayab Ali Added new field in 
+3rd party response 
+4.0 07/12/2023 Ayush Arya Nayab Ali Added fois_02 
+new API 
+5.0 30/04/2024 Ayush Arya Nayab Ali Added fois_03 
+new API 
+6.0 01/10/2024 Ayush Arya Nayab Ali Updated 
+7.0 16/09/2025 Sudhanshu Singh Nayab Ali Added FOIS_04 
+new API 
+8.0 19/05/2026 Gaurav Tyagi Pranab 
+Manna Updated 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 8.0 Page 3 of 15 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+Table of Contents 
+ 
+Introduction ................................................................................................................................................. 4 
+1.1 Purpose .................................................................................................................................... 4 
+The Overall Description .............................................................................................................................. 4 
+1.2 Data Integration between FOIS System and ULIP application ................................................ 4 
+1.3 FOIS/01 .................................................................................................................................... 4 
+1.3.1 Technical Approach .................................................................................................... 5 
+1.4 FOIS/02 .................................................................................................................................... 6 
+1.4.1 Technical Approach .................................................................................................... 7 
+1.5 FOIS/04 .................................................................................................................................. 11 
+1.5.1 Technical Approach .................................................................................................. 11 
+1.6 Data Transmission & Authentication Mechanism .................................................................. 14 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 8.0 Page 4 of 15 
+ 
+Introduction 
+1.1 Purpose 
+ 
+The purpose of this document is to define and provide details for accessing API for 
+Freight Operations Information System (FOIS) system information (such as tracking and monitor 
+the movement of wagons, locomotives and unit trains) from ULIP system. 
+ 
+This document details the following points: 
+ 
+1. Data Integration between FOIS and ULIP web service : Identification of operational 
+points where data integration between FOIS and ULIP web service will be needed. 
+ 
+2. Technical Approach for performing Data Integration  
+ 
+The Overall Description 
+Users will share information such as FNR Number based on data sent by user ULIP system will 
+call respective FOIS API for accessing information. 
+ 
+Following are the points for accessing FOIS information: - 
+ 
+1. This API will share details based on FNR number. 
+ 
+2. ULIP will expose API for getting data from FOIS API. 
+ 
+3. FOIS API will take FNR number from user and get data from FOIS API. 
+ 
+1.2 Data Integration between FOIS System and ULIP application 
+ 
+User will share information to ULIP system based on data shared ULIP will provide data 
+to user. 
+1.3 FOIS/01 
+ 
+This API will take the FNR number and connect with FOIS API to get data. 
+Request Attribute. 
+ 
+S. No. Field Name Field Description Format Required/Not 
+– Required 
+Length 
+1 fnrnumber FNR (freight name record) 
+number for consignment tracking 
+[0-9]{11} 
+ 
+Required 11 
+ 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 8.0 Page 5 of 15 
+ 
+1.3.1 Technical Approach  
+1. All the data will be shared through rest web services. 
+2. ULIP system will provide FNR number for which fois detail is required. 
+3. FOIS API will share details of fnr number which exist in FOIS system in JSON format. 
+4. ULIP system will provide the data in JSON Object format in response body. 
+ 
+Example: FNR number 21013108749 is shared by ULIP system, then ULIP system will make 
+a request to FOIS API. 
+ 
+Request: The request must be of the following format, where fnr number is passed within the 
+URL body in JSON format. 
+ 
+For production: https://www.ulip.dpiit.gov.in/ulip/v1.0.0/FOIS/01 
+ 
+{"fnrnumber": "21030407355"} 
+ 
+Curl URL 
+ 
+curl --location --request POST 'https://www.ulip.dpiit.gov.in/ulip/v1.0.0/FOIS/01’ \ 
+--
+header 'Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZXN0MSIsImlhdCI6MTYzM
+DQ4NTY5MywiYXBwcyI6ImRhdGFwdXNoIn0.dWnnwihLmfcgjdErMlzNwyXTmJTAGuTE5w0Xq
+05IPyhBISxThOvgHTCTNbtJg_PaGgg9bmWatdHkhOADN3xq3Q' \ 
+--header 'Accept: application/json' \ 
+--header 'Content-Type: application/json' \ 
+--data-raw '{"fnrnumber": "00000023000"}' 
+ 
+For staging: https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/FOIS/01 
+ 
+{"fnrnumber": " 23121326682"} 
+ 
+Curl URL 
+ 
+curl --location 'https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/FOIS/01' \ 
+--header 'Authorization: Bearer 
+eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1bGlwMiIsImlhdCI6MTcyNzY5MDAwMCwiYXBwcyI6ImRh
+dGFwdXNoIn0.2BrY8dCCS_BAH5Y6faXPYAPJEV52bGuZZRtKXD04AOmAUtooBy9TC-
+wmWVvxyAWsqLR9ifBhYD9xfqGMDPH9_A' \ 
+--header 'Accept: application/json' \ 
+--header 'Content-Type: application/json' \ 
+--data '{"fnrnumber": "23121326682"}' 
+ 
+For obtaining authentication token, refer Section 1.7 
+ 
+ 
+Response: 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 8.0 Page 6 of 15 
+ 
+ 
+{    "response": [ 
+        { 
+            "response": [ 
+                { 
+                    "newFnr": "", 
+                    "etaDstn": "22:10 20-09-2023", 
+                    "cmdt": "PHC", 
+                    "currentStatus": "REACHED AT DESTINATION ON 22:10 20-09-2023", 
+                    "lastRepStts": "AR", 
+                    "locoNumb": "", 
+                    "lastRepLocn": "M/S NABHA POWER LTD.SIDING(NPSB)", 
+                    "lgtd": "76.515312", 
+                    "fnrNo": "23091420258", 
+                    "lttd": "30.538016", 
+                    "stationFrom": "NEW KUSMUNDA COLLIERY SIDING,  KORBA(NKCR)", 
+                    "stationTo": "M/S NABHA POWER LTD.SIDING(NPSB)" 
+                } 
+            ], 
+            "responseStatus": "SUCCESS" 
+        } 
+    ], 
+    "error": "false", 
+    "code": "200", 
+    "message": "Success"} 
+ 
+Status Code 200: FOIS data response 
+Status Code 400: Bad request (Invalid json syntax, invalid json key) 
+Status Code 401 or 403: Unauthenticated or Unauthorized 
+Status Code 500: Some internal server error occurred 
+Status Code 502: Server is not responding. 
+1.4 FOIS/02 
+ 
+This API will take the sttnfrom, sttnto, cmdt, wgontype and connect with FOIS API to get 
+data. 
+Request Attribute. 
+ 
+S. 
+No. 
+Field 
+Name 
+Field Description Format Required/N
+ot – 
+Required 
+Lengt
+h 
+1 sttnfrom 
+ 
+Enter the station from as 
+available in freight fois 
+system 
+[0-9]{10} 
+ 
+Required 10 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 8.0 Page 7 of 15 
+ 
+2 sttnto 
+ 
+Enter the station to as 
+available in freight fois 
+system 
+[0-9]{10} 
+ 
+Required 10 
+3 cmdt 
+ 
+Enter the cmdt as 
+available in freight fois 
+system 
+[0-9]{10} 
+ 
+Required 10 
+4 wgontype 
+ 
+Enter the wgon type as 
+available in freight fois 
+system 
+[0-9]{10} 
+ 
+Required 10 
+ 
+1.4.1 Technical Approach  
+1. All the data will be shared through rest web services. 
+2. ULIP system will provide sttnfrom, sttnto, cmdt and wgontype for which fois detail is 
+required. 
+3. FOIS API will share details of sttnfrom, sttnto, cmdt and wgontype which exist in FOIS 
+system in JSON format. 
+4. ULIP system will provide the data in JSON Object format in response body. 
+ 
+Request: The request must be of the following format, where sttnfrom, sttnto, cmdt and 
+wgontype is passed within the URL body in JSON format. 
+ 
+For production: https://www.ulip.dpiit.gov.in/ulip/v1.0.0/FOIS/02 
+ 
+{   "sttnfrom": "NZM", 
+    "sttnto": "HPP", 
+    "cmdt": "CEMENT", 
+    "wgontype": "BOXN"} 
+ 
+Curl URL 
+ 
+curl --location 'https://www.ulip.dpiit.gov.in/ulip/v1.0.0/FOIS/02' \ 
+--header 'Authorization: Bearer 
+eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1bGlwIiwiaWF0IjoxNzI3NzYyNzcxLCJhcHBzIjoiZGF0YXB
+1c2gifQ.9_kJwxuXfJYoMt0QeMgOSWi01EaxXQkZQ1JLevfNo-vJ5vjCY9oIemZ_B4hiiq2ZCog-
+yAbIUgL6YN-TVie3cA' \ 
+--header 'Accept: application/json' \ 
+--header 'Content-Type: application/json' \ 
+--data '{ "sttnfrom": "NZM", 
+    "sttnto": "HPP", 
+    "cmdt": "CEMENT", 
+    "wgontype": "BOXN"}' 
+ 
+For staging: https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/FOIS/02 
+ 
+{   "sttnfrom": "NZM", 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 8.0 Page 8 of 15 
+ 
+    "sttnto": "HPP", 
+    "cmdt": "CEMENT", 
+    "wgontype": "BOXN"} 
+ 
+Curl URL 
+ 
+curl --location --request POST 'https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/FOIS/02' \ 
+--
+header 'Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1bGlwIiwiaWF0IjoxNzAxOT
+MwNTI4LCJhcHBzIjoiZGF0YXB1c2gifQ.N4WSBTuvN49BkpNKGBPIK1tv4npJtIucgU7remVqbE
+RZn67LWSwvLYwHYabP9tQ7afFB8wxgpiv78QW-aSIWhw' \ 
+--header 'Accept: application/json' \ 
+--header 'Content-Type: application/json' \ 
+--header 'Cookie: __zlcmid=1DSlSDwigKpTJa2; _fw_crm_v=b6a11a26-11c3-4b74-d0d1-
+3b9c43a5b7c7' \ 
+--data-raw '{  "sttnfrom": "NZM", 
+    "sttnto": "HPP", 
+    "cmdt": "CEMENT", 
+    "wgontype": "BOXN"}' 
+ 
+ 
+For obtaining authentication token, refer Section 1.7 
+ 
+Response: 
+ 
+{    "response": [ 
+        { 
+            "response": { 
+                "stts": { 
+                    "evntCode": "FRGTDTLS", 
+                    "error": "", 
+                    "successFailFlag": "S" 
+                }, 
+                "frgt": { 
+                    "tranloadclss": "140A", 
+                    "wgonothrchrg": "0.00", 
+                    "wgonfrgttaxwrds": "SIX LAKH SEVENTY-
+ONE THOUSAND EIGHT HUNDRED EIGHTEEN RUPEES ONLY", 
+                    "tranntr": "779.93", 
+                    "CCInfo": "CC+8", 
+                    "dist": "488", 
+                    "wgonbascfrgt": "746.10", 
+                    "transurchrg": "101.73", 
+                    "cmdtClssTL": "140A", 
+                    "trantotlfrgt": "5,84,072.40", 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 8.0 Page 9 of 15 
+ 
+                    "wgongsttax": "31,992.00", 
+                    "wgonrebtcont": "", 
+                    "rateWL": "746.10", 
+                    "surchrg": "DYNAMIC PRICING FOR COMMODITIES OTHER THAN COAL AND 
+COK", 
+                    "wgonchblwght": "680.0", 
+                    "wgonsurcont": "1", 
+                    "tranrebtrmrk": "", 
+                    "rakeSize": "10", 
+                    "tranrebtamount": "", 
+                    "wgonothrcont": "3", 
+                    "tranfinlfrgt": "5,84,072.40", 
+                    "routInfo": "Shortest", 
+                    "wgonfrgttax": "6,71,818", 
+                    "wgonloadfrgt": "940.92", 
+                    "PCC": "68.00", 
+                    "miniRake": "10", 
+                    "totlchblwght": "680.0", 
+                    "tranrebtchrg": "0.00", 
+                    "trangsttax": "29,204.00", 
+                    "tranothrchrg": "0.00", 
+                    "tranfullamount": "", 
+                    "wgonntr": "858.02", 
+                    "transurchrgdtls": [ 
+                        { 
+                            "rebtamnt": "101.73", 
+                            "rebtcode": "DPO", 
+                            "prcn": "15.00", 
+                            "desc": "DYNAMIC PRICING FOR COMMODITIES OTHER THAN COAL AN
+D COKE(DPO)" 
+                        } 
+                    ], 
+                    "wgonrebtprcen": "", 
+                    "wgonsurchrg": "111.92", 
+                    "tranfrgttaxwrds": "SIX LAKH THIRTEEN THOUSAND TWO HUNDRED SEVENTY
+-SEVEN RUPEES ONLY", 
+                    "rateTL": "678.20", 
+                    "tranbascfrgt": "678.20", 
+                    "tranothrchrgdtls": [ 
+                        { 
+                            "rebtamnt": "39.00", 
+                            "rebtcode": "DS", 
+                            "prcn": "5.00", 
+                            "desc": "DEVELOPMENT CHARGE(DS)" 
+                        }, 
+                        { 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 8.0 Page 10 of 15 
+ 
+                            "rebtamnt": "20.00", 
+                            "rebtcode": "OTC", 
+                            "prcn": "0", 
+                            "desc": "ORIGINATING TERMINAL CHARGES(OTC)" 
+                        }, 
+                        { 
+                            "rebtamnt": "20.00", 
+                            "rebtcode": "DTC", 
+                            "prcn": "0", 
+                            "desc": "DESTINATION TERMINAL CHARGES(DTC)" 
+                        } 
+                    ], 
+                    "tranchrg": "79.00", 
+                    "tranloadfrgt": "858.93", 
+                    "tranrebtcont": "", 
+                    "wgonrebtamount": "", 
+                    "wgontotlfrgt": "6,39,825.60", 
+                    "atlrout": [ 
+                        { 
+                            "sttnto": "HARPALPUR- HPP (NC)", 
+                            "sttnfrom": "HAZRAT NIZAM-UD-DIN JN.- NZM (NR)" 
+                        } 
+                    ], 
+                    "wgonothrrebt": "0.00", 
+                    "tranothrrebt": "0.00", 
+                    "wgonfullamount": "", 
+                    "othrchrg": "DEVELOPMENT CHARGE,ORIGINATING TERMINAL CHARGES,DE
+STINATION TERMINAL CHARGE", 
+                    "tranfrgttax": "6,13,277", 
+                    "wgonrebtrmrk": "", 
+                    "minmRake": "10", 
+                    "tranrebtprcen": "", 
+                    "wgonrebtchrg": "0.00", 
+                    "ETA": "20", 
+                    "cmdtClssWL": "140B", 
+                    "rebtchrg": "0", 
+                    "tranothrcont": "3", 
+                    "tranrebtchrgdtls": [], 
+                    "transurcont": "1", 
+                    "viaDesc": "TKD-AST-PWL-BTSR-MTJ-RKM-AGC-DHO-BLNR-GWL-VGLJ", 
+                    "wgonchrg": "82.90", 
+                    "wgonfinlfrgt": "6,39,825.60", 
+                    "wgonloadclss": "140B" 
+                } 
+            }, 
+            "responseStatus": "SUCCESS" 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 8.0 Page 11 of 15 
+ 
+        } 
+    ], 
+    "error": "false", 
+    "code": "200", 
+    "message": "Success" 
+} 
+ 
+Status Code 200: FOIS data response 
+Status Code 400: Bad request (Invalid json syntax, invalid json key) 
+Status Code 401 or 403: Unauthenticated or Unauthorized 
+Status Code 500: Some internal server error occurred 
+Status Code 502: Server is not responding. 
+1.5 FOIS/04 
+ 
+This API will take the lngpwbltno and connect with FOIS API to get data. 
+ 
+S. No. Field Name Field Description Format Required/Not 
+– Required 
+Length 
+1 lngpwbltno 
+ 
+Enter the lngpwbltno as 
+available in FOIS system. 
+[0-9]{10} Required 10 
+ 
+1.5.1 Technical Approach  
+1. All the data will be shared through rest web services. 
+2. ULIP system will provide lngpwbltno for which detail is required. 
+3. FOIS API will share details of  Parcel tracking based on  lngpwbltno which exist in 
+FOIS system in JSON format. 
+4. FOIS Integration will add JSON in response key in response body. 
+5. ULIP system will provide the data in JSON Object format in response body. 
+ 
+Request: The request must be of the following format, where lngpwbltno is passed within the 
+URL body in JSON format. 
+ 
+For production: https://www.ulip.dpiit.gov.in/ulip/v1.0.0/FOIS/04 
+ 
+{"lngpwbltno": "4002411032"} 
+ 
+Curl URL 
+ 
+curl --location 'https://www.ulip.dpiit.gov.in/ulip/v1.0.0/FOIS/04' \ 
+--header 'Authorization: Bearer 
+eyJhbGciOiJIUzUxMiJ9.eyJhcHBzIjoiYXBpR2F0ZXdheSIsInN1YiI6InVsaXAiLCJpYXQiOjE3NT
+c5OTMzMTR9.6pJ2ugsh7GodeNIKVJxR9wvPiWOJGt3qkCpHi5ob4fVbHihrMmrZh8hov0amY5k
+jiH7J7IGCc5_nFZ5JMHOW2Q' \ 
+--header 'Accept: application/json' \ 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 8.0 Page 12 of 15 
+ 
+--header 'Content-Type: application/json' \ 
+--data '{"lngpwbltno": "4002411032"}' 
+ 
+For staging: https://ulipstaging.dpiit.gov.in/ulip/v1.0.0/FOIS/04 
+ 
+{"lngpwbltno": "4002411032"} 
+ 
+Curl URL 
+ 
+curl --location 'https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/FOIS/04' \ 
+--header 'Authorization: Bearer 
+eyJhbGciOiJIUzUxMiJ9.eyJhcHBzIjoiYXBpR2F0ZXdheSIsInN1YiI6InVsaXAiLCJpYXQiOjE3NT
+c5MjQ5NzR9.AsGEMHb_74mog1ICzY60eK3gnCSpnCC_lpJB_l-
+PiAlUa1axGFk0LMe8NpDA9bGnIPLBbPN37uzwA6sn4asvPQ' \ 
+--header 'Accept: application/json' \ 
+--header 'Content-Type: application/json' \ 
+--data '{"lngpwbltno": "4002411032"}' 
+ 
+For obtaining authentication token, refer Section 1.7 
+ 
+Response: 
+ 
+To acknowledge the above request, ULIP will send the below response -  
+ 
+1. Invalid “lngpwbltno” format 
+ 
+{    "response": null, 
+    "error": "true", 
+    "code": "400 BAD_REQUEST", 
+    "message": "Data format failed OR wrong value entered at:  lngpwbltno. Format should follow  
+[0-9]{10}"} 
+ 
+2. In case data do not exist for given “lngpwbltno” 
+ 
+{    "response": [ 
+        { 
+            "response": [ 
+                { 
+                    "error": "Invalid Receipt Number.." 
+                } 
+            ], 
+            "responseStatus": "SUCCESS", 
+            "message": null 
+        } 
+    ], 
+    "error": "false", 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 8.0 Page 13 of 15 
+ 
+    "code": "200", 
+    "message": "Success"} 
+ 
+3. In case “lngpwbltno” exist 
+ 
+{ 
+    "response": [ 
+        { 
+            "response": [ 
+                { 
+                    "RR": { 
+                        "PWBLTNO": "4002411032", 
+                        "SCALE": "Lugguage", 
+                        "BDT": "02-09-2025", 
+                        "CNEE": "RAM UDGAR", 
+                        "CNEEADD": "MIRZAPUR JYG", 
+                        "CNOR": "RAM UDGAR", 
+                        "FSTN": "BAREILLY JN.", 
+                        "ITMDET_PRNT": { 
+                            "ITMDET": { 
+                                "LOADSTNDET": "", 
+                                "UNLOADSTATUS_DT": "05-Sep-2025 00:52", 
+                                "LOADTRAIN": "14650", 
+                                "UNLOADSTNDET": "", 
+                                "DESC": "BICYCLE (40KG)", 
+                                "UNLOADTRAIN": "14650", 
+                                "STATUS_DT": "06-Sep-2025 08:26", 
+                                "STATUS": "Delivered", 
+                                "STNDET": "", 
+                                "TOTITMS": "2", 
+                                "LOADSTATUS_DT": "04-Sep-2025 03:37" 
+                            } 
+                        }, 
+                        "CNORADD": "MIRZAPUR JYG", 
+                        "TSTN": "JYG-JAYNAGAR" 
+                    } 
+                } 
+            ], 
+            "responseStatus": "SUCCESS", 
+            "message": null 
+        } 
+    ], 
+    "error": "false", 
+    "code": "200", 
+    "message": "Success"} 
+ 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 8.0 Page 14 of 15 
+ 
+Status Code 200: FOIS data response 
+Status Code 400: Bad request (Invalid json syntax, invalid json key) 
+Status Code 401 or 403: Unauthenticated or Unauthorized 
+Status Code 500: Some internal server errors occurred 
+Status Code 502: Server is not responding. 
+1.6 Data Transmission & Authentication Mechanism 
+ 
+All data exchange would be done over secure HTTP (HTTPS). Request from ULIP's system would 
+be made in FOIS system through a data exchange URL that has following form: 
+ 
+For production: https://www.ulip.dpiit.gov.in/ulip/v1.0.0/FOIS/01 
+ 
+Body 
+ 
+{"fnrnumber":"21030407355"} 
+ 
+Access to above data exchange URL would be authorized by use of a security mechanism 
+implemented by the ULIP system. It is as follows: 
+ 
+• First time access:  It would require a username and password [which would be shared with 
+user beforehand].  Once user hit with valid user id and password, ULIP system will return a 
+basic authorization token to  user, using that token user will communicate with ULIP system 
+until token will not get expired. 
+ 
+Summary of HTTP Basic Authentication is as follows: 
+ 
+First time when User will hit ULIP secured API through username and password for access token 
+as follow- 
+ 
+curl --location 'https://www.ulip.dpiit.gov.in/ulip/v1.0.0/user/login' \ 
+--header 'Accept: application/json' \ 
+--header 'Content-Type: application/json' \ 
+--data-raw '{   "username": "xxxx", "password": "xxxx@123"}' 
+ 
+Authorization:   
+Bearer 
+eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJpbnRlcmNvbnQiLCJpYXQiOjE1ODU1NjYyMzcsImFwcHMi
+OiJkYXRhcHVzaCJ9.jb-23DbkWpz-3ptsuuZofzH-
+ce7jd0xR5WlkFfBPO_Dzjop01dSx9OamqsjsgUAryLUPtUDiMX07oHG4L2AfFQ  
+ 
+Upon successful authentication, the user would be logged into the ULIP system and get an access 
+token. Though this token user can communicate with  ULIP. This token has expiry time which 
+represent user session. The session time out for the same to be fixed hour, generally it is for 30 
+minutes. If there is no request coming from user for 30 minutes, then session (token) will be 
+expired, and user need to re authenticate. 
+ 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 8.0 Page 15 of 15 
+ 
+Using The above token, user can request ULIP system for FOIS details as follow - 
+ 
+curl --location 'https://www.ulip.dpiit.gov.in/ulip/v1.0.0/FOIS/01' \ 
+--header 
+'Authorization:Bearer 
+eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1bGlwIiwiaWF0IjoxNzI3NzYyNzcxLCJhcHBzIjoiZGF0
+YXB1c2gifQ.9_kJwxuXfJYoMt0QeMgOSWi01EaxXQkZQ1JLevfNo-
+vJ5vjCY9oIemZ_B4hiiq2ZCog-yAbIUgL6YN-TVie3cA' \ 
+--header 'Accept: application/json' \ 
+--header 'Content-Type: application/json' \ 
+--data '{"fnrnumber": "23091420258"}' 
+ 
+For staging – 
+ 
+curl --location 'https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/user/login' \ 
+--header 'Accept: application/json' \ 
+--header 'Content-Type: application/json' \ 
+--data-raw '{ "username": "xxxx", "password": "xxxx@123"}' 
+ 
+Authorization:   
+Bearer  
+eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1bGlwIiwiaWF0IjoxNzI3MTYxMDgwLCJhcHBzIjoiZGF0
+YXB1c2gifQ.XhVZm7NiCD05-
+v9091WJQhYzdk1a0Shs_ley0T4R2MX63swRyxHbHxh6bVXtzqWvWiSLwwNGRQIcqGhr49hpGg 
+ 
+Upon successful authentication, the user would be logged into the ULIP system and get an access 
+token. Though this token user can communicate with  ULIP. This token has expiry time which 
+represent user session. The session time out for the same to be f ixed hour, generally it is for 30 
+minutes. If there is no request coming from user for 30 minutes, the n session (token) will be 
+expired, and user need to re authenticate. 
+ 
+Using The above token, user can request ULIP system for details as follow - 
+ 
+https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/FOIS/01 
+ 
+curl --location 'https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/FOIS/01' \ 
+--header 'Authorization: Bearer 
+eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1bGlwMiIsImlhdCI6MTcyNzY5MDAwMCwiYXBwcyI6I
+mRhdGFwdXNoIn0.2BrY8dCCS_BAH5Y6faXPYAPJEV52bGuZZRtKXD04AOmAUtooBy9T
+C-wmWVvxyAWsqLR9ifBhYD9xfqGMDPH9_A' \ 
+--header 'Accept: application/json' \ 
+--header 'Content-Type: application/json' \ 
+--data '{"fnrnumber": "23121326682"}' 
+ 

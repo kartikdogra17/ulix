@@ -1,0 +1,893 @@
+ULIP Integration Document 
+ 
+  
+                        
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+Version No.: 1.0 
+Date: 17/09/2024 
+Project Name: ULIP 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ULIP Integration Document 
+This document contains proprietary information of NLDSL. Unauthorized access, copying and replication are 
+prohibited. This document must not be copied in whole or part by any means, without the written authorization 
+of NLDSL, New Delhi, India. 
+ 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 1.0 Page 2 of 18 
+ 
+ 
+ 
+ 
+Revision History 
+Version Date Author Reviewer Significant Changes  
+1.0 17/09/2024 Ayush Arya Nayab Ali Baseline Version 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+  
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 1.0 Page 3 of 18 
+ 
+Table of Contents 
+ 
+Introduction ................................................................................................................................................. 4 
+1.1 Purpose .................................................................................................................................... 4 
+The Overall Description .............................................................................................................................. 4 
+1.2 Data Integration between MOPNG System and ULIP application ........................................... 4 
+1.3 MOPNG/01 ............................................................................................................................... 4 
+1.3.1 Technical Approach .................................................................................................... 5 
+1.3.2 MOPNG Api scheduler ............................................................................................. 15 
+1.4 Data Transmission & Authentication Mechanism .................................................................. 15 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 1.0 Page 4 of 18 
+ 
+Introduction 
+1.1 Purpose 
+ 
+ 
+The purpose of this document is to define and provide details for accessing API for  
+MOPNG system information (information about petrol pumps and natural gas stations on the 
+basis stcode or latitude, longitude and radius) from ULIP system 
+ 
+ 
+ 
+This document details the following points: 
+ 
+1. Data Integration between MOPNG and ULIP web service : Identification of operational 
+points where data integration between MOPNG and ULIP web service will be needed. 
+ 
+2. Technical Approach for performing Data Integration  
+ 
+The Overall Description 
+ 
+Users will need to share their stcode, or geolocation (latitude, longitude and radius) to 
+access the list of public petrol pumps through the rest API. 
+ 
+Here are some points to keep in mind when accessing MOPNG API data information: 
+ 
+ The API will only share data that is based on the user's provided information. 
+ ULIP will expose API for getting data from MOPNG API. 
+ The MOPNG/01 API will take stcode, or geolocation (latitude, longitude and 
+radius) from user and get data. 
+ radius value should be less than or equal to 100. 
+ 
+ 
+1.2 Data Integration between MOPNG System and ULIP application 
+ 
+The ULIP system will receive information from the user and provide data in return. 
+ 
+1.3 MOPNG/01 
+ 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 1.0 Page 5 of 18 
+ 
+This API is designed to retrieve information about petrol pumps and natural gas stations. It can 
+be used by providing either the take stcode, or geolocation (latitude, longitude and radius) of 
+the desired location. 
+ 
+Please note that when making a request, all of the JSON keys are mandatory in the payload. If 
+you choose to use the stcode to access MOPNG API data, then latitude, longitude and radius 
+fields should be left empty. 
+ 
+{ 
+    "stcode": "28", 
+    "latitude": "", 
+    "longitude": "", 
+    "radius": "" 
+} 
+ 
+When sending geolocation(latitude, longitude and radius) data, if the user provides 
+geocoordinate latitude, longitude and radius, then the stcode will be empty. 
+ 
+{ 
+    "stcode":"", 
+    "latitude": "14.3473952000", 
+    "longitude": "78.0001640500", 
+    "radius":"1" 
+} 
+ 
+ 
+ 
+ 
+Field Name Field 
+Description 
+Format Required/Not – 
+Required 
+Length 
+1 stcode 
+ 
+State Code [0-9]{0,6} Required 0-6 
+2 latitude 
+ 
+Latitude ^[0-9]{2}\\.{0,1}[0-
+9]{2,10}|[0-9]{0,2}$ 
+ 
+Required 0-13 
+ 
+ 
+3 
+longitude 
+ 
+Longitude ^[0-9]{2}\\.{0,1}[0-
+9]{2,10}|[0-9]{0,2}$ 
+ 
+Required  
+0-13 
+ 
+4 radius 
+ 
+Radius ^\\d{0,3}(\\.\\d{1,10})?$ 
+ 
+Required 0-3 
+ 
+ 
+1.3.1 Technical Approach  
+ 
+1. All the data will be shared through REST web services. 
+2. The user will share the input for which information is required. 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 1.0 Page 6 of 18 
+ 
+3. MOPNG API will share details of MOPNG API station information that exists in the system 
+in JSON format. 
+4. The ULIP system will provide the data in JSON Object format in the response body. 
+ 
+ 
+Example: 
+ 
+ 
+Request: 
+ 
+The request must be of the following format, where stcode, or geolocation (latitude, 
+longitude and radius) are passed within the URL post request body in JSON format. 
+ 
+For Staging - 
+https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/MOPNG/01 
+ 
+{ 
+    "stcode":"", 
+    "latitude": "14.3473952000", 
+    "longitude": "78.0001640500", 
+    "radius":"1" 
+} 
+ 
+Curl URL 
+ 
+curl --location 'https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/MOPNG/01' \ 
+--header 'Authorization: Bearer 
+eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1bGlwIiwiaWF0IjoxNzI2NTU1ODE0LCJhcH
+BzIjoiZGF0YXB1c2gifQ.a5dxkDgb_kbRXQhm5XfVH5gfj0b_PfXC0DTFWebjsiya
+7sPbLQsN5sR4-55Tm3hJy4mqSyn9P0HTJqXsdJX5uA' \ 
+--header 'Content-Type: application/json' \ 
+--header 'Accept: application/json' \ 
+--data '{ 
+    "stcode":"", 
+    "latitude": "14.3473952000", 
+    "longitude": "78.0001640500", 
+    "radius":"1" 
+}' 
+ 
+For Production - 
+https://www.ulip.dpiit.gov.in/ulip/v1.0.0/MOPNG/01 
+ 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 1.0 Page 7 of 18 
+ 
+{ 
+    "stcode":"", 
+    "latitude": "14.3473952000", 
+    "longitude": "78.0001640500", 
+    "radius":"1" 
+} 
+ 
+Curl URL 
+ 
+curl --location 'https://www.ulip.dpiit.gov.in/ulip/v1.0.0/MOPNG/01' \ 
+--header 'Authorization: Bearer 
+eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1bGlwIiwiaWF0IjoxNzI2NjM1NDkwLCJhcH
+BzIjoiZGF0YXB1c2gifQ.sa9K0laUTG03XiNyegT00w180U2HLn0hWQ60EJd5joO
+hs26TynBddx2rkZUElZBKwG3cPy6gLPx8q2QnU5yXQA' \ 
+--header 'Accept: application/json' \ 
+--header 'Content-Type: application/json' \ 
+--data '{ 
+    "stcode":"", 
+    "latitude": "14.3473952000", 
+    "longitude": "78.0001640500", 
+    "radius":"1" 
+}' 
+ 
+ 
+For obtaining an authentication token, refer to Section 1.4 
+ 
+Response 
+ 
+To acknowledge the above request, ULIP will send the below response -  
+ 
+a) In case of an invalid format 
+ 
+1. Invalid stcode  
+ 
+{ 
+    "response": null, 
+    "error": "true", 
+    "code": "400", 
+    "message": "Data format failed OR wrong value entered at:  stcode. Format 
+should follow  ^[0-9]{1,6}$" 
+} 
+ 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 1.0 Page 8 of 18 
+ 
+2. Invalid latitude and longitude format 
+ 
+{ 
+    "response": null, 
+    "error": "true", 
+    "code": "400", 
+    "message": "Data format failed OR wrong value entered at:  latitude. Format 
+should follow  ^[0-9]{2}\\.{0,1}[0-9]{2,10}|[0-9]{0,2}$" 
+} 
+ 
+3. Invalid radius format 
+ 
+{ 
+    "response": null, 
+    "error": "true", 
+    "code": "400", 
+    "message": "Data format failed OR wrong value entered at:  radius. Format should 
+follow  ^\\d{0,3}(\\.\\d{1,10})?$" 
+} 
+ 
+ 
+b) In case MOPNG API data does not exist in the MOPNG system 
+ 
+{ 
+    "response": [ 
+        { 
+            "response": [], 
+            "responseStatus": "SUCCESS" 
+        } 
+    ], 
+    "error": "false", 
+    "code": "200", 
+    "message": "Success" 
+} 
+ 
+c) In case MOPNG API data exist 
+ 
+{ 
+    "response": [ 
+        { 
+            "response": [ 
+                { 
+                    "stcode": 28, 
+                    "diesel": "Diesel", 
+                    "lcng": "-", 
+                    "gid": 36288, 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 1.0 Page 9 of 18 
+ 
+                    "villcode": "001962", 
+                    "latitude": 14.347395, 
+                    "dtcode": 502, 
+                    "source": "HPCL", 
+                    "type": "Point", 
+                    "geom": { 
+                        "null": true, 
+                        "type": "geometry", 
+                        "value": "010100000044F312B00280534040899FC8DDB12C40" 
+                    }, 
+                    "sdtcode_lg": 5339, 
+                    "sdtcode": 5339, 
+                    "ro_name": "NAGURI FUEL SUPPLIES", 
+                    "auto_lpg": "-", 
+                    "modified": "DD/MM/YYYY", 
+                    "dtcode_lg": 502, 
+                    "state": "Andhra Pradesh", 
+                    "dname": "Sri Satyasai", 
+                    "cng": "-", 
+                    "entity_nam": "HPCL", 
+                    "creation": 44980, 
+                    "longitude": 78.00017, 
+                    "product": "Petrol,Diesel,EV", 
+                    "thumbnail": null, 
+                    "address": "Anantapur,Andhra Pradesh", 
+                    "lng": "-", 
+                    "agency": "HPCL", 
+                    "vilnam_soi": "MUDIGUBBA", 
+                    "address2": "Anantapur", 
+                    "stcode_lg": 28, 
+                    "ro_id": 12678410, 
+                    "sr_no": 30392, 
+                    "cbg": "-", 
+                    "tname": "Mudigubba", 
+                    "ev": "EV", 
+                    "vname": "Taraf Manjali (OG)", 
+                    "active_clo": "Active", 
+                    "petrol": "Petrol", 
+                    "sname": "ANDHRA PRADESH", 
+                    "sublayer_n": null, 
+                    "category": "Diesel", 
+                    "entity": "HPCL", 
+                    "layer_n": null 
+                }, 
+                { 
+                    "stcode": 28, 
+                    "diesel": "Diesel", 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 1.0 Page 10 of 18 
+ 
+                    "lcng": "-", 
+                    "gid": 48841, 
+                    "villcode": "001962", 
+                    "latitude": 14.347395, 
+                    "dtcode": 502, 
+                    "source": "HPCL", 
+                    "type": "Point", 
+                    "geom": { 
+                        "null": true, 
+                        "type": "geometry", 
+                        "value": "010100000044F312B00280534040899FC8DDB12C40" 
+                    }, 
+                    "sdtcode_lg": 5339, 
+                    "sdtcode": 5339, 
+                    "ro_name": "NAGURI FUEL SUPPLIES", 
+                    "auto_lpg": "-", 
+                    "modified": "DD/MM/YYYY", 
+                    "dtcode_lg": 502, 
+                    "state": "Andhra Pradesh", 
+                    "dname": "Sri Satyasai", 
+                    "cng": "-", 
+                    "entity_nam": "HPCL", 
+                    "creation": 44980, 
+                    "longitude": 78.00017, 
+                    "product": "Petrol,Diesel,EV", 
+                    "thumbnail": null, 
+                    "address": "Anantapur,Andhra Pradesh", 
+                    "lng": "-", 
+                    "agency": "HPCL", 
+                    "vilnam_soi": "MUDIGUBBA", 
+                    "address2": "Anantapur", 
+                    "stcode_lg": 28, 
+                    "ro_id": 12678410, 
+                    "sr_no": 30392, 
+                    "cbg": "-", 
+                    "tname": "Mudigubba", 
+                    "ev": "EV", 
+                    "vname": "Taraf Manjali (OG)", 
+                    "active_clo": "Active", 
+                    "petrol": "Petrol", 
+                    "sname": "ANDHRA PRADESH", 
+                    "sublayer_n": null, 
+                    "category": "EV", 
+                    "entity": "HPCL", 
+                    "layer_n": null 
+                }, 
+                { 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 1.0 Page 11 of 18 
+ 
+                    "stcode": 28, 
+                    "diesel": "Diesel", 
+                    "lcng": "-", 
+                    "gid": 83309, 
+                    "villcode": "001962", 
+                    "latitude": 14.347395, 
+                    "dtcode": 502, 
+                    "source": "HPCL", 
+                    "type": "Point", 
+                    "geom": { 
+                        "null": true, 
+                        "type": "geometry", 
+                        "value": "010100000044F312B00280534040899FC8DDB12C40" 
+                    }, 
+                    "sdtcode_lg": 5339, 
+                    "sdtcode": 5339, 
+                    "ro_name": "NAGURI FUEL SUPPLIES", 
+                    "auto_lpg": "-", 
+                    "modified": "DD/MM/YYYY", 
+                    "dtcode_lg": 502, 
+                    "state": "Andhra Pradesh", 
+                    "dname": "Sri Satyasai", 
+                    "cng": "-", 
+                    "entity_nam": "HPCL", 
+                    "creation": 44980, 
+                    "longitude": 78.00017, 
+                    "product": "Petrol,Diesel,EV", 
+                    "thumbnail": null, 
+                    "address": "Anantapur,Andhra Pradesh", 
+                    "lng": "-", 
+                    "agency": "HPCL", 
+                    "vilnam_soi": "MUDIGUBBA", 
+                    "address2": "Anantapur", 
+                    "stcode_lg": 28, 
+                    "ro_id": 12678410, 
+                    "sr_no": 30392, 
+                    "cbg": "-", 
+                    "tname": "Mudigubba", 
+                    "ev": "EV", 
+                    "vname": "Taraf Manjali (OG)", 
+                    "active_clo": "Active", 
+                    "petrol": "Petrol", 
+                    "sname": "ANDHRA PRADESH", 
+                    "sublayer_n": null, 
+                    "category": "Petrol", 
+                    "entity": "HPCL", 
+                    "layer_n": null 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 1.0 Page 12 of 18 
+ 
+                }, 
+                { 
+                    "stcode": 28, 
+                    "diesel": "Diesel", 
+                    "lcng": "-", 
+                    "gid": 177877, 
+                    "villcode": "001962", 
+                    "latitude": 14.347395, 
+                    "dtcode": 502, 
+                    "source": "HPCL", 
+                    "type": "Point", 
+                    "geom": { 
+                        "null": true, 
+                        "type": "geometry", 
+                        "value": "010100000044F312B00280534040899FC8DDB12C40" 
+                    }, 
+                    "sdtcode_lg": 5339, 
+                    "sdtcode": 5339, 
+                    "ro_name": "MSHSD NAGURI FUEL SUPPLIES", 
+                    "auto_lpg": "-", 
+                    "modified": null, 
+                    "dtcode_lg": 502, 
+                    "state": "ANDHRA PRADESH", 
+                    "dname": "Anantapur", 
+                    "cng": "-", 
+                    "entity_nam": "HPCL", 
+                    "creation": 0, 
+                    "longitude": 78.00017, 
+                    "product": "Petrol ,Diesel,EV", 
+                    "thumbnail": "DD/MM/YYYY", 
+                    "address": "GANJAPALLI MUDIGUBBA 515511", 
+                    "lng": "-", 
+                    "agency": "HPCL", 
+                    "vilnam_soi": "MUDIGUBBA", 
+                    "address2": "GANJAPALLI MUDIGUBBA 515511", 
+                    "stcode_lg": 28, 
+                    "ro_id": 12678410, 
+                    "sr_no": 766, 
+                    "cbg": "-", 
+                    "tname": "Mudigubba", 
+                    "ev": "EV", 
+                    "vname": "Taraf Manjali (OG)", 
+                    "active_clo": "Active", 
+                    "petrol": "Petrol", 
+                    "sname": "ANDHRA PRADESH", 
+                    "sublayer_n": null, 
+                    "category": "Diesel", 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 1.0 Page 13 of 18 
+ 
+                    "entity": "HPCL", 
+                    "layer_n": null 
+                }, 
+                { 
+                    "stcode": 28, 
+                    "diesel": "Diesel", 
+                    "lcng": "-", 
+                    "gid": 177939, 
+                    "villcode": "001962", 
+                    "latitude": 14.347395, 
+                    "dtcode": 502, 
+                    "source": "HPCL", 
+                    "type": "Point", 
+                    "geom": { 
+                        "null": true, 
+                        "type": "geometry", 
+                        "value": "010100000044F312B00280534040899FC8DDB12C40" 
+                    }, 
+                    "sdtcode_lg": 5339, 
+                    "sdtcode": 5339, 
+                    "ro_name": "MSHSD NAGURI FUEL SUPPLIES", 
+                    "auto_lpg": "-", 
+                    "modified": null, 
+                    "dtcode_lg": 502, 
+                    "state": "ANDHRA PRADESH", 
+                    "dname": "Anantapur", 
+                    "cng": "-", 
+                    "entity_nam": "HPCL", 
+                    "creation": 0, 
+                    "longitude": 78.00017, 
+                    "product": "Petrol ,Diesel,EV", 
+                    "thumbnail": "DD/MM/YYYY", 
+                    "address": "GANJAPALLI MUDIGUBBA 515511", 
+                    "lng": "-", 
+                    "agency": "HPCL", 
+                    "vilnam_soi": "MUDIGUBBA", 
+                    "address2": "GANJAPALLI MUDIGUBBA 515511", 
+                    "stcode_lg": 28, 
+                    "ro_id": 12678410, 
+                    "sr_no": 766, 
+                    "cbg": "-", 
+                    "tname": "Mudigubba", 
+                    "ev": "EV", 
+                    "vname": "Taraf Manjali (OG)", 
+                    "active_clo": "Active", 
+                    "petrol": "Petrol", 
+                    "sname": "ANDHRA PRADESH", 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 1.0 Page 14 of 18 
+ 
+                    "sublayer_n": null, 
+                    "category": "EV", 
+                    "entity": "HPCL", 
+                    "layer_n": null 
+                }, 
+                { 
+                    "stcode": 28, 
+                    "diesel": "Diesel", 
+                    "lcng": "-", 
+                    "gid": 178001, 
+                    "villcode": "001962", 
+                    "latitude": 14.347395, 
+                    "dtcode": 502, 
+                    "source": "HPCL", 
+                    "type": "Point", 
+                    "geom": { 
+                        "null": true, 
+                        "type": "geometry", 
+                        "value": "010100000044F312B00280534040899FC8DDB12C40" 
+                    }, 
+                    "sdtcode_lg": 5339, 
+                    "sdtcode": 5339, 
+                    "ro_name": "MSHSD NAGURI FUEL SUPPLIES", 
+                    "auto_lpg": "-", 
+                    "modified": null, 
+                    "dtcode_lg": 502, 
+                    "state": "ANDHRA PRADESH", 
+                    "dname": "Anantapur", 
+                    "cng": "-", 
+                    "entity_nam": "HPCL", 
+                    "creation": 0, 
+                    "longitude": 78.00017, 
+                    "product": "Petrol ,Diesel,EV", 
+                    "thumbnail": "DD/MM/YYYY", 
+                    "address": "GANJAPALLI MUDIGUBBA 515511", 
+                    "lng": "-", 
+                    "agency": "HPCL", 
+                    "vilnam_soi": "MUDIGUBBA", 
+                    "address2": "GANJAPALLI MUDIGUBBA 515511", 
+                    "stcode_lg": 28, 
+                    "ro_id": 12678410, 
+                    "sr_no": 766, 
+                    "cbg": "-", 
+                    "tname": "Mudigubba", 
+                    "ev": "EV", 
+                    "vname": "Taraf Manjali (OG)", 
+                    "active_clo": "Active", 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 1.0 Page 15 of 18 
+ 
+                    "petrol": "Petrol", 
+                    "sname": "ANDHRA PRADESH", 
+                    "sublayer_n": null, 
+                    "category": "Petrol", 
+                    "entity": "HPCL", 
+                    "layer_n": null 
+                } 
+            ], 
+            "responseStatus": "SUCCESS" 
+        } 
+    ], 
+    "error": "false", 
+    "code": "200", 
+    "message": "Success" 
+} 
+ 
+Status Code 200: MOPNG API data response 
+Status Code 400: Bad request (Invalid JSON syntax, invalid JSON key) 
+Status Code 401 or 403: Unauthenticated or Unauthorized 
+Status Code 500: Some internal server error occurred 
+Status Code 502: The server is not responding. 
+ 
+1.3.2 MOPNG Api scheduler  
+We have implemented a scheduler on the ULIP system that will call the MOPNG API and store 
+the response in the mopng_data_dump database table. This scheduler is configured to execute the 
+API call at midnight on the 1st day of every month. 
+ 
+1.4 Data Transmission & Authentication Mechanism 
+ 
+All data exchanges will be securely done over HTTPS. ULIP's system will request data from 
+MOPNG through a URL with the following format: 
+ 
+For Staging API -- 
+https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/MOPNG/01 
+ 
+Body:  
+{ 
+    "stcode":"", 
+    "latitude": "14.3473952000", 
+    "longitude": "78.0001640500", 
+    "radius":"1" 
+} 
+ 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 1.0 Page 16 of 18 
+ 
+To access the data exchange URL, you would need to use a security mechanism that is 
+implemented by the ULIP system. The process is as follows: 
+ 
+- First time access: you would require a username and password. The username and password 
+would be shared with you beforehand. Once you enter the valid username and password, the 
+ULIP system will return a basic authorization token to you. You can use this token to 
+communicate with the ULIP system until the token gets expired. 
+ 
+In brief, HTTP Basic Authentication works as follows: 
+ 
+When you hit the ULIP secured API for the first time, you need to provide a username and 
+password to get an access token. 
+ 
+curl --location 
+'https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/user/login' \ 
+--header 'Accept: application/json' \ 
+--header 'Content-Type: application/json' \ 
+--data-raw '{ 
+    "username": "xxxx", 
+    "password": "xxxx@123" 
+}' 
+ 
+ 
+Authorization:   
+Bearer  
+eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1bGlwIiwiaWF0IjoxNzI2NTU2ODk4LCJhcHBzIjoiZGF
+0YXB1c2gifQ.dqXUxA7agKxu9w961sr-QNG1g-
+9TWWpQQLUX6CsUO5drkwmny9hU4hIf6cOr8CXHlJ67Nv-HdGNtHtr2bH8Irg 
+ 
+After successfully authenticating, the user will be logged into the ULIP system and obtain 
+an access token. This token will be used by the user to communicate with the ULIP 
+system. The token has an expiry time that represents the user session, which is typically 
+set to 30 minutes. If there is no request from the user within this time frame, the session 
+(token) will expire, and the user will need to re-authenticate. 
+ 
+Using The above token, user can request ULIP system for MOPNG API for details as follow - 
+ 
+curl --location 'https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/MOPNG/01' \ 
+--header 'Authorization: Bearer 
+eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1bGlwIiwiaWF0IjoxNzI2NTU2ODk4LCJhcHBzIjoiZGF
+0YXB1c2gifQ.dqXUxA7agKxu9w961sr-QNG1g-
+9TWWpQQLUX6CsUO5drkwmny9hU4hIf6cOr8CXHlJ67Nv-HdGNtHtr2bH8Irg' \ 
+--header 'Content-Type: application/json' \ 
+--header 'Accept: application/json' \ 
+--data '{ 
+    "stcode":"", 
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 1.0 Page 17 of 18 
+ 
+    "latitude": "14.3473952000", 
+    "longitude": "78.0001640500", 
+    "radius":"1" 
+}' 
+ 
+ 
+For Production API -- 
+ 
+https://www.ulip.dpiit.gov.in/ulip/v1.0.0/MOPNG/01 
+ 
+Body:  
+{ 
+    "stcode":"", 
+    "latitude": "14.3473952000", 
+    "longitude": "78.0001640500", 
+    "radius":"1" 
+} 
+ 
+To access the data exchange URL, you would need to use a security mechanism that is 
+implemented by the ULIP system. The process is as follows: 
+ 
+- First time access: you would require a username and password. The username and password 
+would be shared with you beforehand. Once you enter the valid username and password, the 
+ULIP system will return a basic authorization token to you. You can use this token to 
+communicate with the ULIP system until the token gets expired. 
+ 
+In brief, HTTP Basic Authentication works as follows: 
+ 
+When you hit the ULIP secured API for the first time, you need to provide a username and 
+password to get an access token. 
+ 
+curl --location 'https://www.ulip.dpiit.gov.in/ulip/v1.0.0/user/login' 
+\ 
+--header 'Content-Type: application/json' \ 
+--header 'Accept: application/json' \ 
+--data-raw '{ 
+    "username": "xxxx", 
+    "password": "xxxx@123" 
+}' 
+ 
+ 
+Authorization:   
+Bearer  
+eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1bGlwIiwiaWF0IjoxNzI2NjM0NzAwLCJhcHBzIjoiZGF0
+YXB1c2gifQ.JjmtMU-
+ULIP Integration Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 1.0 Page 18 of 18 
+ 
+ZFF_zqiifHU8TUp8S9vm5r1H3DbpfXcmIfTU151LLnY_6aAKLMx9p5KJrJxIOdSP0hdNS3D
+YHA_2kMg 
+ 
+After successfully authenticating, the user will be logged into the ULIP system and obtain 
+an access token. This token will be used by the user to communicate with the ULIP 
+system. The token has an expiry time that represents the user session, which is typically 
+set to 30 minutes. If there is no request from the user within this time frame, the session 
+(token) will expire, and the user will need to re-authenticate. 
+ 
+Using The above token, user can request ULIP system for MOPNG API for details as follow - 
+ 
+curl --location 'https://www.ulip.dpiit.gov.in/ulip/v1.0.0/MOPNG/01' \ 
+--header 'Authorization: Bearer 
+eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1bGlwIiwiaWF0IjoxNzI2NjM0NzAwLCJhcHBzIjoiZGF0
+YXB1c2gifQ.JjmtMU-
+ZFF_zqiifHU8TUp8S9vm5r1H3DbpfXcmIfTU151LLnY_6aAKLMx9p5KJrJxIOdSP0hdNS3D
+YHA_2kMg' \ 
+--header 'Accept: application/json' \ 
+--header 'Content-Type: application/json' \ 
+--data '{ 
+    "stcode":"", 
+    "latitude": "14.3473952000", 
+    "longitude": "78.0001640500", 
+    "radius":"1" 
+}' 
+ 
+ 

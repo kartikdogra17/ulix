@@ -1,0 +1,808 @@
+ULIP Integration Requirement Document 
+ 
+  
+                        
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+Version No.: 8.0 
+Date: 27/03/2026 
+Project Name: ULIP 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ULIP Integration Requirement Document 
+This document contains proprietary information of NLDSL. Unauthorized access, copying and replication are 
+prohibited. This document must not be copied in whole or part by any means, without the written authorization of 
+NLDSL, Noida, India. 
+ 
+ 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 8.0 Page 2 of 16 
+ 
+ 
+ 
+ 
+Revision History 
+Version Date Author Reviewer Significant Changes 
+1.0 18/08/2021 Hasan Mhad Khan Nayab Ali Baseline Version 
+2.0 10/03/2023 Ayush Arya Nayab Ali Added CFS ICD     
+integration API 
+3.0 29/06/2023 Ayush Arya Nayab Ali LDB response 
+changes 
+4.0 27/09/2023 Ayush Arya Nayab Ali CFSCDI API 
+response changes 
+5.0 12/04/2024 Ayush Arya Nayab Ali LDB API response 
+changes 
+6.0 12/04/2024 Girish Chander Nayab Ali Updated 
+7.0 06/12/2024 Ayush Arya Nayab Ali CFSCDI API 
+response changes 
+8.0 27/03/2026 Gaurav Tyagi Pranab 
+Manna Updated 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 8.0 Page 3 of 16 
+ 
+ 
+Table of Contents 
+ 
+Introduction ................................................................................................................................................. 4 
+1.1 Purpose .................................................................................................................................... 4 
+The Overall Description .............................................................................................................................. 4 
+1.2 Data Integration between LDB System and ULIP application ................................................. 4 
+1.3 LDB/01 ..................................................................................................................................... 4 
+1.3.1 Technical Approach .................................................................................................... 5 
+1.4 CFSICD/01 ............................................................................................................................. 10 
+1.4.1 Technical Approach .................................................................................................. 11 
+1.5 Data Transmission & Authentication Mechanism .................................................................. 15 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 8.0 Page 4 of 16 
+ 
+Introduction 
+1.1 Purpose 
+ 
+The purpose of this document is to define and provide details for accessing API for  
+LDB system from ULIP system. 
+This document details the following points: 
+ 
+1. Data Integration between LDB and ULIP web service : Identification of operational 
+points where data integration between LDB and ULIP web service will be needed. 
+ 
+2. Technical Approach for performing Data Integration  
+ 
+The Overall Description 
+User will share information such as container number based on data send by user 
+ULIP system will call respective LDB API for accessing information. 
+ 
+Following are the points for accessing container information: - 
+ 
+1. This API will share data based on information provided by user. 
+2. ULIP will expose API for getting data from LDB API. 
+3. LDB/01 API will take container Number from user and get data from LDB API. 
+4. CFSICD/01 API will take the port Code, destination Code, from and to, input 
+parameter from the user and get the data from LDB API. 
+ 
+1.2 Data Integration between LDB System and ULIP application 
+ 
+User will share information to ULIP system based on data shared ULIP will provide data 
+to user. 
+1.3 LDB/01 
+ 
+This API will take container number and connect with LDB API to get data. 
+ 
+S. 
+No. 
+Field Name Field Description Format Require
+d/Not – 
+Require
+d 
+Length 
+1 containerNu
+mber 
+container number as 
+available in LDB system. 
+^[a-zA-Z0-
+9]{8,11}$ 
+Required Min 8 
+Max 11 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 8.0 Page 5 of 16 
+ 
+1.3.1 Technical Approach  
+1. All the data will be shared through rest web services. 
+2. ULIP system will provide container number for which detail is required. 
+3. LDB API will share details of container tracking information which exist in LDB system in 
+JSON format. 
+4. LDB Integration will add response from LDB system as value to response key in response 
+body. 
+5. ULIP system will provide the data in JSON Object format in response body. 
+ 
+Example: 
+ 
+Container number ACMP1000010 is shared by ULIP system, then LDB-integration will 
+make a request to LDB API. 
+ 
+Request: 
+ 
+The request must be of the following format, where container number is passed within the URL 
+body in JSON format. 
+ 
+For Production: 
+ 
+https://www.ulip.dpiit.gov.in/ulip/v1.0.0/LDB/01 
+ 
+ 
+ 
+{"containerNumber": "ACMP1000010"} 
+ 
+ 
+Curl URL 
+ 
+ 
+curl --location --request POST 
+'https://www.ulip.dpiit.gov.in/ulip/v1.0.0/LDB/01' \ 
+--header 'Authorization: Bearer 
+eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZXN0MSIsImlhdCI6MTYyOTI2ODM4NSwiYXBwcyI6ImRh
+dGFwdXNoIn0.x3REIfQ7GGF4-
+ysUexOBegV_ON7Ex4RitT62ipKnAI_RyMEfQgdV_DBzAJnz118yoieTAqsRyIozj-pAwudB_w' \ 
+--header 'Content-Type: application/json' \ 
+--header 'Accept: application/json' \ 
+--data-raw '{"containerNumber": "ACMP1000010"}' 
+  
+ 
+ 
+ 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 8.0 Page 6 of 16 
+ 
+For Staging: 
+ 
+https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/LDB/01 
+ 
+ 
+{"containerNumber": "NSST1234570"} 
+ 
+Curl URL 
+ 
+ 
+curl --location --request POST 
+'https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/LDB/01' \ 
+--header 'Authorization: Bearer 
+eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZXN0MSIsImlhdCI6MTYyOTI2ODM4NSwiYXBwcyI6ImRh
+dGFwdXNoIn0.x3REIfQ7GGF4-
+ysUexOBegV_ON7Ex4RitT62ipKnAI_RyMEfQgdV_DBzAJnz118yoieTAqsRyIozj-pAwudB_w' \ 
+--header 'Content-Type: application/json' \ 
+--header 'Accept: application/json' \ 
+--data-raw '{"containerNumber": "NSST1234570"}' 
+  
+ 
+For obtaining authentication token, refer Section 1.5 
+ 
+Response 
+ 
+To acknowledge the above request, ULIP will send the below response -  
+ 
+a) In case of invalid format 
+ 
+1. Invalid container number 
+ 
+ 
+{ 
+    "response": null, 
+    "error": "true", 
+    "code": "400", 
+    "message": "Data format failed OR wrong value entered 
+at:  containerNumber. Format should follow [A-Z]{4}[0-
+9]{4,7}" 
+} 
+ 
+ 
+ 
+ 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 8.0 Page 7 of 16 
+ 
+b) In case of container number do not exist in LDB system 
+ 
+{ 
+    "response": [ 
+        { 
+            "responseStatus": "FAILURE", 
+            "message": { 
+                "text": "Container details not found for the giv
+en container number: TCLU8538800" 
+            } 
+        } 
+    ], 
+    "error": "false", 
+    "code": "200", 
+    "message": "Success" 
+} 
+ 
+c) In case container number exists 
+ 
+{ 
+    "response": [ 
+        { 
+            "response": { 
+                "eximContainerTrail": { 
+                    "cntrDetail": { 
+                        "cntrno": "NSST1234570", 
+                        "refflg": "Yes", 
+                        "cntrsize": 40, 
+                        "isocode": "22G3", 
+                        "containertype": null 
+                    }, 
+                    "dpd_dpe": { 
+                        "c_import": { 
+                            "dpd": "N", 
+                            "destination": null 
+                        }, 
+                        "c_export": null 
+                    }, 
+                    "last_event": [ 
+                        { 
+                            "serialno": 1, 
+                            "eventname": "PORT OUT", 
+                            "currentlocation": "Raigad/Nhava 
+Sheva Freeport Terminal (NSFT)", 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 8.0 Page 8 of 16 
+ 
+                            "division": null, 
+                            "timestamptimezone": "2023-03-29 
+11:00:09", 
+                            "timezoneabvr": "IST", 
+                            "latitude": 18.950149, 
+                            "longitude": 72.95123, 
+                            "containernumber": "NSST1234570", 
+                            "timeinms": 1680067809000, 
+                            "transportmode": "TRUCK", 
+                            "type": "I", 
+                            "isempty": "Y" 
+                        } 
+                    ], 
+                    "res_Message": "Success", 
+                    "trackLog": [ 
+                        { 
+                            "serialno": 1, 
+                            "eventname": "PORT OUT", 
+                            "currentlocation": "Raigad/Nhava 
+Sheva Freeport Terminal (NSFT)", 
+                            "division": null, 
+                            "timestamptimezone": "2023-03-29 
+11:00:09", 
+                            "timezoneabvr": "IST", 
+                            "latitude": 18.950149, 
+                            "longitude": 72.95123, 
+                            "containernumber": "NSST1234570", 
+                            "timeinms": 1680067809000, 
+                            "transportmode": "TRUCK", 
+                            "type": "I", 
+                            "isempty": "Y" 
+                        }, 
+                        { 
+                            "serialno": 2, 
+                            "eventname": "PORT IN", 
+                            "currentlocation": "Raigad/Nhava 
+Sheva Freeport Terminal (NSFT)", 
+                            "division": null, 
+                            "timestamptimezone": "2023-03-28 
+09:00:08", 
+                            "timezoneabvr": "IST", 
+                            "latitude": 18.950149, 
+                            "longitude": 72.95123, 
+                            "containernumber": "NSST1234570", 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 8.0 Page 9 of 16 
+ 
+                            "timeinms": 1679974208000, 
+                            "transportmode": "VESSEL", 
+                            "type": "I", 
+                            "isempty": "Y" 
+                        } 
+                    ], 
+                    "vessel_ata": null, 
+                    "vessel_atd": null, 
+                    "vessel_eta": [ 
+                        { 
+                            "eventid": 24, 
+                            "infotime": 1680659629000, 
+                            "eventname": "EXPECTED VESSEL 
+ARRIVAL", 
+                            "orgname": "Nhava Sheva Freeport 
+Terminal (NSFT)", 
+                            "timeinms": 1679978002000, 
+                            "timetimestamp": "2023-03-28 
+10:03:22", 
+                            "latitude": null, 
+                            "longitude": null, 
+                            "vesselname": "APR EXPRESSS", 
+                            "vesselimo": null, 
+                            "cntrcycleid": 1, 
+                            "shippingline": "TRANSPORT 
+CORPORATION OF INDIA LTD" 
+                        } 
+                    ], 
+                    "vessel_etd": null, 
+                    "vessel_gate_cutoff": null 
+                }, 
+                "domesticContainerTrail": { 
+                    "cntrDetail": null, 
+                    "dpd_dpe": null, 
+                    "last_event": null, 
+                    "res_Message": "NO RECORD FOUND", 
+                    "trackLog": null, 
+                    "vessel_ata": null, 
+                    "vessel_atd": null, 
+                    "vessel_eta": null, 
+                    "vessel_etd": null, 
+                    "vessel_gate_cutoff": null 
+                } 
+            }, 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 8.0 Page 10 of 16 
+ 
+            "responseStatus": "SUCCESS", 
+            "message": null 
+        } 
+    ], 
+    "error": "false", 
+    "code": "200", 
+    "message": "Success" 
+} 
+ 
+ 
+Status Code 200: container data response 
+Status Code 400: Bad request (Invalid json syntax, invalid json key) 
+Status Code 401 or 403: Unauthenticated or Unauthorized 
+Status Code 500: Some internal server error occurred 
+Status Code 502: Server is not responding. 
+ 
+1.4 CFSICD/01 
+ 
+This API will take “port Code, destination Code, from and to” and connect with LDB API 
+to get data. 
+ 
+S. 
+No. 
+Field Name Field Description Format Require
+d/Not – 
+Require
+d 
+Length 
+1 portCode Port Code as available in 
+LDB system. 
+[a-zA-Z0-9]{12} Required  
+Max and 
+Min 12 
+2. destinationC
+ode 
+Destination Code as 
+available in LDB system. 
+[a-zA-Z0-9]{1,20} Required  
+Min 1 
+and Max 
+20 
+3. from From Date as available in 
+LDB system. 
+^([0-2][1-9]|[1-
+3][01])([0][1-
+9]|1[0-2])\d{4}$ 
+ 
+Required Max and 
+Min 8 
+4. to To Date as available in 
+LDB system. 
+^([0-2][1-9]|[1-
+3][01])([0][1-
+9]|1[0-2])\d{4}$ 
+ 
+Required Max and 
+Min 8 
+ 
+ 
+ 
+ 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 8.0 Page 11 of 16 
+ 
+1.4.1 Technical Approach  
+1. All the data will be shared through rest web services. 
+2. ULIP system will provide port Code, destination Code, from and to  for which detail is 
+required. 
+3. CFS ICD API will share details of “port code, destination code, from and to” information 
+which exist in LDB system in JSON format. 
+4. CFS ICD Integration will add response from LDB system as value to response key in 
+response body. 
+5. ULIP system will provide the data in JSON Object format in response body. 
+ 
+ 
+Request: 
+ 
+The request must be of the following format, where port code, destination code, from and to 
+details is passed within the URL body in JSON format. 
+ 
+For Staging: 
+ 
+https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/CFSICD/01 
+ 
+{ 
+    "portCode": "ORG000004818", 
+    "destinationCode": "INTUT1HAR1", 
+    "from": "20012023", 
+    "to": "29012023" 
+} 
+ 
+Curl URL 
+ 
+curl --location --
+request POST 'https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/CFSICD/01' \ 
+--
+header 'Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1bGlwIiwiaWF0IjoxNjc4NDQ
+2ODYyLCJhcHBzIjoiZGF0YXB1c2gifQ.GnWvfsv9FcQlfxPMYCZiP2-yivi0oJi2P5ybS9XCyPLtN9IvL3WCB-
+6upIlMlXFG6lTD_ct3u6Nehux5TQQ4NQ' \ 
+--header 'Accept: application/json' \ 
+--header 'Content-Type: application/json' \ 
+--data-raw '{ 
+    "portCode": "ORG000004818", 
+    "destinationCode": "INTUT1HAR1", 
+    "from": "20012023", 
+    "to": "29012023" 
+}' 
+ 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 8.0 Page 12 of 16 
+ 
+For Production: 
+ 
+https://www.ulip.dpiit.gov.in/ulip/v1.0.0/CFSICD/01 
+ 
+{ 
+  "portCode": "ORG000004818", 
+  "destinationCode": "INTUT1HAR1", 
+  "from": "20012023", 
+  "to": "29012023" 
+} 
+ 
+ 
+Curl URL 
+ 
+curl --location --request POST 'https://www.ulip.dpiit.gov.in/ulip/v1.0.0/CFSICD/01' \ 
+--
+header 'Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1bGlwIiwiaWF0IjoxNjc4NDQ
+2ODYyLCJhcHBzIjoiZGF0YXB1c2gifQ.GnWvfsv9FcQlfxPMYCZiP2-yivi0oJi2P5ybS9XCyPLtN9IvL3WCB-
+6upIlMlXFG6lTD_ct3u6Nehux5TQQ4NQ' \ 
+--header 'Accept: application/json' \ 
+--header 'Content-Type: application/json' \ 
+--data-raw '{ 
+  "portCode": "ORG000004818", 
+  "destinationCode": "INTUT1HAR1", 
+  "from": "20012023", 
+  "to": "29012023" 
+}' 
+ 
+For obtaining authentication token, refer Section 1.5 
+ 
+Response 
+ 
+To acknowledge the above request, ULIP will send the below response -  
+ 
+a) In case of invalid format 
+ 
+1. Invalid portCode number (or any field) 
+{ 
+    "response": null, 
+    "error": "true", 
+    "code": "400", 
+    "message": "Data format failed OR wrong value entered at:  portCode. Format should
+ follow  [a-zA-Z0-9]{12}" 
+} 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 8.0 Page 13 of 16 
+ 
+b) In case of any field missing is request body 
+ 
+{ 
+    "response": null, 
+    "error": "true", 
+    "code": "400", 
+    "message": "to:is mandatory field." 
+} 
+ 
+ 
+c) In case port Code, destination Code, from and to exist 
+ 
+    "response": [ 
+        { 
+            "response": { 
+                "message": { 
+                    "text": "COMMON_002" 
+                }, 
+                "objectType": "Optional", 
+                "object": [ 
+                    { 
+                        "containerNo": "TCNU4866067", 
+                        "containerSize": "40", 
+                        "category": "I", 
+                        "entryTime": "01-01-2023 01:06:18", 
+                        "entryMode": null, 
+                        "exitMode": "T", 
+                        "exitTime": "02-01-2023 09:16:39", 
+                        "isRefrigerated": "N", 
+                        "wagonNo": null, 
+                        "loadingTime": "1672630836000", 
+                        "destination": "INTUT1HAR1", 
+                        "vesselName": "FSL KELANG", 
+                        "isoCode": "4500", 
+                        "isEmpty": "Y", 
+                        "containerType": null 
+                    }, 
+                    { 
+                        "containerNo": "TEMU6678583", 
+                        "containerSize": "40", 
+                        "category": "I", 
+                        "entryTime": "01-01-2023 05:27:14", 
+                        "entryMode": null, 
+                        "exitMode": "T", 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 8.0 Page 14 of 16 
+ 
+                        "exitTime": "02-01-2023 09:18:44", 
+                        "isRefrigerated": "N", 
+                        "wagonNo": null, 
+                        "loadingTime": "1672629801000", 
+                        "destination": "INTUT1HAR1", 
+                        "vesselName": "FSL KELANG", 
+                        "isoCode": "4500", 
+                        "isEmpty": "Y", 
+                        "containerType": null 
+                    } 
+                ] 
+            }, 
+            "responseStatus": "SUCCESS" 
+        } 
+    ], 
+    "error": "false", 
+    "code": "200", 
+    "message": "Success" 
+} 
+ 
+d) In case from date is greater than to date 
+ 
+{ 
+    "response": [ 
+        { 
+            "response": { 
+                "date": "2024-12-06T05:11:10.080+00:00", 
+                "message": "From date cannot be greater than to date.", 
+                "description": "uri=/container/cfsIcdData" 
+            }, 
+            "responseStatus": "ERROR" 
+        } 
+    ], 
+    "error": "false", 
+    "code": "200", 
+    "message": "Success" 
+} 
+ 
+Status Code 200: Data response 
+Status Code 400: Bad request (Invalid json syntax, invalid json key) 
+Status Code 401 or 403: Unauthenticated or Unauthorized 
+Status Code 500: Some internal server error occurred 
+Status Code 502: Server is not responding. 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 8.0 Page 15 of 16 
+ 
+1.5 Data Transmission & Authentication Mechanism 
+ 
+All data exchange would be done over secure HTTP (HTTPS). Request from ULIP's system would 
+be made in LDB system through a data exchange URL that has following form: 
+ 
+For Production: 
+ 
+https://www.ulip.dpiit.gov.in/ulip/v1.0.0/LDB/01 
+ 
+Body:  
+ 
+{"containerNumber": "ACMP1000014"} 
+ 
+ 
+Access to above data exchange URL would be authorized by use of a security mechanism 
+implemented by the ULIP system. It is as follows: 
+ 
+• First time access:  It would require a username and password [which would be shared with 
+user beforehand].  Once user hit with valid user id and password, ULIP system will return a 
+basic authorization token to  user, using that token user will communicate with ULIP system 
+until token will not get expired. 
+ 
+Brief summary of HTTP Basic Authentication is as follows: 
+ 
+First time when User will hit ULIP secured API through username and password for access token 
+as follow- 
+ 
+ curl -X POST  
+‘https://www.ulip.dpiit.gov.in/ulip/v1.0.0/user/login  
+-H 'accept: application/json'  
+   -H 'content-type: application/json'  
+-data ‘{"username":"xxxxxx","password":" XXxxx@12345"}’ 
+ 
+Authorization:   
+Bearer 
+eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJpbnRlcmNvbnQiLCJpYXQiOjE1ODU1NjYyMzcsImFwcHMi
+OiJkYXRhcHVzaCJ9.jb-23DbkWpz-3ptsuuZofzH-
+ce7jd0xR5WlkFfBPO_Dzjop01dSx9OamqsjsgUAryLUPtUDiMX07oHG4L2AfFQ  
+ 
+Upon successful authentication, the user would be logged into the ULIP system and get an access 
+token. Though this token user can communicate with  ULIP. This token has expiry time which 
+represent user session. The session time out for the same to be fixed hour, generally it is for 30 
+minutes. If there is no request coming from user for 30 minutes, then session (token) will be 
+expired, and user need to re authenticate. 
+ 
+Using The above token, user can request ULIP system for container details as follow - 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 8.0 Page 16 of 16 
+ 
+ 
+curl --location --request POST 
+'https://www.ulip.dpiit.gov.in/ulip/v1.0.0/LDB/01' \ 
+--header 'Authorization: Bearer 
+eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZXN0MSIsImlhdCI6MTYyOTI4MzQxMiwiYXBwcyI6ImRh
+dGFwdXNoIn0.2fanfJuecjmwyT0Z0-H3qLpA4bKEnurPXx5yFeV_pw8h5Tbls5sBQFXu1Gq-
+FF5GMOfZV2a7EAOPvazmJC1QTw' \ 
+--header 'Content-Type: application/json' \ 
+--header 'Accept: application/json' \ 
+--data-raw '{"containerNumber": "ACMP1000014"}' 
+ 
+ 
+For Staging: 
+ 
+curl -X POST  
+‘https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/user/login  
+-H 'accept: application/json'  
+   -H 'content-type: application/json'  
+-data ‘{"username":"xxxxxx","password":" XXxxx@12345"}' 
+ 
+ 
+Authorization:   
+Bearer 
+eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJpbnRlcmNvbnQiLCJpYXQiOjE1ODU1NjYyMzcsImFwcHMi
+OiJkYXRhcHVzaCJ9.jb-23DbkWpz-3ptsuuZofzH-
+ce7jd0xR5WlkFfBPO_Dzjop01dSx9OamqsjsgUAryLUPtUDiMX07oHG4L2AfFQ  
+ 
+Upon successful authentication, the user would be logged into the ULIP system and get an access 
+token. Though this token user can communicate with ULIP. This token has expiry time which 
+represent user session. The session time out for the same to be fixed hour, generally it is for 30 
+minutes. If there is no request coming from user for 30 minutes, then session (token) will be 
+expired, and user need to re authenticate. 
+ 
+Using The above token, user can request ULIP system for container details as follow - 
+ 
+curl --location --request POST 
+'https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/LDB/01' \ 
+--header 'Authorization: Bearer 
+eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZXN0MSIsImlhdCI6MTYyOTI4MzQxMiwiYXBwcyI6ImRh
+dGFwdXNoIn0.2fanfJuecjmwyT0Z0-H3qLpA4bKEnurPXx5yFeV_pw8h5Tbls5sBQFXu1Gq-
+FF5GMOfZV2a7EAOPvazmJC1QTw' \ 
+--header 'Content-Type: application/json' \ 
+--header 'Accept: application/json' \ 
+--data-raw '{"containerNumber": "NSST1234570"}' 
+ 
+ 

@@ -1,0 +1,488 @@
+ULIP Integration Requirement Document 
+ 
+  
+                        
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+Version No.: 2.0 
+Date: 30/03/2026 
+Project Name: ULIP 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ULIP Integration Requirement Document 
+This document contains proprietary information of NLDSL. Unauthorized access, copying and replication are 
+prohibited. This document must not be copied in whole or part by any means, without the written authorization of 
+NLDSL, Noida, India. 
+ 
+ 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 2.0 Page 2 of 10 
+ 
+ 
+ 
+ 
+Revision History 
+Version Date Author Reviewer Significant Changes 
+1.0 03/10/2024 Hasan Nayab Ali Baseline Version 
+2.0 30/03/2026 Gaurav Tyagi Pranab 
+Manna Updated 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+  
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 2.0 Page 3 of 10 
+ 
+Table of Contents 
+ 
+Introduction ................................................................................................................................................. 4 
+1.1 Purpose .................................................................................................................................... 4 
+The Overall Description .............................................................................................................................. 4 
+1.2 Data Integration between TGSARATHI System and ULIP application .................................... 4 
+1.3 TGSARATHI/01 ........................................................................................................................ 4 
+1.3.1 Technical Approach .................................................................................................... 5 
+1.4 Data Transmission & Authentication Mechanism .................................................................... 8 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 2.0 Page 4 of 10 
+ 
+Introduction 
+1.1 Purpose 
+ 
+This document defines and provides details for accessing the  API for TGSARATHI 
+system information from the ULIP system. 
+This document details the following points: 
+ 
+1. Data Integration between TGSARATHI and ULIP web service : Identification of 
+operational points where data integration between the Telangana Transport Department 
+and ULIP web service will be needed. 
+2. Technical Approach for Performing Data Integration  
+The Overall Description 
+The user will share information such as a Driving License (DL) based on data sent by the 
+user. The ULIP system will call the respective TGSARATHI API to access information. 
+ 
+The following are the points for accessing cargo information: - 
+ 
+1. This API will share data based on information provided by the user. 
+ 
+2. ULIP will expose API for getting data from TGSARATHI API. 
+ 
+3. TGSARATHI/01 API will take a Driving License (DL) from the user and get data from 
+TGSARATHI/01 API. 
+1.2 Data Integration between TGSARATHI System and ULIP 
+application 
+ 
+The user will share information with the ULIP system based on the data shared ULIP 
+will provide data to the user. 
+1.3 TGSARATHI/01 
+ 
+This API will take the driver's license number and connect with the TGSARATHI API to 
+get data. 
+ 
+S. 
+No. 
+Field Name Field Description Format Require
+d/Not – 
+Require
+d 
+Length 
+1 dlnumber 
+ 
+driver's license 
+number  
+^[a-zA-Z0-
+9]{1,25}$ 
+Required Max 25 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 2.0 Page 5 of 10 
+ 
+1.3.1 Technical Approach  
+1. All the data will be shared through the rest web services. 
+2. The ULIP system will provide the driver's license number, which is required for details. 
+3. TGSARATHI API will share details of driver's license information that exists in the 
+TGSARATHI system in JSON format. 
+4. TGSARATHI Integration will add JSON in the response key in the response body. 
+5. The ULIP system will provide the data in JSON Object format in the response body. 
+ 
+Example: 
+ 
+The ULIP system shares the driver's license number, and TGSARATHI-integration will 
+request TGSARATHI API. 
+ 
+Request: 
+ 
+The request must be of the following format, where the driver's license number is passed within 
+the URL body in JSON format. 
+ 
+For staging – 
+ 
+https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/TGSARATHI/01 
+ 
+ 
+{ 
+    "dlnumber": "AP01120130018301" 
+} 
+ 
+Curl URL 
+ 
+ 
+ 
+curl --location --
+request POST 'https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/TGSARATHI/01' 
+\ 
+--
+header 'Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1bGlwIiwiaWF0Ij
+oxNjQwNjcxMTU4LCJhcHBzIjoiZGF0YXB1c2gifQ.C1kSY1oUhhaJcch5Svaq9HUB7WtLHYnsVMIm
+6P1kyvr39qnqNxTqYTZ0QPAEiKsITxdE8ohCyFWPGdvsWrn8cg' \ 
+--header 'accept: application/json' \ 
+--header 'content-type: application/json' \ 
+--data-raw ' { 
+    "dlnumber": "AP01120130018301" 
+}' 
+ 
+ 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 2.0 Page 6 of 10 
+ 
+For Production – 
+ 
+https://www.ulip.dpiit.gov.in/ulip/v1.0.0/TGSARATHI/01 
+ 
+{ 
+    "dlnumber": "AP01120130018301" 
+} 
+ 
+Curl URL 
+ 
+curl --location 'https://www.ulip.dpiit.gov.in/ulip/v1.0.0/TGSARATHI/01' \ 
+--header 'Authorization: Bearer 
+eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1bGlwIiwiaWF0IjoxNzI3MTYxMDgwLCJhcHBzIjoiZGF0
+YXB1c2gifQ.XhVZm7NiCD05-
+v9091WJQhYzdk1a0Shs_ley0T4R2MX63swRyxHbHxh6bVXtzqWvWiSLwwNGRQIcqGhr49hpGg' \ 
+--header 'accept: application/json' \ 
+--header 'content-type: application/json' \ 
+--data '{ 
+    "dlnumber": "AP01120130018301" 
+}' 
+ 
+For obtaining an authentication token, refer Section 1.5 
+ 
+Response 
+ 
+To acknowledge the above request, ULIP will send the below response -  
+ 
+a) In case of an invalid format 
+ 
+1. Invalid driver's license number 
+ 
+{ 
+    "response": null, 
+    "error": "true", 
+    "code": "400", 
+    "message": "Data format failed OR wrong value entered a
+t:  dlnumber. Format should follow  ^[a-zA-Z0-9]{1,25}$" 
+} 
+ 
+ 
+b) In case of driver's license number does not exist in the TGSARATHI system 
+ 
+{ 
+    "response": [ 
+        { 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 2.0 Page 7 of 10 
+ 
+            "response": "<NewDataSet>\n  <errors>\n    <isError>Y</isError>\n
+    <errorMessage>No data found</errorMessage>\n  </errors>\n  <data>\n    <G
+ender></Gender>\n    <GenderDescription></GenderDescription>\n    <BloodGroup
+></BloodGroup>\n    <BloodGroupName></BloodGroupName>\n    <QualificationCode
+></QualificationCode>\n    <QualificationDescription></QualificationDescripti
+on>\n    <FullName></FullName>\n    <DateOfBirth></DateOfBirth>\n    <SwdFull
+Name></SwdFullName>\n    <PermanentAddress></PermanentAddress>\n    <Temporar
+yAddress></TemporaryAddress>\n    <MobileNumber></MobileNumber>\n    <DLNumbe
+r></DLNumber>\n    <PoliceStationCode></PoliceStationCode>\n    <PermanentDis
+trictName></PermanentDistrictName>\n    <TemporaryDistictName></TemporaryDist
+ictName>\n    <aadharAuthenticated></aadharAuthenticated>\n    <olacode_Rtoco
+de></olacode_Rtocode>\n    <olaName_RtoName></olaName_RtoName>\n    <StateCod
+e></StateCode>\n    <StateName></StateName>\n    <DLIssueDate></DLIssueDate>\
+n    <DLTransportValidityfromDate></DLTransportValidityfromDate>\n    <DLTran
+sportValidityToDate></DLTransportValidityToDate>\n    <DLNonTransportValidity
+FromDate></DLNonTransportValidityFromDate>\n    <DLHazardasValidityFromDate><
+/DLHazardasValidityFromDate>\n    <DLHazardasValidityToDate></DLHazardasValid
+ityToDate>\n    <DLHillValifityFromDate></DLHillValifityFromDate>\n    <DLHil
+lValidityToDate></DLHillValidityToDate>\n    <DLStatus></DLStatus>\n    <DLEn
+dorseDate></DLEndorseDate>\n    <DLEndorseTime></DLEndorseTime>\n    <DLRtoCo
+de></DLRtoCode>\n    <RtoFullName></RtoFullName>\n    <RtoShortName></RtoShor
+tName>\n    <DLCovcode></DLCovcode>\n    <DLCovStatus></DLCovStatus>\n    <co
+vDescription></covDescription>\n    <covAbbreviation></covAbbreviation>\n    
+<covIssueDate></covIssueDate>\n    <objectionType></objectionType>\n    <Obje
+ctionTodate></ObjectionTodate>\n    <EnforcementOfficeCode></EnforcementOffic
+eCode>\n    <ObjectionFromDate></ObjectionFromDate>\n  </data>\n</NewDataSet>
+", 
+            "responseStatus": "SUCCESS", 
+            "message": null 
+        } 
+    ], 
+    "error": "false", 
+    "code": "200", 
+    "message": "Success" 
+} 
+ 
+ 
+ 
+c) In case driver's license number exist 
+ 
+{ 
+    "response": [ 
+        { 
+            "response": "<NewDataSet>\n  <errors>\n    <isError>N</isError>\n
+    <errorMessage></errorMessage>\n  </errors>\n  <data>\n    <Gender>M</Gend
+er>\n    <GenderDescription>MALE</GenderDescription>\n    <BloodGroup></Blood
+Group>\n    <BloodGroupName></BloodGroupName>\n    <QualificationCode>PG</Qua
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 2.0 Page 8 of 10 
+ 
+lificationCode>\n    <QualificationDescription>POST GRADUATION</Qualification
+Description>\n    <FullName>M*D*U*U*A* S*Y*N*</FullName>\n    <DateOfBirth>XX
+XXXXXXXX</DateOfBirth>\n    <SwdFullName>K*M*R</SwdFullName>\n    <PermanentA
+ddress>29-
+4851/3  RAJAMPET COLONY,SECENDERABAD,502001</PermanentAddress>\n    <Temporar
+yAddress>29-
+4851/3  RAJAMPET COLONY,SECENDERABAD,502001</TemporaryAddress>\n    <MobileNu
+mber>XXXXXX1253</MobileNumber>\n    <DLNumber>AP01120130018301</DLNumber>\n  
+  <PoliceStationCode>15864</PoliceStationCode>\n    <PermanentDistrictName>HY
+DERABAD</PermanentDistrictName>\n    <TemporaryDistictName>HYDERABAD</Tempora
+ryDistictName>\n    <aadharAuthenticated></aadharAuthenticated>\n    <olacode
+_Rtocode>TG009</olacode_Rtocode>\n    <olaName_RtoName>HYDERABAD-
+CZ</olaName_RtoName>\n    <StateCode>TG</StateCode>\n    <StateName>TELANGANA
+</StateName>\n    <DLIssueDate>26/09/2007</DLIssueDate>\n    <DLTransportVali
+dityfromDate>26/09/2007</DLTransportValidityfromDate>\n    <DLTransportValidi
+tyToDate>25/09/2027</DLTransportValidityToDate>\n    <DLNonTransportValidityF
+romDate>25/09/2030</DLNonTransportValidityFromDate>\n    <DLHazardasValidityF
+romDate>25/09/2026</DLHazardasValidityFromDate>\n    <DLHazardasValidityToDat
+e>25/09/2027</DLHazardasValidityToDate>\n    <DLHillValifityFromDate></DLHill
+ValifityFromDate>\n    <DLHillValidityToDate></DLHillValidityToDate>\n    <DL
+Status>APPROVED</DLStatus>\n    <DLEndorseDate></DLEndorseDate>\n    <DLEndor
+seTime></DLEndorseTime>\n    <DLRtoCode>TG009</DLRtoCode>\n    <RtoFullName>K
+RISHNA</RtoFullName>\n    <RtoShortName>KRISH</RtoShortName>\n    <DLCovcode>
+ MCWG, LMVNT,TVEH,HZRD</DLCovcode>\n    <DLCovStatus>PASS</DLCovStatus>\n    
+<covDescription>MOTORCYCLEWITHGEAR,LIGHTMOTORVEHICLE</covDescription>\n    <c
+ovAbbreviation></covAbbreviation>\n    <covIssueDate>26/09/2007</covIssueDate
+>\n    <objectionType></objectionType>\n    <ObjectionTodate></ObjectionTodat
+e>\n    <EnforcementOfficeCode></EnforcementOfficeCode>\n    <ObjectionFromDa
+te></ObjectionFromDate>\n  </data>\n</NewDataSet>", 
+            "responseStatus": "SUCCESS", 
+            "message": null 
+        } 
+    ], 
+    "error": "false", 
+    "code": "200", 
+    "message": "Success" 
+} 
+Status Code 200: Driver's license number data response 
+Status Code 400: Bad request (Invalid JSON syntax, invalid JSON key) 
+Status Code 401 or 403: Unauthenticated or Unauthorized 
+Status Code 500: Some internal server error occurred 
+Status Code 502: The server is not responding. 
+1.4 Data Transmission & Authentication Mechanism 
+ 
+All data exchange would be done over secure HTTP (HTTPS). Request from ULIP's system would 
+be made in the TGSARATHI system through a data exchange URL that has the following form: 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 2.0 Page 9 of 10 
+ 
+ 
+For Staging – 
+ 
+https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/TGSARATHI/01 
+ 
+Body:  
+{"dlnumber": "AP01120130018301"} 
+ 
+Access to above data exchange URL would be authorized by use of a security mechanism 
+implemented by the ULIP system. It is as follows: 
+• To access the system for the first time, you will need a username and password, which will 
+be provided in advance. Once you enter your valid user ID and password, the ULIP system 
+will return a basic authorisation token. You can use this token to communicate with the ULIP 
+system until it expires. 
+ 
+The summary of HTTP Basic Authentication is as follows: 
+ 
+First time the User will hit ULIP secured API through username and password for access token 
+as follows- 
+ 
+ curl -X POST  
+‘https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/user/login’ 
+ -H 'accept: application/json'  
+   -H 'content-type: application/json'  
+-data ‘{"username":"xxxxxx","password":" XXxxx@12345"} ‘ 
+ 
+Authorization:   
+Bearer 
+eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJpbnRlcmNvbnQiLCJpYXQiOjE1ODU1NjYyMzcsImFwcHMi
+OiJkYXRhcHVzaCJ9.jb-23DbkWpz-3ptsuuZofzH-
+ce7jd0xR5WlkFfBPO_Dzjop01dSx9OamqsjsgUAryLUPtUDiMX07oHG4L2AfFQ  
+ 
+Upon successful authentication, the user would be logged into the ULIP system and get an access 
+token. Though this token user can communicate with ULIP. This token has expiry time which 
+represent user session. The session time out for the same to be fixed hour, generally it is for 30 
+minutes. If there is no request coming from user for 30 minutes, then session (token) will be 
+expired, and user need to re authenticate. 
+ 
+Using The above token, user can request ULIP system for details as follow - 
+ 
+curl --location --
+request POST 'https://www.ulipstaging.dpiit.gov.in/ulip/v1.0.0/TGSARATHI/01' 
+\ 
+--
+header 'authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1bGlwIiwiaWF0Ij
+oxNjQwNjcxMTU4LCJhcHBzIjoiZGF0YXB1c2gifQ.C1kSY1oUhhaJcch5Svaq9HUB7WtLHYnsVMIm
+6P1kyvr39qnqNxTqYTZ0QPAEiKsITxdE8ohCyFWPGdvsWrn8cg' \ 
+ULIP Integration Requirement Document 
+  
+          
+ 
+Doc Ref. No: ULIP Integration Doc Version No: 2.0 Page 10 of 10 
+ 
+--header 'accept: application/json' \ 
+--header 'content-type: application/json' \ 
+--data-raw '{"dlnumber": "AP01120130018301"}' 
+ 
+For Production – 
+curl --location 'https://www.ulip.dpiit.gov.in/ulip/v1.0.0/user/login' \ 
+--header 'Content-Type: application/json' \ 
+--header 'Accept: application/json' \ 
+--data-raw '{ 
+    "username": "xxxx", 
+    "password": "xxxx@123" 
+}' 
+ 
+Authorization:   
+Bearer  
+eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1bGlwIiwiaWF0IjoxNzI3MTYxMDgwLCJhcHBzIjoiZGF0
+YXB1c2gifQ.XhVZm7NiCD05-
+v9091WJQhYzdk1a0Shs_ley0T4R2MX63swRyxHbHxh6bVXtzqWvWiSLwwNGRQIcqGhr49hpGg 
+ 
+Upon successful authentication, the user would be logged into the ULIP system and get an access 
+token. Though this token user can communicate with  ULIP. This token has expiry time which 
+represent user session. The session time out for the same to be f ixed hour, generally it is for 30 
+minutes. If there is no request coming from user for 30 minutes, the n session (token) will be 
+expired, and user need to re authenticate. 
+ 
+Using The above token, user can request ULIP system for vehicle details as follow - 
+ 
+https://www.ulip.dpiit.gov.in/ulip/v1.0.0/TGSARATHI/01 
+curl --location 'https://www.ulip.dpiit.gov.in/ulip/v1.0.0/TGSARATHI/01' \ 
+--header 'authorization: Bearer 
+eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1bGlwIiwiaWF0IjoxNzI3MTYxMDgwLCJhcHBzIjoiZGF0
+YXB1c2gifQ.XhVZm7NiCD05-
+v9091WJQhYzdk1a0Shs_ley0T4R2MX63swRyxHbHxh6bVXtzqWvWiSLwwNGRQIcqGhr49hpGg' \ 
+--header 'accept: application/json' \ 
+--header 'content-type: application/json' \ 
+--data '{"dlnumber": "AP01120130018301"}' 
+ 
