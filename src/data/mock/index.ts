@@ -1,6 +1,11 @@
 import type {
-  DataAdapter, Dashboard, DocQuery, Fused360, Page, ShipmentQuery, VehicleQuery,
+  CaseQuery, DataAdapter, Dashboard, DocQuery, Fused360, Page, ShipmentQuery, VehicleQuery,
 } from '../adapter'
+import {
+  type Case, type CaseRecord, type CaseStatus, type Resolution,
+  RESOLUTION_LABEL, appendActivity, blankCase, isLive, isOverdue,
+  loadCases, memberById, saveCases,
+} from '../cases'
 import {
   type Signal, confidence, coverageForShipment, riskScore, signalsForShipment,
 } from '../fusion'
@@ -37,6 +42,36 @@ export class MockAdapter implements DataAdapter {
   private daily = makeDailySeries()
   private modal = makeModalSplit()
   private signalCache: Signal[] | null = null
+  private cases: Record<string, CaseRecord> = loadCases()
+
+  /* ── Case work ─────────────────────────────────────────────── */
+
+  /** Materialise a case for a signal, creating one lazily on first sight. */
+  private caseFor(signal: Signal, now = Date.now()): Case {
+    const rec = this.cases[signal.id] ?? blankCase(signal.id, signal.detectedAt, now)
+    if (!this.cases[signal.id]) this.cases[signal.id] = rec
+    return {
+      ...rec,
+      signal,
+      isDue: rec.status === 'snoozed'
+        ? !rec.snoozedUntil || Date.parse(rec.snoozedUntil) <= now
+        : false,
+    }
+  }
+
+  private allCases(): Case[] {
+    const now = Date.now()
+    return this.allSignals().map((s) => this.caseFor(s, now))
+  }
+
+  private mutate(signalId: string, fn: (rec: CaseRecord) => CaseRecord): Case {
+    const signal = this.allSignals().find((s) => s.id === signalId)
+    if (!signal) throw new Error(`Unknown signal ${signalId}`)
+    const current = this.cases[signalId] ?? blankCase(signalId, signal.detectedAt)
+    this.cases = { ...this.cases, [signalId]: fn(current) }
+    saveCases(this.cases)
+    return this.caseFor(signal)
+  }
 
   /** The vehicle currently under a consignment, via its active road leg. */
   private vehicleFor(shipmentId: string) {
@@ -176,6 +211,94 @@ export class MockAdapter implements DataAdapter {
     return this.allSignals()
   }
 
+  async listCases(q: CaseQuery = {}): Promise<Case[]> {
+    await sleep(latency())
+    const scope = q.scope ?? 'live'
+    const term = q.search?.trim().toLowerCase()
+    return this.allCases().filter((c) => {
+      if (q.severity && q.severity !== 'all' && c.signal.severity !== q.severity) return false
+      if (q.assignee && c.assignee !== q.assignee) return false
+      if (term && ![c.signal.title, c.signal.entity, c.signal.detail, ...c.signal.sources]
+        .join(' ').toLowerCase().includes(term)) return false
+
+      switch (scope) {
+        case 'all': return true
+        case 'resolved': return c.status === 'resolved' || c.status === 'dismissed'
+        case 'mine': return isLive(c) && c.assignee === q.assignee
+        case 'unassigned': return isLive(c) && !c.assignee
+        case 'overdue': return isOverdue(c)
+        default: return isLive(c)
+      }
+    })
+  }
+
+  async getCase(signalId: string) {
+    await sleep(latency() / 2)
+    const signal = this.allSignals().find((s) => s.id === signalId)
+    return signal ? this.caseFor(signal) : null
+  }
+
+  async assignCase(signalId: string, memberId: string | null, actor: string) {
+    await sleep(160)
+    return this.mutate(signalId, (rec) => {
+      const who = memberById(memberId)
+      const next = appendActivity(
+        { ...rec, assignee: memberId },
+        actor,
+        memberId ? 'assigned' : 'unassigned',
+        memberId ? `Assigned to ${who?.name ?? memberId}` : 'Owner removed',
+      )
+      // Picking up an untouched case starts the clock on it.
+      return next.status === 'open' && memberId ? { ...next, status: 'in_progress' } : next
+    })
+  }
+
+  async setCaseStatus(signalId: string, status: CaseStatus, actor: string) {
+    await sleep(160)
+    return this.mutate(signalId, (rec) =>
+      appendActivity({ ...rec, status, snoozedUntil: null }, actor, 'status',
+        `Status changed to ${status.replace('_', ' ')}`))
+  }
+
+  async snoozeCase(signalId: string, hours: number, actor: string) {
+    await sleep(160)
+    const until = new Date(Date.now() + hours * 3_600_000).toISOString()
+    return this.mutate(signalId, (rec) =>
+      appendActivity({ ...rec, status: 'snoozed', snoozedUntil: until }, actor, 'snoozed',
+        `Snoozed for ${hours}h — back in the queue ${new Date(until).toLocaleString('en-IN')}`))
+  }
+
+  async resolveCase(signalId: string, resolution: Resolution, note: string, actor: string) {
+    await sleep(200)
+    return this.mutate(signalId, (rec) =>
+      appendActivity(
+        { ...rec, status: 'resolved', resolution, snoozedUntil: null }, actor, 'resolved',
+        `${RESOLUTION_LABEL[resolution]}${note.trim() ? ` — ${note.trim()}` : ''}`))
+  }
+
+  async dismissCase(signalId: string, note: string, actor: string) {
+    await sleep(160)
+    return this.mutate(signalId, (rec) =>
+      appendActivity(
+        { ...rec, status: 'dismissed', resolution: 'false_positive', snoozedUntil: null },
+        actor, 'dismissed',
+        `Dismissed${note.trim() ? ` — ${note.trim()}` : ''}`))
+  }
+
+  async reopenCase(signalId: string, actor: string) {
+    await sleep(160)
+    return this.mutate(signalId, (rec) =>
+      appendActivity(
+        { ...rec, status: 'in_progress', resolution: null, snoozedUntil: null },
+        actor, 'reopened', 'Reopened'))
+  }
+
+  async addCaseNote(signalId: string, note: string, actor: string) {
+    await sleep(140)
+    return this.mutate(signalId, (rec) =>
+      appendActivity(rec, actor, 'note', note.trim()))
+  }
+
   async shipment360(id: string): Promise<Fused360 | null> {
     await sleep(latency())
     const shipment = this.shipments.find((s) => s.id === id || s.ulipRef === id)
@@ -203,7 +326,9 @@ export class MockAdapter implements DataAdapter {
     const badDocs = this.docs.filter((d) => d.status === 'expired' || d.status === 'mismatch')
     const expiring = this.docs.filter((d) => d.status === 'expiring')
     const today = this.calls.filter((c) => Date.parse(c.ts) > NOW - 86_400_000)
-    const signals = this.allSignals()
+    const cases = this.allCases()
+    const liveCases = cases.filter(isLive)
+    const signals = liveCases.map((c) => c.signal)
     const subs = this.subscribedSet()
     // Coverage is expensive per consignment; a sample is enough for a mean.
     const sampled = active.slice(0, 40)
@@ -245,10 +370,17 @@ export class MockAdapter implements DataAdapter {
       onTimePct: +((onTime / Math.max(1, done.length)) * 100).toFixed(1),
       avgDelayHrs: +(delayed.reduce((a, s) => a + s.delayMins, 0) / Math.max(1, delayed.length) / 60).toFixed(1),
       openExceptions: this.exceptions.filter((e) => !e.ack).length,
+      // Exposure counts each consignment once, and only while its case is
+      // still live — resolving a case should visibly move this number.
       valueAtRisk: [...new Map(
         signals.filter((g) => g.severity !== 'medium').map((g) => [g.entity, g.valueAtRisk]),
       ).values()].reduce((a, v) => a + v, 0),
       criticalSignals: signals.filter((g) => g.severity === 'critical').length,
+      unassignedCases: liveCases.filter((c) => !c.assignee).length,
+      overdueCases: liveCases.filter((c) => isOverdue(c)).length,
+      resolvedToday: cases.filter((c) =>
+        (c.status === 'resolved' || c.status === 'dismissed')
+        && Date.parse(c.updatedAt) > Date.now() - 86_400_000).length,
       dataConfidence: Math.round(
         sampled.reduce((a, s) => a + confidence(
           coverageForShipment(s, this.vehicleFor(s.id),

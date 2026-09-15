@@ -5,6 +5,7 @@ import type {
 import type { CatalogueEntry } from './mock/gateway'
 import type { UlipEnvelope } from './ulip/envelope'
 import type { Coverage, Signal } from './fusion'
+import type { Case, CaseStatus, Resolution } from './cases'
 
 export interface Page<T> { rows: T[]; total: number }
 
@@ -47,15 +48,28 @@ export interface Fused360 {
   confidence: number
 }
 
+export interface CaseQuery {
+  /** 'live' hides resolved and dismissed, and snoozes that have not lapsed. */
+  scope?: 'live' | 'all' | 'mine' | 'unassigned' | 'overdue' | 'resolved'
+  severity?: 'critical' | 'high' | 'medium' | 'all'
+  assignee?: string
+  search?: string
+}
+
 export interface Dashboard {
   activeShipments: number
   inTransitValue: number
   onTimePct: number
   avgDelayHrs: number
   openExceptions: number
-  /** Consignment value exposed to unresolved critical/high signals. */
+  /** Consignment value exposed to LIVE critical/high signals (resolved excluded). */
   valueAtRisk: number
   criticalSignals: number
+  /** Live cases with no owner — the queue nobody has picked up. */
+  unassignedCases: number
+  /** Live cases past the SLA for their severity. */
+  overdueCases: number
+  resolvedToday: number
   /** Mean share of relevant source systems reporting per consignment. */
   dataConfidence: number
   fleetActive: number
@@ -99,6 +113,21 @@ export interface DataAdapter {
 
   /** Network-wide cross-system signals, ranked by severity then exposure. */
   signals(): Promise<Signal[]>
+
+  /* ── Case work ───────────────────────────────────────────────
+     Signals are derived and recomputed; cases are the human record
+     over them — owner, status, outcome, and an audit trail. */
+  listCases(q?: CaseQuery): Promise<Case[]>
+  getCase(signalId: string): Promise<Case | null>
+  assignCase(signalId: string, memberId: string | null, actor: string): Promise<Case>
+  setCaseStatus(signalId: string, status: CaseStatus, actor: string): Promise<Case>
+  snoozeCase(signalId: string, hours: number, actor: string): Promise<Case>
+  resolveCase(
+    signalId: string, resolution: Resolution, note: string, actor: string,
+  ): Promise<Case>
+  dismissCase(signalId: string, note: string, actor: string): Promise<Case>
+  reopenCase(signalId: string, actor: string): Promise<Case>
+  addCaseNote(signalId: string, note: string, actor: string): Promise<Case>
   /** Everything every subscribed system knows about one consignment. */
   shipment360(id: string): Promise<Fused360 | null>
 

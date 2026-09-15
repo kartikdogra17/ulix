@@ -1,11 +1,15 @@
 import { useEffect, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import {
-  CircleAlert, Filter, Gauge, Layers, Package, Plane, Search, Ship,
+  CircleAlert, Filter, Gauge, Package, Plane, Search, Ship,
   ThermometerSnowflake, Train, Truck, TriangleAlert,
 } from 'lucide-react'
 import { adapter } from '../data'
-import type { Coverage, Severity } from '../data/fusion'
+import type { Coverage } from '../data/fusion'
+import {
+  AssigneeSelect, CaseDrawer, SEV_TONE, Sources, StatusChip, currentMemberId,
+} from '../components/cases'
+import { useApp } from '../state/app'
 import { useAsync, useDebounced } from '../lib/useAsync'
 import { d, dt, dur, inr, kg, num, rel } from '../lib/format'
 import { NODES, nodeName } from '../data/mock/seed'
@@ -29,10 +33,6 @@ const STATUSES: Array<ShipmentStatus | 'all'> = [
 
 /* ── Detail drawer ────────────────────────────────────────────── */
 
-const SEV_TONE: Record<Severity, 'bad' | 'warn' | 'info'> = {
-  critical: 'bad', high: 'warn', medium: 'info',
-}
-
 const COVERAGE_TONE: Record<Coverage['state'], 'ok' | 'warn' | 'bad' | 'neutral'> = {
   reported: 'ok', stale: 'warn', missing: 'bad',
   not_subscribed: 'neutral', not_applicable: 'neutral',
@@ -43,23 +43,21 @@ const COVERAGE_LABEL: Record<Coverage['state'], string> = {
   not_subscribed: 'Not subscribed', not_applicable: 'Not applicable',
 }
 
-function Sources({ ids }: { ids: string[] }) {
-  return (
-    <div className="flex flex-wrap items-center gap-1">
-      <Layers className="size-3 text-faint" />
-      {ids.map((id) => (
-        <span key={id} className="rounded border border-line bg-surface-2 px-1 font-mono text-[10px] leading-4 text-muted">
-          {id}
-        </span>
-      ))}
-    </div>
-  )
-}
-
 function ShipmentDetail({ id, onClose }: { id: string | null; onClose: () => void }) {
+  const { session } = useApp()
+  const actor = currentMemberId(session?.name)
+  const [tab, setTab] = useState('overview')
+  const [openCase, setOpenCase] = useState<string | null>(null)
+  const [version, setVersion] = useState(0)
+  const bump = () => setVersion((v) => v + 1)
+
   const { data: f } = useAsync(
     () => (id ? adapter.shipment360(id) : Promise.resolve(null)), [id])
-  const [tab, setTab] = useState('overview')
+  // Working state for this consignment's signals — owner, status, outcome.
+  const { data: cases } = useAsync(
+    () => (id ? adapter.listCases({ scope: 'all', search: id }) : Promise.resolve([])),
+    [id, version])
+  const caseFor = (signalId: string) => cases?.find((c) => c.signalId === signalId) ?? null
 
   useEffect(() => { setTab('overview') }, [id])
 
@@ -152,22 +150,36 @@ function ShipmentDetail({ id, onClose }: { id: string | null; onClose: () => voi
                     </p>
                   </div>
                 )}
-                {f.signals.map((sig) => (
-                  <Card key={sig.id} className="p-3">
-                    <div className="flex items-start gap-2.5">
-                      <Badge tone={SEV_TONE[sig.severity]} dot className="mt-0.5 shrink-0">{sig.severity}</Badge>
-                      <div className="min-w-0 flex-1">
-                        <div className="text-[13px] font-medium">{sig.title}</div>
-                        <p className="mt-1 text-[12px] leading-relaxed text-muted">{sig.detail}</p>
-                        <div className="mt-2 rounded-lg border border-line bg-surface-2 px-2.5 py-1.5">
-                          <div className="text-[10px] font-semibold uppercase tracking-wide text-faint">Do next</div>
-                          <p className="mt-0.5 text-[12px]">{sig.action}</p>
+                {f.signals.map((sig) => {
+                  const c = caseFor(sig.id)
+                  return (
+                    <Card key={sig.id} className="p-3">
+                      <div className="flex items-start gap-2.5">
+                        <Badge tone={SEV_TONE[sig.severity]} dot className="mt-0.5 shrink-0">{sig.severity}</Badge>
+                        <div className="min-w-0 flex-1">
+                          <div className="flex flex-wrap items-center gap-2">
+                            <span className="text-[13px] font-medium">{sig.title}</span>
+                            {c && <StatusChip c={c} />}
+                          </div>
+                          <p className="mt-1 text-[12px] leading-relaxed text-muted">{sig.detail}</p>
+                          <div className="mt-2 rounded-lg border border-line bg-surface-2 px-2.5 py-1.5">
+                            <div className="text-[10px] font-semibold uppercase tracking-wide text-faint">Do next</div>
+                            <p className="mt-0.5 text-[12px]">{sig.action}</p>
+                          </div>
+                          <div className="mt-2 flex flex-wrap items-center justify-between gap-2">
+                            <Sources ids={sig.sources} />
+                            {c && (
+                              <div className="flex items-center gap-2">
+                                <AssigneeSelect c={c} actor={actor} onChanged={bump} compact />
+                                <Button size="sm" onClick={() => setOpenCase(sig.id)}>Open case</Button>
+                              </div>
+                            )}
+                          </div>
                         </div>
-                        <div className="mt-2"><Sources ids={sig.sources} /></div>
                       </div>
-                    </div>
-                  </Card>
-                ))}
+                    </Card>
+                  )
+                })}
               </div>
             )}
 
@@ -296,6 +308,8 @@ function ShipmentDetail({ id, onClose }: { id: string | null; onClose: () => voi
           </Tabs>
         </div>
       )}
+      <CaseDrawer signalId={openCase} actor={actor}
+        onClose={() => setOpenCase(null)} onChanged={bump} />
     </Drawer>
   )
 }

@@ -92,6 +92,32 @@ Two derived measures sit on top:
   made on one of four, and the platform says which it is rather than implying
   completeness it does not have.
 
+### From signal to closed case
+
+A signal is *derived* — it exists because the source data says so, and vanishes when
+the facts change. A **case** is the human record attached to it, and it persists:
+
+- **Assign** to a desk. Routing is by signal kind, so compliance issues land on
+  Compliance and tag problems on the Fleet Desk rather than in one undifferentiated pile.
+- **Snooze** (4/8/24h) when the answer is "not yet"; it returns to the queue on time.
+- **Close** with an outcome, not just a tick — *fixed at source, mitigated, false
+  positive, risk accepted, no longer relevant*. Accepting a risk **requires** a written
+  reason, because that note is the audit record.
+- Every action appends to an **activity trail** with actor and timestamp.
+
+Queue views: **Queue / Mine / Unassigned / Overdue / Closed**, plus a desk-load panel
+showing who is carrying what.
+
+SLA clocks run from **when the condition arose**, not when someone first opened the
+page — and detection is clamped to the platform's own visibility horizon (72h, FASTag's
+retention), so it never claims to have seen something before it had data.
+
+Resolving a case visibly moves **value at risk**: exposure counts each consignment once,
+and only while its case is still live.
+
+Case state is stored per-operator in `localStorage` and never leaves the browser. In a
+real deployment this is the one table you would move server-side first.
+
 The **control tower leads with a ranked decisions queue** — what needs action, the
 consignment value exposed, hours left to act, the contributing endpoints, and the
 recommended next step — instead of a wall of charts. Opening any consignment gives the
@@ -101,7 +127,7 @@ same picture at entity level, including a per-system coverage table.
 
 | Route | What it does |
 |---|---|
-| `/` **Control tower** | Value at risk and the ranked decisions queue, risk-coloured live map, what is driving risk, lane reliability, per-ministry source-system health |
+| `/` **Control tower** | Value at risk, unassigned and overdue counts, the working decisions queue (assign / snooze / close with an outcome), desk load, risk-coloured live map, what is driving risk, lane reliability, source-system health |
 | `/shipments` **Consignments** | Filterable register; drawer opens on risk score and data confidence, then cross-system signals with recommended actions, a per-system coverage table, leg-by-leg journey, event chain attributed to its source system, and documents |
 | `/fleet` **Fleet** | VAHAN registration and statutory validity, SARATHI licence checks, FASTag crossings and balance, utilisation and detention analytics |
 | `/compliance` **Documents** | e-Way Bills, GST invoices, customs filings and vehicle papers, triaged by mismatch / expired / expiring / pending, with the specific discrepancy named |

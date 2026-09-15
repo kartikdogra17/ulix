@@ -47,6 +47,12 @@ export interface Signal {
   valueAtRisk: number
   /** Hours until the window to act closes; null when already closed. */
   hoursToAct: number | null
+  /**
+   * When the underlying condition became true — NOT when the platform first
+   * rendered it. SLA clocks run from here, otherwise nothing is ever overdue
+   * because every case looks newly created the moment someone opens the page.
+   */
+  detectedAt: string
   /** What a controller should actually do next. */
   action: string
 }
@@ -71,13 +77,26 @@ export function signalsForShipment(
   const out: Signal[] = []
   const done = s.status === 'delivered'
   const eta = Date.parse(s.eta)
+  const started = Date.parse(s.createdAt)
+  /**
+   * Clamp an onset into the window the platform could actually have seen it in:
+   * never before dispatch, and never before the gateway's own visibility horizon
+   * (FASTAG/01 retains 72h, so nothing road-side is observable earlier than that).
+   * Without this, a certificate that lapsed three weeks ago would present as a
+   * case that has been waiting three weeks, and every SLA would read as breached.
+   */
+  const horizon = now - FASTAG_RETENTION_HOURS * HOUR
+  const onset = (ms: number) =>
+    new Date(Math.min(now, Math.max(started, horizon, ms))).toISOString()
+
   const mk = (
     kind: SignalKind, severity: Severity, title: string, detail: string,
     sources: string[], hoursToAct: number | null, action: string,
+    detectedAt: string = onset(started),
   ) => out.push({
     id: `${s.id}-${kind}`, kind, severity, title, detail, sources,
     entity: s.id, entityKind: 'shipment', valueAtRisk: s.invoiceValue,
-    hoursToAct, action,
+    hoursToAct, action, detectedAt,
   })
 
   /* ── e-Way Bill validity vs the ETA the movement data implies ──
@@ -123,7 +142,8 @@ export function signalsForShipment(
         `No toll read for ${Math.round(darkFor)}h`,
         `Last plaza read was ${vehicle.crossings[0].plaza}. On a corridor of this length a read is expected every few hours — the vehicle may be halted, diverted, or running a toll-free stretch.`,
         ['FASTAG/01'], null,
-        'Call the driver to confirm position, then reconcile against the next expected plaza.')
+        'Call the driver to confirm position, then reconcile against the next expected plaza.',
+        onset((lastRead ?? now) + 10 * HOUR))
     }
   }
 
@@ -131,37 +151,43 @@ export function signalsForShipment(
   if (vehicle && !done) {
     const v = vehicle
     const add = (
-      kind: SignalKind, sev: Severity, title: string, detail: string, src: string[], action: string,
+      kind: SignalKind, sev: Severity, title: string, detail: string,
+      src: string[], action: string, detectedAt: string,
     ) => out.push({
       id: `${s.id}-${kind}`, kind, severity: sev, title, detail, sources: src,
       entity: s.id, entityKind: 'shipment', valueAtRisk: s.invoiceValue,
-      hoursToAct: 0, action,
+      hoursToAct: 0, action, detectedAt,
     })
 
     if (Date.parse(v.fitnessUpto) < now) {
       add('fitness_lapsed', 'critical', 'Carrying vehicle is not road legal',
         `${v.regNo} has a fitness certificate that lapsed on ${new Date(v.fitnessUpto).toLocaleDateString('en-IN')} and is under load with ${s.commodity}. Any enforcement stop detains the cargo, not just the truck.`,
         ['VAHAN/01', 'EWAYBILL/01'],
-        'Swap the consignment onto a compliant vehicle at the next hub.')
+        'Swap the consignment onto a compliant vehicle at the next hub.',
+        onset(Date.parse(v.fitnessUpto)))
     }
     if (Date.parse(v.insuranceUpto) < now) {
       add('insurance_lapsed', 'critical', 'Goods in transit are uninsured',
         `Motor insurance on ${v.regNo} expired on ${new Date(v.insuranceUpto).toLocaleDateString('en-IN')}. Cargo worth this much is moving without cover.`,
-        ['VAHAN/01'], 'Renew cover immediately or halt the vehicle at the nearest safe point.')
+        ['VAHAN/01'], 'Renew cover immediately or halt the vehicle at the nearest safe point.',
+        onset(Date.parse(v.insuranceUpto)))
     }
     if (v.tagStatus === 'BLACKLIST') {
       add('tag_blacklisted', 'high', 'FASTag blacklisted — plaza entry will be refused',
         `${v.regNo} will be turned back or charged double at the next plaza, and you lose toll-read visibility for this consignment entirely.`,
-        ['FASTAG/01'], 'Clear the tag with the issuing bank before the next plaza.')
+        ['FASTAG/01'], 'Clear the tag with the issuing bank before the next plaza.',
+        onset(now - 6 * HOUR))
     } else if (v.tagStatus === 'LOW_BALANCE') {
       add('tag_low_balance', 'medium', 'FASTag balance will not cover the remaining route',
         `Balance on ${v.regNo} is low for the plazas still ahead on this lane.`,
-        ['FASTAG/01', 'TOLL/01'], 'Top up the tag before the vehicle reaches the next plaza.')
+        ['FASTAG/01', 'TOLL/01'], 'Top up the tag before the vehicle reaches the next plaza.',
+        onset(now - 12 * HOUR))
     }
     if (Date.parse(v.dlValidUpto) < now) {
       add('dl_expired', 'high', 'Driving licence has expired',
         `${v.driverName}'s licence lapsed on ${new Date(v.dlValidUpto).toLocaleDateString('en-IN')}. The driver is not legally entitled to move this load.`,
-        ['SARATHI/01', 'VAHAN/01'], 'Relieve the driver at the next hub and log the renewal.')
+        ['SARATHI/01', 'VAHAN/01'], 'Relieve the driver at the next hub and log the renewal.',
+        onset(Date.parse(v.dlValidUpto)))
     }
   }
 
@@ -198,7 +224,8 @@ export function signalsForShipment(
       `Running ${Math.round(s.delayMins / 60)}h behind`,
       `Projected arrival has slipped past the promised ETA on the ${s.legs[s.legs.length - 1].mode} leg.`,
       ['FASTAG/01', 'FOIS/01'], null,
-      'Notify the consignee with a revised ETA before they escalate.')
+      'Notify the consignee with a revised ETA before they escalate.',
+      onset(now - s.delayMins * 60_000))
   }
 
   return out.sort((a, b) =>

@@ -1,22 +1,25 @@
 import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import {
-  ArrowUpRight, CheckCircle2, ChevronRight, CircleDollarSign, Clock,
-  Gauge, Layers, ShieldAlert, Signal as SignalIcon, Timer, TrendingUp, Truck,
+  ArrowUpRight, CheckCircle2, ChevronRight, CircleDollarSign, Gauge,
+  Signal as SignalIcon, Timer, TrendingUp, Truck, UserRoundPlus,
 } from 'lucide-react'
 import { adapter } from '../data'
 import { useAsync } from '../lib/useAsync'
-import { inr, num, titleCase } from '../lib/format'
+import { dur, inr, num, titleCase } from '../lib/format'
 import { NetworkMap, type MapMarker } from '../components/NetworkMap'
 import {
   Badge, Button, Card, CardHead, Meter, Mono, Skeleton, TableSkeleton, Td, Th,
 } from '../components/ui'
-import type { Severity, Signal } from '../data/fusion'
+import {
+  Avatar, CaseDrawer, QuickActions, SEV_TONE, Sources, StatusChip, currentMemberId,
+} from '../components/cases'
+import { SLA_HOURS, TEAM, ageHours, isOverdue, memberById } from '../data/cases'
+import type { CaseQuery } from '../data/adapter'
+import type { Case } from '../data/cases'
+import type { Severity } from '../data/fusion'
+import { useApp } from '../state/app'
 import { cn } from '../lib/cn'
-
-const SEV_TONE: Record<Severity, 'bad' | 'warn' | 'info'> = {
-  critical: 'bad', high: 'warn', medium: 'info',
-}
 
 const KIND_LABEL: Record<string, string> = {
   ewb_expires_before_eta: 'e-Way Bill expiring mid-transit',
@@ -32,21 +35,6 @@ const KIND_LABEL: Record<string, string> = {
   reefer_breach: 'Cold-chain breach',
   detention: 'Detention',
   eta_slip: 'Schedule slip',
-}
-
-/** Provenance: which government systems produced this conclusion. */
-function Sources({ ids }: { ids: string[] }) {
-  return (
-    <div className="flex flex-wrap items-center gap-1">
-      <Layers className="size-3 text-faint" />
-      {ids.map((id) => (
-        <span key={id}
-          className="rounded border border-line bg-surface-2 px-1 font-mono text-[10px] leading-4 text-muted">
-          {id}
-        </span>
-      ))}
-    </div>
-  )
 }
 
 function Kpi({ label, value, sub, icon: Icon, tone = 'neutral', loading, accent }: {
@@ -74,45 +62,66 @@ function Kpi({ label, value, sub, icon: Icon, tone = 'neutral', loading, accent 
   )
 }
 
-/* ── The hero: a ranked queue of decisions, not a list of charts ── */
+/* ── The hero: a worklist, not a list of charts ── */
 
-function DecisionRow({ s }: { s: Signal }) {
-  const [open, setOpen] = useState(false)
+function CaseRow({ c, actor, onOpen, onChanged }: {
+  c: Case; actor: string; onOpen: () => void; onChanged: () => void
+}) {
+  const closed = c.status === 'resolved' || c.status === 'dismissed'
   return (
-    <div className="px-3.5 py-3 transition-colors hover:bg-surface-2/40">
-      <button onClick={() => setOpen((v) => !v)} className="flex w-full items-start gap-3 text-left">
-        <Badge tone={SEV_TONE[s.severity]} dot className="mt-0.5 shrink-0">{s.severity}</Badge>
-        <div className="min-w-0 flex-1">
+    <div className={cn('px-3.5 py-3 transition-colors hover:bg-surface-2/40', closed && 'opacity-60')}>
+      <div className="flex items-start gap-3">
+        <Badge tone={SEV_TONE[c.signal.severity]} dot className="mt-0.5 shrink-0">
+          {c.signal.severity}
+        </Badge>
+
+        <button onClick={onOpen} className="min-w-0 flex-1 text-left">
           <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
-            <span className="text-[13px] font-medium">{s.title}</span>
-            <Mono className="text-faint">{s.entity}</Mono>
+            <span className="text-[13px] font-medium">{c.signal.title}</span>
+            <Mono className="text-faint">{c.signal.entity}</Mono>
+            <StatusChip c={c} />
           </div>
-          <p className={cn('mt-1 text-[12px] leading-relaxed text-muted', !open && 'line-clamp-1')}>
-            {s.detail}
+          <p className="mt-1 line-clamp-1 text-[12px] leading-relaxed text-muted">
+            {c.signal.detail}
           </p>
           <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1">
-            <Sources ids={s.sources} />
-            {s.hoursToAct !== null && (
+            <Sources ids={c.signal.sources} />
+            {c.signal.hoursToAct !== null && (
               <span className={cn('text-[10px] font-medium',
-                s.hoursToAct <= 0 ? 'text-bad' : s.hoursToAct < 12 ? 'text-warn' : 'text-faint')}>
+                c.signal.hoursToAct <= 0 ? 'text-bad'
+                  : c.signal.hoursToAct < 12 ? 'text-warn' : 'text-faint')}>
                 <Timer className="mr-0.5 inline size-3" />
-                {s.hoursToAct <= 0 ? 'window closed' : `${Math.round(s.hoursToAct)}h to act`}
+                {c.signal.hoursToAct <= 0 ? 'window closed' : `${Math.round(c.signal.hoursToAct)}h to act`}
               </span>
             )}
+            <span className="text-[10px] text-faint">
+              waiting {dur(ageHours(c) * 60)} · SLA {SLA_HOURS[c.signal.severity]}h
+            </span>
           </div>
+        </button>
+
+        {/* Owner is a glanceable avatar here; changing it happens in the case,
+            where there is room to see who is already carrying what. */}
+        <div className="hidden shrink-0 items-center gap-2.5 sm:flex">
+          <button onClick={onOpen} title={memberById(c.assignee)?.name ?? 'Unassigned — click to open'}>
+            <Avatar id={c.assignee} />
+          </button>
+          <div className="w-[4.5rem] text-right">
+            <div className="tnum text-[13px] font-semibold">{inr(c.signal.valueAtRisk)}</div>
+            <div className="text-[10px] text-faint">at risk</div>
+          </div>
+          <QuickActions c={c} actor={actor} onChanged={onChanged} />
         </div>
-        <div className="shrink-0 text-right">
-          <div className="tnum text-[13px] font-semibold">{inr(s.valueAtRisk)}</div>
-          <div className="text-[10px] text-faint">at risk</div>
-        </div>
-        <ChevronRight className={cn('mt-1 size-4 shrink-0 text-faint transition-transform', open && 'rotate-90')} />
-      </button>
-      {open && (
-        <div className="ml-[4.25rem] mt-2 rounded-lg border border-line bg-surface-2 px-3 py-2">
-          <div className="text-[10px] font-semibold uppercase tracking-wide text-faint">Recommended action</div>
-          <p className="mt-0.5 text-[12px] leading-relaxed">{s.action}</p>
-        </div>
-      )}
+
+        <ChevronRight className="mt-1 size-4 shrink-0 text-faint sm:hidden" />
+      </div>
+
+      {/* Compact controls for narrow screens */}
+      <div className="mt-2 flex items-center gap-2 sm:hidden">
+        <Avatar id={c.assignee} />
+        <span className="tnum ml-auto text-[12px] font-semibold">{inr(c.signal.valueAtRisk)}</span>
+        <QuickActions c={c} actor={actor} onChanged={onChanged} />
+      </div>
     </div>
   )
 }
@@ -120,26 +129,35 @@ function DecisionRow({ s }: { s: Signal }) {
 /* ── Page ─────────────────────────────────────────────────────── */
 
 export function ControlTower() {
-  const { data } = useAsync(() => adapter.dashboard(), [])
-  const { data: live } = useAsync(() => adapter.liveMap(), [])
-  const { data: signals } = useAsync(() => adapter.signals(), [])
-  const [sev, setSev] = useState<Severity | 'all'>('all')
+  const { session } = useApp()
+  const actor = currentMemberId(session?.name)
 
-  const queue = useMemo(
-    () => (signals ?? []).filter((s) => sev === 'all' || s.severity === sev),
-    [signals, sev])
+  const [scope, setScope] = useState<NonNullable<CaseQuery['scope']>>('live')
+  const [sev, setSev] = useState<Severity | 'all'>('all')
+  const [openCase, setOpenCase] = useState<string | null>(null)
+  const [version, setVersion] = useState(0)
+  const bump = () => setVersion((v) => v + 1)
+
+  const { data } = useAsync(() => adapter.dashboard(), [version])
+  const { data: live } = useAsync(() => adapter.liveMap(), [])
+  const { data: cases } = useAsync(
+    () => adapter.listCases({ scope, severity: sev, assignee: scope === 'mine' ? actor : undefined }),
+    [scope, sev, actor, version])
+  // Unfiltered, for tab counts and the risk breakdown.
+  const { data: allLive } = useAsync(() => adapter.listCases({ scope: 'live' }), [version])
 
   /** Risk per consignment, so the map shows exposure rather than mere position. */
   const riskByEntity = useMemo(() => {
     const m = new Map<string, Severity>()
-    for (const s of signals ?? []) {
-      const cur = m.get(s.entity)
-      if (!cur || (s.severity === 'critical') || (s.severity === 'high' && cur === 'medium')) {
-        m.set(s.entity, s.severity)
+    for (const c of allLive ?? []) {
+      const cur = m.get(c.signal.entity)
+      if (!cur || c.signal.severity === 'critical'
+        || (c.signal.severity === 'high' && cur === 'medium')) {
+        m.set(c.signal.entity, c.signal.severity)
       }
     }
     return m
-  }, [signals])
+  }, [allLive])
 
   const markers: MapMarker[] = useMemo(() =>
     (live ?? []).slice(0, 90).map((s) => {
@@ -157,11 +175,11 @@ export function ControlTower() {
   const mix = useMemo(() => {
     const m = new Map<string, { count: number; worst: Severity }>()
     const rank = { critical: 0, high: 1, medium: 2 } as const
-    for (const s of signals ?? []) {
-      const cur = m.get(s.kind)
-      m.set(s.kind, {
+    for (const c of allLive ?? []) {
+      const cur = m.get(c.signal.kind)
+      m.set(c.signal.kind, {
         count: (cur?.count ?? 0) + 1,
-        worst: !cur || rank[s.severity] < rank[cur.worst] ? s.severity : cur.worst,
+        worst: !cur || rank[c.signal.severity] < rank[cur.worst] ? c.signal.severity : cur.worst,
       })
     }
     const rows = [...m.entries()]
@@ -169,14 +187,16 @@ export function ControlTower() {
       .sort((a, b) => b.count - a.count)
     const max = Math.max(1, ...rows.map((r) => r.count))
     return rows.slice(0, 9).map((r) => ({ ...r, pct: (r.count / max) * 100 }))
-  }, [signals])
+  }, [allLive])
 
-  const counts = useMemo(() => ({
-    all: signals?.length ?? 0,
-    critical: (signals ?? []).filter((s) => s.severity === 'critical').length,
-    high: (signals ?? []).filter((s) => s.severity === 'high').length,
-    medium: (signals ?? []).filter((s) => s.severity === 'medium').length,
-  }), [signals])
+  const mine = (allLive ?? []).filter((c) => c.assignee === actor).length
+  const SCOPES: Array<[NonNullable<CaseQuery['scope']>, string, number | undefined]> = [
+    ['live', 'Queue', allLive?.length],
+    ['mine', 'Mine', mine],
+    ['unassigned', 'Unassigned', data?.unassignedCases],
+    ['overdue', 'Overdue', data?.overdueCases],
+    ['resolved', 'Closed', data?.resolvedToday],
+  ]
 
   return (
     <div className="space-y-4 p-3 sm:p-4">
@@ -184,7 +204,7 @@ export function ControlTower() {
         <div>
           <h1 className="text-lg font-semibold tracking-tight">Control tower</h1>
           <p className="text-[13px] text-muted">
-            Every source system joined into one picture — what needs a decision, and why.
+            Every source system joined into one picture — what needs a decision, who owns it, and why.
           </p>
         </div>
         {data && (
@@ -201,53 +221,73 @@ export function ControlTower() {
       <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-6">
         <Kpi loading={!data} accent label="Value at risk" icon={CircleDollarSign} tone="bad"
           value={data ? inr(data.valueAtRisk) : '—'}
-          sub={data ? `${data.criticalSignals} critical signals` : undefined} />
-        <Kpi loading={!data} label="Needs a decision" icon={ShieldAlert}
-          tone={counts.critical ? 'bad' : 'warn'}
-          value={num(counts.critical + counts.high)} sub="critical + high, unresolved" />
+          sub={data ? `${data.criticalSignals} critical, unresolved` : undefined} />
+        <Kpi loading={!data} label="Unassigned" icon={UserRoundPlus}
+          tone={data?.unassignedCases ? 'warn' : 'ok'}
+          value={data ? num(data.unassignedCases) : '—'} sub="nobody has picked these up" />
+        <Kpi loading={!data} label="Overdue" icon={Timer}
+          tone={data?.overdueCases ? 'bad' : 'ok'}
+          value={data ? num(data.overdueCases) : '—'} sub="past SLA for their severity" />
+        <Kpi loading={!data} label="Closed today" icon={CheckCircle2} tone="ok"
+          value={data ? num(data.resolvedToday) : '—'} sub="resolved or dismissed" />
         <Kpi loading={!data} label="Active consignments" icon={Truck}
           value={data ? num(data.activeShipments) : '—'}
           sub={data ? `${inr(data.inTransitValue)} in transit` : undefined} />
-        <Kpi loading={!data} label="On-time delivery" icon={CheckCircle2}
+        <Kpi loading={!data} label="On-time delivery" icon={SignalIcon}
           tone={data && data.onTimePct >= 85 ? 'ok' : 'warn'}
-          value={data ? `${data.onTimePct}%` : '—'} sub="rolling, delivered" />
-        <Kpi loading={!data} label="Avg delay" icon={Clock}
-          tone={data && data.avgDelayHrs > 8 ? 'bad' : 'warn'}
-          value={data ? `${data.avgDelayHrs}h` : '—'} sub="on delayed legs" />
-        <Kpi loading={!data} label="Fleet active" icon={SignalIcon} tone="ok"
-          value={data ? `${data.fleetActive}/${data.fleetTotal}` : '—'}
-          sub={data ? `${data.utilisationPct}% utilisation` : undefined} />
+          value={data ? `${data.onTimePct}%` : '—'} sub={data ? `avg delay ${data.avgDelayHrs}h` : undefined} />
       </div>
 
       <div className="grid gap-3 xl:grid-cols-[1.45fr_1fr]">
-        {/* Hero — the decision queue */}
+        {/* Hero — the worklist */}
         <Card className="overflow-hidden">
           <CardHead
             title="Decisions queue"
-            sub="Cross-system signals no single ministry API can produce, ranked by exposure"
+            sub="Cross-system signals no single ministry API can produce — assign, action, close"
             right={
               <div className="flex gap-1">
-                {([['all', counts.all], ['critical', counts.critical], ['high', counts.high], ['medium', counts.medium]] as const)
-                  .map(([k, n]) => (
-                    <button key={k} onClick={() => setSev(k as Severity | 'all')}
-                      className={cn('rounded-md px-2 py-1 text-[11px] font-medium transition-colors',
-                        sev === k ? 'bg-surface-3 text-fg' : 'text-muted hover:text-fg')}>
-                      {k === 'all' ? 'All' : titleCase(k)} <span className="tnum text-faint">{n}</span>
-                    </button>
-                  ))}
+                {(['all', 'critical', 'high', 'medium'] as const).map((k) => (
+                  <button key={k} onClick={() => setSev(k as Severity | 'all')}
+                    className={cn('rounded-md px-2 py-1 text-[11px] font-medium transition-colors',
+                      sev === k ? 'bg-surface-3 text-fg' : 'text-muted hover:text-fg')}>
+                    {k === 'all' ? 'All' : titleCase(k)}
+                  </button>
+                ))}
               </div>
             }
           />
+          <div className="flex gap-1 overflow-x-auto border-b border-line-soft px-3 py-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            {SCOPES.map(([k, label, n]) => (
+              <button key={k} onClick={() => setScope(k)}
+                className={cn('inline-flex shrink-0 items-center gap-1.5 rounded-md px-2.5 py-1 text-[12px] font-medium transition-colors',
+                  scope === k ? 'bg-surface-2 text-fg' : 'text-muted hover:text-fg')}>
+                {label}
+                {n !== undefined && <span className="tnum text-[10px] text-faint">{n}</span>}
+              </button>
+            ))}
+          </div>
           <div className="max-h-[560px] divide-y divide-line-soft overflow-y-auto">
-            {!signals && <TableSkeleton rows={6} cols={3} />}
-            {signals && !queue.length && (
+            {!cases && <TableSkeleton rows={6} cols={3} />}
+            {cases && !cases.length && (
               <div className="px-4 py-14 text-center">
                 <CheckCircle2 className="mx-auto mb-2 size-6 text-ok" />
-                <p className="text-sm font-medium">Nothing at this severity</p>
-                <p className="mt-1 text-[13px] text-muted">No cross-system conflicts in the network right now.</p>
+                <p className="text-sm font-medium">
+                  {scope === 'mine' ? 'Nothing assigned to you'
+                    : scope === 'overdue' ? 'Nothing is overdue'
+                    : scope === 'resolved' ? 'Nothing closed yet today'
+                    : 'Queue is clear'}
+                </p>
+                <p className="mt-1 text-[13px] text-muted">
+                  {scope === 'resolved'
+                    ? 'Cases you resolve or dismiss will appear here.'
+                    : 'No cross-system conflicts waiting at this filter.'}
+                </p>
               </div>
             )}
-            {queue.slice(0, 40).map((s) => <DecisionRow key={s.id} s={s} />)}
+            {(cases ?? []).slice(0, 40).map((c) => (
+              <CaseRow key={c.signalId} c={c} actor={actor}
+                onOpen={() => setOpenCase(c.signalId)} onChanged={bump} />
+            ))}
           </div>
         </Card>
 
@@ -270,9 +310,9 @@ export function ControlTower() {
             <CardHead title="What is driving risk"
               sub="Which cross-system checks are firing, network-wide" />
             <div className="space-y-2 p-3">
-              {!signals && Array.from({ length: 6 }).map((_, i) => <Skeleton key={i} className="h-5" />)}
+              {!allLive && Array.from({ length: 6 }).map((_, i) => <Skeleton key={i} className="h-5" />)}
               {mix.map((m) => (
-                <button key={m.kind} onClick={() => setSev(m.worst)}
+                <button key={m.kind} onClick={() => { setSev(m.worst); setScope('live') }}
                   className="flex w-full items-center gap-3 text-left">
                   <span className="w-[9.75rem] shrink-0 truncate text-[12px]">{m.label}</span>
                   <Meter value={m.pct} tone={SEV_TONE[m.worst] === 'bad' ? 'bad'
@@ -280,9 +320,47 @@ export function ControlTower() {
                   <span className="tnum w-6 shrink-0 text-right text-[12px] font-medium">{m.count}</span>
                 </button>
               ))}
-              {signals && !mix.length && (
+              {allLive && !mix.length && (
                 <p className="py-6 text-center text-[13px] text-muted">No signals firing.</p>
               )}
+            </div>
+          </Card>
+
+          {/* Who is carrying the queue */}
+          <Card>
+            <CardHead title="Desk load" sub="Live cases by owner" />
+            <div className="divide-y divide-line-soft">
+              {TEAM.map((m) => {
+                const owned = (allLive ?? []).filter((c) => c.assignee === m.id)
+                const late = owned.filter((c) => isOverdue(c)).length
+                return (
+                  <button key={m.id} onClick={() => { setScope('mine'); }}
+                    disabled={m.id !== actor}
+                    className={cn('flex w-full items-center gap-2.5 px-3.5 py-2 text-left',
+                      m.id === actor && 'hover:bg-surface-2/50')}>
+                    <span className="grid size-6 shrink-0 place-items-center rounded-full bg-surface-3 text-[9px] font-semibold">
+                      {m.initials}
+                    </span>
+                    <span className="min-w-0 flex-1">
+                      <span className="block truncate text-[12px] font-medium">
+                        {m.name}{m.id === actor && <span className="ml-1 text-faint">· you</span>}
+                      </span>
+                      <span className="block text-[10px] text-faint">{m.role}</span>
+                    </span>
+                    {late > 0 && <Badge tone="bad">{late} late</Badge>}
+                    <span className="tnum w-6 text-right text-[13px] font-semibold">{owned.length}</span>
+                  </button>
+                )
+              })}
+              <div className="flex items-center gap-2.5 px-3.5 py-2">
+                <span className="grid size-6 shrink-0 place-items-center rounded-full border border-dashed border-line text-faint">
+                  <UserRoundPlus className="size-3" />
+                </span>
+                <span className="flex-1 text-[12px] text-muted">Unassigned</span>
+                <span className="tnum w-6 text-right text-[13px] font-semibold">
+                  {(allLive ?? []).filter((c) => !c.assignee).length}
+                </span>
+              </div>
             </div>
           </Card>
         </div>
@@ -339,6 +417,9 @@ export function ControlTower() {
           </div>
         </Card>
       </div>
+
+      <CaseDrawer signalId={openCase} actor={actor}
+        onClose={() => setOpenCase(null)} onChanged={bump} />
     </div>
   )
 }
