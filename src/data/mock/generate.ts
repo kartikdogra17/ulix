@@ -172,13 +172,21 @@ export function makeShipments(count = 160): Shipment[] {
     while (destination === origin) destination = pick(r, INLAND)
 
     const status = weightedStatus(r)
-    const createdAt = NOW - int(r, 1, 26) * DAY - int(r, 0, 23) * HOUR
-    const legs = buildLegs(r, origin, destination, createdAt)
+    /* The same two draws as before, reinterpreted.
+       They used to set an absolute age, and because the status was drawn
+       independently of the timetable the two were never reconciled: a
+       consignment could be 'planned' while its first leg was booked to
+       depart three weeks ago. Now they are a BOOKING LEAD — how far ahead
+       of departure the consignment was raised — and the schedule is
+       anchored to the clock below, once progress is known.
+       Kept at two draws of the same ranges on purpose, so the rest of the
+       generated world does not re-roll off the back of a date fix. */
+    const leadHrs = int(r, 1, 26) * 4 + int(r, 0, 23)
+    // NOW is a placeholder anchor; buildLegs' own draws do not depend on it.
+    const legs = buildLegs(r, origin, destination, NOW)
     if (!legs.length) continue
-    const plannedArr = Date.parse(legs[legs.length - 1].plannedArr)
     const delayMins = status === 'exception' ? int(r, 240, 1900)
       : r() < 0.26 ? int(r, 30, 600) : int(r, -120, 25)
-    const eta = plannedArr + delayMins * 60_000
 
     const progress =
       status === 'delivered' ? 1
@@ -187,6 +195,27 @@ export function makeShipments(count = 160): Shipment[] {
       : status === 'customs' ? float(r, 0.6, 0.75, 3)
       : status === 'at_hub' ? float(r, 0.4, 0.6, 3)
       : float(r, 0.12, 0.85, 3)
+
+    /* Re-anchor the schedule so the clock agrees with the status: a planned
+       consignment has not departed, an in-flight one has NOW somewhere
+       inside its journey, and a delivered one finished before NOW. */
+    const builtDep = Date.parse(legs[0].plannedDep)
+    const duration = Math.max(HOUR, Date.parse(legs[legs.length - 1].plannedArr) - builtDep)
+    const targetDep =
+      status === 'planned' ? NOW + (2 + (leadHrs % 46)) * HOUR
+      : status === 'delivered' ? NOW - duration - (leadHrs % 120) * HOUR
+      : NOW - Math.round(progress * duration)
+    const shift = targetDep - builtDep
+    for (const leg of legs) {
+      leg.plannedDep = iso(Date.parse(leg.plannedDep) + shift)
+      leg.plannedArr = iso(Date.parse(leg.plannedArr) + shift)
+    }
+    // A planned consignment departs in the future, and a short booking lead
+    // would otherwise put its creation there too. Nothing is raised later
+    // than now.
+    const createdAt = Math.min(NOW, targetDep - leadHrs * HOUR)
+    const plannedArr = Date.parse(legs[legs.length - 1].plannedArr)
+    const eta = plannedArr + delayMins * 60_000
 
     // Mark leg progress
     const totalKm = legs.reduce((a, l) => a + l.distanceKm, 0)

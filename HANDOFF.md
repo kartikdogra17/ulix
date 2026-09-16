@@ -229,8 +229,32 @@ the same category error as comparing rail track to road lanes, and I gave the si
 unfloored clock. That was wrong. Unfloored, these age from a planned departure that can be
 weeks old and present as 21-day-old cases — precisely what the horizon comment says it
 exists to prevent. The floor is a deliberate product decision about the platform's own
-visibility, not a FASTag leak. Reverted to the shared `onset`. If the uniform `3d 0h` ever
-becomes the thing that annoys, the fix is the mock data's leg dates, not the clamp.
+visibility, not a FASTag leak. Reverted to the shared `onset`, and the real cause — the leg
+dates — was fixed separately, below. Ages now vary as they should.
+
+## The timetable now agrees with the status
+
+`makeShipments` drew `status` from one distribution and `createdAt` from another, then
+built the legs forward from `createdAt`. The two were never reconciled, so a consignment
+could be **`planned` with its first leg booked to depart three weeks ago**, and most
+undelivered consignments carried an ETA already in the past.
+
+The schedule is now re-anchored to the clock once progress is known: a planned consignment
+departs in the future, an in-flight one has *now* somewhere inside its journey, and a
+delivered one finished before now. The two date draws were kept at the same count and
+ranges and reinterpreted as a **booking lead** rather than an absolute age, so a date fix
+does not re-roll every commodity, weight and invoice value downstream.
+
+Checked across all 160: **0 pending legs with a departure already past** (the bug), and 0
+violations of planned-not-yet-departed, delivered-arrived-before-now, in-flight-now-inside
+-the-journey, or created-before-its-own-departure. An `in_transit` example sits 71% through
+a 45.1h journey having departed 32.2h ago, which is the arithmetic working.
+
+**This was hiding real signals, not just cosmetics.** `e-Way Bill expiring mid-transit`
+went from 3 to 11, because comparing a document's validity against an ETA three weeks in
+the past is a comparison about nothing. `0 of 104` undelivered consignments now have an ETA
+behind them, where most used to. Queue 101 → 109, criticals 12 → 20, and no kind dominates:
+the top is schedule slip at 31 of 160.
 
 ## Licence
 

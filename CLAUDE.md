@@ -129,6 +129,11 @@ sidebar, which looks exactly like a broken route.
   with the most depth has the least headroom.
 - **`dns.setDefaultResultOrder('ipv4first')`** in the proxy. GDELT publishes unreachable
   AAAA records; without it you get a bare `UND_ERR_CONNECT_TIMEOUT` that looks like downtime.
+- **A generated status and a generated timetable must be reconciled.** `makeShipments`
+  drew both independently and never compared them, which produced consignments that were
+  `planned` with a departure weeks in the past, and ETAs behind the clock on most of the
+  book. Anything comparing a date against `eta` was then comparing against nothing. The
+  schedule is re-anchored to the clock after progress is known; keep it that way.
 - **Calibrate generated data.** Three screens have shipped flagging *everything* — zero
   clear counterparties, one navigable month a year, overdue permanently zero. A screen that
   flags everyone trains people to ignore it. After generating, check the distribution.
