@@ -2,12 +2,12 @@ import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import {
   Anchor, ArrowUpRight, CheckCircle2, ChevronRight, CircleDollarSign,
-  Newspaper, ShieldAlert, Timer, TrendingUp, Truck, UserRoundPlus,
+  Layers3, Newspaper, ShieldAlert, Timer, TrendingUp, Truck, UserRoundPlus,
 } from 'lucide-react'
 import { adapter } from '../data'
 import { useAsync } from '../lib/useAsync'
 import { dur, inr, num, rel, titleCase } from '../lib/format'
-import { NetworkMap, type MapMarker } from '../components/NetworkMap'
+import { NetworkMap, type MapCorridor, type MapMarker } from '../components/NetworkMap'
 import {
   Badge, Button, Card, CardHead, Meter, Mono, Skeleton, TableSkeleton, Td, Th,
 } from '../components/ui'
@@ -21,6 +21,7 @@ import type { CaseQuery } from '../data/adapter'
 import type { Case } from '../data/cases'
 import { SIGNAL_LABEL, type Severity, type SignalKind } from '../data/fusion'
 import { lensFor, ownership, rankForRole, type Role } from '../data/roles'
+import { GATISHAKTI_SOURCES, constrained } from '../data/gatishakti'
 import { useApp } from '../state/app'
 import { cn } from '../lib/cn'
 
@@ -115,6 +116,9 @@ export function ControlTower() {
   const [scope, setScope] = useState<NonNullable<CaseQuery['scope']>>('live')
   const [sev, setSev] = useState<Severity | 'all'>('all')
   const [openCase, setOpenCase] = useState<string | null>(null)
+  /* Off by default: infrastructure is context, and the map's first job
+     is still to show where the risk is. */
+  const [infra, setInfra] = useState(false)
   const [version, setVersion] = useState(0)
   const bump = () => setVersion((v) => v + 1)
 
@@ -128,6 +132,7 @@ export function ControlTower() {
   const { data: storeKind } = useAsync(() => adapter.caseStoreKind(), [])
   const { data: feed } = useAsync(() => adapter.disruptions(), [])
   const { data: marine } = useAsync(() => adapter.vessels(), [])
+  const { data: gs } = useAsync(() => adapter.gatiShakti(), [])
 
   /** Risk per consignment, so the map shows exposure rather than mere position. */
   const riskByEntity = useMemo(() => {
@@ -188,6 +193,40 @@ export function ControlTower() {
     for (const x of allLive ?? []) c[x.signal.severity]++
     return c
   }, [allLive])
+
+  /* Corridors are drawn from their own coordinates; the pinch segments are
+     the stretches still at the corridor's narrowest lane status. */
+  const corridors: MapCorridor[] = useMemo(() => !infra || !gs ? [] : gs.corridors.map((c) => ({
+    id: c.id,
+    mode: c.mode,
+    points: c.segments.length
+      ? [c.segments[0].a, ...c.segments.map((sg) => sg.b)]
+      : [],
+    pinches: c.belowStandard
+      ? c.segments.filter((sg) => sg.lanes === c.narrowest).map((sg) => ({
+          a: sg.a, b: sg.b, label: `${c.name}: ${sg.from}–${sg.to} still ${sg.lanes}`,
+        }))
+      : [],
+    label: c.name,
+  })), [infra, gs])
+
+  const infraMarkers: MapMarker[] = useMemo(() => {
+    if (!infra || !gs) return []
+    return [
+      ...gs.tollPlazas.map((t) => ({
+        id: `toll-${t.name}`, lat: t.lat, lon: t.lon, tone: 'info' as const,
+        glyph: 'toll' as const, r: 3,
+        label: `${t.name} · ${t.nh} · ${t.lanes} · ${t.operator}`,
+      })),
+      ...gs.parks.map((pk) => ({
+        id: `park-${pk.name}`, lat: pk.lat, lon: pk.lon, tone: 'brand' as const,
+        glyph: 'park' as const, r: 3,
+        label: `${pk.name} · ${pk.type} · ${pk.landAvailableHa ? `${pk.landAvailableHa} ha free` : 'no land free'}`,
+      })),
+    ]
+  }, [infra, gs])
+
+  const pinched = useMemo(() => gs ? constrained(gs.corridors) : [], [gs])
 
   const head = useMemo(() => lens.headline(allLive ?? [], data ?? null), [lens, allLive, data])
   /* The queue arrives sorted by severity; the lens re-sorts it by remit. */
@@ -363,14 +402,47 @@ export function ControlTower() {
             <CardHead title="Live network" sub="Coloured by risk, not just position"
               right={
                 <div className="flex items-center gap-2.5 text-[10px] text-muted">
-                  {[['ok', 'Clear'], ['warn', 'High'], ['bad', 'Critical']].map(([t, l]) => (
-                    <span key={t} className="flex items-center gap-1">
-                      <span className="size-2 rounded-full" style={{ background: `var(--c-${t})` }} />{l}
-                    </span>
-                  ))}
+                  {/* The legend is explanatory and stands down on a phone so the
+                      card title keeps its width; the toggle does something, so it stays. */}
+                  <span className="hidden items-center gap-2.5 sm:flex">
+                    {[['ok', 'Clear'], ['warn', 'High'], ['bad', 'Critical']].map(([t, l]) => (
+                      <span key={t} className="flex items-center gap-1">
+                        <span className="size-2 rounded-full" style={{ background: `var(--c-${t})` }} />{l}
+                      </span>
+                    ))}
+                  </span>
+                  <button onClick={() => setInfra((v) => !v)} disabled={!gs}
+                    aria-pressed={infra}
+                    className={cn('inline-flex items-center gap-1 rounded-md px-1.5 py-0.5 text-[10px] font-medium transition-colors disabled:opacity-40',
+                      infra ? 'bg-surface-3 text-fg' : 'text-muted hover:text-fg')}>
+                    <Layers3 className="size-3" /> Infrastructure
+                  </button>
                 </div>
               } />
-            <NetworkMap markers={markers} className="h-[clamp(240px,42vw,330px)] w-full p-2" />
+            <NetworkMap corridors={corridors} markers={[...infraMarkers, ...markers]}
+              className="h-[clamp(240px,42vw,330px)] w-full p-2" />
+            {infra && gs && (
+              <div className="border-t border-line-soft px-3 py-2">
+                <p className="text-[11px] leading-relaxed text-muted">
+                  <strong className="text-fg">{gs.corridors.length} corridors</strong>,{' '}
+                  {gs.tollPlazas.length} toll plazas, {gs.parks.length} industrial parks and{' '}
+                  {gs.depots.length} storage depots.{' '}
+                  {pinched.length > 0 ? (
+                    <>Amber marks a genuine capacity constraint —{' '}
+                    <strong className="text-warn">{pinched.length} of {gs.corridors.length}</strong>{' '}
+                    {pinched.length === 1 ? 'corridor has a stretch' : 'corridors have a stretch'}{' '}
+                    still at two lanes on road, or single track on rail.</>
+                  ) : (
+                    <>No corridor is carrying a capacity constraint right now.</>
+                  )}
+                </p>
+                <p className="mt-1 text-[11px] leading-relaxed text-faint">
+                  Depots are counted, not plotted: GATISHAKTI/02 returns a state and a postal
+                  address and no coordinates.
+                </p>
+                <div className="mt-1.5"><Sources ids={GATISHAKTI_SOURCES} /></div>
+              </div>
+            )}
           </Card>
 
           <Card>

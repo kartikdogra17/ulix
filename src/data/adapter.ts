@@ -14,6 +14,7 @@ import type { ScenarioResult, ScenarioSpec } from './scenarios'
 import type { Counterparty } from './counterparty'
 import type { EximFile } from './exim'
 import type { Waterway } from './waterways'
+import type { GatiShaktiLayer } from './gatishakti'
 
 export interface Page<T> { rows: T[]; total: number }
 
@@ -175,6 +176,14 @@ export interface DataAdapter {
 
   /** National Waterways, their stretches, structures and terminals. */
   waterways(): Promise<Waterway[]>
+
+  /**
+   * The infrastructure the network runs on — corridors and their lane
+   * status, toll plazas, industrial parks, warehousing. A map layer
+   * rather than a screen: a corridor only means something next to the
+   * consignments using it.
+   */
+  gatiShakti(): Promise<GatiShaktiLayer>
 
   /** Import and export clearance files, with their demurrage clocks. */
   eximFiles(q?: { direction?: 'import' | 'export' | 'all'; search?: string; onlyOpen?: boolean }):

@@ -1,5 +1,7 @@
 import type { Node } from '../types'
 
+export interface LatLon { lat: number; lon: number }
+
 /** Deterministic PRNG so every reload of the demo shows the same world. */
 export function rng(seed: number) {
   let a = seed >>> 0
@@ -53,8 +55,8 @@ export const NODES: Node[] = [
 export const NODE_BY_CODE = Object.fromEntries(NODES.map((n) => [n.code, n])) as Record<string, Node>
 export const nodeName = (code: string) => NODE_BY_CODE[code]?.name ?? code
 
-/** Great-circle distance, km. */
-export function haversine(a: Node, b: Node) {
+/** Great-circle distance, km. Takes anything with coordinates, not just a Node. */
+export function haversine(a: LatLon, b: LatLon) {
   const R = 6371
   const dLat = ((b.lat - a.lat) * Math.PI) / 180
   const dLon = ((b.lon - a.lon) * Math.PI) / 180

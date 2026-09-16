@@ -36,10 +36,10 @@ it, and becomes a case someone owns.
 
 ## Endpoint coverage
 
-**53 of 95 wired.** Remaining are thin: GatiShakti ×5 (infrastructure overlay),
-India Post ×4 (non-metro last mile), IWAI statistics ×7 (year-on-year aggregates already
-represented), and near-duplicates worth skipping — Telangana VAHAN/SARATHI, fuel-station
-*registration* endpoints, chassis/engine VAHAN lookups.
+**58 of 95 wired.** Remaining are thin: India Post ×4 (non-metro last mile), IWAI
+statistics ×7 (year-on-year aggregates already represented), and near-duplicates worth
+skipping — Telangana VAHAN/SARATHI, fuel-station *registration* endpoints, chassis/engine
+VAHAN lookups.
 
 `docs/ulip-api/INDEX.md` maps each family to the one document that answers questions
 about it, so nobody greps 36 files.
@@ -157,6 +157,44 @@ at with a question already in hand, not worklists that can open on the wrong one
 4. **Column sets per role**, if it ever seems worth it. Defaults changed which *rows* you
    land on; which *columns* matter also differs, but that is a much larger change to
    every table for a smaller return, so I stopped at rows.
+
+## GatiShakti — the map's under-layer
+
+Wired as a layer under the existing map rather than a screen of its own, because a
+corridor only means something next to the consignments using it. All five endpoints, read
+from `ULIP_GATISHAKTI_Integration_Requirement`:
+
+| | Returns | On the map |
+|---|---|---|
+| `GATISHAKTI/01` | highway segments, `gis_length`, `lane_statu` | corridor lane status |
+| `GATISHAKTI/02` | storage and warehousing infrastructure | **counted, not plotted** |
+| `GATISHAKTI/03` | toll plazas, operator, lanes | toll glyphs |
+| `GATISHAKTI/04` | industrial parks, land available | park glyphs |
+| `GATISHAKTI/05` | named economic corridors, length | the polylines |
+
+Five real alignments: Golden Quadrilateral, North–South, East–West, and the Western and
+Eastern Dedicated Freight Corridors. The corridors and their routing are factual; lane
+status, tolls and land figures are generated.
+
+**GATISHAKTI/02 is counted rather than plotted on purpose.** It returns a state and a
+postal address and no coordinates. Geocoding depots to get them onto the map would be
+inventing a field the gateway does not return, which is the same sin as badging simulated
+data `live`.
+
+**Two bugs the distribution check caught**, and the reason to keep running it:
+
+1. `constrained()` compared rail against a road standard, so every freight corridor was
+   "below four lanes" — a corridor with no lanes at all. Road lanes and rail tracks are
+   different scales and are now never compared across modes.
+2. At a 1-in-6 chance of a two-lane segment, **5 of 5** corridors came back constrained.
+   That rate sounds like a minority until you remember the Golden Quadrilateral has
+   sixteen segments. At 5% it is 3 of 5, with two corridors genuinely clear. A separate
+   bug in the same area: a corridor that is six-lane throughout reported *every* segment
+   as a pinch, because `narrowest` was being used without asking whether it was actually
+   sub-standard — the map drew the whole thing amber.
+
+The overlay is off by default. Infrastructure is context; the map's first job is still to
+show where the risk is.
 
 ## Licence
 

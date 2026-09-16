@@ -14,6 +14,7 @@ const SUBSCRIBED = new Set([
   'FASTAG/01', 'FASTAG/02', 'VAHAN/01', 'VAHAN/02', 'SARATHI/01',
   'EWAYBILL/01', 'FOIS/01', 'FOIS/02', 'ICEGATE/02', 'ICEGATE/05',
   'PCS/01', 'PCS/04', 'LDB/01', 'TOLL/01', 'ECHALLAN/01', 'CARBON/01',
+  'GATISHAKTI/01', 'GATISHAKTI/02', 'GATISHAKTI/03', 'GATISHAKTI/04', 'GATISHAKTI/05',
 ])
 
 export function makeCatalogue(): CatalogueEntry[] {

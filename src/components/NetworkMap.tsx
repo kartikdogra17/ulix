@@ -12,12 +12,26 @@ export const px = (lon: number) => ((lon - LON0) / (LON1 - LON0)) * W
 export const py = (lat: number) => ((LAT1 - lat) / (LAT1 - LAT0)) * H
 
 export interface MapRoute { from: string; to: string; mode: Mode; active?: boolean }
+
+/**
+ * A fixed piece of infrastructure drawn under the traffic — a GatiShakti
+ * corridor, given as its own coordinates rather than as node codes,
+ * because a corridor passes through places this network has no node for.
+ */
+export interface MapCorridor {
+  id: string
+  mode: 'road' | 'rail'
+  points: Array<{ lat: number; lon: number }>
+  /** Segments below the corridor's own standard, drawn heavier. */
+  pinches?: Array<{ a: { lat: number; lon: number }; b: { lat: number; lon: number }; label: string }>
+  label?: string
+}
 export interface MapMarker {
   id: string; lat: number; lon: number
   tone: 'ok' | 'warn' | 'bad' | 'info' | 'brand'
   label?: string; pulse?: boolean; r?: number
   /** Glyph instead of a dot — hazards and stops read better as shapes. */
-  glyph?: 'dot' | 'hazard' | 'toll' | 'fuel' | 'ev'
+  glyph?: 'dot' | 'hazard' | 'toll' | 'fuel' | 'ev' | 'park'
 }
 
 const TONE_VAR = {
@@ -55,6 +69,15 @@ function Glyph({ kind, x, y, colour }: {
       </g>
     )
   }
+  if (kind === 'park') {
+    return (
+      <g transform={`translate(${x} ${y})`}>
+        <path d="M-4 3.2 V-1.4 L0 -4.2 L4 -1.4 V3.2 Z" fill={colour}
+          stroke="var(--c-bg)" strokeWidth="1" strokeLinejoin="round" />
+        <rect x="-1" y="0.2" width="2" height="3" fill="var(--c-bg)" />
+      </g>
+    )
+  }
   // fuel / ev
   return (
     <g transform={`translate(${x} ${y})`}>
@@ -74,9 +97,11 @@ function arc(x1: number, y1: number, x2: number, y2: number, bend = 0.18) {
 }
 
 export function NetworkMap({
-  routes = [], markers = [], showLabels = true, className, onMarkerClick, highlight,
+  routes = [], corridors = [], markers = [], showLabels = true, className,
+  onMarkerClick, highlight,
 }: {
   routes?: MapRoute[]
+  corridors?: MapCorridor[]
   markers?: MapMarker[]
   showLabels?: boolean
   className?: string
@@ -113,6 +138,28 @@ export function NetworkMap({
         <rect width={W} height={H} fill="url(#mapGlow)" />
         <g stroke="var(--c-grid)" strokeWidth="1" opacity="0.55">
           {grid.map((l, i) => <line key={i} {...l} />)}
+        </g>
+
+        {/* Infrastructure, under everything — GatiShakti corridors */}
+        <g fill="none" strokeLinecap="round" strokeLinejoin="round">
+          {corridors.map((c) => {
+            const d = c.points.map((pt, i) =>
+              `${i === 0 ? 'M' : 'L'} ${px(pt.lon)} ${py(pt.lat)}`).join(' ')
+            return (
+              <g key={c.id}>
+                <path d={d} stroke="var(--c-faint)" strokeWidth="3.4" opacity="0.18" />
+                <path d={d} stroke="var(--c-faint)" strokeWidth="1.3" opacity="0.6"
+                  strokeDasharray={c.mode === 'rail' ? '7 4' : undefined} />
+                {(c.pinches ?? []).map((p, i) => (
+                  <path key={i}
+                    d={`M ${px(p.a.lon)} ${py(p.a.lat)} L ${px(p.b.lon)} ${py(p.b.lat)}`}
+                    stroke="var(--c-warn)" strokeWidth="2.6" opacity="0.85">
+                    <title>{p.label}</title>
+                  </path>
+                ))}
+              </g>
+            )
+          })}
         </g>
 
         {/* Lanes */}

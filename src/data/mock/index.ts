@@ -26,6 +26,7 @@ import { type ScenarioSpec, runScenario } from '../scenarios'
 import { makeCounterparties } from '../counterparty'
 import { makeEximFiles } from '../exim'
 import { makeWaterways } from '../waterways'
+import { makeGatiShakti } from '../gatishakti'
 
 const sleep = (ms: number) => new Promise((res) => setTimeout(res, ms))
 /** Simulated gateway latency so loading states are real, not theatre. */
@@ -537,10 +538,16 @@ export class MockAdapter implements DataAdapter {
   /* ── Waterways ─────────────────────────────────────────────── */
 
   private nw = makeWaterways()
+  private gs = makeGatiShakti()
 
   async waterways() {
     await sleep(latency())
     return this.nw
+  }
+
+  async gatiShakti() {
+    await sleep(latency())
+    return this.gs
   }
 
   /* ── EXIM ──────────────────────────────────────────────────── */

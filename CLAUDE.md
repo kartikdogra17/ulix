@@ -69,6 +69,7 @@ src/data/
   fusion.ts       cross-system signals — the core idea of the product
   cases.ts        case model; caseStore.ts = shared (proxy) or local storage
   roles.ts        role lens — what each org type is shown first, and why
+  gatishakti.ts   corridors, tolls, parks, warehousing — the map's under-layer
   osint.ts        live AQI → GRAP eligibility, corridor weather
   disruptions.ts  GDELT filter pipeline    vessels.ts  AIS
   routes.ts       lane planning    scenarios.ts  drill    exim.ts    waterways.ts
@@ -146,6 +147,6 @@ the proxy and degrade to their labelled fallbacks.
 
 - Case work is shared through the proxy when it is running, and per-browser otherwise.
 - GDELT and AIS fall back to labelled simulated sets.
-- 53 of 95 endpoints are wired. The rest are thin: GatiShakti ×5, India Post ×4, IWAI
-  statistics ×7, and near-duplicates (Telangana VAHAN/SARATHI, fuel-station *registration*
-  endpoints, chassis/engine VAHAN lookups).
+- 58 of 95 endpoints are wired. The rest are thin: India Post ×4, IWAI statistics ×7,
+  and near-duplicates (Telangana VAHAN/SARATHI, fuel-station *registration* endpoints,
+  chassis/engine VAHAN lookups).

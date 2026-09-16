@@ -9,7 +9,7 @@ This index exists so you can find the one document that answers a question witho
 grepping 36 files — 1.3 MB of text, 24 MB of PDF.
 
 - Endpoints in the catalogue: **95**
-- Referenced somewhere in the app: **53**
+- Referenced somewhere in the app: **58**
 
 | System | Endpoints | Wired | Ministry | Document |
 |---|---|---|---|---|
@@ -27,7 +27,7 @@ grepping 36 files — 1.3 MB of text, 24 MB of PDF.
 | `FASTAG` | 01* 02* | 2/2 | Ministry of Road Transport & Highways | `ULIP_FASTAG_Integration_Requirement.txt` |
 | `FCI` | 01 | 0/1 | Ministry of Consumer Affairs, Food & PD | `ULIP_FCI_Integration_Requirement.txt` |
 | `FOIS` | 01* 02* 04 | 2/3 | Ministry of Railways | `ULIP_FOIS_Integration_Requirement.txt` |
-| `GATISHAKTI` | 01 02 03 04 05 | 0/5 | Ministry of Commerce & Industry | `ULIP_GATISHAKTI_Integration_Requirement.txt` |
+| `GATISHAKTI` | 01* 02* 03* 04* 05* | 5/5 | Ministry of Commerce & Industry | `ULIP_GATISHAKTI_Integration_Requirement.txt` |
 | `HPCL` | 01 02 | 0/2 | Ministry of Petroleum & Natural Gas | `ULIP_HPCL_Integration_requirement.txt` |
 | `ICEGATE` | 01 02* 03* 04* 05* 06 07* 08* 09* 10* 11* 12 13* | 10/13 | Ministry of Finance (CBIC) | `ULIP_ICEGATE_Integration_Requirement.txt` |
 | `INDIAPOST` | 01 02 03 04 | 0/4 | Ministry of Communications | `ULIP_INDIA_POST_Integration_Requirement.txt` |
