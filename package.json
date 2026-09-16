@@ -1,5 +1,5 @@
 {
-  "name": "ulip-platform",
+  "name": "sangam",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -27,5 +27,6 @@
     "tailwindcss": "^4.3.3",
     "typescript": "~6.0.2",
     "vite": "^8.3.0"
-  }
+  },
+  "description": "Logistics control tower on India's Unified Logistics Interface Platform"
 }

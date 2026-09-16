@@ -1,10 +1,15 @@
-# ULIP platform — orientation
+# Sangam — orientation
 
 Read this first. It exists so you do not have to explore the repo to find your bearings.
 
-**What it is.** A web + installable-mobile platform for India's Unified Logistics Interface
-Platform. Ten modules over a simulated ULIP gateway, built against the real published
-specification.
+**What it is.** Sangam ("confluence") is a logistics control tower built **on top of**
+India's Unified Logistics Interface Platform — independent software, not a government
+service, and named so nobody mistakes it for one. Ten modules over a simulated ULIP
+gateway, built against the real published specification.
+
+**Brand.** Mark and wordmark live in `src/components/Logo.tsx`; the mark is three streams
+merging into one heavier trunk, matching the name. Icons in `public/` are generated from
+the same geometry. Do not reintroduce "ULIP" as the product's own name.
 
 ```bash
 npm run dev            # app on :5173

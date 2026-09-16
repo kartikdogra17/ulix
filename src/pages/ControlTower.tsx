@@ -1,8 +1,8 @@
 import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import {
-  Anchor, ArrowUpRight, CheckCircle2, ChevronRight, CircleDollarSign, Gauge,
-  Newspaper, Signal as SignalIcon, Timer, TrendingUp, Truck, UserRoundPlus,
+  Anchor, ArrowUpRight, CheckCircle2, ChevronRight, CircleDollarSign,
+  Newspaper, Timer, TrendingUp, UserRoundPlus,
 } from 'lucide-react'
 import { adapter } from '../data'
 import { useAsync } from '../lib/useAsync'
@@ -42,40 +42,6 @@ const KIND_LABEL: Record<string, string> = {
   reefer_breach: 'Cold-chain breach',
   detention: 'Detention',
   eta_slip: 'Schedule slip',
-}
-
-const SPARK_TONE = { ok: 'ok', warn: 'warn', bad: 'bad', neutral: 'muted' } as const
-
-function Kpi({ label, value, sub, icon: Icon, tone = 'neutral', loading, accent, trend }: {
-  label: string; value: string; sub?: string
-  icon: React.ComponentType<{ className?: string }>
-  tone?: 'ok' | 'warn' | 'bad' | 'neutral'; loading?: boolean; accent?: boolean
-  /** Recent history, drawn as a sparkline under the figure. */
-  trend?: number[]
-}) {
-  const ring = {
-    ok: 'text-ok bg-ok-soft', warn: 'text-warn bg-warn-soft',
-    bad: 'text-bad bg-bad-soft', neutral: 'text-muted bg-surface-2',
-  }[tone]
-  return (
-    <Card className={cn('relative overflow-hidden p-3.5', accent && 'border-bad/30 bg-bad-soft/25')}>
-      <div className="flex items-start justify-between gap-2">
-        <span className="text-[11px] font-medium uppercase tracking-wide text-faint">{label}</span>
-        <span className={cn('grid size-6 shrink-0 place-items-center rounded-md', ring)}>
-          <Icon className="size-3.5" />
-        </span>
-      </div>
-      {loading
-        ? <Skeleton className="mt-2 h-7 w-24" />
-        : <div className="tnum mt-1.5 text-[22px] font-semibold leading-tight tracking-tight">{value}</div>}
-      {sub && <div className="mt-0.5 text-[11px] text-muted">{sub}</div>}
-      {trend && trend.length > 1 && (
-        <div className="-mx-3.5 -mb-3.5 mt-2">
-          <Sparkline values={trend} tone={SPARK_TONE[tone]} height={26} />
-        </div>
-      )}
-    </Card>
-  )
 }
 
 /* ── The hero: a worklist, not a list of charts ── */
@@ -240,40 +206,97 @@ export function ControlTower() {
             Every source system joined into one picture — what needs a decision, who owns it, and why.
           </p>
         </div>
-        {data && (
-          <div className="flex items-center gap-2 rounded-lg border border-line bg-surface px-2.5 py-1.5">
-            <Gauge className="size-3.5 text-muted" />
-            <span className="text-[11px] text-muted">Data confidence</span>
-            <Meter value={data.dataConfidence} className="w-16"
-              tone={data.dataConfidence >= 75 ? 'ok' : data.dataConfidence >= 50 ? 'warn' : 'bad'} />
-            <span className="tnum text-[12px] font-semibold">{data.dataConfidence}%</span>
-          </div>
-        )}
+        <Badge tone="neutral" dot>
+          {data ? `${num(data.activeShipments)} moving · ${inr(data.inTransitValue)}` : 'loading'}
+        </Badge>
       </header>
 
-      <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-6">
-        <Kpi loading={!data} accent label="Value at risk" icon={CircleDollarSign} tone="bad"
-          value={data ? inr(data.valueAtRisk) : '—'}
-          sub={data ? `${data.criticalSignals} critical, unresolved` : undefined} />
-        <Kpi loading={!data} label="Unassigned" icon={UserRoundPlus}
-          tone={data?.unassignedCases ? 'warn' : 'ok'}
-          value={data ? num(data.unassignedCases) : '—'} sub="nobody has picked these up" />
-        <Kpi loading={!data} label="Overdue" icon={Timer}
-          tone={data?.overdueCases ? 'bad' : 'ok'}
-          value={data ? num(data.overdueCases) : '—'} sub="past SLA for their severity" />
-        <Kpi loading={!data} label="Closed today" icon={CheckCircle2} tone="ok"
-          value={data ? num(data.resolvedToday) : '—'} sub="resolved or dismissed"
-          trend={trend.delivered} />
-        <Kpi loading={!data} label="Active consignments" icon={Truck}
-          value={data ? num(data.activeShipments) : '—'}
-          sub={data ? `${inr(data.inTransitValue)} in transit` : undefined}
-          trend={trend.created} />
-        <Kpi loading={!data} label="On-time delivery" icon={SignalIcon}
-          tone={data && data.onTimePct >= 85 ? 'ok' : 'warn'}
-          value={data ? `${data.onTimePct}%` : '—'}
-          sub={data ? `avg delay ${data.avgDelayHrs}h` : undefined}
-          trend={trend.onTime} />
-      </div>
+      {/* ── Hero: one number that decides whether you keep reading ── */}
+      <Card className="relative overflow-hidden border-line">
+        <div className="pointer-events-none absolute inset-0 opacity-[0.5]"
+          style={{ backgroundImage:
+            'radial-gradient(120% 140% at 0% 0%, color-mix(in srgb, var(--c-bad) 13%, transparent), transparent 55%), radial-gradient(100% 120% at 100% 100%, color-mix(in srgb, var(--c-accent) 11%, transparent), transparent 60%)' }} />
+
+        <div className="relative flex flex-wrap items-start gap-x-8 gap-y-5 p-4 sm:p-5">
+          <div className="min-w-[13rem]">
+            <div className="flex items-center gap-1.5 text-[11px] font-medium uppercase tracking-[0.1em] text-faint">
+              <CircleDollarSign className="size-3.5" />Value at risk
+            </div>
+            {data ? (
+              <div className="tnum mt-1 text-[40px] font-semibold leading-none tracking-[-0.03em] text-bad">
+                {inr(data.valueAtRisk)}
+              </div>
+            ) : <Skeleton className="mt-1 h-10 w-44" />}
+            <p className="mt-1.5 max-w-[22rem] text-[12px] leading-relaxed text-muted">
+              {data ? (
+                <>Exposed to <strong className="text-fg">{data.criticalSignals} critical</strong>{' '}
+                and {severityMix.high} high signals still open, out of{' '}
+                {inr(data.inTransitValue)} moving.</>
+              ) : 'Reading the network…'}
+            </p>
+          </div>
+
+          {/* Standing of the queue itself */}
+          <div className="flex flex-wrap gap-x-7 gap-y-4">
+            {[
+              ['Unassigned', data ? num(data.unassignedCases) : '—', 'nobody owns these', data?.unassignedCases ? 'warn' : 'ok'],
+              ['Overdue', data ? num(data.overdueCases) : '—', 'past SLA', data?.overdueCases ? 'bad' : 'ok'],
+              ['Closed today', data ? num(data.resolvedToday) : '—', 'resolved or dismissed', 'ok'],
+            ].map(([label, value, sub, tone]) => (
+              <div key={label as string}>
+                <div className="text-[11px] font-medium uppercase tracking-[0.1em] text-faint">{label as string}</div>
+                <div className={cn('tnum mt-1 text-[26px] font-semibold leading-none tracking-[-0.02em]',
+                  tone === 'bad' && 'text-bad', tone === 'warn' && 'text-warn')}>
+                  {value as string}
+                </div>
+                <div className="mt-1 text-[11px] text-muted">{sub as string}</div>
+              </div>
+            ))}
+          </div>
+
+          {/* Network health, pushed right */}
+          <div className="ml-auto flex items-center gap-5">
+            {allLive && (
+              <Donut size={74} thickness={9}
+                centre={String(allLive.length)} centreSub="live"
+                segments={[
+                  { label: 'critical', value: severityMix.critical, tone: 'bad' },
+                  { label: 'high', value: severityMix.high, tone: 'warn' },
+                  { label: 'medium', value: severityMix.medium, tone: 'info' },
+                ]} />
+            )}
+            {data && (
+              <Radial size={68} value={data.dataConfidence} sublabel="confidence"
+                tone={data.dataConfidence >= 75 ? 'ok' : data.dataConfidence >= 50 ? 'warn' : 'bad'} />
+            )}
+          </div>
+        </div>
+
+        {/* Secondary metrics as a quiet strip, with their trends */}
+        <div className="relative grid grid-cols-2 border-t border-line-soft sm:grid-cols-4">
+          {[
+            ['Active consignments', data ? num(data.activeShipments) : '—', trend.created, 'brand'],
+            ['On-time delivery', data ? `${data.onTimePct}%` : '—', trend.onTime, data && data.onTimePct >= 85 ? 'ok' : 'warn'],
+            ['Avg delay', data ? `${data.avgDelayHrs}h` : '—', undefined, 'warn'],
+            ['Fleet active', data ? `${data.fleetActive}/${data.fleetTotal}` : '—', undefined, 'ok'],
+          ].map(([label, value, series, tone], i) => (
+            <div key={label as string}
+              className={cn('relative overflow-hidden px-4 py-2.5',
+                i > 0 && 'sm:border-l border-line-soft', i === 2 && 'border-l sm:border-l',
+                i >= 2 && 'border-t sm:border-t-0 border-line-soft')}>
+              <div className="text-[10px] font-medium uppercase tracking-[0.1em] text-faint">
+                {label as string}
+              </div>
+              <div className="tnum mt-0.5 text-[17px] font-semibold tracking-tight">{value as string}</div>
+              {Array.isArray(series) && series.length > 1 && (
+                <div className="-mx-4 -mb-2.5 mt-1 opacity-70">
+                  <Sparkline values={series as number[]} tone={tone as 'ok'} height={20} />
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      </Card>
 
       <div className="grid gap-3 xl:grid-cols-[1.45fr_1fr]">
         {/* Hero — the worklist */}
@@ -352,28 +375,17 @@ export function ControlTower() {
             <CardHead title="What is driving risk"
               sub="Which cross-system checks are firing, network-wide" />
             {allLive && (
-              <div className="flex items-center gap-4 border-b border-line-soft p-3">
-                <Donut size={78} thickness={10}
-                  centre={String(allLive.length)} centreSub="live"
-                  segments={[
-                    { label: 'critical', value: severityMix.critical, tone: 'bad' },
-                    { label: 'high', value: severityMix.high, tone: 'warn' },
-                    { label: 'medium', value: severityMix.medium, tone: 'info' },
-                  ]} />
-                <div className="min-w-0 flex-1 space-y-1">
-                  {([['critical', severityMix.critical, 'bg-bad'],
-                     ['high', severityMix.high, 'bg-warn'],
-                     ['medium', severityMix.medium, 'bg-accent']] as const).map(([k, n, dot]) => (
-                    <button key={k} onClick={() => { setSev(k as Severity); setScope('live') }}
-                      className="flex w-full items-center gap-2 text-left text-[12px] hover:text-fg">
-                      <span className={cn('size-2 shrink-0 rounded-full', dot)} />
-                      <span className="flex-1 capitalize text-muted">{k}</span>
-                      <span className="tnum font-medium">{n}</span>
-                    </button>
-                  ))}
-                </div>
-                <Radial size={52} value={data?.dataConfidence ?? 0} sublabel="conf"
-                  tone={(data?.dataConfidence ?? 0) >= 75 ? 'ok' : (data?.dataConfidence ?? 0) >= 50 ? 'warn' : 'bad'} />
+              <div className="flex flex-wrap gap-x-4 gap-y-1 border-b border-line-soft px-3 py-2">
+                {([['critical', severityMix.critical, 'bg-bad'],
+                   ['high', severityMix.high, 'bg-warn'],
+                   ['medium', severityMix.medium, 'bg-accent']] as const).map(([k, n, dot]) => (
+                  <button key={k} onClick={() => { setSev(k as Severity); setScope('live') }}
+                    className="flex items-center gap-1.5 text-[12px] text-muted hover:text-fg">
+                    <span className={cn('size-2 shrink-0 rounded-full', dot)} />
+                    <span className="capitalize">{k}</span>
+                    <span className="tnum font-medium text-fg">{n}</span>
+                  </button>
+                ))}
               </div>
             )}
             <div className="space-y-2 p-3">

@@ -1,8 +1,16 @@
-# ULIP — Unified Logistics Interface Platform
+# Sangam — Logistics Control Tower
 
-A master platform for India's **Unified Logistics Interface Platform**: one responsive
-web application that also installs as a mobile app, covering multimodal shipment
-visibility, fleet intelligence, document compliance and a full API gateway console.
+**Sangam** — *the confluence, where many streams become one.* Ninety-five endpoints across
+thirty-six government systems, resolved into a single picture and turned into decisions
+someone can act on.
+
+One responsive web application that also installs as a mobile app: multimodal visibility,
+fleet intelligence, compliance, EXIM clearance, inland waterways, lane planning, scenario
+drills, counterparty due diligence and a full API gateway console.
+
+> Sangam is **independent software built on** India's Unified Logistics Interface
+> Platform. It is not a government service, and it is deliberately not named as though it
+> were one.
 
 Built against the **official ULIP integration documents** published on
 [goulip.in](https://goulip.in) — all 36 of them are vendored in

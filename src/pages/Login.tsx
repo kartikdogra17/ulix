@@ -1,7 +1,8 @@
 import { useState } from 'react'
-import { ArrowRight, Boxes, ShieldCheck } from 'lucide-react'
+import { ArrowRight, ShieldCheck } from 'lucide-react'
 import { DEMO_ORGS, useApp } from '../state/app'
 import { ULIP_ENDPOINTS, ULIP_SYSTEMS } from '../data/ulip/catalogue'
+import { Logo } from '../components/Logo'
 import { Button, Field, Input, Select } from '../components/ui'
 import { cn } from '../lib/cn'
 
@@ -30,24 +31,16 @@ export function Login() {
         <div className="pointer-events-none absolute inset-0 opacity-[0.55]"
           style={{ backgroundImage:
             'radial-gradient(60% 50% at 30% 20%, color-mix(in srgb, var(--c-brand) 16%, transparent), transparent 70%), radial-gradient(50% 45% at 80% 75%, color-mix(in srgb, var(--c-accent) 18%, transparent), transparent 70%)' }} />
-        <div className="relative flex items-center gap-2.5">
-          <div className="grid size-9 place-items-center rounded-xl bg-brand text-brand-fg">
-            <Boxes className="size-5" strokeWidth={2.4} />
-          </div>
-          <div className="leading-tight">
-            <div className="text-sm font-semibold tracking-tight">ULIP</div>
-            <div className="text-[11px] text-muted">Unified Logistics Interface Platform</div>
-          </div>
-        </div>
+        <div className="relative"><Logo /></div>
 
         <div className="relative max-w-lg">
           <h1 className="text-[34px] font-semibold leading-[1.1] tracking-tight">
-            One window onto every consignment, vehicle and document in your network.
+            Where every consignment, vehicle and document in your network meets.
           </h1>
           <p className="mt-4 text-[15px] leading-relaxed text-muted">
-            Multimodal visibility, fleet intelligence and compliance built on the
-            government data ULIP already brokers — FASTag, VAHAN, SARATHI, e-Way Bill,
-            FOIS, ICEGATE, PCS and more, behind one authenticated gateway.
+            Sangam joins the government data ULIP already brokers — FASTag, VAHAN,
+            SARATHI, e-Way Bill, FOIS, ICEGATE, PCS and more — into one picture, and
+            turns the conflicts between them into decisions someone can act on.
           </p>
           <dl className="mt-8 grid grid-cols-3 gap-6 border-t border-line pt-6">
             {[
@@ -64,24 +57,17 @@ export function Login() {
         </div>
 
         <p className="relative text-[11px] leading-relaxed text-faint">
-          Catalogue generated from the integration documents published on goulip.in.
-          This build ships a simulated gateway; production access requires an approved
-          ULIP account and signed NDA.
+          Sangam is independent software built on the Unified Logistics Interface
+          Platform, not a government service. Catalogue generated from the integration
+          documents published on goulip.in; production access requires an approved ULIP
+          account and a signed NDA.
         </p>
       </div>
 
       {/* Form */}
       <div className="flex items-center justify-center px-5 py-12">
         <form onSubmit={submit} className="w-full max-w-sm">
-          <div className="mb-8 flex items-center gap-2.5 lg:hidden">
-            <div className="grid size-9 place-items-center rounded-xl bg-brand text-brand-fg">
-              <Boxes className="size-5" strokeWidth={2.4} />
-            </div>
-            <div className="leading-tight">
-              <div className="text-sm font-semibold tracking-tight">ULIP</div>
-              <div className="text-[11px] text-muted">Unified Logistics Interface Platform</div>
-            </div>
-          </div>
+          <div className="mb-8 lg:hidden"><Logo /></div>
 
           <h2 className="text-xl font-semibold tracking-tight">Sign in to the control tower</h2>
           <p className="mt-1.5 text-[13px] text-muted">

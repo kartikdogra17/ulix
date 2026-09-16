@@ -7,6 +7,7 @@ import {
 } from 'lucide-react'
 import { useApp } from '../state/app'
 import { ULIP_MODE } from '../data'
+import { Logo } from './Logo'
 import { cn } from '../lib/cn'
 import { Badge, Button } from './ui'
 
@@ -54,8 +55,8 @@ function ModeBanner() {
       <p className="min-w-0 flex-1">
         <span className="font-semibold">Simulated gateway.</span>{' '}
         Endpoint codes, payloads and the response envelope follow the official ULIP
-        integration documents, but no live government data is being fetched. Connect real
-        datasets via the proxy once your goulip.in access is approved.
+        integration documents, but no live government data is being fetched. Connect
+        real datasets via the proxy once your goulip.in access is approved.
       </p>
       <button onClick={() => setOpen(false)} aria-label="Dismiss" className="shrink-0 opacity-70 hover:opacity-100">
         <X className="size-3.5" />
@@ -90,17 +91,7 @@ export function Shell() {
       {/* ── Top bar ─────────────────────────────────────────── */}
       <header className="sticky top-0 z-30 border-b border-line bg-bg/85 backdrop-blur-lg">
         <div className="flex h-14 items-center gap-3 px-3 sm:px-4">
-          <div className="flex items-center gap-2.5">
-            <div className="grid size-8 place-items-center rounded-lg bg-brand text-brand-fg">
-              <Boxes className="size-4.5" strokeWidth={2.4} />
-            </div>
-            <div className="leading-tight">
-              <div className="text-[13px] font-semibold tracking-tight">ULIP</div>
-              <div className="hidden text-[10px] uppercase tracking-wide text-faint sm:block">
-                Unified Logistics Interface
-              </div>
-            </div>
-          </div>
+          <Logo tileClass="size-8 rounded-lg" />
 
           <form
             className="relative ml-auto hidden max-w-sm flex-1 md:block"
