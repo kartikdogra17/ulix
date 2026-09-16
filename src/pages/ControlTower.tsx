@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import {
   Anchor, ArrowUpRight, CheckCircle2, ChevronRight, CircleDollarSign,
-  Newspaper, Timer, TrendingUp, UserRoundPlus,
+  Newspaper, ShieldAlert, Timer, TrendingUp, Truck, UserRoundPlus,
 } from 'lucide-react'
 import { adapter } from '../data'
 import { useAsync } from '../lib/useAsync'
@@ -19,7 +19,8 @@ import {
 import { SLA_HOURS, TEAM, ageHours, isOverdue, memberById } from '../data/cases'
 import type { CaseQuery } from '../data/adapter'
 import type { Case } from '../data/cases'
-import type { Severity } from '../data/fusion'
+import { SIGNAL_LABEL, type Severity, type SignalKind } from '../data/fusion'
+import { lensFor, ownership, rankForRole, type Role } from '../data/roles'
 import { useApp } from '../state/app'
 import { cn } from '../lib/cn'
 
@@ -28,20 +29,15 @@ const DISRUPTION_TONE: Record<DisruptionKind, 'bad' | 'warn' | 'info' | 'neutral
   protest: 'warn', accident: 'info', weather: 'info',
 }
 
-const KIND_LABEL: Record<string, string> = {
-  ewb_expires_before_eta: 'e-Way Bill expiring mid-transit',
-  partb_vehicle_mismatch: 'Part-B vehicle mismatch',
-  vehicle_dark: 'No toll reads',
-  fitness_lapsed: 'Fitness lapsed',
-  insurance_lapsed: 'Insurance lapsed',
-  tag_blacklisted: 'FASTag blacklisted',
-  tag_low_balance: 'FASTag low balance',
-  dl_expired: 'Licence expired',
-  customs_hold: 'Customs hold',
-  hazmat_no_clearance: 'Hazmat without clearance',
-  reefer_breach: 'Cold-chain breach',
-  detention: 'Detention',
-  eta_slip: 'Schedule slip',
+
+/* Each role leads with a different number, so each leads with a different
+   glyph. Rupees for the two who carry cargo value, a truck for the one who
+   carries the asset, a shield for the one who carries neither. */
+const HEADLINE_ICON: Record<Role, React.ComponentType<{ className?: string }>> = {
+  Shipper: CircleDollarSign,
+  Transporter: Truck,
+  'Freight Forwarder': CircleDollarSign,
+  Regulator: ShieldAlert,
 }
 
 /* ── The hero: a worklist, not a list of charts ── */
@@ -113,6 +109,8 @@ function CaseRow({ c, actor, onOpen, onChanged }: {
 export function ControlTower() {
   const { session } = useApp()
   const actor = currentMemberId(session?.name)
+  const lens = lensFor(session?.org.role ?? 'Shipper')
+  const HeadlineIcon = HEADLINE_ICON[lens.role]
 
   const [scope, setScope] = useState<NonNullable<CaseQuery['scope']>>('live')
   const [sev, setSev] = useState<Severity | 'all'>('all')
@@ -168,11 +166,14 @@ export function ControlTower() {
       })
     }
     const rows = [...m.entries()]
-      .map(([kind, v]) => ({ kind, label: KIND_LABEL[kind] ?? titleCase(kind), ...v }))
+      .map(([kind, v]) => ({
+        kind, label: SIGNAL_LABEL[kind as SignalKind] ?? titleCase(kind),
+        own: ownership(lens, kind as SignalKind), ...v,
+      }))
       .sort((a, b) => b.count - a.count)
     const max = Math.max(1, ...rows.map((r) => r.count))
     return rows.slice(0, 9).map((r) => ({ ...r, pct: (r.count / max) * 100 }))
-  }, [allLive])
+  }, [allLive, lens])
 
   const daily = data?.daily ?? []
   const trend = {
@@ -188,6 +189,10 @@ export function ControlTower() {
     return c
   }, [allLive])
 
+  const head = useMemo(() => lens.headline(allLive ?? [], data ?? null), [lens, allLive, data])
+  /* The queue arrives sorted by severity; the lens re-sorts it by remit. */
+  const ranked = useMemo(() => rankForRole(lens, cases ?? []), [lens, cases])
+
   const mine = (allLive ?? []).filter((c) => c.assignee === actor).length
   const SCOPES: Array<[NonNullable<CaseQuery['scope']>, string, number | undefined]> = [
     ['live', 'Queue', allLive?.length],
@@ -201,13 +206,11 @@ export function ControlTower() {
     <div className="space-y-4 p-3 sm:p-4">
       <header className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h1 className="text-lg font-semibold tracking-tight">Control tower</h1>
-          <p className="text-[13px] text-muted">
-            Every source system joined into one picture — what needs a decision, who owns it, and why.
-          </p>
+          <h1 className="text-lg font-semibold tracking-tight">{lens.towerTitle}</h1>
+          <p className="text-[13px] text-muted">{lens.towerSub}</p>
         </div>
         <Badge tone="neutral" dot>
-          {data ? `${num(data.activeShipments)} moving · ${inr(data.inTransitValue)}` : 'loading'}
+          {data ? lens.contextBadge(data) : 'loading'}
         </Badge>
       </header>
 
@@ -220,20 +223,19 @@ export function ControlTower() {
         <div className="relative flex flex-wrap items-start gap-x-8 gap-y-5 p-4 sm:p-5">
           <div className="min-w-[13rem]">
             <div className="flex items-center gap-1.5 text-[11px] font-medium uppercase tracking-[0.1em] text-faint">
-              <CircleDollarSign className="size-3.5" />Value at risk
+              <HeadlineIcon className="size-3.5" />{head.label}
             </div>
             {data ? (
-              <div className="tnum mt-1 text-[40px] font-semibold leading-none tracking-[-0.03em] text-bad">
-                {inr(data.valueAtRisk)}
+              <div className={cn('tnum mt-1 text-[40px] font-semibold leading-none tracking-[-0.03em]',
+                head.tone === 'bad' ? 'text-bad' : head.tone === 'warn' ? 'text-warn' : 'text-ok')}>
+                {head.value}
               </div>
             ) : <Skeleton className="mt-1 h-10 w-44" />}
             <p className="mt-1.5 max-w-[22rem] text-[12px] leading-relaxed text-muted">
-              {data ? (
-                <>Exposed to <strong className="text-fg">{data.criticalSignals} critical</strong>{' '}
-                and {severityMix.high} high signals still open, out of{' '}
-                {inr(data.inTransitValue)} moving.</>
-              ) : 'Reading the network…'}
+              {data ? head.detail : 'Reading the network…'}
             </p>
+            {/* Never show a headline number without saying what went into it. */}
+            <p className="mt-1.5 max-w-[22rem] text-[11px] leading-relaxed text-faint">{head.basis}</p>
           </div>
 
           {/* Standing of the queue itself */}
@@ -303,7 +305,7 @@ export function ControlTower() {
         <Card className="overflow-hidden">
           <CardHead
             title="Decisions queue"
-            sub="Cross-system signals no single ministry API can produce — assign, action, close"
+            sub={lens.queueSub}
             right={
               <div className="flex items-center gap-1">
                 {storeKind && (
@@ -349,7 +351,7 @@ export function ControlTower() {
                 </p>
               </div>
             )}
-            {(cases ?? []).slice(0, 40).map((c) => (
+            {ranked.slice(0, 40).map((c) => (
               <CaseRow key={c.signalId} c={c} actor={actor}
                 onOpen={() => setOpenCase(c.signalId)} onChanged={bump} />
             ))}
@@ -373,7 +375,7 @@ export function ControlTower() {
 
           <Card>
             <CardHead title="What is driving risk"
-              sub="Which cross-system checks are firing, network-wide" />
+              sub={`Which checks are firing network-wide · dotted are yours to fix as ${lens.role}`} />
             {allLive && (
               <div className="flex flex-wrap gap-x-4 gap-y-1 border-b border-line-soft px-3 py-2">
                 {([['critical', severityMix.critical, 'bg-bad'],
@@ -393,7 +395,12 @@ export function ControlTower() {
               {mix.map((m) => (
                 <button key={m.kind} onClick={() => { setSev(m.worst); setScope('live') }}
                   className="flex w-full items-center gap-3 text-left">
-                  <span className="w-[9.75rem] shrink-0 truncate text-[12px]">{m.label}</span>
+                  <span className={cn('flex w-[9.75rem] shrink-0 items-center gap-1.5 truncate text-[12px]',
+                    m.own === 'muted' && 'text-faint')}>
+                    <span className={cn('size-1.5 shrink-0 rounded-full',
+                      m.own === 'primary' ? 'bg-brand' : 'bg-transparent')} />
+                    <span className="truncate">{m.label}</span>
+                  </span>
                   <Meter value={m.pct} tone={SEV_TONE[m.worst] === 'bad' ? 'bad'
                     : SEV_TONE[m.worst] === 'warn' ? 'warn' : 'info'} className="flex-1" />
                   <span className="tnum w-6 shrink-0 text-right text-[12px] font-medium">{m.count}</span>

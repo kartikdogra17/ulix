@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { NavLink, Outlet, useLocation } from 'react-router-dom'
 import {
   Activity, Boxes, Building2, Container, Download, FileCheck2, FlaskConical,
@@ -6,6 +6,7 @@ import {
   Sun, Truck, Waves, X,
 } from 'lucide-react'
 import { useApp } from '../state/app'
+import { MODULE_LABEL, lensFor, navRank, type RoleLens } from '../data/roles'
 import { ULIP_MODE } from '../data'
 import { Logo } from './Logo'
 import { cn } from '../lib/cn'
@@ -15,27 +16,28 @@ import { Badge, Button } from './ui'
    the ceiling. So the sidebar groups them by what you are doing, and the
    mobile bar keeps four you reach for constantly plus a More sheet. */
 interface NavItem {
-  to: string; label: string; short: string
+  /** The visible name comes from MODULE_LABEL — named once, in the lens. */
+  to: string; short: string
   icon: React.ComponentType<{ className?: string }>; end?: boolean
 }
 
 const OPERATE: NavItem[] = [
-  { to: '/', label: 'Control tower', short: 'Tower', icon: LayoutGrid, end: true },
-  { to: '/shipments', label: 'Consignments', short: 'Cargo', icon: Boxes },
-  { to: '/fleet', label: 'Fleet', short: 'Fleet', icon: Truck },
-  { to: '/exim', label: 'EXIM', short: 'EXIM', icon: Container },
-  { to: '/compliance', label: 'Compliance', short: 'Docs', icon: FileCheck2 },
+  { to: '/', short: 'Tower', icon: LayoutGrid, end: true },
+  { to: '/shipments', short: 'Cargo', icon: Boxes },
+  { to: '/fleet', short: 'Fleet', icon: Truck },
+  { to: '/exim', short: 'EXIM', icon: Container },
+  { to: '/compliance', short: 'Docs', icon: FileCheck2 },
 ]
 
 const PLAN: NavItem[] = [
-  { to: '/plan', label: 'Lane planner', short: 'Plan', icon: Route },
-  { to: '/waterways', label: 'Waterways', short: 'Water', icon: Waves },
-  { to: '/drill', label: 'Scenario drill', short: 'Drill', icon: FlaskConical },
-  { to: '/parties', label: 'Counterparties', short: 'Parties', icon: Building2 },
+  { to: '/plan', short: 'Plan', icon: Route },
+  { to: '/waterways', short: 'Water', icon: Waves },
+  { to: '/drill', short: 'Drill', icon: FlaskConical },
+  { to: '/parties', short: 'Parties', icon: Building2 },
 ]
 
 const PLATFORM: NavItem[] = [
-  { to: '/apis', label: 'API gateway', short: 'APIs', icon: Plug },
+  { to: '/apis', short: 'APIs', icon: Plug },
 ]
 
 const GROUPS: Array<[string, NavItem[]]> = [
@@ -43,8 +45,24 @@ const GROUPS: Array<[string, NavItem[]]> = [
 ]
 
 const ALL_NAV = [...OPERATE, ...PLAN, ...PLATFORM]
-/** What the phone keeps one tap away; everything else lives behind More. */
-const MOBILE_PRIMARY = ['/', '/shipments', '/fleet', '/exim']
+
+/**
+ * The same information architecture, filtered and ordered for whoever is
+ * signed in. Groups keep their meaning across roles — only membership and
+ * order change — so somebody who learns this sidebar at one organisation
+ * does not have to relearn it at the next. What a role does not see here
+ * is un-advertised, not forbidden: every route still resolves by URL.
+ */
+function groupsFor(lens: RoleLens): Array<[string, NavItem[]]> {
+  return GROUPS
+    .map(([name, items]) => [
+      name,
+      items
+        .filter((n) => navRank(lens, n.to) >= 0)
+        .sort((a, b) => navRank(lens, a.to) - navRank(lens, b.to)),
+    ] as [string, NavItem[]])
+    .filter(([, items]) => items.length > 0)
+}
 
 function ModeBanner() {
   const [open, setOpen] = useState(true)
@@ -70,6 +88,11 @@ export function Shell() {
   const loc = useLocation()
   const [q, setQ] = useState('')
   const [moreOpen, setMoreOpen] = useState(false)
+
+  const lens = lensFor(session?.org.role ?? 'Shipper')
+  const groups = useMemo(() => groupsFor(lens), [lens])
+  const mobilePrimary = lens.mobilePrimary
+  const navLabel = (to: string) => (to === '/' ? lens.towerTitle : MODULE_LABEL[to])
 
   // Global "/" focuses search, the way an ops console should behave.
   useEffect(() => {
@@ -141,16 +164,16 @@ export function Shell() {
       <div className="flex min-h-0 flex-1">
         {/* ── Sidebar (desktop) ─────────────────────────────── */}
         <nav className="sticky top-14 hidden h-[calc(100dvh-3.5rem)] w-56 shrink-0 flex-col gap-0.5 overflow-y-auto border-r border-line p-3 lg:flex">
-          {GROUPS.map(([group, items], gi) => (
+          {groups.map(([group, items], gi) => (
             <div key={group} className={cn(gi > 0 && 'mt-3')}>
               <div className="px-3 pb-1 text-[10px] font-semibold uppercase tracking-wide text-faint">
                 {group}
               </div>
-              {items.map(({ to, label, icon: Icon, end }) => (
+              {items.map(({ to, icon: Icon, end }) => (
                 <NavLink key={to} to={to} end={end} className={({ isActive }) =>
                   cn('flex items-center gap-2.5 rounded-lg px-3 py-2 text-[13px] font-medium transition-colors',
                     isActive ? 'bg-surface-2 text-fg' : 'text-muted hover:bg-surface-2/60 hover:text-fg')}>
-                  <Icon className="size-4" /> {label}
+                  <Icon className="size-4" /> {navLabel(to)}
                 </NavLink>
               ))}
             </div>
@@ -163,6 +186,7 @@ export function Shell() {
               </Badge>
             </div>
             <p className="text-[11px] leading-relaxed text-faint">
+              <span className="font-medium text-muted">{lens.role} view</span><br />
               {session?.org.plan} client<br />
               <span className="font-mono text-[10px]">{session?.org.ulipClientId}</span>
             </p>
@@ -177,7 +201,7 @@ export function Shell() {
 
       {/* ── Bottom nav (mobile) ───────────────────────────────── */}
       <nav className="fixed inset-x-0 bottom-0 z-30 grid grid-cols-5 border-t border-line bg-bg/95 pb-[env(safe-area-inset-bottom)] backdrop-blur-lg lg:hidden">
-        {ALL_NAV.filter((n) => MOBILE_PRIMARY.includes(n.to)).map(({ to, short, icon: Icon, end }) => (
+        {mobilePrimary.flatMap((to) => ALL_NAV.filter((n) => n.to === to)).map(({ to, short, icon: Icon, end }) => (
           <NavLink key={to} to={to} end={end} className={({ isActive }) =>
             cn('flex flex-col items-center gap-0.5 py-2 text-[10px] font-medium transition-colors',
               isActive ? 'text-brand' : 'text-faint')}>
@@ -186,7 +210,7 @@ export function Shell() {
         ))}
         <button onClick={() => setMoreOpen(true)}
           className={cn('flex flex-col items-center gap-0.5 py-2 text-[10px] font-medium transition-colors',
-            moreOpen || !MOBILE_PRIMARY.includes(loc.pathname) ? 'text-brand' : 'text-faint')}>
+            moreOpen || !mobilePrimary.includes(loc.pathname) ? 'text-brand' : 'text-faint')}>
           <MoreHorizontal className="size-5" /> More
         </button>
       </nav>
@@ -199,18 +223,18 @@ export function Shell() {
             style={{ animation: 'ulip-fade-up .2s cubic-bezier(.16,1,.3,1) both' }}
             onClick={(e) => e.stopPropagation()}>
             <div className="mx-auto mb-3 h-1 w-10 rounded-full bg-line" />
-            {GROUPS.map(([group, items]) => (
+            {groups.map(([group, items]) => (
               <div key={group} className="mb-2">
                 <div className="px-2 pb-1 text-[10px] font-semibold uppercase tracking-wide text-faint">
                   {group}
                 </div>
                 <div className="grid grid-cols-2 gap-1.5">
-                  {items.map(({ to, label, icon: Icon, end }) => (
+                  {items.map(({ to, icon: Icon, end }) => (
                     <NavLink key={to} to={to} end={end} onClick={() => setMoreOpen(false)}
                       className={({ isActive }) =>
                         cn('flex items-center gap-2 rounded-lg border px-3 py-2.5 text-[13px] font-medium',
                           isActive ? 'border-brand/40 bg-brand-soft text-brand' : 'border-line')}>
-                      <Icon className="size-4" /> {label}
+                      <Icon className="size-4" /> {navLabel(to)}
                     </NavLink>
                   ))}
                 </div>

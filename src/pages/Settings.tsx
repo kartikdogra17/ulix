@@ -2,11 +2,18 @@ import { KeyRound, Moon, Smartphone, Sun } from 'lucide-react'
 import { ULIP_MODE, ULIP_PROXY } from '../data'
 import { ULIP_BASE, ULIP_ENDPOINTS, ULIP_SYSTEMS } from '../data/ulip/catalogue'
 import { useApp } from '../state/app'
+import { MODULE_LABEL, lensFor } from '../data/roles'
+import { SIGNAL_LABEL } from '../data/fusion'
 import { Badge, Button, Card, CardHead, KeyVal } from '../components/ui'
 
 export function SettingsPage() {
   const { session, theme, toggleTheme, installPrompt, signOut } = useApp()
   if (!session) return null
+
+  const lens = lensFor(session.org.role)
+  // label and basis do not depend on the data, only on the lens.
+  const head = lens.headline([], null)
+  const hidden = Object.keys(MODULE_LABEL).filter((to) => !lens.nav.includes(to))
 
   return (
     <div className="mx-auto max-w-3xl space-y-3 p-3 sm:p-4">
@@ -26,6 +33,66 @@ export function SettingsPage() {
             <KeyVal k="Plan" v={<Badge tone={session.org.plan === 'Production' ? 'ok' : 'warn'}>{session.org.plan}</Badge>} />
             <KeyVal k="Members" v={session.org.members} />
           </dl>
+        </div>
+      </Card>
+
+      <Card>
+        <CardHead title="Role lens"
+          sub={`What changes because this organisation is a ${session.org.role}`} />
+        <div className="space-y-4 p-4">
+          <p className="text-[13px] leading-relaxed text-muted">{lens.remit}</p>
+
+          <div>
+            <Label>Leads with</Label>
+            <div className="text-[13px] font-medium">{head.label}</div>
+            <p className="mt-0.5 text-[12px] leading-relaxed text-muted">{head.basis}</p>
+          </div>
+
+          <div>
+            <Label>Modules advertised</Label>
+            <div className="flex flex-wrap gap-1">
+              {lens.nav.map((to) => (
+                <Badge key={to} tone="neutral">
+                  {to === '/' ? lens.towerTitle : MODULE_LABEL[to]}
+                </Badge>
+              ))}
+            </div>
+            {hidden.length > 0 && (
+              <p className="mt-1.5 text-[11px] leading-relaxed text-faint">
+                Left out of this sidebar: {hidden.map((to) => MODULE_LABEL[to]).join(', ')}.
+              </p>
+            )}
+          </div>
+
+          <div>
+            <Label>Sorted to the top of the queue</Label>
+            <div className="flex flex-wrap gap-1">
+              {lens.primaryKinds.map((k) => (
+                <Badge key={k} tone="brand">{SIGNAL_LABEL[k]}</Badge>
+              ))}
+            </div>
+          </div>
+
+          {lens.mutedKinds.length > 0 && (
+            <div>
+              <Label>Ranked last — someone else's to fix</Label>
+              <div className="flex flex-wrap gap-1">
+                {lens.mutedKinds.map((k) => (
+                  <Badge key={k} tone="neutral" className="opacity-60">{SIGNAL_LABEL[k]}</Badge>
+                ))}
+              </div>
+            </div>
+          )}
+
+          <p className="rounded-lg border border-line bg-surface-2 p-3 text-[11px] leading-relaxed text-faint">
+            <span className="font-medium text-muted">This is a lens, not access control.</span>{' '}
+            It changes what the platform puts in front of you — the order of the
+            sidebar, which conflicts sort to the top, and which single number leads
+            the control tower. It filters no records: every route still resolves by
+            URL and every signal stays in the queue. What an organisation is actually
+            entitled to see is decided by the datasets approved against its ULIP
+            account, not by anything held in this browser.
+          </p>
         </div>
       </Card>
 
@@ -107,6 +174,9 @@ ULIP_USERNAME=… ULIP_PASSWORD=… \
     </div>
   )
 }
+
+const Label = ({ children }: { children: React.ReactNode }) =>
+  <div className="mb-1.5 text-[11px] font-semibold uppercase tracking-wide text-faint">{children}</div>
 
 const Mono = ({ children }: { children: React.ReactNode }) =>
   <code className="rounded bg-surface px-1 font-mono text-[11px]">{children}</code>

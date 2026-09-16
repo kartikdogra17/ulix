@@ -64,6 +64,7 @@ src/data/
   mock/           index.ts = MockAdapter (771 lines, the busiest file), generate.ts, seed.ts
   fusion.ts       cross-system signals — the core idea of the product
   cases.ts        case model; caseStore.ts = shared (proxy) or local storage
+  roles.ts        role lens — what each org type is shown first, and why
   osint.ts        live AQI → GRAP eligibility, corridor weather
   disruptions.ts  GDELT filter pipeline    vessels.ts  AIS
   routes.ts       lane planning    scenarios.ts  drill    exim.ts    waterways.ts
@@ -74,7 +75,10 @@ server/ulip-proxy.mjs   credentials, OSINT feeds, shared case store
 ```
 
 **Adding a module:** data module in `src/data/` → method on `DataAdapter` → implement in
-`MockAdapter` → page in `src/pages/` → lazy route in `App.tsx` → nav entry in `Shell.tsx`.
+`MockAdapter` → page in `src/pages/` → lazy route in `App.tsx` → nav entry in `Shell.tsx`
+→ **name it in `MODULE_LABEL` and add its path to every role that should see it in
+`roles.ts`.** A route missing from `roles.ts` renders fine but appears in nobody's
+sidebar, which looks exactly like a broken route.
 
 ---
 
@@ -86,6 +90,13 @@ server/ulip-proxy.mjs   credentials, OSINT feeds, shared case store
   it shipped 370 kB to draw one illegible bar chart. Do not add one back.
 - **Styling** is Tailwind v4 with semantic tokens (`bg-surface`, `text-muted`, `border-line`)
   defined in `index.css`. Never hard-code a colour; both themes resolve through the tokens.
+- **Roles are a lens, not access control.** `roles.ts` decides what each org type sees
+  first — nav order and membership, which signals sort to the top of the queue, and
+  which single number leads the tower. It filters no records: every route still
+  resolves by URL and every signal stays in the queue. Say so wherever it shows.
+- **Name things once.** Module names live in `MODULE_LABEL` (`roles.ts`) and signal
+  names in `SIGNAL_LABEL` (`fusion.ts`), both keyed exhaustively. Do not re-declare
+  a label in a page.
 - **Comments explain why, not what.** Most existing comments record a decision or a trap.
 - Everything must work at 375 px. Sidebar on desktop, four tabs + a More sheet on mobile.
 

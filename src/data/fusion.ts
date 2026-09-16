@@ -36,6 +36,30 @@ export type SignalKind =
   | 'fog_risk'
   | 'corridor_disruption'
 
+/**
+ * Display names for every kind. Typed as a total Record so adding a kind
+ * without naming it is a compile error rather than a titleCased slug
+ * appearing in a screen nobody was looking at.
+ */
+export const SIGNAL_LABEL: Record<SignalKind, string> = {
+  ewb_expires_before_eta: 'e-Way Bill expiring mid-transit',
+  partb_vehicle_mismatch: 'Part-B vehicle mismatch',
+  vehicle_dark: 'No toll reads',
+  fitness_lapsed: 'Fitness lapsed',
+  insurance_lapsed: 'Insurance lapsed',
+  tag_blacklisted: 'FASTag blacklisted',
+  tag_low_balance: 'FASTag low balance',
+  dl_expired: 'Licence expired',
+  customs_hold: 'Customs hold',
+  hazmat_no_clearance: 'Hazmat without clearance',
+  reefer_breach: 'Cold-chain breach',
+  detention: 'Detention',
+  eta_slip: 'Schedule slip',
+  grap_entry_ban: 'GRAP entry ban',
+  fog_risk: 'Fog risk',
+  corridor_disruption: 'Corridor disruption',
+}
+
 export type Severity = 'critical' | 'high' | 'medium'
 
 export interface Signal {

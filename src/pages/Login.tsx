@@ -1,6 +1,7 @@
 import { useState } from 'react'
-import { ArrowRight, ShieldCheck } from 'lucide-react'
+import { ArrowRight, Compass, ShieldCheck } from 'lucide-react'
 import { DEMO_ORGS, useApp } from '../state/app'
+import { lensFor } from '../data/roles'
 import { ULIP_ENDPOINTS, ULIP_SYSTEMS } from '../data/ulip/catalogue'
 import { Logo } from '../components/Logo'
 import { Button, Field, Input, Select } from '../components/ui'
@@ -14,6 +15,8 @@ export function Login() {
   const [orgId, setOrgId] = useState(DEMO_ORGS[0].id)
 
   const org = DEMO_ORGS.find((o) => o.id === orgId)!
+  const lens = lensFor(org.role)
+  const head = lens.headline([], null)
   const submit = (e: React.FormEvent) => {
     e.preventDefault()
     signIn({
@@ -86,6 +89,15 @@ export function Login() {
                 ))}
               </Select>
             </Field>
+
+            {/* The line above promises the app adapts to the role. Show what
+                that actually means before anyone commits to a choice. */}
+            <div className="rounded-lg border border-line bg-surface-2 p-3 text-[12px] leading-relaxed text-muted">
+              <div className="mb-1 flex items-center gap-1.5 font-medium text-fg">
+                <Compass className="size-3.5 text-brand" /> {lens.towerTitle}
+              </div>
+              {lens.remit} Leads with {head.label.toLowerCase()}.
+            </div>
 
             <div className={cn('rounded-lg border border-line bg-surface-2 p-3 text-[12px] leading-relaxed text-muted')}>
               <div className="mb-1 flex items-center gap-1.5 font-medium text-fg">
