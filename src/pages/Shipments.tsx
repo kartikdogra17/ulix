@@ -5,7 +5,9 @@ import {
   ThermometerSnowflake, Train, Truck, TriangleAlert,
 } from 'lucide-react'
 import { adapter } from '../data'
-import type { Coverage } from '../data/fusion'
+import { lensFor } from '../data/roles'
+import { LensDefault } from '../components/lens'
+import type { Coverage, SignalKind } from '../data/fusion'
 import {
   AssigneeSelect, CaseDrawer, SEV_TONE, Sources, StatusChip, currentMemberId,
 } from '../components/cases'
@@ -317,23 +319,29 @@ function ShipmentDetail({ id, onClose }: { id: string | null; onClose: () => voi
 /* ── Page ─────────────────────────────────────────────────────── */
 
 export function Shipments() {
+  const { session } = useApp()
+  const lens = lensFor(session?.org.role ?? 'Shipper')
+  const opens = lens.pageDefaults.shipments
+
   const [sp, setSp] = useSearchParams()
   const [search, setSearch] = useState(sp.get('q') ?? '')
   const [status, setStatus] = useState<ShipmentStatus | 'all'>('all')
   const [mode, setMode] = useState('all')
   const [origin, setOrigin] = useState('all')
   const [onlyDelayed, setOnlyDelayed] = useState(false)
-  const [sort, setSort] = useState<'created' | 'eta' | 'delay' | 'value'>('created')
+  const [sort, setSort] = useState<'created' | 'eta' | 'delay' | 'value'>(opens.sort)
+  /* Seeded from the lens; cleared to [] the moment anyone asks to see everything. */
+  const [signalKinds, setSignalKinds] = useState<readonly SignalKind[]>(opens.signalKinds)
   const [page, setPage] = useState(1)
   const [openId, setOpenId] = useState<string | null>(null)
 
   const q = useDebounced(search)
-  useEffect(() => { setPage(1) }, [q, status, mode, origin, onlyDelayed, sort])
+  useEffect(() => { setPage(1) }, [q, status, mode, origin, onlyDelayed, sort, signalKinds])
   useEffect(() => { if (q) setSp({ q }, { replace: true }); else setSp({}, { replace: true }) }, [q, setSp])
 
   const { data, loading } = useAsync(
-    () => adapter.listShipments({ search: q, status, mode, origin, onlyDelayed, sort, page, pageSize: 25 }),
-    [q, status, mode, origin, onlyDelayed, sort, page])
+    () => adapter.listShipments({ search: q, status, mode, origin, onlyDelayed, signalKinds, sort, page, pageSize: 25 }),
+    [q, status, mode, origin, onlyDelayed, signalKinds, sort, page])
 
   const pages = data ? Math.max(1, Math.ceil(data.total / 25)) : 1
 
@@ -390,10 +398,13 @@ export function Shipments() {
 
       {/* Table */}
       <Card className="overflow-hidden">
+        {signalKinds.length > 0 && opens.note && (
+          <LensDefault role={lens.role} what={opens.note} onClear={() => setSignalKinds([])} />
+        )}
         {loading && !data ? <TableSkeleton rows={9} cols={7} /> : !data?.rows.length ? (
           <Empty icon={Package} title="Nothing matches those filters"
             sub="Try clearing the search box or widening the status and mode filters."
-            action={<Button size="sm" onClick={() => { setSearch(''); setStatus('all'); setMode('all'); setOrigin('all'); setOnlyDelayed(false) }}>Reset filters</Button>} />
+            action={<Button size="sm" onClick={() => { setSearch(''); setStatus('all'); setMode('all'); setOrigin('all'); setOnlyDelayed(false); setSignalKinds([]) }}>Reset filters</Button>} />
         ) : (
           <>
             {/* Desktop table */}

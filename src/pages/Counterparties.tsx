@@ -4,6 +4,8 @@ import {
   Search, ShieldAlert, Users,
 } from 'lucide-react'
 import { adapter } from '../data'
+import { useApp } from '../state/app'
+import { lensFor } from '../data/roles'
 import { useAsync, useDebounced } from '../lib/useAsync'
 import { d, inr, num } from '../lib/format'
 import { type CheckStatus, type Counterparty, riskTone } from '../data/counterparty'
@@ -167,7 +169,10 @@ function PartyDrawer({ id, onClose }: { id: string | null; onClose: () => void }
 
 export function Counterparties() {
   const [search, setSearch] = useState('')
-  const [risk, setRisk] = useState<'all' | Counterparty['risk']>('all')
+  const { session } = useApp()
+  /* The risk Select shows and clears this, so no banner. */
+  const opens = lensFor(session?.org.role ?? 'Shipper').pageDefaults.parties
+  const [risk, setRisk] = useState<'all' | Counterparty['risk']>(opens.risk)
   const [openId, setOpenId] = useState<string | null>(null)
   const q = useDebounced(search)
 

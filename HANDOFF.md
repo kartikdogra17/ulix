@@ -118,18 +118,46 @@ Two things worth knowing if you extend it:
 - The per-role headlines count **distinct consignments**, not signals. One truck with a
   lapsed certificate *and* no insurance is one movement to stop, not two.
 
-Still thin: the other nine pages are not yet lensed. Fleet for a shipper and EXIM for a
-transporter are simply un-advertised rather than re-framed, and the per-page tables still
-open on the same default filters for everyone. That is the obvious next cut.
+### What each module opens on
+
+`pageDefaults` on the lens seeds the filter state of four pages. Consignments gained a
+`signalKinds` filter on `ShipmentQuery` to make it possible — role-agnostic at the
+adapter, which only knows how to filter; the lens decides which kinds matter.
+
+| | Consignments | Fleet | Compliance | Counterparties |
+|---|---|---|---|---|
+| Shipper | whole book, newest | all | Expiring | all |
+| Transporter | on blocked assets | issues only | Expiring | all |
+| Freight Forwarder | held at a border, soonest ETA | all | all | all |
+| Regulator | in breach | issues only | Expired | Blocked |
+
+**Checked the distribution, per the standing trap.** Of 160 consignments, the defaults
+land on 160 / 13 / 20 / 26 — and each matches that role's own tower headline, so two
+screens never disagree. Counterparties for a regulator is the narrowest at 3 of 32
+blocked, which is deliberate: those are the ones where something has to happen, and the
+tiles directly above show Clear 19 / Watch 10 / Blocked 3, so the page cannot be mistaken
+for empty.
+
+**The rule that keeps this honest:** a lensed default is visible and reversible. Where
+the filter has a control — the Compliance status tabs, the Fleet and Counterparties
+Selects — that control *is* the disclosure. Consignments' signal filter has no control,
+so it renders `<LensDefault>` (`src/components/lens.tsx`) naming the role and the filter
+with a *Show everything* button, verified to restore all 160.
+
+Not lensed, deliberately: **EXIM** has no role-specific opening question — every role
+that sees it wants both directions — and a default for it was removed rather than left as
+dead config. Lane planner, Waterways, Scenario drill and API gateway are tools you arrive
+at with a question already in hand, not worklists that can open on the wrong one.
 
 ## Open threads, in the order I would pick them up
 
-1. **Lens the module pages, not just the tower.** Default filters and column sets per
-   role — a regulator opening Consignments should land on the ones in breach.
-2. **A licence file.** None committed, so default copyright applies on a public repo.
-3. **GatiShakti ×5** as a corridor overlay on the existing map, rather than a new screen.
-4. **Case store on a real datastore** if it ever outgrows a JSON file, or if it needs to
+1. **A licence file.** None committed, so default copyright applies on a public repo.
+2. **GatiShakti ×5** as a corridor overlay on the existing map, rather than a new screen.
+3. **Case store on a real datastore** if it ever outgrows a JSON file, or if it needs to
    run serverless.
+4. **Column sets per role**, if it ever seems worth it. Defaults changed which *rows* you
+   land on; which *columns* matter also differs, but that is a much larger change to
+   every table for a smaller return, so I stopped at rows.
 
 ## Traps already paid for
 

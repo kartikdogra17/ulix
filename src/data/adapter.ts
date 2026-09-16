@@ -4,7 +4,7 @@ import type {
 } from './types'
 import type { CatalogueEntry } from './mock/gateway'
 import type { UlipEnvelope } from './ulip/envelope'
-import type { Coverage, Signal } from './fusion'
+import type { Coverage, Signal, SignalKind } from './fusion'
 import type { Case, CaseStatus, Resolution } from './cases'
 import type { LanePlan } from './routes'
 import type { AirQuality, CorridorWeather } from './osint'
@@ -24,6 +24,12 @@ export interface ShipmentQuery {
   origin?: string
   destination?: string
   onlyDelayed?: boolean
+  /**
+   * Only consignments carrying a live signal of one of these kinds. Empty or
+   * absent means no signal filter. Role-agnostic on purpose — the lens
+   * decides which kinds matter, the adapter only knows how to filter.
+   */
+  signalKinds?: readonly SignalKind[]
   sort?: 'eta' | 'created' | 'delay' | 'value'
   page?: number
   pageSize?: number

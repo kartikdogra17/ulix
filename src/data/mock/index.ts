@@ -185,7 +185,14 @@ export class MockAdapter implements DataAdapter {
   async listShipments(q: ShipmentQuery): Promise<Page<Shipment>> {
     await sleep(latency())
     const term = q.search?.trim().toLowerCase()
+    /* allSignals() is cached, so this is a Set build rather than a re-derive. */
+    const flagged = q.signalKinds?.length
+      ? new Set(this.allSignals()
+          .filter((sig) => (q.signalKinds as readonly string[]).includes(sig.kind))
+          .map((sig) => sig.entity))
+      : null
     let rows = this.shipments.filter((s) => {
+      if (flagged && !flagged.has(s.id)) return false
       if (q.status && q.status !== 'all' && s.status !== q.status) return false
       if (q.mode && q.mode !== 'all' && !s.legs.some((l) => l.mode === q.mode)) return false
       if (q.origin && q.origin !== 'all' && s.origin !== q.origin) return false

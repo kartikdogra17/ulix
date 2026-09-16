@@ -14,6 +14,13 @@ export function SettingsPage() {
   // label and basis do not depend on the data, only on the lens.
   const head = lens.headline([], null)
   const hidden = Object.keys(MODULE_LABEL).filter((to) => !lens.nav.includes(to))
+  const pd = lens.pageDefaults
+  const opensOn: Array<[string, string]> = ([
+    ['Consignments', pd.shipments.note],
+    ['Fleet', pd.fleet.note],
+    ['Compliance', pd.compliance.note],
+    ['Counterparties', pd.parties.note],
+  ] as Array<[string, string | undefined]>).filter((r): r is [string, string] => Boolean(r[1]))
 
   return (
     <div className="mx-auto max-w-3xl space-y-3 p-3 sm:p-4">
@@ -63,6 +70,23 @@ export function SettingsPage() {
               </p>
             )}
           </div>
+
+          {opensOn.length > 0 && (
+            <div>
+              <Label>Modules open on</Label>
+              <ul className="space-y-1">
+                {opensOn.map(([mod, note]) => (
+                  <li key={mod} className="flex flex-wrap gap-x-2 text-[12px] leading-relaxed">
+                    <span className="w-28 shrink-0 font-medium">{mod}</span>
+                    <span className="min-w-0 text-muted">{note}</span>
+                  </li>
+                ))}
+              </ul>
+              <p className="mt-1.5 text-[11px] leading-relaxed text-faint">
+                Each of these is shown on the page itself and clears in one click.
+              </p>
+            </div>
+          )}
 
           <div>
             <Label>Sorted to the top of the queue</Label>

@@ -4,6 +4,8 @@ import {
   Search, ShieldAlert, Truck, UserRound,
 } from 'lucide-react'
 import { adapter } from '../data'
+import { useApp } from '../state/app'
+import { lensFor } from '../data/roles'
 import { useAsync, useDebounced } from '../lib/useAsync'
 import { d, daysTo, dt, inr, num } from '../lib/format'
 import { FASTAG_RETENTION_HOURS } from '../data/ulip/catalogue'
@@ -197,9 +199,14 @@ function VehicleDetail({ regNo, onClose }: { regNo: string | null; onClose: () =
 }
 
 export function Fleet() {
+  const { session } = useApp()
+  /* No banner here: the compliance Select below already shows the filter
+     and clears it in one click, which is the whole point of the rule. */
+  const opens = lensFor(session?.org.role ?? 'Shipper').pageDefaults.fleet
+
   const [search, setSearch] = useState('')
   const [status, setStatus] = useState<Vehicle['status'] | 'all'>('all')
-  const [compliance, setCompliance] = useState<'all' | 'issues'>('all')
+  const [compliance, setCompliance] = useState<'all' | 'issues'>(opens.compliance)
   const [page, setPage] = useState(1)
   const [openReg, setOpenReg] = useState<string | null>(null)
 

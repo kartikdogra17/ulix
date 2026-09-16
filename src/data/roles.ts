@@ -25,7 +25,8 @@
 import type { Dashboard } from './adapter'
 import type { Case } from './cases'
 import type { Severity, SignalKind } from './fusion'
-import type { Org } from './types'
+import type { Counterparty } from './counterparty'
+import type { DocStatus, Org } from './types'
 import { inr, num } from '../lib/format'
 
 export type Role = Org['role']
@@ -39,6 +40,28 @@ export interface Headline {
   detail: string
   /** Why this number and not another. Shown small, but shown. */
   basis: string
+}
+
+/**
+ * What each module opens on.
+ *
+ * A lensed default is only honest if it is visible and reversible, so every
+ * page that applies one renders a note saying so with a one-click way out.
+ * A silently pre-filtered table is indistinguishable from missing data, and
+ * this project has already paid for screens that looked broken when they
+ * were merely opinionated.
+ */
+export interface PageDefaults {
+  shipments: {
+    /** Empty means no signal filter: open on the whole book. */
+    signalKinds: readonly SignalKind[]
+    /** Sort hides nothing, so it never needs a note. */
+    sort: 'created' | 'eta' | 'delay' | 'value'
+    note?: string
+  }
+  fleet: { compliance: 'all' | 'issues'; note?: string }
+  compliance: { status: DocStatus | 'all'; note?: string }
+  parties: { risk: 'all' | Counterparty['risk']; note?: string }
 }
 
 export interface RoleLens {
@@ -58,6 +81,8 @@ export interface RoleLens {
   queueSub: string
   /** The standing-of-the-network chip beside the page title. */
   contextBadge: (d: Dashboard) => string
+  /** What each module opens on for this role. */
+  pageDefaults: PageDefaults
   headline: (cases: Case[], d: Dashboard | null) => Headline
 }
 
@@ -142,6 +167,14 @@ const SHIPPER: RoleLens = {
   towerSub: 'Every source system joined into one picture — what needs a decision, who owns it, and why.',
   queueSub: 'Cross-system conflicts against cargo you own — assign, action, close',
   contextBadge: (d) => `${num(d.activeShipments)} moving · ${inr(d.inTransitValue)}`,
+  pageDefaults: {
+    // Their own book, newest first — no filter. The paperwork clock is the
+    // one question a shipper opens Compliance to ask.
+    shipments: { signalKinds: [], sort: 'created' },
+    fleet: { compliance: 'all' },
+    compliance: { status: 'expiring', note: 'documents inside their expiry window' },
+    parties: { risk: 'all' },
+  },
   headline: (cases, d) => {
     const mix = severityMix(cases)
     return {
@@ -172,6 +205,14 @@ const TRANSPORTER: RoleLens = {
   towerSub: 'Which of your vehicles and drivers can legally move right now, and what is stopping the rest.',
   queueSub: 'Conflicts against your assets and the loads riding on them — assign, action, close',
   contextBadge: (d) => `${d.fleetActive}/${d.fleetTotal} active · ${num(d.activeShipments)} loads`,
+  pageDefaults: {
+    // Opens on the loads riding on an asset that cannot legally move.
+    shipments: { signalKinds: ASSET_BLOCKING, sort: 'created',
+      note: 'loads riding on a vehicle or driver that cannot legally move' },
+    fleet: { compliance: 'issues', note: 'vehicles with an open compliance problem' },
+    compliance: { status: 'expiring', note: 'documents inside their expiry window' },
+    parties: { risk: 'all' },
+  },
   headline: (cases) => {
     const a = affected(cases, ASSET_BLOCKING)
     return {
@@ -200,6 +241,15 @@ const FORWARDER: RoleLens = {
   towerSub: "Where your principals' cargo is held, what is holding it, and what the delay is costing.",
   queueSub: 'Conflicts against cargo you are carrying for someone else — assign, action, close',
   contextBadge: (d) => `${num(d.activeShipments)} moving · ${inr(d.inTransitValue)}`,
+  pageDefaults: {
+    // Opens on what is stopped rather than what is moving, because a
+    // forwarder is paid on the clock and demurrage runs regardless.
+    shipments: { signalKinds: ['customs_hold', 'hazmat_no_clearance', 'detention'], sort: 'eta',
+      note: 'cargo held by customs, a missing clearance or detention' },
+    fleet: { compliance: 'all' },
+    compliance: { status: 'all' },
+    parties: { risk: 'all' },
+  },
   headline: (cases, d) => {
     const held = affected(cases, BORDER)
     return {
@@ -229,6 +279,15 @@ const REGULATOR: RoleLens = {
   towerSub: 'Where the network is moving outside the rules, on whose vehicles, and how long it has been true.',
   queueSub: 'Breaches visible only by joining two ministries — assign, action, close',
   contextBadge: (d) => `${num(d.activeShipments)} movements supervised · ${d.fleetActive} vehicles active`,
+  pageDefaults: {
+    // The point of the thread: a regulator opening Consignments lands on
+    // the ones in breach, not on the whole moving book.
+    shipments: { signalKinds: ENFORCEABLE, sort: 'created',
+      note: 'movements in breach of VAHAN, SARATHI or FASTag status' },
+    fleet: { compliance: 'issues', note: 'vehicles with an open compliance problem' },
+    compliance: { status: 'expired', note: 'documents that have already lapsed' },
+    parties: { risk: 'blocked', note: 'counterparties currently blocked' },
+  },
   headline: (cases) => {
     const v = affected(cases, ENFORCEABLE)
     return {

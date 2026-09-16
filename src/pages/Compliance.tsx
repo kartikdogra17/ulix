@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react'
 import { FileCheck2, Search, ShieldAlert, ShieldCheck } from 'lucide-react'
 import { adapter } from '../data'
+import { useApp } from '../state/app'
+import { lensFor } from '../data/roles'
 import { useAsync, useDebounced } from '../lib/useAsync'
 import { d, daysTo, inr, num, titleCase } from '../lib/format'
 import { docLabel } from '../data/mock/generate'
@@ -27,9 +29,13 @@ const STATUS_TABS: Array<{ id: DocStatus | 'all'; label: string }> = [
 ]
 
 export function Compliance() {
+  const { session } = useApp()
+  /* The status tabs render the filter with counts, so it explains itself. */
+  const opens = lensFor(session?.org.role ?? 'Shipper').pageDefaults.compliance
+
   const [search, setSearch] = useState('')
   const [type, setType] = useState('all')
-  const [status, setStatus] = useState<DocStatus | 'all'>('all')
+  const [status, setStatus] = useState<DocStatus | 'all'>(opens.status)
   const [page, setPage] = useState(1)
 
   const q = useDebounced(search)

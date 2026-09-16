@@ -91,9 +91,14 @@ sidebar, which looks exactly like a broken route.
 - **Styling** is Tailwind v4 with semantic tokens (`bg-surface`, `text-muted`, `border-line`)
   defined in `index.css`. Never hard-code a colour; both themes resolve through the tokens.
 - **Roles are a lens, not access control.** `roles.ts` decides what each org type sees
-  first — nav order and membership, which signals sort to the top of the queue, and
-  which single number leads the tower. It filters no records: every route still
-  resolves by URL and every signal stays in the queue. Say so wherever it shows.
+  first — nav order and membership, which signals sort to the top of the queue, which
+  single number leads the tower, and what each module opens on. It filters no records:
+  every route still resolves by URL and every signal stays in the queue. Say so wherever
+  it shows.
+- **A lensed default must be visible and reversible.** If the filter has a visible
+  control (a tab, a Select), that control *is* the disclosure — set it and stop. If it
+  does not, render `<LensDefault>` with a one-click way out. A silently pre-filtered
+  table is indistinguishable from missing data.
 - **Name things once.** Module names live in `MODULE_LABEL` (`roles.ts`) and signal
   names in `SIGNAL_LABEL` (`fusion.ts`), both keyed exhaustively. Do not re-declare
   a label in a page.
