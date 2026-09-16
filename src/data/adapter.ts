@@ -12,6 +12,7 @@ import type { DisruptionFeed } from './disruptions'
 import type { PortTraffic, VesselFeed } from './vessels'
 import type { ScenarioResult, ScenarioSpec } from './scenarios'
 import type { Counterparty } from './counterparty'
+import type { EximFile } from './exim'
 
 export interface Page<T> { rows: T[]; total: number }
 
@@ -162,6 +163,11 @@ export interface DataAdapter {
 
   /** Cost a hypothetical disruption against the network as it stands now. */
   runScenario(spec: ScenarioSpec): Promise<ScenarioResult>
+
+  /** Import and export clearance files, with their demurrage clocks. */
+  eximFiles(q?: { direction?: 'import' | 'export' | 'all'; search?: string; onlyOpen?: boolean }):
+    Promise<EximFile[]>
+  getEximFile(id: string): Promise<EximFile | null>
 
   /** Due diligence on the parties this network actually trades with. */
   counterparties(search?: string): Promise<Counterparty[]>

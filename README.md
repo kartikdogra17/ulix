@@ -135,6 +135,7 @@ same picture at entity level, including a per-system coverage table.
 |---|---|
 | `/` **Control tower** | Value at risk, unassigned and overdue counts, the working decisions queue (assign / snooze / close with an outcome), desk load, risk-coloured live map, what is driving risk, lane reliability, source-system health |
 | `/drill` **Scenario drill** | Cost a disruption before it happens — GRAP stage, port shutdown, corridor closure or fog — against the network as it stands. Reports consignments caught, value exposed, **new** e-Way Bill breaches the delay would create, vehicles needing a swap and whether the fleet can cover them |
+| `/exim` **EXIM cockpit** | Import and export clearance chains, each milestone attributed to the endpoint that reports it, plus the demurrage and detention clocks and which boxes are about to cross into a higher tariff slab |
 | `/parties` **Counterparties** | Who you are actually trading with: company standing, directors and shared directorships, MSME status with the 45-day payment clock, and IEC validity |
 | `/plan` **Lane planner** | Plan a corridor before booking it: black spots you will cross, municipal no-entry windows against your projected arrival, toll and own-account cost, energy stops, and the road/rail/sea/air trade-off on time, cost and carbon |
 | `/shipments` **Consignments** | Filterable register; drawer opens on risk score and data confidence, then cross-system signals with recommended actions, a per-system coverage table, leg-by-leg journey, event chain attributed to its source system, and documents |
@@ -151,6 +152,30 @@ older ones **Stored** — data this platform polled and persisted itself. The ba
 the FASTag tab says exactly that.
 
 ---
+
+## Where the money actually burns
+
+Eleven ICEGATE endpoints and four more from PCS sat unused while "in customs" was a
+single status chip. That chip hides the part of the journey that costs the most: a box
+sitting in a terminal is not late, it is **expensive**, and it gets more expensive in
+steps rather than smoothly.
+
+[`/exim`](src/pages/Exim.tsx) models two things properly.
+
+**The milestone chain**, each step attributed to the endpoint that reports it — for a sea
+export: `ICEGATE/03` shipping bill → `PCS/02` goods received → `ICEGATE/05` LEO →
+`ICEGATE/13` e-seal → `PCS/03` loaded → `ICEGATE/08` EGM → `PCS/06` sailed. Imports run
+the other chain, through IGM, bill of entry, assessment, duty and out-of-charge.
+
+**The demurrage and detention clocks, which are slabbed rather than linear.** Free days,
+then a daily rate, then roughly double, then double again. A flat "₹/day" figure hides
+the cliff entirely, so the cockpit leads with what is about to cross one:
+
+> **EX4206 · Paradip · demurrage — in 4h, ₹1,800 → ₹3,600/day**
+
+Demurrage is the terminal charging for its ground; detention is the line charging for its
+box. They run on different clocks and can both be live at once, so they are tracked
+separately.
 
 ## Knowing who you are dealing with
 

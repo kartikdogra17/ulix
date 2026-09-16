@@ -24,6 +24,7 @@ import { type DisruptionFeed, fetchDisruptions } from '../disruptions'
 import { fetchVessels, portTraffic } from '../vessels'
 import { type ScenarioSpec, runScenario } from '../scenarios'
 import { makeCounterparties } from '../counterparty'
+import { makeEximFiles } from '../exim'
 
 const sleep = (ms: number) => new Promise((res) => setTimeout(res, ms))
 /** Simulated gateway latency so loading states are real, not theatre. */
@@ -477,6 +478,32 @@ export class MockAdapter implements DataAdapter {
     // Several source systems answer here, so the wait is deliberately longer.
     await sleep(latency() * 2.2)
     return planLane(origin, destination, opts)
+  }
+
+  /* ── EXIM ──────────────────────────────────────────────────── */
+
+  private exim = makeEximFiles(this.shipments)
+
+  async eximFiles(q: { direction?: 'import' | 'export' | 'all'; search?: string; onlyOpen?: boolean } = {}) {
+    await sleep(latency())
+    const term = q.search?.trim().toLowerCase()
+    return this.exim.filter((f) => {
+      if (q.direction && q.direction !== 'all' && f.direction !== q.direction) return false
+      if (q.onlyOpen && f.cleared) return false
+      if (term) {
+        const hay = [
+          f.id, f.containerNumber, f.party, f.portName, f.chaNo,
+          f.beNo, f.sbNo, f.igmNo, f.egmNo, f.mawbNumber, f.esealNumber, f.vesselName,
+        ].filter(Boolean).join(' ').toLowerCase()
+        if (!hay.includes(term)) return false
+      }
+      return true
+    })
+  }
+
+  async getEximFile(id: string) {
+    await sleep(latency() / 2)
+    return this.exim.find((f) => f.id === id) ?? null
   }
 
   /* ── Counterparties ────────────────────────────────────────── */
