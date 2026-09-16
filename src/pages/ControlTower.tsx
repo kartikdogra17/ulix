@@ -258,6 +258,9 @@ export function ControlTower() {
     return m
   }, [quality])
   const weak = useMemo(() => weakDetectors(quality ?? []), [quality])
+  /* Nulls sort last and the panel only lists eight, so without this the
+     honest "not enough history" state is computed and never seen. */
+  const unjudged = useMemo(() => (quality ?? []).filter((q) => q.precision === null), [quality])
 
   const head = useMemo(() => lens.headline(allLive ?? [], data ?? null), [lens, allLive, data])
   /* The queue arrives sorted by severity; the lens re-sorts it by remit. */
@@ -549,12 +552,20 @@ export function ControlTower() {
                   </div>
                 )
               })}
+              {unjudged.length > 0 && (
+                <p className="border-t border-line-soft pt-2 text-[11px] leading-relaxed text-muted">
+                  <span className="font-medium text-fg">
+                    {unjudged.length} not judged yet
+                  </span>{' '}
+                  — {unjudged.map((q) => q.label).join(', ')}. Under {MIN_SAMPLE} closed
+                  outcomes apiece, which is too few to score without inventing confidence.
+                </p>
+              )}
               <p className="border-t border-line-soft pt-2 text-[11px] leading-relaxed text-faint">
                 Share of closed cases where the signal was acted on rather than dismissed as
                 wrong. Checks against a government register score high; anything inferred from
-                absence or from open news scores lower, and should. Below {MIN_SAMPLE} judged
-                outcomes no figure is shown — a precision from three cases is noise with a
-                decimal point. History is simulated; outcomes you record are real.
+                absence or from open news scores lower, and should. History is simulated;
+                outcomes you record are real.
               </p>
             </div>
           </Card>
