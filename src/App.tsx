@@ -11,6 +11,7 @@ const ControlTower = lazy(() => import('./pages/ControlTower').then((m) => ({ de
 const Shipments = lazy(() => import('./pages/Shipments').then((m) => ({ default: m.Shipments })))
 const LanePlanner = lazy(() => import('./pages/LanePlanner').then((m) => ({ default: m.LanePlanner })))
 const ScenarioDrill = lazy(() => import('./pages/ScenarioDrill').then((m) => ({ default: m.ScenarioDrill })))
+const Counterparties = lazy(() => import('./pages/Counterparties').then((m) => ({ default: m.Counterparties })))
 const Fleet = lazy(() => import('./pages/Fleet').then((m) => ({ default: m.Fleet })))
 const Compliance = lazy(() => import('./pages/Compliance').then((m) => ({ default: m.Compliance })))
 const ApiConsole = lazy(() => import('./pages/ApiConsole').then((m) => ({ default: m.ApiConsole })))
@@ -39,6 +40,7 @@ function Routed() {
           <Route path="shipments" element={<Shipments />} />
           <Route path="plan" element={<LanePlanner />} />
         <Route path="drill" element={<ScenarioDrill />} />
+        <Route path="parties" element={<Counterparties />} />
         <Route path="fleet" element={<Fleet />} />
           <Route path="compliance" element={<Compliance />} />
           <Route path="apis" element={<ApiConsole />} />

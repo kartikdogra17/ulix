@@ -135,6 +135,7 @@ same picture at entity level, including a per-system coverage table.
 |---|---|
 | `/` **Control tower** | Value at risk, unassigned and overdue counts, the working decisions queue (assign / snooze / close with an outcome), desk load, risk-coloured live map, what is driving risk, lane reliability, source-system health |
 | `/drill` **Scenario drill** | Cost a disruption before it happens — GRAP stage, port shutdown, corridor closure or fog — against the network as it stands. Reports consignments caught, value exposed, **new** e-Way Bill breaches the delay would create, vehicles needing a swap and whether the fleet can cover them |
+| `/parties` **Counterparties** | Who you are actually trading with: company standing, directors and shared directorships, MSME status with the 45-day payment clock, and IEC validity |
 | `/plan` **Lane planner** | Plan a corridor before booking it: black spots you will cross, municipal no-entry windows against your projected arrival, toll and own-account cost, energy stops, and the road/rail/sea/air trade-off on time, cost and carbon |
 | `/shipments` **Consignments** | Filterable register; drawer opens on risk score and data confidence, then cross-system signals with recommended actions, a per-system coverage table, leg-by-leg journey, event chain attributed to its source system, and documents |
 | `/fleet` **Fleet** | VAHAN registration and statutory validity, SARATHI licence checks, FASTag crossings and balance, utilisation and detention analytics |
@@ -150,6 +151,36 @@ older ones **Stored** — data this platform polled and persisted itself. The ba
 the FASTag tab says exactly that.
 
 ---
+
+## Knowing who you are dealing with
+
+Every other screen treats the consignor, consignee and carrier as names on a consignment.
+[`/parties`](src/pages/Counterparties.tsx) asks what four APIs can say about them —
+`MCA/03` and `MCA/05` for company standing and directors, `UDYAM/01` for MSME
+registration, `DGFT/01` for the import-export code.
+
+Two checks earn their keep on their own.
+
+**A company struck off the register** is not an entity you can enforce a contract
+against, and nothing in a consignment feed will ever tell you.
+
+**An MSME-registered counterparty puts you on a statutory clock.** Under s.15 of the
+MSMED Act 2006 a buyer must settle a registered micro or small enterprise within 45 days,
+with compound interest at three times the RBI bank rate beyond that — and under s.43B(h)
+of the Income Tax Act the deduction can be disallowed if it is unpaid at year end. That
+is a payables obligation most TMS software never surfaces, because it lives in a
+different government system from the freight. Note it raises an **obligation on you**,
+not a risk from them, so it does not move the risk score.
+
+The other checks: director standing, **shared directorships across counterparties** (a
+related-party exposure larger than it looks per counterparty), IEC validity where the
+party actually moves sea or air freight, and GSTIN state against the registered office.
+
+Two calibration bugs were worth fixing during the build. The related-party check fired on
+every counterparty because the simulated director pool was too small, and the IEC check
+failed most EXIM traders because IEC presence was random rather than following actual
+EXIM activity. The result was *zero* clear counterparties — a screen that flags everyone
+trains people to ignore it. It now reads 19 clear, 10 watch, 3 blocked out of 32.
 
 ## Asking the other question
 

@@ -23,6 +23,7 @@ import { type AirQuality, fetchAirQuality, fetchCorridorWeather } from '../osint
 import { type DisruptionFeed, fetchDisruptions } from '../disruptions'
 import { fetchVessels, portTraffic } from '../vessels'
 import { type ScenarioSpec, runScenario } from '../scenarios'
+import { makeCounterparties } from '../counterparty'
 
 const sleep = (ms: number) => new Promise((res) => setTimeout(res, ms))
 /** Simulated gateway latency so loading states are real, not theatre. */
@@ -476,6 +477,24 @@ export class MockAdapter implements DataAdapter {
     // Several source systems answer here, so the wait is deliberately longer.
     await sleep(latency() * 2.2)
     return planLane(origin, destination, opts)
+  }
+
+  /* ── Counterparties ────────────────────────────────────────── */
+
+  private parties = makeCounterparties(this.shipments)
+
+  async counterparties(search?: string) {
+    await sleep(latency())
+    const term = search?.trim().toLowerCase()
+    if (!term) return this.parties
+    return this.parties.filter((p) =>
+      [p.name, p.cin, p.gstin, p.udyamNo ?? '', p.iecNumber ?? '', ...p.directors.map((d) => d.name)]
+        .join(' ').toLowerCase().includes(term))
+  }
+
+  async getCounterparty(id: string) {
+    await sleep(latency() / 2)
+    return this.parties.find((p) => p.id === id) ?? null
   }
 
   /* ── Scenario drill ────────────────────────────────────────── */
