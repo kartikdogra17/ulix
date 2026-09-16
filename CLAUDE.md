@@ -13,7 +13,11 @@ merging into one heavier trunk — what comes out is more than what went in. Ico
 **The name sits close to ULIP on purpose, which puts an obligation on us:** ULIX is
 independent software, not a government service and not affiliated with NICDC or DPIIT.
 The login and settings screens state that. Keep those statements wherever a user could
-reasonably wonder whether they are looking at an official platform.
+reasonably wonder whether they are looking at an official platform. `NOTICE` carries the
+same statement for anyone who takes the **code** rather than uses the app — Apache-2.0
+requires NOTICE to travel with redistributions, which is the main reason that licence was
+chosen over MIT. Licence is Apache-2.0; `LICENSE` is the canonical text, unmodified apart
+from the copyright line.
 
 ```bash
 npm run dev            # app on :5173

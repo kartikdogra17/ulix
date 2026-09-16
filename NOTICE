@@ -1,0 +1,25 @@
+ULIX — logistics control tower
+Copyright 2026 Kartik Dogra
+
+Licensed under the Apache License, Version 2.0. See the LICENSE file.
+
+ULIX is independent software built on India's Unified Logistics Interface
+Platform (ULIP). It is not a government service, and it is not affiliated
+with, endorsed by or sponsored by NICDC Logistics Data Services Ltd or the
+Department for Promotion of Industry and Internal Trade. The name sits close
+to ULIP deliberately, which is exactly why that has to be said plainly here
+as well as on the login and settings screens.
+
+The endpoint catalogue in src/data/ulip/catalogue.ts is generated from the
+ULIP integration documents published on goulip.in. Those documents and the
+data they describe belong to their publishers; this licence covers only the
+code in this repository. Production access to the ULIP gateway requires an
+approved ULIP account and a signed NDA.
+
+Consignment, fleet, document, customs and waterway data shown by this
+software is simulated. See docs/DATA-PROVENANCE.md for exactly which parts
+of the application are live and which are generated.
+
+ULIP, VAHAN, SARATHI, FASTag, FOIS, ICEGATE, PCS and GatiShakti are the marks
+of their respective owners and appear here only to identify the systems this
+software integrates with. Section 6 of the License grants no rights in them.

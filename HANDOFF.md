@@ -151,13 +151,32 @@ at with a question already in hand, not worklists that can open on the wrong one
 
 ## Open threads, in the order I would pick them up
 
-1. **A licence file.** None committed, so default copyright applies on a public repo.
-2. **GatiShakti ×5** as a corridor overlay on the existing map, rather than a new screen.
+1. **GatiShakti ×5** as a corridor overlay on the existing map, rather than a new screen.
 3. **Case store on a real datastore** if it ever outgrows a JSON file, or if it needs to
    run serverless.
 4. **Column sets per role**, if it ever seems worth it. Defaults changed which *rows* you
    land on; which *columns* matter also differs, but that is a much larger change to
    every table for a smaller return, so I stopped at rows.
+
+## Licence
+
+**Apache-2.0**, chosen over MIT for Section 6: it grants no trademark or trade-name
+rights. For a project whose name sits deliberately close to a government platform, that
+clause is doing real work rather than decorating the repo. `LICENSE` is the canonical
+text fetched from apache.org, byte-identical apart from the copyright line.
+
+`NOTICE` is where the obligations live, and Apache-2.0 requires it to travel with any
+redistribution: the non-affiliation statement, the fact that the catalogue is generated
+from documents published on goulip.in that belong to their publishers, the pointer to
+`docs/DATA-PROVENANCE.md` for what is simulated, and that ULIP, VAHAN, SARATHI, FASTag
+and the rest are other people's marks. The UI says the same things to users; NOTICE says
+them to whoever takes the code.
+
+One thing deliberately **not** settled: whether generating `catalogue.ts` from the
+published integration documents is licensed by whatever terms goulip.in attaches to them.
+NOTICE states the position factually and claims nothing. If this were ever to become a
+commercial product rather than a demonstration, that is a question for a lawyer, not for
+a licence file.
 
 ## Traps already paid for
 
