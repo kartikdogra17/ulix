@@ -62,8 +62,15 @@ about it, so nobody greps 36 files.
 | Host | Vercel, static build, project still named `ulip-platform` |
 
 Deploys are currently **manual** — `vercel --prod` from this directory. The repo is not
-yet connected in Vercel's Git settings, so a push does not redeploy. Connecting it is a
-dashboard action the CLI cannot do.
+connected in Vercel's Git settings, so a push does not redeploy.
+
+`vercel git connect --yes` **does** exist and was tried on 16 September 2026. It fails
+with *"Failed to connect kartikdogra17/ulix to project"* even though the repo is public,
+spelled right and reachable via `gh`. The CLI cannot grant itself GitHub access: the
+Vercel GitHub App has to be installed and authorised for the `kartiks-projects-3e44c9bb`
+team first, and that is a browser step. Do that once in the dashboard, then the CLI
+command works — until then the error message is misleading, because it blames the
+repository for what is an authorisation gap.
 
 Two gotchas already paid for:
 
