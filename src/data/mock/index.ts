@@ -20,7 +20,7 @@ import {
 import { NODE_BY_CODE } from './seed'
 import { planLane } from '../routes'
 import { type AirQuality, fetchAirQuality, fetchCorridorWeather } from '../osint'
-import { type Disruption, fetchDisruptions } from '../disruptions'
+import { type DisruptionFeed, fetchDisruptions } from '../disruptions'
 import { fetchVessels, portTraffic } from '../vessels'
 
 const sleep = (ms: number) => new Promise((res) => setTimeout(res, ms))
@@ -49,7 +49,7 @@ export class MockAdapter implements DataAdapter {
   /** Live OSINT context, refreshed out of band and folded into fusion. */
   private ncrAir: AirQuality | null = null
   private airLoaded: Promise<void> | null = null
-  private disruptionList: Disruption[] = []
+  private disruptionFeed: DisruptionFeed | null = null
   private disruptionsLoaded: Promise<void> | null = null
   private cases: Record<string, CaseRecord> = loadCases()
 
@@ -107,7 +107,7 @@ export class MockAdapter implements DataAdapter {
   private async ensureDisruptions() {
     if (!this.disruptionsLoaded) {
       this.disruptionsLoaded = fetchDisruptions().then((f) => {
-        this.disruptionList = f.items
+        this.disruptionFeed = f
         if (f.items.length) this.signalCache = null
       })
     }
@@ -126,7 +126,7 @@ export class MockAdapter implements DataAdapter {
     this.signalCache = this.shipments
       .flatMap((s) => signalsForShipment(
         s, this.vehicleFor(s.id), byShipment.get(s.id) ?? [], Date.now(),
-        { ncrAir: this.ncrAir, disruptions: this.disruptionList }))
+        { ncrAir: this.ncrAir, disruptions: this.disruptionFeed?.items ?? [] }))
       .sort((a, b) => {
         const rank = { critical: 0, high: 1, medium: 2 } as const
         return rank[a.severity] - rank[b.severity] || b.valueAtRisk - a.valueAtRisk
@@ -246,8 +246,10 @@ export class MockAdapter implements DataAdapter {
   }
 
   async disruptions() {
+    // Served from the session fetch — hitting the proxy twice for one screen
+    // was costing a visible second of skeleton on every dashboard load.
     await this.ensureDisruptions()
-    return fetchDisruptions()
+    return this.disruptionFeed ?? { items: [], live: false, fetchedAt: null }
   }
 
   async vessels() {
