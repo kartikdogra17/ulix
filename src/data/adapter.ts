@@ -8,6 +8,8 @@ import type { Coverage, Signal } from './fusion'
 import type { Case, CaseStatus, Resolution } from './cases'
 import type { LanePlan } from './routes'
 import type { AirQuality, CorridorWeather } from './osint'
+import type { DisruptionFeed } from './disruptions'
+import type { PortTraffic, VesselFeed } from './vessels'
 
 export interface Page<T> { rows: T[]; total: number }
 
@@ -123,6 +125,10 @@ export interface DataAdapter {
    */
   ncrAirQuality(): Promise<AirQuality | null>
   corridorWeather(origin: string, destination: string): Promise<CorridorWeather[]>
+  /** Filtered, de-duplicated disruption news affecting logistics nodes. */
+  disruptions(): Promise<DisruptionFeed>
+  /** AIS vessel positions, plus per-port congestion rolled up from them. */
+  vessels(): Promise<VesselFeed & { ports: PortTraffic[] }>
 
   /* ── Case work ───────────────────────────────────────────────
      Signals are derived and recomputed; cases are the human record

@@ -20,6 +20,8 @@ import {
 import { NODE_BY_CODE } from './seed'
 import { planLane } from '../routes'
 import { type AirQuality, fetchAirQuality, fetchCorridorWeather } from '../osint'
+import { type Disruption, fetchDisruptions } from '../disruptions'
+import { fetchVessels, portTraffic } from '../vessels'
 
 const sleep = (ms: number) => new Promise((res) => setTimeout(res, ms))
 /** Simulated gateway latency so loading states are real, not theatre. */
@@ -47,6 +49,8 @@ export class MockAdapter implements DataAdapter {
   /** Live OSINT context, refreshed out of band and folded into fusion. */
   private ncrAir: AirQuality | null = null
   private airLoaded: Promise<void> | null = null
+  private disruptionList: Disruption[] = []
+  private disruptionsLoaded: Promise<void> | null = null
   private cases: Record<string, CaseRecord> = loadCases()
 
   /* ── Case work ─────────────────────────────────────────────── */
@@ -99,6 +103,17 @@ export class MockAdapter implements DataAdapter {
     return this.airLoaded
   }
 
+  /** Disruption news is fetched once per session and folded into fusion. */
+  private async ensureDisruptions() {
+    if (!this.disruptionsLoaded) {
+      this.disruptionsLoaded = fetchDisruptions().then((f) => {
+        this.disruptionList = f.items
+        if (f.items.length) this.signalCache = null
+      })
+    }
+    return this.disruptionsLoaded
+  }
+
   private allSignals(): Signal[] {
     if (this.signalCache) return this.signalCache
     const byShipment = new Map<string, typeof this.docs>()
@@ -111,7 +126,7 @@ export class MockAdapter implements DataAdapter {
     this.signalCache = this.shipments
       .flatMap((s) => signalsForShipment(
         s, this.vehicleFor(s.id), byShipment.get(s.id) ?? [], Date.now(),
-        { ncrAir: this.ncrAir }))
+        { ncrAir: this.ncrAir, disruptions: this.disruptionList }))
       .sort((a, b) => {
         const rank = { critical: 0, high: 1, medium: 2 } as const
         return rank[a.severity] - rank[b.severity] || b.valueAtRisk - a.valueAtRisk
@@ -226,8 +241,18 @@ export class MockAdapter implements DataAdapter {
   /* ── Cross-system fusion ───────────────────────────────────── */
 
   async signals() {
-    await Promise.all([sleep(latency()), this.ensureAir()])
+    await Promise.all([sleep(latency()), this.ensureAir(), this.ensureDisruptions()])
     return this.allSignals()
+  }
+
+  async disruptions() {
+    await this.ensureDisruptions()
+    return fetchDisruptions()
+  }
+
+  async vessels() {
+    const feed = await fetchVessels()
+    return { ...feed, ports: portTraffic(feed.vessels) }
   }
 
   async ncrAirQuality() {
@@ -242,7 +267,7 @@ export class MockAdapter implements DataAdapter {
   }
 
   async listCases(q: CaseQuery = {}): Promise<Case[]> {
-    await Promise.all([sleep(latency()), this.ensureAir()])
+    await Promise.all([sleep(latency()), this.ensureAir(), this.ensureDisruptions()])
     const scope = q.scope ?? 'live'
     const term = q.search?.trim().toLowerCase()
     return this.allCases().filter((c) => {
@@ -347,7 +372,7 @@ export class MockAdapter implements DataAdapter {
   /* ── Dashboard ─────────────────────────────────────────────── */
 
   async dashboard(): Promise<Dashboard> {
-    await Promise.all([sleep(latency()), this.ensureAir()])
+    await Promise.all([sleep(latency()), this.ensureAir(), this.ensureDisruptions()])
     const active = this.shipments.filter((s) => s.status !== 'delivered' && s.status !== 'planned')
     const done = this.shipments.filter((s) => s.status === 'delivered')
     const onTime = done.filter((s) => s.delayMins <= 30).length

@@ -21,6 +21,12 @@ import { MockAdapter } from './mock'
 export const ULIP_MODE = import.meta.env.VITE_ULIP_MODE === 'live' ? 'live' : 'mock'
 export const ULIP_PROXY = import.meta.env.VITE_ULIP_PROXY ?? 'http://localhost:8787/api/ulip'
 
+/**
+ * The same proxy fronts the OSINT feeds. AIS forbids browser connections and
+ * GDELT rate-limits per IP, so both need one server-side consumer with a cache.
+ */
+export const OSINT_BASE = ULIP_PROXY.replace(/\/ulip\/?$/, '/osint')
+
 export const adapter: DataAdapter = new MockAdapter()
 
 export type { DataAdapter }

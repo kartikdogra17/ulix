@@ -14,6 +14,7 @@
 import type { ComplianceDoc, Shipment, Vehicle } from './types'
 import { FASTAG_RETENTION_HOURS } from './ulip/catalogue'
 import { type AirQuality, GRAP_LABEL, isNcr, ncrEligibility } from './osint'
+import type { Disruption } from './disruptions'
 
 const HOUR = 3_600_000
 
@@ -33,6 +34,7 @@ export type SignalKind =
   | 'eta_slip'
   | 'grap_entry_ban'
   | 'fog_risk'
+  | 'corridor_disruption'
 
 export type Severity = 'critical' | 'high' | 'medium'
 
@@ -77,7 +79,7 @@ export function signalsForShipment(
   docs: ComplianceDoc[],
   now = Date.now(),
   /** Live open-source context, when the platform has been able to fetch it. */
-  osint?: { ncrAir?: AirQuality | null },
+  osint?: { ncrAir?: AirQuality | null; disruptions?: Disruption[] },
 ): Signal[] {
   const out: Signal[] = []
   const done = s.status === 'delivered'
@@ -241,6 +243,23 @@ export function signalsForShipment(
           ? 'Swap to a BS-VI, CNG or electric unit before the NCR boundary, or hold the load outside until the stage is revoked.'
           : 'Carry proof of essential-commodity carriage, or re-assign to a compliant vehicle.',
         onset(now - 3 * HOUR))
+    }
+  }
+
+  /* ── Open news touching this consignment's own lane ──
+     Only corroborated, placeable stories reach here — the filter has already
+     dropped the cricket, the markets and anything it could not put on a map. */
+  if (!done && osint?.disruptions?.length) {
+    const onLane = osint.disruptions
+      .filter((x) => x.severity !== 'low')
+      .find((x) => x.nodes.includes(s.destination) || x.nodes.includes(s.currentNode))
+    if (onLane) {
+      mk('corridor_disruption', onLane.severity === 'high' ? 'high' : 'medium',
+        `Reported disruption at ${onLane.placeLabel}`,
+        `${onLane.title} — carried by ${onLane.corroboration} outlet${onLane.corroboration === 1 ? '' : 's'}${onLane.live ? '' : ' (simulated feed)'}. This consignment routes through ${onLane.placeLabel}.`,
+        ['GDELT (open news)'], null,
+        'Confirm with the ground team before committing the next leg, and warn the consignee if the lane is affected.',
+        onset(Date.parse(onLane.seenAt)))
     }
   }
 

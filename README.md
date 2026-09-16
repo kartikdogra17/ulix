@@ -200,6 +200,52 @@ is answerable in September.
 Live temperature, precipitation, wind and visibility sampled at three points along the
 lane. Sub-200 m visibility is what actually closes northern highways overnight.
 
+### Corridor disruption feed (GDELT)
+
+Open news, filtered hard. Raw news is a terrible operational feed — "strike" matches a
+cricket report, a market piece and a port pay dispute, and the same dispute arrives forty
+times from forty outlets. [`src/data/disruptions.ts`](src/data/disruptions.ts) runs five
+stages, and the value is in the filter rather than the fetch:
+
+1. **Relevance** — disruption vocabulary, minus an exclusion list that kills the
+   sport / markets / cinema / idiom false positives
+2. **Geography** — resolve to a known logistics node via a gazetteer with aliases
+   (Bombay, Gurgaon, Vizag, JNPT…), or discard; an unplaceable protest is not actionable
+3. **Category** — protest, strike, flood, closure, accident, port, weather
+4. **Dedupe** — cluster headlines by Jaccard overlap of stemmed content words, not exact
+   match, so *"Truckers strike at JNPT enters second day"* and *"JNPT truckers strike
+   continues"* collapse into one story
+5. **Score** — category weight × log-scaled corroboration × recency
+
+Stage 4 is what makes it usable: forty outlets on one port strike becomes a single item
+with `corroboration: 40`, which is a far stronger signal than forty rows. On the test
+fixture, 13 articles reduce to 3 stories with all noise rejected.
+
+Placeable, corroborated disruptions raise a `corridor_disruption` signal on consignments
+routing through the affected node.
+
+### AIS vessel positions
+
+Ships broadcast AIS in the clear, but the access path is gated: aisstream.io is
+WebSocket-only, needs a free key, and states that **direct browser connections are not
+permitted**. So the proxy keeps one upstream subscription for the whole tenant and serves
+snapshots, and positions are rolled up into a per-port **anchorage queue** — the
+congestion signal that actually costs money.
+
+Set `AISSTREAM_API_KEY` on the proxy to enable it; without a key the screens show
+simulated traffic, labelled as such.
+
+### Why both go through the proxy
+
+Not incidental architecture. AIS forbids browser connections outright, and GDELT
+rate-limits to roughly one request per five seconds **per IP** — so N browser tabs
+hitting it directly is exactly the wrong shape. The proxy is the single upstream consumer
+with a shared cache (10 min for GDELT, a 6-second minimum gap, stale-over-empty on 429).
+
+It also sets `dns.setDefaultResultOrder('ipv4first')`: GDELT publishes AAAA records that
+are unreachable from some networks, where curl falls back via happy eyeballs but undici
+times out with a bare `UND_ERR_CONNECT_TIMEOUT`. That cost an hour to find once.
+
 ### Scope, deliberately narrow
 
 This layer covers **places and rules** — environmental, regulatory, infrastructure. It
@@ -232,6 +278,8 @@ src/
       client.ts         UlipClient — login, bearer, retry, regex validation
     routes.ts           Lane planning — safety, restrictions, cost, modal trade-off
     osint.ts            Live open data: CPCB AQI, GRAP eligibility, corridor weather
+    disruptions.ts      GDELT news → relevance, geo, dedupe, corroboration scoring
+    vessels.ts          AIS positions and per-port anchorage congestion
     cases.ts            Case model: owner, status, outcome, audit trail
     mock/               Deterministic simulated world + gateway
   components/           Shell, NetworkMap, charts, case UI, primitives

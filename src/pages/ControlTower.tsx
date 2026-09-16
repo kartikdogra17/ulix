@@ -1,17 +1,18 @@
 import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import {
-  ArrowUpRight, CheckCircle2, ChevronRight, CircleDollarSign, Gauge,
-  Signal as SignalIcon, Timer, TrendingUp, Truck, UserRoundPlus,
+  Anchor, ArrowUpRight, CheckCircle2, ChevronRight, CircleDollarSign, Gauge,
+  Newspaper, Signal as SignalIcon, Timer, TrendingUp, Truck, UserRoundPlus,
 } from 'lucide-react'
 import { adapter } from '../data'
 import { useAsync } from '../lib/useAsync'
-import { dur, inr, num, titleCase } from '../lib/format'
+import { dur, inr, num, rel, titleCase } from '../lib/format'
 import { NetworkMap, type MapMarker } from '../components/NetworkMap'
 import {
   Badge, Button, Card, CardHead, Meter, Mono, Skeleton, TableSkeleton, Td, Th,
 } from '../components/ui'
 import { Donut, Radial, Sparkline } from '../components/charts'
+import type { DisruptionKind } from '../data/disruptions'
 import {
   Avatar, CaseDrawer, QuickActions, SEV_TONE, Sources, StatusChip, currentMemberId,
 } from '../components/cases'
@@ -21,6 +22,11 @@ import type { Case } from '../data/cases'
 import type { Severity } from '../data/fusion'
 import { useApp } from '../state/app'
 import { cn } from '../lib/cn'
+
+const DISRUPTION_TONE: Record<DisruptionKind, 'bad' | 'warn' | 'info' | 'neutral'> = {
+  port: 'bad', strike: 'bad', closure: 'warn', flood: 'warn',
+  protest: 'warn', accident: 'info', weather: 'info',
+}
 
 const KIND_LABEL: Record<string, string> = {
   ewb_expires_before_eta: 'e-Way Bill expiring mid-transit',
@@ -155,6 +161,8 @@ export function ControlTower() {
     [scope, sev, actor, version])
   // Unfiltered, for tab counts and the risk breakdown.
   const { data: allLive } = useAsync(() => adapter.listCases({ scope: 'live' }), [version])
+  const { data: feed } = useAsync(() => adapter.disruptions(), [])
+  const { data: marine } = useAsync(() => adapter.vessels(), [])
 
   /** Risk per consignment, so the map shows exposure rather than mere position. */
   const riskByEntity = useMemo(() => {
@@ -468,6 +476,105 @@ export function ControlTower() {
             ))}
             {!data && <TableSkeleton rows={6} cols={3} />}
           </div>
+        </Card>
+      </div>
+
+      {/* Open-source layer: filtered news and AIS, both clearly labelled. */}
+      <div className="grid gap-3 lg:grid-cols-2">
+        <Card className="overflow-hidden">
+          <CardHead
+            title="Corridor disruption feed"
+            sub="Open news, filtered to placeable logistics events and de-duplicated across outlets"
+            right={feed && (
+              <Badge tone={feed.live ? 'ok' : 'warn'} dot>
+                {feed.live ? 'live · GDELT' : 'simulated feed'}
+              </Badge>
+            )}
+          />
+          <div className="max-h-[320px] divide-y divide-line-soft overflow-y-auto">
+            {!feed && <TableSkeleton rows={4} cols={2} />}
+            {feed && !feed.items.length && (
+              <p className="px-4 py-10 text-center text-[13px] text-muted">
+                Nothing on the network passed the relevance and geography filters.
+              </p>
+            )}
+            {feed?.items.slice(0, 12).map((d) => (
+              <div key={d.id} className="px-3.5 py-2.5">
+                <div className="flex items-start gap-2.5">
+                  <Badge tone={DISRUPTION_TONE[d.kind]} className="mt-0.5 shrink-0">{d.kind}</Badge>
+                  <div className="min-w-0 flex-1">
+                    <p className="line-clamp-2 text-[12px] font-medium leading-snug">{d.title}</p>
+                    <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[10px] text-faint">
+                      <span className="font-medium text-muted">{d.placeLabel}</span>
+                      <span>·</span>
+                      <span>{rel(d.seenAt)}</span>
+                      <span>·</span>
+                      <span className={d.corroboration > 2 ? 'font-medium text-fg' : undefined}>
+                        {d.corroboration} outlet{d.corroboration === 1 ? '' : 's'}
+                      </span>
+                      <span className="truncate">
+                        {d.sources.slice(0, 3).map((x) => x.domain.replace(/^www\./, '').split('.')[0]).join(', ')}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="shrink-0 text-right">
+                    <div className="tnum text-[13px] font-semibold">{d.score}</div>
+                    <div className="text-[10px] text-faint">score</div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+          {feed && !feed.live && (
+            <p className="border-t border-line-soft px-3.5 py-2 text-[11px] text-faint">
+              <Newspaper className="mr-1 inline size-3" />
+              GDELT rate-limits per IP, so the live feed is served by the proxy.
+              Start it to replace this sample.
+            </p>
+          )}
+        </Card>
+
+        <Card className="overflow-hidden">
+          <CardHead
+            title="Port traffic"
+            sub="AIS positions rolled up into an anchorage queue per port"
+            right={marine && (
+              <Badge tone={marine.live ? 'ok' : 'warn'} dot>
+                {marine.live ? 'live · AIS' : 'simulated AIS'}
+              </Badge>
+            )}
+          />
+          <div className="max-h-[320px] divide-y divide-line-soft overflow-y-auto">
+            {!marine && <TableSkeleton rows={5} cols={4} />}
+            {marine?.ports.filter((p) => p.vessels.length).map((p) => (
+              <div key={p.code} className="flex items-center gap-3 px-3.5 py-2.5">
+                <span className={cn('grid size-7 shrink-0 place-items-center rounded-lg border',
+                  p.congestion === 'congested' ? 'border-bad/30 bg-bad-soft text-bad'
+                    : p.congestion === 'building' ? 'border-warn/30 bg-warn-soft text-warn'
+                    : 'border-ok/30 bg-ok-soft text-ok')}>
+                  <Anchor className="size-3.5" />
+                </span>
+                <div className="min-w-0 flex-1">
+                  <div className="text-[13px] font-medium">{p.name}</div>
+                  <div className="text-[10px] text-faint">
+                    {p.inbound} inbound · {p.atAnchor} at anchor · {p.moored} moored
+                  </div>
+                </div>
+                <Badge tone={p.congestion === 'congested' ? 'bad'
+                  : p.congestion === 'building' ? 'warn' : 'ok'}>
+                  {p.congestion}
+                </Badge>
+                <span className="tnum w-6 text-right text-[13px] font-semibold">{p.vessels.length}</span>
+              </div>
+            ))}
+          </div>
+          {marine && !marine.configured && (
+            <p className="border-t border-line-soft px-3.5 py-2 text-[11px] text-faint">
+              <Anchor className="mr-1 inline size-3" />
+              aisstream.io forbids direct browser connections. Set AISSTREAM_API_KEY on
+              the proxy to replace this with live traffic.
+            </p>
+          )}
         </Card>
       </div>
 
