@@ -6,8 +6,11 @@
 # from them and committed, so the build never reads this directory.
 docs/
 
-# The credential-holding proxy runs on its own host, not here.
+# The credential-holding proxy runs on its own host, not here — but the
+# store drivers are shared with api/, so those do ship. Keeping one
+# compare-and-set implementation matters more than the few kB.
 server/
+!server/store/
 
 # Vercel runs the build itself.
 dist/

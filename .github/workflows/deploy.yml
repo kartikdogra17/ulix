@@ -57,7 +57,12 @@ jobs:
 
       # The same checks that gate a local "done".
       - run: npx tsc --noEmit -p tsconfig.app.json
+      - run: npx tsc --noEmit -p tsconfig.api.json
 
       - run: npx vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
+      # Same-origin, so the browser does not block it the way it blocks the
+      # local proxy's http://localhost:8787 from an https page.
       - run: npx vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
+        env:
+          VITE_ULIP_PROXY: /api/ulip
       - run: npx vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }}

@@ -167,9 +167,16 @@ at with a question already in hand, not worklists that can open on the wrong one
 
 ## Open threads, in the order I would pick them up
 
-1. **Share the queue in production.** The deployed site still keeps cases per browser,
-   which is the last limitation a user can actually feel. The Postgres driver is written;
-   it needs a database you provision and a serverless function in front of it.
+1. **Share the queue in production.** The function now exists (`api/cases/`) and the
+   production build points the client at `/api/cases` on the same origin. What is left is
+   yours: provision a Postgres — Neon and Vercel Postgres both have a free tier — and set
+   `DATABASE_URL` on the Vercel project. Until then the route answers 503 and the app
+   falls back to per-browser storage, which is documented behaviour, not a fault.
+
+   **Nothing in this path has run against a real database.** The handlers are covered for
+   method, argument and no-database cases; the compare-and-set underneath them is the same
+   driver the local proxy uses, but that driver has only ever been exercised on SQLite.
+   Test the conflict case first when a database exists.
 2. **Role-aware mobile cards.** The desktop tables are lensed, the cards are not. They
    carry identity, lane, status and progress, which all four roles want. Lowest value on
    this list.

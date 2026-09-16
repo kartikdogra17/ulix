@@ -198,6 +198,11 @@ src/state/       app.tsx — session, theme, PWA install prompt
 server/
   ulip-proxy.mjs  credentials, OSINT feeds, shared case store (372 lines)
   store/          index.mjs picks by DATABASE_URL; sqlite.mjs (default), postgres.mjs
+api/
+  _store.ts       pooled Postgres accessor for serverless; imports the driver
+                  directly so node:sqlite is never pulled into a function
+  cases/index.ts       GET  /api/cases
+  cases/[signalId].ts  PUT  /api/cases/:id — pinned to the version you read
 scripts/
   conformance.ts  mappers vs the documented response samples
 docs/
@@ -514,8 +519,11 @@ VAHAN lookups).
 
 **Open threads**
 
-1. Share the queue in production — the Postgres driver exists but has never run; needs a
-   provisioned database and a serverless function in front of it.
+1. Share the queue in production — **the function is written and the client is wired**;
+   it needs a provisioned Postgres and `DATABASE_URL` set on the Vercel project. Until
+   then `/api/cases` answers 503 and the app falls back to per-browser storage, which is
+   the documented behaviour rather than a fault. Nothing in this path has ever run
+   against a real database.
 2. Role-aware mobile cards.
 
 **Not code, and higher value than either:** get the goulip.in NDA signed, and talk to
