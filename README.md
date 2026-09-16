@@ -12,7 +12,13 @@ Built against the **official ULIP integration documents** published on
 
 ## What is real, and what is simulated
 
-This distinction matters, so it is stated plainly everywhere in the product:
+> **Full breakdown: [docs/DATA-PROVENANCE.md](docs/DATA-PROVENANCE.md)** — every figure on
+> every screen, where it comes from, and what it would take to make it live.
+
+Short version: the **ULIP specification is real** (95 endpoint codes, payloads, envelope,
+all extracted from the official documents), the **ULIP data is simulated**, and the
+**open-source environmental feeds are genuinely live**. Anything live carries a `live`
+badge; nothing simulated is ever styled to look live.
 
 | Real, taken from the official documents | Simulated locally |
 |---|---|
@@ -174,8 +180,11 @@ not tell you that Delhi is about to bar your truck, or that the corridor you are
 dispatching onto is fogged in. That information is public — it just lives outside the
 gateway. [`src/data/osint.ts`](src/data/osint.ts) brings it in.
 
-**This is the only live data in the build.** Everything sourced from ULIP itself is
+**This layer is the only live data in the build.** Everything sourced from ULIP itself is
 simulated; the UI marks live panels with a `live` badge so the two are never confused.
+Of the three feeds here, air quality and weather fetch successfully today; GDELT and AIS
+are wired but unavailable from this machine — see
+[docs/DATA-PROVENANCE.md](docs/DATA-PROVENANCE.md) for exactly why.
 
 ### GRAP entry eligibility — the join worth having
 
