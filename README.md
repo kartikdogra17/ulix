@@ -1,16 +1,15 @@
-# Sangam — Logistics Control Tower
+# ULIX — Logistics Control Tower
 
-**Sangam** — *the confluence, where many streams become one.* Ninety-five endpoints across
-thirty-six government systems, resolved into a single picture and turned into decisions
-someone can act on.
+Ninety-five endpoints across thirty-six government systems, resolved into a single picture
+and turned into decisions someone can act on.
 
 One responsive web application that also installs as a mobile app: multimodal visibility,
 fleet intelligence, compliance, EXIM clearance, inland waterways, lane planning, scenario
 drills, counterparty due diligence and a full API gateway console.
 
-> Sangam is **independent software built on** India's Unified Logistics Interface
-> Platform. It is not a government service, and it is deliberately not named as though it
-> were one.
+> ULIX is **independent software built on** India's Unified Logistics Interface Platform.
+> It is not a government service and is not affiliated with NICDC or DPIIT. The login and
+> settings screens say so, because the name sits close to the platform it consumes.
 
 Built against the **official ULIP integration documents** published on
 [goulip.in](https://goulip.in) — all 36 of them are vendored in

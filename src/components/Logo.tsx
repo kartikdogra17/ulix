@@ -1,16 +1,19 @@
 /* ────────────────────────────────────────────────────────────────
-   Sangam — the confluence, where many streams become one.
+   ULIX — the control tower.
 
-   The name is the product: 95 endpoints across 36 government systems
-   resolving into a single picture. It is also deliberately NOT "ULIP",
-   because this is software built on top of the government platform, not
-   the platform itself, and a name that implied otherwise would be
-   dishonest.
+   A coined name, so the mark carries the meaning rather than the word:
+   three streams entering from the left, meeting at a node, leaving as
+   one heavier trunk. What comes out is more than what went in, which is
+   the product — 95 endpoints across 36 government systems resolved into
+   a single picture.
 
-   The mark draws the same idea: three streams entering from the left,
-   meeting at a node, leaving as one heavier trunk. Curved rather than
-   angular so it reads as flow rather than as a network diagram, and
-   built from four strokes so it survives 16 px in a browser tab.
+   Curved rather than angular so it reads as flow rather than as a
+   network diagram, and built from four strokes so it survives 16 px in
+   a browser tab.
+
+   ULIX is independent software built on the Unified Logistics Interface
+   Platform. It is not a government service and the UI says so where a
+   user could reasonably wonder — the login page and the settings screen.
    ──────────────────────────────────────────────────────────────── */
 
 import { cn } from '../lib/cn'
@@ -47,9 +50,13 @@ export function LogoTile({ className }: { className?: string }) {
 export function Wordmark({ compact }: { compact?: boolean }) {
   return (
     <span className="leading-tight">
-      <span className="block text-[15px] font-semibold tracking-[-0.02em]">Sangam</span>
+      {/* Four letters, set tight and upper-case. The X takes the brand colour
+          so the wordmark still reads as a mark when the tile is not beside it. */}
+      <span className="block text-[16px] font-semibold uppercase tracking-[0.06em]">
+        ULI<span className="text-brand">X</span>
+      </span>
       {!compact && (
-        <span className="block text-[9.5px] uppercase tracking-[0.14em] text-faint">
+        <span className="block text-[9px] uppercase tracking-[0.15em] text-faint">
           Logistics Control Tower
         </span>
       )}

@@ -38,7 +38,7 @@ export function Login() {
             Where every consignment, vehicle and document in your network meets.
           </h1>
           <p className="mt-4 text-[15px] leading-relaxed text-muted">
-            Sangam joins the government data ULIP already brokers — FASTag, VAHAN,
+            ULIX joins the government data ULIP already brokers — FASTag, VAHAN,
             SARATHI, e-Way Bill, FOIS, ICEGATE, PCS and more — into one picture, and
             turns the conflicts between them into decisions someone can act on.
           </p>
@@ -57,10 +57,10 @@ export function Login() {
         </div>
 
         <p className="relative text-[11px] leading-relaxed text-faint">
-          Sangam is independent software built on the Unified Logistics Interface
-          Platform, not a government service. Catalogue generated from the integration
-          documents published on goulip.in; production access requires an approved ULIP
-          account and a signed NDA.
+          ULIX is independent software built on the Unified Logistics Interface
+          Platform — not a government service, and not affiliated with NICDC or DPIIT.
+          Catalogue generated from the integration documents published on goulip.in;
+          production access requires an approved ULIP account and a signed NDA.
         </p>
       </div>
 

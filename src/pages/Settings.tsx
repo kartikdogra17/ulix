@@ -61,6 +61,11 @@ ULIP_USERNAME=… ULIP_PASSWORD=… \
               The browser never receives the ULIP username, password or bearer token —
               only the proxy does.
             </p>
+            <p className="mt-2 border-t border-line pt-2 text-[11px] leading-relaxed text-faint">
+              ULIX is independent software built on the Unified Logistics Interface
+              Platform. It is not a government service and is not affiliated with NICDC
+              Logistics Data Services or DPIIT.
+            </p>
           </div>
         </div>
       </Card>
