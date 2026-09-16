@@ -134,6 +134,7 @@ same picture at entity level, including a per-system coverage table.
 | Route | What it does |
 |---|---|
 | `/` **Control tower** | Value at risk, unassigned and overdue counts, the working decisions queue (assign / snooze / close with an outcome), desk load, risk-coloured live map, what is driving risk, lane reliability, source-system health |
+| `/drill` **Scenario drill** | Cost a disruption before it happens — GRAP stage, port shutdown, corridor closure or fog — against the network as it stands. Reports consignments caught, value exposed, **new** e-Way Bill breaches the delay would create, vehicles needing a swap and whether the fleet can cover them |
 | `/plan` **Lane planner** | Plan a corridor before booking it: black spots you will cross, municipal no-entry windows against your projected arrival, toll and own-account cost, energy stops, and the road/rail/sea/air trade-off on time, cost and carbon |
 | `/shipments` **Consignments** | Filterable register; drawer opens on risk score and data confidence, then cross-system signals with recommended actions, a per-system coverage table, leg-by-leg journey, event chain attributed to its source system, and documents |
 | `/fleet` **Fleet** | VAHAN registration and statutory validity, SARATHI licence checks, FASTag crossings and balance, utilisation and detention analytics |
@@ -149,6 +150,26 @@ older ones **Stored** — data this platform polled and persisted itself. The ba
 the FASTag tab says exactly that.
 
 ---
+
+## Asking the other question
+
+The rest of the platform is reactive — something has gone wrong and the queue says so.
+[`/drill`](src/pages/ScenarioDrill.tsx) asks the opposite: *if this happens tomorrow, what
+does it cost us?* Four event types, run against live network state, changing nothing.
+
+The part worth having is the **second-order effect**. Adding delay to a consignment is
+arithmetic. Noticing that the delay pushes arrival past its **e-Way Bill validity** —
+turning an operational problem into a compliance one, on a consignment nobody had flagged
+— is what an ops team does not get from a spreadsheet. The drill counts only breaches the
+scenario *creates*, and reports separately those already lapsing regardless, because
+blaming the scenario for pre-existing exposure would overstate it.
+
+It also answers the follow-up immediately: 11 vehicles need swapping, 28 compliant units
+are free, so the fleet covers it — or it doesn't, and you know how many to hire in.
+
+One modelling note: GRAP curbs **entry**, not delivery, so the drill matches any
+consignment routing *through* the NCR, not only those terminating there. That distinction
+took the Stage IV result from 2 consignments to 11.
 
 ## Planning, not just tracking
 

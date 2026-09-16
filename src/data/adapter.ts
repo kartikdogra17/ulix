@@ -10,6 +10,7 @@ import type { LanePlan } from './routes'
 import type { AirQuality, CorridorWeather } from './osint'
 import type { DisruptionFeed } from './disruptions'
 import type { PortTraffic, VesselFeed } from './vessels'
+import type { ScenarioResult, ScenarioSpec } from './scenarios'
 
 export interface Page<T> { rows: T[]; total: number }
 
@@ -157,6 +158,9 @@ export interface DataAdapter {
   planLane(origin: string, destination: string, opts: {
     weightKg: number; departAt: Date; vehicleClass: string
   }): Promise<LanePlan>
+
+  /** Cost a hypothetical disruption against the network as it stands now. */
+  runScenario(spec: ScenarioSpec): Promise<ScenarioResult>
 
   apiCatalogue(): Promise<CatalogueEntry[]>
   apiLogs(): Promise<ApiCall[]>

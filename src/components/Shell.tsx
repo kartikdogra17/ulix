@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
 import { NavLink, Outlet, useLocation } from 'react-router-dom'
 import {
-  Activity, Boxes, Download, FileCheck2, LayoutGrid, LogOut, Moon,
-  Plug, Route, Search, Settings, Sun, Truck, X,
+  Activity, Boxes, Download, FileCheck2, FlaskConical, LayoutGrid, LogOut,
+  Moon, Plug, Route, Search, Settings, Sun, Truck, X,
 } from 'lucide-react'
 import { useApp } from '../state/app'
 import { ULIP_MODE } from '../data'
@@ -13,6 +13,7 @@ const NAV = [
   { to: '/', label: 'Control tower', short: 'Tower', icon: LayoutGrid, end: true },
   { to: '/shipments', label: 'Consignments', short: 'Cargo', icon: Boxes },
   { to: '/plan', label: 'Lane planner', short: 'Plan', icon: Route },
+  { to: '/drill', label: 'Scenario drill', short: 'Drill', icon: FlaskConical },
   { to: '/fleet', label: 'Fleet', short: 'Fleet', icon: Truck },
   { to: '/compliance', label: 'Compliance', short: 'Docs', icon: FileCheck2 },
   { to: '/apis', label: 'API gateway', short: 'APIs', icon: Plug },
@@ -146,7 +147,7 @@ export function Shell() {
       </div>
 
       {/* ── Bottom nav (mobile) ───────────────────────────────── */}
-      <nav className="fixed inset-x-0 bottom-0 z-30 grid grid-cols-6 border-t border-line bg-bg/95 pb-[env(safe-area-inset-bottom)] backdrop-blur-lg lg:hidden">
+      <nav className="fixed inset-x-0 bottom-0 z-30 grid grid-cols-7 border-t border-line bg-bg/95 pb-[env(safe-area-inset-bottom)] backdrop-blur-lg lg:hidden">
         {NAV.map(({ to, short, icon: Icon, end }) => (
           <NavLink key={to} to={to} end={end} className={({ isActive }) =>
             cn('flex flex-col items-center gap-0.5 py-2 text-[10px] font-medium transition-colors',

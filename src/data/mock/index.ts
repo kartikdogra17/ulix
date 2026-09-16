@@ -22,6 +22,7 @@ import { planLane } from '../routes'
 import { type AirQuality, fetchAirQuality, fetchCorridorWeather } from '../osint'
 import { type DisruptionFeed, fetchDisruptions } from '../disruptions'
 import { fetchVessels, portTraffic } from '../vessels'
+import { type ScenarioSpec, runScenario } from '../scenarios'
 
 const sleep = (ms: number) => new Promise((res) => setTimeout(res, ms))
 /** Simulated gateway latency so loading states are real, not theatre. */
@@ -475,6 +476,13 @@ export class MockAdapter implements DataAdapter {
     // Several source systems answer here, so the wait is deliberately longer.
     await sleep(latency() * 2.2)
     return planLane(origin, destination, opts)
+  }
+
+  /* ── Scenario drill ────────────────────────────────────────── */
+
+  async runScenario(spec: ScenarioSpec) {
+    await sleep(latency())
+    return runScenario(spec, this.shipments, this.vehicles, this.docs)
   }
 
   /* ── API gateway console ───────────────────────────────────── */
