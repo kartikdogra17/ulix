@@ -303,6 +303,8 @@ export function makeVehicles(shipments: Shipment[], spare = 30): Vehicle[] {
       makeModel: pick(r, MAKE_MODELS),
       owner: link ? link.l.carrier : pick(r, CARRIERS_ROAD),
       fuel: pick(r, ['Diesel', 'Diesel', 'Diesel', 'CNG', 'LNG', 'Electric'] as const),
+      // A realistic mix: the national fleet is still far from fully BS-VI.
+      bsNorm: pick(r, ['BS-VI', 'BS-VI', 'BS-IV', 'BS-IV', 'BS-III'] as const),
       capacityKg: int(r, 9000, 42000),
       rcStatus: r() < 0.05 ? 'SUSPENDED' : 'ACTIVE',
       rcValidUpto: iso(NOW + int(r, 200, 3000) * DAY),

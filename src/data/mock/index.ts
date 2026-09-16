@@ -19,6 +19,7 @@ import {
 } from './generate'
 import { NODE_BY_CODE } from './seed'
 import { planLane } from '../routes'
+import { type AirQuality, fetchAirQuality, fetchCorridorWeather } from '../osint'
 
 const sleep = (ms: number) => new Promise((res) => setTimeout(res, ms))
 /** Simulated gateway latency so loading states are real, not theatre. */
@@ -43,6 +44,9 @@ export class MockAdapter implements DataAdapter {
   private daily = makeDailySeries()
   private modal = makeModalSplit()
   private signalCache: Signal[] | null = null
+  /** Live OSINT context, refreshed out of band and folded into fusion. */
+  private ncrAir: AirQuality | null = null
+  private airLoaded: Promise<void> | null = null
   private cases: Record<string, CaseRecord> = loadCases()
 
   /* ── Case work ─────────────────────────────────────────────── */
@@ -83,6 +87,18 @@ export class MockAdapter implements DataAdapter {
     return new Set(this.endpoints.filter((e) => e.subscribed).map((e) => e.id))
   }
 
+  /** Fetch NCR air once per session; fusion runs with or without it. */
+  private async ensureAir() {
+    if (!this.airLoaded) {
+      this.airLoaded = fetchAirQuality(28.61, 77.21).then((a) => {
+        this.ncrAir = a
+        // Air quality changes the signal set, so drop the derived cache.
+        if (a) this.signalCache = null
+      })
+    }
+    return this.airLoaded
+  }
+
   private allSignals(): Signal[] {
     if (this.signalCache) return this.signalCache
     const byShipment = new Map<string, typeof this.docs>()
@@ -93,7 +109,9 @@ export class MockAdapter implements DataAdapter {
       byShipment.set(d.linkedTo, list)
     }
     this.signalCache = this.shipments
-      .flatMap((s) => signalsForShipment(s, this.vehicleFor(s.id), byShipment.get(s.id) ?? []))
+      .flatMap((s) => signalsForShipment(
+        s, this.vehicleFor(s.id), byShipment.get(s.id) ?? [], Date.now(),
+        { ncrAir: this.ncrAir }))
       .sort((a, b) => {
         const rank = { critical: 0, high: 1, medium: 2 } as const
         return rank[a.severity] - rank[b.severity] || b.valueAtRisk - a.valueAtRisk
@@ -208,12 +226,23 @@ export class MockAdapter implements DataAdapter {
   /* ── Cross-system fusion ───────────────────────────────────── */
 
   async signals() {
-    await sleep(latency())
+    await Promise.all([sleep(latency()), this.ensureAir()])
     return this.allSignals()
   }
 
+  async ncrAirQuality() {
+    await this.ensureAir()
+    return this.ncrAir
+  }
+
+  async corridorWeather(origin: string, destination: string) {
+    const a = NODE_BY_CODE[origin], b = NODE_BY_CODE[destination]
+    if (!a || !b) return []
+    return fetchCorridorWeather(a, b, 3)
+  }
+
   async listCases(q: CaseQuery = {}): Promise<Case[]> {
-    await sleep(latency())
+    await Promise.all([sleep(latency()), this.ensureAir()])
     const scope = q.scope ?? 'live'
     const term = q.search?.trim().toLowerCase()
     return this.allCases().filter((c) => {
@@ -318,7 +347,7 @@ export class MockAdapter implements DataAdapter {
   /* ── Dashboard ─────────────────────────────────────────────── */
 
   async dashboard(): Promise<Dashboard> {
-    await sleep(latency())
+    await Promise.all([sleep(latency()), this.ensureAir()])
     const active = this.shipments.filter((s) => s.status !== 'delivered' && s.status !== 'planned')
     const done = this.shipments.filter((s) => s.status === 'delivered')
     const onTime = done.filter((s) => s.delayMins <= 30).length
@@ -507,6 +536,7 @@ export class MockAdapter implements DataAdapter {
         return {
           rcRegnNo: v.regNo, rcOwnerName: v.owner, rcVhClassDesc: v.vehicleClass,
           rcMakerModel: v.makeModel, rcFuelDesc: v.fuel.toUpperCase(),
+          rcNormsDesc: v.bsNorm,
           rcFitUpto: dmy(v.fitnessUpto), rcInsuranceUpto: dmy(v.insuranceUpto),
           rcPuccUpto: dmy(v.pucUpto), rcTaxUpto: dmy(v.permitUpto),
           rcStatus: v.rcStatus, rcBlacklistStatus: v.tagStatus === 'BLACKLIST' ? 'Y' : 'N',

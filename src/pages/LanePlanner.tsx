@@ -1,13 +1,16 @@
 import { useMemo, useState } from 'react'
 import {
-  AlertTriangle, BatteryCharging, Ban, Fuel, Plane, Route,
-  Ship, Train, Truck, Wallet,
+  AlertTriangle, BatteryCharging, Ban, CloudFog, CloudRain, Fuel, Plane,
+  Radio, Route, Ship, Train, Truck, Wallet, Wind,
 } from 'lucide-react'
 import { adapter } from '../data'
 import { useAsync } from '../lib/useAsync'
 import { compact, dur, inr, num } from '../lib/format'
 import { NODES } from '../data/mock/seed'
 import { minsToClock } from '../data/routes'
+import {
+  GRAP_FREIGHT_CURBS, GRAP_LABEL, isNcr, ncrEligibility,
+} from '../data/osint'
 import { NetworkMap, type MapMarker, type MapRoute } from '../components/NetworkMap'
 import { CompareBars, DayBand, Donut, Radial } from '../components/charts'
 import {
@@ -62,9 +65,24 @@ export function LanePlanner() {
 
   const departAt = useMemo(() => new Date(departLocal), [departLocal])
 
+  const [bsNorm, setBsNorm] = useState<'BS-VI' | 'BS-IV' | 'BS-III'>('BS-IV')
+  const [fuel, setFuel] = useState<'Diesel' | 'CNG' | 'Electric' | 'LNG'>('Diesel')
+
   const { data: plan, loading } = useAsync(
     () => adapter.planLane(origin, destination, { weightKg, departAt, vehicleClass }),
     [origin, destination, weightKg, departAt.getTime(), vehicleClass])
+
+  /* Live open data — the only non-simulated feed in the build. */
+  const { data: air } = useAsync(() => adapter.ncrAirQuality(), [])
+  const { data: weather } = useAsync(
+    () => adapter.corridorWeather(origin, destination), [origin, destination])
+
+  const ncrBound = isNcr(destination) || isNcr(origin)
+  const verdict = air && ncrBound ? ncrEligibility(air.stage, bsNorm, fuel) : null
+  const worstFog = (weather ?? []).reduce<'none' | 'moderate' | 'severe'>(
+    (w, p) => (p.fogRisk === 'severe' ? 'severe' : p.fogRisk === 'moderate' && w === 'none' ? 'moderate' : w),
+    'none')
+  const totalRain = (weather ?? []).reduce((a, p) => a + p.precipMm, 0)
 
   const arriveMin = plan
     ? new Date(plan.arriveAt).getHours() * 60 + new Date(plan.arriveAt).getMinutes()
@@ -114,7 +132,7 @@ export function LanePlanner() {
 
       {/* Inputs */}
       <Card className="p-3">
-        <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-5">
+        <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-7">
           <Field label="Origin">
             <Select value={origin} onChange={(e) => setOrigin(e.target.value)}>
               {NODES.map((n) => <option key={n.code} value={n.code}>{n.name}</option>)}
@@ -136,6 +154,16 @@ export function LanePlanner() {
                 <option key={w} value={w}>{(w / 1000).toFixed(0)} tonnes</option>)}
             </Select>
           </Field>
+          <Field label="Emission norm">
+            <Select value={bsNorm} onChange={(e) => setBsNorm(e.target.value as typeof bsNorm)}>
+              {(['BS-VI', 'BS-IV', 'BS-III'] as const).map((b) => <option key={b} value={b}>{b}</option>)}
+            </Select>
+          </Field>
+          <Field label="Fuel">
+            <Select value={fuel} onChange={(e) => setFuel(e.target.value as typeof fuel)}>
+              {(['Diesel', 'CNG', 'LNG', 'Electric'] as const).map((f) => <option key={f} value={f}>{f}</option>)}
+            </Select>
+          </Field>
           <Field label="Departure">
             <input type="datetime-local" value={departLocal}
               onChange={(e) => setDepartLocal(e.target.value)}
@@ -150,6 +178,133 @@ export function LanePlanner() {
         </div>
       ) : plan && (
         <>
+          {/* Live open-source context — labelled, because everything else is simulated. */}
+          {(air || weather?.length) && (
+            <div className="grid gap-3 lg:grid-cols-[1.25fr_1fr]">
+              {air && ncrBound && (
+                <Card className={cn('p-3.5',
+                  verdict?.status === 'barred' ? 'border-bad/35 bg-bad-soft/40'
+                    : verdict?.status === 'essential_only' ? 'border-warn/35 bg-warn-soft/40'
+                    : 'border-ok/30 bg-ok-soft/25')}>
+                  <div className="flex items-start gap-3">
+                    <Radial size={58} thickness={6} value={Math.min(100, (air.aqi / 500) * 100)}
+                      label={String(air.aqi)} sublabel="AQI"
+                      tone={air.aqi > 300 ? 'bad' : air.aqi > 200 ? 'warn' : 'ok'} />
+                    <div className="min-w-0 flex-1">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <h3 className="text-[14px] font-semibold">
+                          {GRAP_LABEL[air.stage]}
+                        </h3>
+                        <Badge tone="ok" dot>live</Badge>
+                        <Badge tone="neutral">{air.category}</Badge>
+                      </div>
+                      <p className="mt-1 text-[12px] leading-relaxed">
+                        Delhi PM2.5 {air.pm25} µg/m³, PM10 {air.pm10} µg/m³ — CPCB AQI {air.aqi}.{' '}
+                        {verdict?.reason}
+                      </p>
+                      {GRAP_FREIGHT_CURBS[air.stage].length > 0 && (
+                        <ul className="mt-1.5 space-y-0.5">
+                          {GRAP_FREIGHT_CURBS[air.stage].map((c) => (
+                            <li key={c} className="flex gap-1.5 text-[11px] text-muted">
+                              <span className="text-faint">·</span>{c}
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+                      {/* GRAP Stage III/IV is a winter phenomenon. Showing the
+                          verdict at every stage keeps this useful in September
+                          and answers the real fleet question: which units can
+                          still serve Delhi when the curbs land. */}
+                      <div className="mt-2.5 rounded-lg border border-line bg-surface/70 p-2">
+                        <div className="mb-1.5 text-[10px] font-semibold uppercase tracking-wide text-faint">
+                          {bsNorm} {fuel} at each stage
+                        </div>
+                        <div className="grid grid-cols-4 gap-1.5">
+                          {([1, 2, 3, 4] as const).map((st) => {
+                            const v = ncrEligibility(st, bsNorm, fuel)
+                            const tone = v.status === 'allowed' ? 'ok'
+                              : v.status === 'essential_only' ? 'warn' : 'bad'
+                            return (
+                              <div key={st}
+                                className={cn('rounded-md border px-1.5 py-1 text-center',
+                                  st === air.stage && 'ring-2 ring-fg/25',
+                                  tone === 'ok' ? 'border-ok/30 bg-ok-soft text-ok'
+                                    : tone === 'warn' ? 'border-warn/30 bg-warn-soft text-warn'
+                                    : 'border-bad/30 bg-bad-soft text-bad')}>
+                                <div className="text-[10px] font-semibold">Stage {st}</div>
+                                <div className="text-[9px] leading-tight">
+                                  {v.status === 'allowed' ? 'may enter'
+                                    : v.status === 'essential_only' ? 'essentials' : 'barred'}
+                                </div>
+                              </div>
+                            )
+                          })}
+                        </div>
+                      </div>
+
+                      <div className="mt-2 flex flex-wrap items-center gap-2">
+                        <Sources ids={['VAHAN/01', 'CPCB-AQI (open data)']} />
+                        {ncrEligibility(4, bsNorm, fuel).status !== 'allowed' && (
+                          <Button size="sm" variant="outline" className="ml-auto"
+                            onClick={() => { setBsNorm('BS-VI'); setFuel('CNG') }}>
+                            Try a compliant unit
+                          </Button>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </Card>
+              )}
+
+              {!!weather?.length && (
+                <Card className="p-3.5">
+                  <div className="mb-2 flex items-center gap-2">
+                    <Radio className="size-3.5 text-ok" />
+                    <h3 className="text-[13px] font-semibold">Corridor conditions</h3>
+                    <Badge tone="ok" dot>live</Badge>
+                    {worstFog !== 'none' && (
+                      <Badge tone={worstFog === 'severe' ? 'bad' : 'warn'}>
+                        <CloudFog className="size-3" />{worstFog} fog risk
+                      </Badge>
+                    )}
+                  </div>
+                  <div className="grid grid-cols-3 gap-2">
+                    {weather.map((w, i) => (
+                      <div key={i} className="rounded-lg border border-line bg-surface-2/60 p-2">
+                        <div className="text-[10px] uppercase tracking-wide text-faint">
+                          {i === 0 ? 'Origin' : i === weather.length - 1 ? 'Destination' : 'Midpoint'}
+                        </div>
+                        <div className="tnum mt-0.5 text-[15px] font-semibold">{w.tempC}°C</div>
+                        <div className="mt-1 space-y-0.5 text-[10px] text-muted">
+                          <div className="flex items-center gap-1">
+                            <CloudRain className="size-2.5" />{w.precipMm} mm
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <Wind className="size-2.5" />{w.windKmph} km/h
+                          </div>
+                          <div className={cn('flex items-center gap-1',
+                            w.fogRisk !== 'none' && (w.fogRisk === 'severe' ? 'text-bad' : 'text-warn'))}>
+                            <CloudFog className="size-2.5" />
+                            {(w.visibilityM / 1000).toFixed(1)} km vis
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  <p className="mt-2 text-[11px] leading-relaxed text-muted">
+                    {worstFog === 'severe'
+                      ? 'Visibility below 200 m on part of this corridor — expect highway closures and convoy restrictions overnight.'
+                      : worstFog === 'moderate'
+                      ? 'Reduced visibility on part of the corridor. Build slack into the overnight leg.'
+                      : totalRain > 5
+                      ? 'Rain across the corridor — allow for slower running and slippery loading bays.'
+                      : 'Clear running conditions across the sampled corridor.'}
+                  </p>
+                </Card>
+              )}
+            </div>
+          )}
+
           {/* The headline: does arrival land inside a closed window? */}
           {plan.conflict ? (
             <Card className="border-bad/35 bg-bad-soft/40 p-3.5">

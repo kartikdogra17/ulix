@@ -120,6 +120,8 @@ export interface Vehicle {
   makeModel: string
   owner: string
   fuel: 'Diesel' | 'CNG' | 'Electric' | 'LNG'
+  /** Emission norm from VAHAN `rcNormsDesc` — what GRAP entry curbs key off. */
+  bsNorm: 'BS-III' | 'BS-IV' | 'BS-VI'
   capacityKg: number
   // VAHAN
   rcStatus: 'ACTIVE' | 'SUSPENDED' | 'EXPIRED'

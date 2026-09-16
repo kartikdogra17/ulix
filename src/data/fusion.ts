@@ -13,6 +13,7 @@
 
 import type { ComplianceDoc, Shipment, Vehicle } from './types'
 import { FASTAG_RETENTION_HOURS } from './ulip/catalogue'
+import { type AirQuality, GRAP_LABEL, isNcr, ncrEligibility } from './osint'
 
 const HOUR = 3_600_000
 
@@ -30,6 +31,8 @@ export type SignalKind =
   | 'reefer_breach'
   | 'detention'
   | 'eta_slip'
+  | 'grap_entry_ban'
+  | 'fog_risk'
 
 export type Severity = 'critical' | 'high' | 'medium'
 
@@ -73,6 +76,8 @@ export function signalsForShipment(
   vehicle: Vehicle | null,
   docs: ComplianceDoc[],
   now = Date.now(),
+  /** Live open-source context, when the platform has been able to fetch it. */
+  osint?: { ncrAir?: AirQuality | null },
 ): Signal[] {
   const out: Signal[] = []
   const done = s.status === 'delivered'
@@ -216,6 +221,27 @@ export function signalsForShipment(
       `Set point for ${s.commodity} is well below this. Product may already be out of specification.`,
       ['ULIP'], 0,
       'Instruct the driver to restore set point and raise a quality hold at destination.')
+  }
+
+  /* ── GRAP: can this vehicle legally enter Delhi today? ──
+     Neither ULIP nor CAQM can answer this alone. VAHAN knows the truck's
+     emission norm; the public air-quality feed determines which GRAP stage
+     is in force. The answer only exists in the join. */
+  const air = osint?.ncrAir
+  if (air && vehicle && !done && isNcr(s.destination) && air.stage >= 3) {
+    const verdict = ncrEligibility(air.stage, vehicle.bsNorm, vehicle.fuel, false)
+    if (verdict.status !== 'allowed') {
+      mk('grap_entry_ban', verdict.status === 'barred' ? 'critical' : 'high',
+        verdict.status === 'barred'
+          ? 'Vehicle barred from Delhi under GRAP'
+          : 'Delhi entry allowed only as essential carriage',
+        `Delhi AQI is ${air.aqi} (${air.category}), so ${GRAP_LABEL[air.stage]} is in force. ${vehicle.regNo} is ${vehicle.bsNorm} ${vehicle.fuel}. ${verdict.reason}`,
+        ['VAHAN/01', 'CPCB-AQI (open data)'], null,
+        verdict.status === 'barred'
+          ? 'Swap to a BS-VI, CNG or electric unit before the NCR boundary, or hold the load outside until the stage is revoked.'
+          : 'Carry proof of essential-commodity carriage, or re-assign to a compliant vehicle.',
+        onset(now - 3 * HOUR))
+    }
   }
 
   /* ── Schedule slip worth escalating ── */

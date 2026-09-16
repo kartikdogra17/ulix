@@ -167,6 +167,57 @@ Cost is modelled honestly: an **own-account stack** (fuel, driver, toll, upkeep)
 against the **market freight rate**, rather than listing a ₹/tonne-km rate beside fuel —
 which would count the diesel twice.
 
+## Open-source intelligence
+
+ULIP tells you what the government's own systems know about your consignment. It does
+not tell you that Delhi is about to bar your truck, or that the corridor you are
+dispatching onto is fogged in. That information is public — it just lives outside the
+gateway. [`src/data/osint.ts`](src/data/osint.ts) brings it in.
+
+**This is the only live data in the build.** Everything sourced from ULIP itself is
+simulated; the UI marks live panels with a `live` badge so the two are never confused.
+
+### GRAP entry eligibility — the join worth having
+
+Under CAQM's Graded Response Action Plan, **Stage III** bars BS-IV and older diesel goods
+vehicles inside Delhi, and **Stage IV** bans their entry outright except for essential
+commodities. Which stage is in force depends on air quality; whether *your* truck is
+caught depends on its emission norm.
+
+- Air quality comes from [Open-Meteo](https://open-meteo.com) (free, no key, CORS-open);
+  PM2.5/PM10 are converted to a **CPCB-scale AQI** locally using the official breakpoints.
+- The emission norm comes from `VAHAN/01` (`rcNormsDesc`).
+
+Neither source can answer "can this truck enter Delhi today". Together they can — and the
+verdict becomes a `grap_entry_ban` signal in the decisions queue like any other.
+
+Because Stage III/IV is a winter phenomenon, the planner also shows the verdict at **every
+stage**, so the fleet question — which units can still serve Delhi when the curbs land —
+is answerable in September.
+
+### Corridor conditions
+
+Live temperature, precipitation, wind and visibility sampled at three points along the
+lane. Sub-200 m visibility is what actually closes northern highways overnight.
+
+### Scope, deliberately narrow
+
+This layer covers **places and rules** — environmental, regulatory, infrastructure. It
+does not profile people: no driver social media, no counterparty dossiers, no scraping of
+individuals. A control tower has no business doing that, and the useful signal is in the
+public environmental and regulatory feeds anyway.
+
+Every read is cached for 30 minutes, times out at 8 seconds, and fails soft — if the
+network is gone the panels simply do not render and nothing else breaks.
+
+### Caveats
+
+- The CPCB AQI here is **computed from Open-Meteo's modelled PM values**, not a CPCB
+  station reading. Treat it as indicative; CAQM invokes GRAP by notification, not by a
+  number crossing a threshold.
+- The GRAP curbs encoded are the freight-relevant subset. The full schedule is broader,
+  and enforcement varies by district.
+
 ## Architecture
 
 ```
@@ -180,6 +231,7 @@ src/
       envelope.ts       Response envelope, unwrap/isNotFound, error types
       client.ts         UlipClient — login, bearer, retry, regex validation
     routes.ts           Lane planning — safety, restrictions, cost, modal trade-off
+    osint.ts            Live open data: CPCB AQI, GRAP eligibility, corridor weather
     cases.ts            Case model: owner, status, outcome, audit trail
     mock/               Deterministic simulated world + gateway
   components/           Shell, NetworkMap, charts, case UI, primitives

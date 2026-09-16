@@ -7,6 +7,7 @@ import type { UlipEnvelope } from './ulip/envelope'
 import type { Coverage, Signal } from './fusion'
 import type { Case, CaseStatus, Resolution } from './cases'
 import type { LanePlan } from './routes'
+import type { AirQuality, CorridorWeather } from './osint'
 
 export interface Page<T> { rows: T[]; total: number }
 
@@ -114,6 +115,14 @@ export interface DataAdapter {
 
   /** Network-wide cross-system signals, ranked by severity then exposure. */
   signals(): Promise<Signal[]>
+
+  /**
+   * Live open-source context: NCR air quality and the GRAP stage it implies.
+   * Returns null when the network is unavailable — every caller degrades
+   * rather than failing.
+   */
+  ncrAirQuality(): Promise<AirQuality | null>
+  corridorWeather(origin: string, destination: string): Promise<CorridorWeather[]>
 
   /* ── Case work ───────────────────────────────────────────────
      Signals are derived and recomputed; cases are the human record
