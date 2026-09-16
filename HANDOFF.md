@@ -8,8 +8,9 @@ trap. This file is *where things stand*.
 ## What this is
 
 **ULIX** — a logistics control tower built on India's Unified Logistics Interface
-Platform. Independent software, not a government service. Ten modules, ~12.8k lines,
-typecheck and build clean.
+Platform. Independent software, not a government service. Eleven modules, ~15.5k lines
+across `src/`, `server/` and `scripts/`, 38 commits. Typecheck and build clean, and
+pushes to `main` deploy themselves.
 
 ## How it got here
 
@@ -55,29 +56,37 @@ about it, so nobody greps 36 files.
   `AISSTREAM_API_KEY`; the service forbids browser connections, hence the proxy).
 - **Everything ULIP:** simulated, deterministic, seeded.
 
-## Deployment — live
+## Deployment — live, and automatic
 
 | | |
 |---|---|
 | Site | **https://ulip-platform.vercel.app** |
 | Repo | **https://github.com/kartikdogra17/ulix** (public, `main`) |
 | Host | Vercel, static build, project still named `ulip-platform` |
+| Trigger | push to `main` → `.github/workflows/deploy.yml` |
 
-Deploys are currently **manual** — `vercel --prod` from this directory. The repo is not
-connected in Vercel's Git settings, so a push does not redeploy.
+**A push to `main` now deploys.** GitHub checks out, installs, runs the typecheck, builds,
+and hands the finished output to Vercel over the CLI. `vercel --prod` by hand still works
+and bypasses it. Verified end to end on two consecutive commits (16 September 2026):
+workflow green, deployment count moved each time, site 200.
 
-`vercel git connect --yes` **does** exist and fails with *"Failed to connect
-kartikdogra17/ulix to project"* even though the repo is public, spelled right, and
-reachable via `gh` with admin rights. The CLI cannot grant itself GitHub access.
+**Vercel's own Git integration is a dead end here — do not retry it.** It requires a paid
+team plan and this project sits in a team scope. The CLI reports that as
+`POST /v9/projects/{id}/link → 400` with *"Failed to connect… make sure there aren't any
+typos"*, which blames the repository for what is a plan limit. Two test pushes confirmed
+nothing fires through it, and an earlier diagnosis of "the GitHub App is not authorised
+for the team" was wrong — it was never an authorisation problem.
 
-Verified by test push on 16 September 2026: a real commit to `main` produced **no**
-deployment (count stayed at 12 over three minutes) and `vercel git connect` still failed,
-so whatever was connected did not take on this project. `vercel project inspect` shows no
-Git section. Three things to check, and they are different: the **account-level** GitHub
-login (Settings → Authentication — the Vercel username is `kartikdogra17-6159` rather than
-the GitHub handle, which suggests an email signup with no GitHub link), the
-**project-level** repo link (a project created by CLI upload is not linked automatically),
-and whether the Vercel GitHub App is scoped to selected repositories with `ulix` excluded.
+Setup is one secret, `VERCEL_TOKEN`, already in place. The org and project ids are
+committed in the workflow because they are identifiers, not credentials.
+
+Two things the workflow does on purpose, both learned from the GitHub Pages workflow it
+replaced (deleted for failing on every push for days with a 404 nobody read):
+
+- **Fails readably.** A missing token stops the run in 11 seconds with a message naming
+  the fix, rather than a stack trace deep in a deploy action.
+- **Typechecks before deploying.** A push that would not build locally cannot reach
+  production.
 
 Two gotchas already paid for:
 
@@ -164,11 +173,15 @@ at with a question already in hand, not worklists that can open on the wrong one
 2. **Role-aware mobile cards.** The desktop tables are lensed, the cards are not. They
    carry identity, lane, status and progress, which all four roles want. Lowest value on
    this list.
-3. **Add `VERCEL_TOKEN` as a repo secret** to switch on push-to-deploy. See Deployment.
 
 Everything else that was on this list is done: the role lens, per-role page defaults and
 column sets, the licence, the GatiShakti overlay, the `corridor_pinch` signal, the leg-date
-fix, and the case store.
+fix, the case store, the CSV import, the live adapter, and push-to-deploy.
+
+**Still the two highest-value things, and neither is code:** get the goulip.in NDA signed
+(in progress, up to a month), and talk to eight to ten operators to find out whether the
+statutory-conflict wedge is a real pain. No feature added while waiting changes either
+answer.
 
 ## GatiShakti — the map's under-layer
 
