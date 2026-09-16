@@ -15,6 +15,8 @@ import type { ComplianceDoc, Shipment, Vehicle } from './types'
 import { FASTAG_RETENTION_HOURS } from './ulip/catalogue'
 import { type AirQuality, GRAP_LABEL, isNcr, ncrEligibility } from './osint'
 import type { Disruption } from './disruptions'
+import type { Corridor } from './gatishakti'
+import type { LatLon } from './mock/seed'
 
 const HOUR = 3_600_000
 
@@ -35,6 +37,7 @@ export type SignalKind =
   | 'grap_entry_ban'
   | 'fog_risk'
   | 'corridor_disruption'
+  | 'corridor_pinch'
 
 /**
  * Display names for every kind. Typed as a total Record so adding a kind
@@ -58,6 +61,7 @@ export const SIGNAL_LABEL: Record<SignalKind, string> = {
   grap_entry_ban: 'GRAP entry ban',
   fog_risk: 'Fog risk',
   corridor_disruption: 'Corridor disruption',
+  corridor_pinch: 'Corridor capacity pinch',
 }
 
 export type Severity = 'critical' | 'high' | 'medium'
@@ -86,7 +90,49 @@ export interface Signal {
   action: string
 }
 
+/**
+ * What a single consignment cannot tell you about itself.
+ *
+ * `route` is per-consignment rather than shared, and it is here rather than
+ * derived because fusion.ts deliberately holds no geography of its own —
+ * every other data module imports the node table, this one does not, and
+ * keeping it that way is what lets the joins be read as pure logic.
+ */
+export interface FusionContext {
+  ncrAir?: AirQuality | null
+  disruptions?: Disruption[]
+  /** GatiShakti corridors, for the lane-capacity join. */
+  corridors?: Corridor[]
+  /**
+   * Node coordinates, resolved by the caller. A lookup rather than a table:
+   * fusion asks where a node is, it does not hold the answer.
+   */
+  nodeAt?: (code: string) => LatLon | undefined
+}
+
 const SEVERITY_RANK: Record<Severity, number> = { critical: 0, high: 1, medium: 2 }
+
+const DEG_KM = 111.32
+
+/**
+ * Where a point falls relative to the path a→b: how far off it sits, and how
+ * far along it lies as a 0..1 fraction.
+ *
+ * Equirectangular, with longitude shrunk by the latitude of the path. Over a
+ * few hundred kilometres in India that is accurate well inside the tolerance
+ * this is compared against, and it avoids pulling a projection library in to
+ * answer "is this roughly on the way".
+ */
+function alongPath(p: LatLon, a: LatLon, b: LatLon) {
+  const k = Math.cos(((a.lat + b.lat) / 2) * (Math.PI / 180))
+  const ax = a.lon * k, ay = a.lat
+  const bx = b.lon * k, by = b.lat
+  const dx = bx - ax, dy = by - ay
+  const len2 = dx * dx + dy * dy
+  const t = len2 ? Math.max(0, Math.min(1, ((p.lon * k - ax) * dx + (p.lat - ay) * dy) / len2)) : 0
+  const cx = ax + t * dx, cy = ay + t * dy
+  return { offPathKm: Math.hypot(p.lon * k - cx, p.lat - cy) * DEG_KM, t }
+}
 
 const hoursBetween = (a: number, b: number) => (a - b) / HOUR
 
@@ -102,8 +148,8 @@ export function signalsForShipment(
   vehicle: Vehicle | null,
   docs: ComplianceDoc[],
   now = Date.now(),
-  /** Live open-source context, when the platform has been able to fetch it. */
-  osint?: { ncrAir?: AirQuality | null; disruptions?: Disruption[] },
+  /** Everything the consignment cannot supply about itself. */
+  ctx?: FusionContext,
 ): Signal[] {
   const out: Signal[] = []
   const done = s.status === 'delivered'
@@ -253,7 +299,7 @@ export function signalsForShipment(
      Neither ULIP nor CAQM can answer this alone. VAHAN knows the truck's
      emission norm; the public air-quality feed determines which GRAP stage
      is in force. The answer only exists in the join. */
-  const air = osint?.ncrAir
+  const air = ctx?.ncrAir
   if (air && vehicle && !done && isNcr(s.destination) && air.stage >= 3) {
     const verdict = ncrEligibility(air.stage, vehicle.bsNorm, vehicle.fuel, false)
     if (verdict.status !== 'allowed') {
@@ -273,8 +319,8 @@ export function signalsForShipment(
   /* ── Open news touching this consignment's own lane ──
      Only corroborated, placeable stories reach here — the filter has already
      dropped the cricket, the markets and anything it could not put on a map. */
-  if (!done && osint?.disruptions?.length) {
-    const onLane = osint.disruptions
+  if (!done && ctx?.disruptions?.length) {
+    const onLane = ctx.disruptions
       .filter((x) => x.severity !== 'low')
       .find((x) => x.nodes.includes(s.destination) || x.nodes.includes(s.currentNode))
     if (onLane) {
@@ -284,6 +330,77 @@ export function signalsForShipment(
         ['GDELT (open news)'], null,
         'Confirm with the ground team before committing the next leg, and warn the consignee if the lane is affected.',
         onset(Date.parse(onLane.seenAt)))
+    }
+  }
+
+  /* ── Corridor capacity against the lane this consignment is on ──
+     The cleanest join in the set. GatiShakti knows a stretch is still two
+     lanes; the consignment book knows what is about to cross it. Neither
+     record mentions the other, and no single ministry API can be asked the
+     question, which is the whole argument for the platform.
+
+     Matched per LEG, not per journey: a road corridor constrains the road
+     leg, and a multimodal consignment's overall origin and destination say
+     very little about where its trucks actually run. Fires only for a pinch
+     still ahead of the consignment — a constraint behind you is history, and
+     a queue of those would bury the ones you can still plan around. */
+  if (!done && ctx?.corridors?.length && ctx.nodeAt) {
+    const pinched = ctx.corridors.filter((c) => c.belowStandard)
+    const hits = []
+    for (const leg of s.legs) {
+      if (leg.status === 'completed') continue
+      if (leg.mode !== 'road' && leg.mode !== 'rail') continue
+      const from = ctx.nodeAt(leg.from), to = ctx.nodeAt(leg.to)
+      if (!from || !to) continue
+      // A pending leg has not started, so all of it is ahead. On the active
+      // leg, the consignment's own last known position says how much is left.
+      const tNow = leg.status === 'pending'
+        ? 0
+        : alongPath({ lat: s.lat, lon: s.lon }, from, to).t
+      for (const c of pinched) {
+        if (c.mode !== leg.mode) continue
+        for (const sg of c.segments) {
+          if (sg.lanes !== c.narrowest) continue
+          const mid = { lat: (sg.a.lat + sg.b.lat) / 2, lon: (sg.a.lon + sg.b.lon) / 2 }
+          // 55 km of slack: close enough that the leg genuinely runs over the
+          // stretch, tight enough that a corridor merely crossing the country
+          // in the same general direction does not count.
+          const { offPathKm, t } = alongPath(mid, from, to)
+          if (offPathKm <= 55 && t > tNow) hits.push({ c, sg, leg, t, tNow, offPathKm })
+        }
+      }
+    }
+
+    // Closest to the lane wins: that is the one most certainly on the route,
+    // and one signal per consignment is the point of picking at all.
+    const hit = hits.sort((a, b) => a.offPathKm - b.offPathKm)[0]
+    if (hit) {
+      const rail = hit.leg.mode === 'rail'
+      /* The window to act is the window before the leg departs: once the
+         truck is rolling, re-timing the crossing is no longer on the table.
+         Clock from planned departure rather than from the consignment being
+         created — a pinch on a leg that has not left yet is fresh, however
+         long ago someone raised the paperwork. */
+      const dep = Date.parse(hit.leg.plannedDep)
+      const toDeparture = hoursBetween(dep, now)
+      mk('corridor_pinch', s.delayMins > 240 ? 'high' : 'medium',
+        rail ? `Single-track stretch ahead on the ${hit.c.name}`
+             : `Two-lane stretch ahead on the ${hit.c.name}`,
+        `GatiShakti reports ${hit.sg.from}–${hit.sg.to} at ${hit.sg.lanes} across ${hit.sg.lengthKm} km. `
+        + `The ${hit.leg.from}→${hit.leg.to} ${hit.leg.mode} leg runs over it carrying `
+        + `${(s.weightKg / 1000).toFixed(1)} t of ${s.commodity}, and is `
+        + `${hit.tNow > 0 ? `${Math.round(hit.tNow * 100)}% along and has not reached it` : 'not yet dispatched'}. `
+        + `Neither the corridor record nor the consignment knows about the other.`,
+        rail ? ['GATISHAKTI/01', 'GATISHAKTI/05', 'FOIS/01']
+             : ['GATISHAKTI/01', 'GATISHAKTI/05', 'FASTAG/01'],
+        toDeparture > 0 ? Math.round(toDeparture) : null,
+        rail ? 'Confirm the path allocation before committing, or price the road alternative in the lane planner.'
+             : 'Re-time the crossing outside peak, or price the alternative in the lane planner before committing.',
+        // The shared clamp, deliberately. Unfloored, these age from a planned
+        // departure that can be weeks old and present as 21-day-old cases —
+        // exactly what the horizon exists to prevent. The platform's own
+        // visibility starts 72h back whatever the underlying record says.
+        onset(dep))
     }
   }
 

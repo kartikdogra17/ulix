@@ -121,7 +121,9 @@ sidebar, which looks exactly like a broken route.
   and reports failure on the *inner* `responseStatus`. Use `unwrap()` / `isNotFound()`.
   `error` and `code` are strings, not a boolean and a number.
 - **FASTag retains 72 hours only.** Anything longer is platform-stored history and must be
-  labelled as such.
+  labelled as such. `onset()` in `fusion.ts` floors every signal's age at that horizon on
+  purpose — it is the platform's own visibility window, not a FASTag detail. Unfloored,
+  cases present as weeks old. Do not "fix" it.
 - **GRAP curbs entry, not delivery** — match consignments routing *through* the NCR.
 - **Bridge clearance is lowest in monsoon**, because it is measured to the water. The season
   with the most depth has the least headroom.

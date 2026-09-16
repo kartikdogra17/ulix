@@ -196,6 +196,42 @@ data `live`.
 The overlay is off by default. Infrastructure is context; the map's first job is still to
 show where the risk is.
 
+### `corridor_pinch` — the join the overlay was for
+
+GatiShakti knows a stretch is still two lanes; the consignment book knows what is about to
+cross it. Neither record mentions the other, which is the shape of every signal in
+`fusion.ts`.
+
+Matched **per leg**, not per journey: a road corridor constrains the road leg, and a
+multimodal consignment's overall origin and destination say very little about where its
+trucks run. A pinch counts when its midpoint sits within 55 km of that leg's own path and
+is still ahead of the consignment — for a pending leg the whole leg is ahead, for an
+active one the consignment's last known position says how much is left. A constraint
+behind you is history.
+
+`fusion.ts` still holds no node table. It takes a `nodeAt` lookup on `FusionContext` and
+asks where a node is rather than knowing; it is the only data module that imports no
+geography and that is worth keeping.
+
+**It fires 4 times across 160 consignments, and that is the honest number** — there are
+only four constrained stretches nationally and a leg has to actually run over one. Sample:
+a Haldia→Ludhiana rail leg against the Pandit Deen Dayal Upadhyaya–Dhanbad single-track
+stretch of the Eastern DFC, which is exactly where that path runs. Rare and specific beats
+common and vague; it still earns a row in *What is driving risk*.
+
+Primary for Shipper, Transporter and Forwarder — all three can re-time or re-plan. Muted
+for the Regulator: a two-lane highway is a planning matter, not a breach.
+
+**A dead end worth recording so nobody repeats it.** Every pinch case aged to exactly
+`3d 0h`, and the cause is `onset()` flooring every signal at the FASTag 72-hour horizon. A
+corridor's lane status is a published record with no retention window, so this looked like
+the same category error as comparing rail track to road lanes, and I gave the signal an
+unfloored clock. That was wrong. Unfloored, these age from a planned departure that can be
+weeks old and present as 21-day-old cases — precisely what the horizon comment says it
+exists to prevent. The floor is a deliberate product decision about the platform's own
+visibility, not a FASTag leak. Reverted to the shared `onset`. If the uniform `3d 0h` ever
+becomes the thing that annoys, the fix is the mock data's leg dates, not the clamp.
+
 ## Licence
 
 **Apache-2.0**, chosen over MIT for Section 6: it grants no trademark or trade-name

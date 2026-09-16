@@ -161,6 +161,7 @@ const SHIPPER: RoleLens = {
   primaryKinds: [
     'ewb_expires_before_eta', 'eta_slip', 'reefer_breach',
     'detention', 'customs_hold', 'corridor_disruption', 'vehicle_dark',
+    'corridor_pinch',
   ],
   mutedKinds: ['insurance_lapsed', 'dl_expired', 'tag_low_balance'],
   towerTitle: 'Control tower',
@@ -198,7 +199,7 @@ const TRANSPORTER: RoleLens = {
   primaryKinds: [
     'fitness_lapsed', 'insurance_lapsed', 'dl_expired', 'tag_blacklisted',
     'tag_low_balance', 'vehicle_dark', 'partb_vehicle_mismatch',
-    'grap_entry_ban', 'detention',
+    'grap_entry_ban', 'detention', 'corridor_pinch',
   ],
   mutedKinds: ['customs_hold'],
   towerTitle: 'Fleet control tower',
@@ -234,7 +235,7 @@ const FORWARDER: RoleLens = {
   mobilePrimary: ['/', '/exim', '/shipments', '/waterways'],
   primaryKinds: [
     'customs_hold', 'hazmat_no_clearance', 'detention', 'eta_slip',
-    'ewb_expires_before_eta', 'corridor_disruption',
+    'ewb_expires_before_eta', 'corridor_disruption', 'corridor_pinch',
   ],
   mutedKinds: ['insurance_lapsed', 'dl_expired', 'tag_low_balance', 'fitness_lapsed'],
   towerTitle: 'Forwarding desk',
@@ -274,7 +275,10 @@ const REGULATOR: RoleLens = {
   primaryKinds: ENFORCEABLE,
   // Commercial performance is not a compliance matter. A late truck is
   // between the parties; an uninsured one is not.
-  mutedKinds: ['eta_slip', 'detention', 'reefer_breach', 'tag_low_balance', 'corridor_disruption'],
+  mutedKinds: [
+    'eta_slip', 'detention', 'reefer_breach', 'tag_low_balance',
+    'corridor_disruption', 'corridor_pinch',
+  ],
   towerTitle: 'Supervision desk',
   towerSub: 'Where the network is moving outside the rules, on whose vehicles, and how long it has been true.',
   queueSub: 'Breaches visible only by joining two ministries — assign, action, close',

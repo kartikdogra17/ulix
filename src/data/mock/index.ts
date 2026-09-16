@@ -162,6 +162,10 @@ export class MockAdapter implements DataAdapter {
   }
 
   private allSignals(): Signal[] {
+    const nodeAt = (code: string) => {
+      const n = NODE_BY_CODE[code]
+      return n ? { lat: n.lat, lon: n.lon } : undefined
+    }
     if (this.signalCache) return this.signalCache
     const byShipment = new Map<string, typeof this.docs>()
     for (const d of this.docs) {
@@ -173,7 +177,14 @@ export class MockAdapter implements DataAdapter {
     this.signalCache = this.shipments
       .flatMap((s) => signalsForShipment(
         s, this.vehicleFor(s.id), byShipment.get(s.id) ?? [], Date.now(),
-        { ncrAir: this.ncrAir, disruptions: this.disruptionFeed?.items ?? [] }))
+        {
+          ncrAir: this.ncrAir,
+          disruptions: this.disruptionFeed?.items ?? [],
+          corridors: this.gs.corridors,
+          // fusion.ts holds no node table of its own, so the geography is
+          // resolved here where it already lives.
+          nodeAt,
+        }))
       .sort((a, b) => {
         const rank = { critical: 0, high: 1, medium: 2 } as const
         return rank[a.severity] - rank[b.severity] || b.valueAtRisk - a.valueAtRisk
