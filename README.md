@@ -17,6 +17,9 @@ Built against the **official ULIP integration documents** published on
 
 ---
 
+> **New here?** [HANDOFF.md](HANDOFF.md) is where things stand and what is worth doing
+> next. [DEPLOYMENT.md](DEPLOYMENT.md) covers pushing and hosting.
+>
 > Working on this repo with an agent? Start from **[CLAUDE.md](CLAUDE.md)** — architecture
 > map, conventions, and the traps that have already cost time. It is written to save a
 > session from exploring, and it names the files that should *not* be read.

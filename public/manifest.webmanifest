@@ -2,8 +2,8 @@
   "name": "ULIX \u2014 Logistics Control Tower",
   "short_name": "ULIX",
   "description": "A logistics control tower on India's Unified Logistics Interface Platform: multimodal visibility, fleet intelligence, compliance, EXIM, waterways and lane planning.",
-  "start_url": "/",
-  "scope": "/",
+  "start_url": "./",
+  "scope": "./",
   "display": "standalone",
   "orientation": "portrait-primary",
   "background_color": "#0a0f1a",
@@ -15,25 +15,25 @@
   ],
   "icons": [
     {
-      "src": "/icon.svg",
+      "src": "./icon.svg",
       "sizes": "any",
       "type": "image/svg+xml",
       "purpose": "any"
     },
     {
-      "src": "/icon-192.png",
+      "src": "./icon-192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/icon-512.png",
+      "src": "./icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/icon-maskable.png",
+      "src": "./icon-maskable.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
@@ -42,15 +42,15 @@
   "shortcuts": [
     {
       "name": "Consignments",
-      "url": "/#/shipments"
+      "url": "./#/shipments"
     },
     {
       "name": "Fleet",
-      "url": "/#/fleet"
+      "url": "./#/fleet"
     },
     {
       "name": "API console",
-      "url": "/#/apis"
+      "url": "./#/apis"
     }
   ]
 }

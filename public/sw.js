@@ -2,7 +2,8 @@
    Navigations fall back to the cached shell when the network is unavailable;
    built assets are cached on first use. Gateway calls are never cached. */
 const CACHE = 'ulip-shell-v1'
-const SHELL = ['/', '/index.html', '/manifest.webmanifest', '/icon.svg']
+// Relative to the worker's scope, so a subpath deploy caches the right URLs.
+const SHELL = ['./', './index.html', './manifest.webmanifest', './icon.svg']
 
 self.addEventListener('install', (e) => {
   e.waitUntil(caches.open(CACHE).then((c) => c.addAll(SHELL)).then(() => self.skipWaiting()))
@@ -21,10 +22,10 @@ self.addEventListener('fetch', (e) => {
   if (request.method !== 'GET') return
   const url = new URL(request.url)
   if (url.origin !== self.location.origin) return
-  if (url.pathname.startsWith('/api/')) return
+  if (url.pathname.includes('/api/')) return
 
   if (request.mode === 'navigate') {
-    e.respondWith(fetch(request).catch(() => caches.match('/index.html')))
+    e.respondWith(fetch(request).catch(() => caches.match(new URL('index.html', self.registration.scope).href)))
     return
   }
 

@@ -112,6 +112,16 @@ server/ulip-proxy.mjs   credentials, OSINT feeds, shared case store
 
 ---
 
+## Deployment
+
+Static SPA, hash-routed, no rewrite rules needed. `vercel.json`, `netlify.toml` and a
+Pages workflow are committed; `VITE_BASE=/sub/` handles subpath hosting and the manifest
+and service worker already use relative URLs. Full notes in `DEPLOYMENT.md`.
+
+On a static deploy the live air-quality and weather feeds still work (Open-Meteo is
+HTTPS and CORS-open, fetched from the browser). GDELT, AIS and the shared case queue need
+the proxy and degrade to their labelled fallbacks.
+
 ## Known limitations
 
 - Case work is shared through the proxy when it is running, and per-browser otherwise.
