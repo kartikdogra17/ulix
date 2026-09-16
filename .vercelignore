@@ -1,0 +1,17 @@
+# Vercel uploads the project directory before building, so anything the build
+# does not read is pure upload cost. The first attempt pushed 23.6 MB and timed
+# out; almost all of it was the vendored PDFs.
+
+# 24 MB of ULIP integration documents. src/data/ulip/catalogue.ts is GENERATED
+# from them and committed, so the build never reads this directory.
+docs/
+
+# The credential-holding proxy runs on its own host, not here.
+server/
+
+# Vercel runs the build itself.
+dist/
+
+.github/
+*.md
+!README.md
