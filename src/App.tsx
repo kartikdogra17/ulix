@@ -17,6 +17,7 @@ const Counterparties = lazy(() => import('./pages/Counterparties').then((m) => (
 const Fleet = lazy(() => import('./pages/Fleet').then((m) => ({ default: m.Fleet })))
 const Compliance = lazy(() => import('./pages/Compliance').then((m) => ({ default: m.Compliance })))
 const ApiConsole = lazy(() => import('./pages/ApiConsole').then((m) => ({ default: m.ApiConsole })))
+const ImportPage = lazy(() => import('./pages/Import').then((m) => ({ default: m.ImportPage })))
 const SettingsPage = lazy(() => import('./pages/Settings').then((m) => ({ default: m.SettingsPage })))
 
 function PageFallback() {
@@ -48,6 +49,7 @@ function Routed() {
         <Route path="fleet" element={<Fleet />} />
           <Route path="compliance" element={<Compliance />} />
           <Route path="apis" element={<ApiConsole />} />
+          <Route path="import" element={<ImportPage />} />
           <Route path="settings" element={<SettingsPage />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Route>

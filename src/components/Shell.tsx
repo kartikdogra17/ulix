@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { NavLink, Outlet, useLocation } from 'react-router-dom'
 import {
   Activity, Boxes, Building2, Container, Download, FileCheck2, FlaskConical,
-  LayoutGrid, LogOut, Moon, MoreHorizontal, Plug, Route, Search, Settings,
+  FileUp, LayoutGrid, LogOut, Moon, MoreHorizontal, Plug, Route, Search, Settings,
   Sun, Truck, Waves, X,
 } from 'lucide-react'
 import { useApp } from '../state/app'
@@ -37,6 +37,7 @@ const PLAN: NavItem[] = [
 ]
 
 const PLATFORM: NavItem[] = [
+  { to: '/import', short: 'Import', icon: FileUp },
   { to: '/apis', short: 'APIs', icon: Plug },
 ]
 

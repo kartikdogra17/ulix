@@ -116,6 +116,7 @@ export const MODULE_LABEL: Record<string, string> = {
   '/drill': 'Scenario drill',
   '/parties': 'Counterparties',
   '/apis': 'API gateway',
+  '/import': 'Import book',
 }
 
 /* ── Kind groupings the headlines count over ───────────────────── */
@@ -169,7 +170,7 @@ function severityMix(cases: Case[]) {
 const SHIPPER: RoleLens = {
   role: 'Shipper',
   remit: 'Owns the cargo. Answers for its value, its paperwork and its arrival.',
-  nav: ['/', '/shipments', '/compliance', '/exim', '/plan', '/waterways', '/parties', '/drill', '/apis'],
+  nav: ['/', '/shipments', '/compliance', '/exim', '/plan', '/waterways', '/parties', '/drill', '/import', '/apis'],
   mobilePrimary: ['/', '/shipments', '/compliance', '/exim'],
   // A lapsed fitness certificate stays un-muted: the signal text is right
   // that an enforcement stop detains the cargo, not just the truck.
@@ -212,7 +213,7 @@ const TRANSPORTER: RoleLens = {
   role: 'Transporter',
   remit: 'Owns the vehicles and the drivers. Answers for whether they are legal to move.',
   // No EXIM and no waterways: a road carrier files no bill of entry and runs no barge.
-  nav: ['/', '/fleet', '/shipments', '/compliance', '/plan', '/drill', '/parties', '/apis'],
+  nav: ['/', '/fleet', '/shipments', '/compliance', '/plan', '/drill', '/parties', '/import', '/apis'],
   mobilePrimary: ['/', '/fleet', '/shipments', '/compliance'],
   primaryKinds: [
     'fitness_lapsed', 'insurance_lapsed', 'dl_expired', 'tag_blacklisted',
@@ -256,7 +257,7 @@ const TRANSPORTER: RoleLens = {
 const FORWARDER: RoleLens = {
   role: 'Freight Forwarder',
   remit: "Moves other people's cargo across borders. Answers for the clock at both ends.",
-  nav: ['/', '/exim', '/shipments', '/waterways', '/compliance', '/plan', '/parties', '/drill', '/apis'],
+  nav: ['/', '/exim', '/shipments', '/waterways', '/compliance', '/plan', '/parties', '/drill', '/import', '/apis'],
   mobilePrimary: ['/', '/exim', '/shipments', '/waterways'],
   primaryKinds: [
     'customs_hold', 'hazmat_no_clearance', 'detention', 'eta_slip',
@@ -298,7 +299,7 @@ const REGULATOR: RoleLens = {
   remit: 'Supervises the network. Owns none of the cargo and answers for whether the rules held.',
   // No lane planner and no EXIM: a state logistics cell books no freight
   // and clears no customs. Both are commercial screens.
-  nav: ['/', '/compliance', '/fleet', '/shipments', '/parties', '/waterways', '/drill', '/apis'],
+  nav: ['/', '/compliance', '/fleet', '/shipments', '/parties', '/waterways', '/drill', '/import', '/apis'],
   mobilePrimary: ['/', '/compliance', '/fleet', '/shipments'],
   primaryKinds: ENFORCEABLE,
   // Commercial performance is not a compliance matter. A late truck is

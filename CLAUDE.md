@@ -78,6 +78,7 @@ src/data/
   disruptions.ts  GDELT filter pipeline    vessels.ts  AIS
   routes.ts       lane planning    scenarios.ts  drill    exim.ts    waterways.ts
   counterparty.ts due diligence
+  importer.ts     CSV → the consignment book ULIP cannot supply
 src/pages/        one file per module, lazily routed in App.tsx
 src/components/   Shell (nav), NetworkMap, charts.tsx (inline SVG), cases.tsx, ui.tsx
 server/ulip-proxy.mjs   credentials, OSINT feeds, shared case store

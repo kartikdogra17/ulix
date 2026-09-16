@@ -238,6 +238,33 @@ exists to prevent. The floor is a deliberate product decision about the platform
 visibility, not a FASTag leak. Reverted to the shared `onset`, and the real cause — the leg
 dates — was fixed separately, below. Ages now vary as they should.
 
+## The consignment book comes from a CSV
+
+The direct consequence of ULIP being a lookup API. The book has to come from the
+customer's own system, and until there is a TMS integration the shortest honest path is the
+file they already export. `/import` parses it in the browser, maps the columns, and tells
+each row which endpoints can enrich it.
+
+**Rows are validated with `UlipClient.validate`** — the same call path and the same regexes
+the real gateway request uses. A preview that validates differently from the actual call is
+worse than no preview: it promises a lookup will work and then fails at the counter. A bad
+e-Way Bill shows the gateway's own wording, verbatim: *Data format failed OR wrong value
+entered at: ewbNo. Format should follow [0-9]{12}*.
+
+Column mapping is by alias, because nobody's export says `ref`: docket/CN/LR number,
+e-Way Bill under six spellings, vehicle/truck/lorry registration, from/to, goods, weight,
+invoice value. Unrecognised columns are carried through and reported, not dropped silently.
+A file with no e-Way Bill and no vehicle column fails fast and says why — there is nothing
+ULIP could be asked about it.
+
+The CSV parser is hand-written and dependency-free: quoted commas, doubled quotes, embedded
+newlines, CRLF, and the BOM Excel puts on the front that otherwise corrupts the first
+header. Indian exports carry `₹` and lakh separators, so `"₹12,45,000"` parses to 1245000.
+Twenty checks cover the parser and the mapping.
+
+A row missing its e-Way Bill still resolves against VAHAN and FASTag on its vehicle number;
+partial keys give partial enrichment rather than nothing.
+
 ## The live path — and what building it revealed
 
 **The flag used to lie.** `src/data/index.ts` hardcoded `new MockAdapter()`, and `ULIP_MODE`
