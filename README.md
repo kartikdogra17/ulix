@@ -135,6 +135,7 @@ same picture at entity level, including a per-system coverage table.
 |---|---|
 | `/` **Control tower** | Value at risk, unassigned and overdue counts, the working decisions queue (assign / snooze / close with an outcome), desk load, risk-coloured live map, what is driving risk, lane reliability, source-system health |
 | `/drill` **Scenario drill** | Cost a disruption before it happens — GRAP stage, port shutdown, corridor closure or fog — against the network as it stands. Reports consignments caught, value exposed, **new** e-Way Bill breaches the delay would create, vehicles needing a swap and whether the fleet can cover them |
+| `/waterways` **Inland waterways** | National Waterways, stretches and terminals; whether a given barge can pass in a given month, and how much it may carry; and the modal-shift case against road |
 | `/exim` **EXIM cockpit** | Import and export clearance chains, each milestone attributed to the endpoint that reports it, plus the demurrage and detention clocks and which boxes are about to cross into a higher tariff slab |
 | `/parties` **Counterparties** | Who you are actually trading with: company standing, directors and shared directorships, MSME status with the 45-day payment clock, and IEC validity |
 | `/plan` **Lane planner** | Plan a corridor before booking it: black spots you will cross, municipal no-entry windows against your projected arrival, toll and own-account cost, energy stops, and the road/rail/sea/air trade-off on time, cost and carbon |
@@ -152,6 +153,38 @@ older ones **Stored** — data this platform polled and persisted itself. The ba
 the FASTag tab says exactly that.
 
 ---
+
+## Two constraints road planning has no equivalent of
+
+All fifteen IWAI endpoints were dark. Nine are traffic statistics; the four that matter
+are `IWAI/10` waterways and stretches, `IWAI/11` navigability windows, `IWAI/12`
+structures with vertical clearance, `IWAI/13` terminals positioned by chainage.
+
+**Air draft.** A vessel must pass under every bridge on the stretch, so the binding number
+is the *lowest* clearance on the route. And clearance is measured to the water — which
+means it is lowest in monsoon, when the water is high. **The season that gives you the
+most depth gives you the least headroom.** Software that treats clearance as a fixed
+number gets this exactly backwards. The page states the reason out loud:
+
+> Haldia – Farakka in Sep — **blocked**. Rail-cum-road bridge at chainage 203 km leaves
+> **−3.9 m** over the vessel — under the 1.0 m working margin. *High water this month is
+> the reason.*
+
+**LAD — least available depth.** It sets how deep the vessel may sit, which sets how much
+cargo it may carry. The same barge on the same stretch carries materially less in the
+lean season.
+
+Together: a waterway is never simply "available". It is available for a particular vessel,
+carrying a particular tonnage, in a particular month. The season band shows all twelve at
+once, and the modal-shift panel puts the answer against road — on NW-1's Haldia–Farakka
+stretch, 1,200 t over 405 km avoids ~35 t of CO₂e and saves ₹8.92L, for 50 hours more
+transit.
+
+Calibration note: the first cut left even the smallest barge with one clear month a year,
+because the simulated LAD sat below what NW-1 actually maintains. A screen where
+everything is blocked says nothing, so the depths were corrected — it now grades properly
+by vessel, from twelve clear months for a small barge on NW-3 down to none for a 3-tier
+container barge.
 
 ## Where the money actually burns
 
@@ -363,6 +396,7 @@ src/
       envelope.ts       Response envelope, unwrap/isNotFound, error types
       client.ts         UlipClient — login, bearer, retry, regex validation
     routes.ts           Lane planning — safety, restrictions, cost, modal trade-off
+    waterways.ts        National Waterways, air-draft and LAD feasibility
     osint.ts            Live open data: CPCB AQI, GRAP eligibility, corridor weather
     disruptions.ts      GDELT news → relevance, geo, dedupe, corroboration scoring
     vessels.ts          AIS positions and per-port anchorage congestion

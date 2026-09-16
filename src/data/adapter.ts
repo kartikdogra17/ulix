@@ -13,6 +13,7 @@ import type { PortTraffic, VesselFeed } from './vessels'
 import type { ScenarioResult, ScenarioSpec } from './scenarios'
 import type { Counterparty } from './counterparty'
 import type { EximFile } from './exim'
+import type { Waterway } from './waterways'
 
 export interface Page<T> { rows: T[]; total: number }
 
@@ -163,6 +164,9 @@ export interface DataAdapter {
 
   /** Cost a hypothetical disruption against the network as it stands now. */
   runScenario(spec: ScenarioSpec): Promise<ScenarioResult>
+
+  /** National Waterways, their stretches, structures and terminals. */
+  waterways(): Promise<Waterway[]>
 
   /** Import and export clearance files, with their demurrage clocks. */
   eximFiles(q?: { direction?: 'import' | 'export' | 'all'; search?: string; onlyOpen?: boolean }):

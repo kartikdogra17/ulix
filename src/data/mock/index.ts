@@ -25,6 +25,7 @@ import { fetchVessels, portTraffic } from '../vessels'
 import { type ScenarioSpec, runScenario } from '../scenarios'
 import { makeCounterparties } from '../counterparty'
 import { makeEximFiles } from '../exim'
+import { makeWaterways } from '../waterways'
 
 const sleep = (ms: number) => new Promise((res) => setTimeout(res, ms))
 /** Simulated gateway latency so loading states are real, not theatre. */
@@ -478,6 +479,15 @@ export class MockAdapter implements DataAdapter {
     // Several source systems answer here, so the wait is deliberately longer.
     await sleep(latency() * 2.2)
     return planLane(origin, destination, opts)
+  }
+
+  /* ── Waterways ─────────────────────────────────────────────── */
+
+  private nw = makeWaterways()
+
+  async waterways() {
+    await sleep(latency())
+    return this.nw
   }
 
   /* ── EXIM ──────────────────────────────────────────────────── */
