@@ -121,8 +121,25 @@ export function ncrEligibility(
   stage: GrapStage, bsNorm: string, fuel: string, carriesEssentials = false,
 ): EligibilityVerdict {
   const clean = fuel === 'Electric' || fuel === 'CNG' || fuel === 'LNG'
-  const bs = Number(/BS-?([IVX]+|\d)/i.exec(bsNorm)?.[1]?.replace(/VI/i, '6').replace(/IV/i, '4')
-    .replace(/III/i, '3').replace(/II/i, '2').replace(/I$/i, '1') ?? 6)
+  /* VAHAN writes the norm as "BHARAT STAGE II", not "BS-II" — the older
+     pattern here required a literal "BS" and so matched nothing against a
+     real record. It then fell back to 6, which meant an unreadable norm was
+     treated as the CLEANEST possible vehicle and waved through Stage IV.
+     Failing open on an entry ban is the wrong direction to fail in, so an
+     unreadable norm is now restricted rather than permitted. */
+  const roman = /(?:BS|BHARAT\s*STAGE)[\s-]*([IVX]+|\d)/i.exec(bsNorm)?.[1]
+  const bs = roman === undefined ? null : Number(
+    roman.replace(/^VI$/i, '6').replace(/^IV$/i, '4')
+      .replace(/^III$/i, '3').replace(/^II$/i, '2').replace(/^I$/i, '1'))
+
+  if (bs === null || Number.isNaN(bs)) {
+    return {
+      stage, status: stage < 3 ? 'allowed' : 'barred',
+      reason: stage < 3
+        ? 'No entry curbs in force at this stage.'
+        : `Emission norm could not be read from the VAHAN record ("${bsNorm}"). Treated as restricted until it is confirmed — an entry ban is not a good thing to guess in the permissive direction.`,
+    }
+  }
 
   if (stage < 3 || clean || bs >= 6) {
     return {

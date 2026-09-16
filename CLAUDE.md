@@ -21,6 +21,7 @@ from the copyright line.
 
 ```bash
 npm run dev            # app on :5173
+npx tsx scripts/conformance.ts   # mappers vs the documented response samples
 node server/ulip-proxy.mjs   # optional; needs ULIP_USERNAME + ULIP_PASSWORD
                              # cases persist to server/data/cases.db (SQLite)
 npx tsc --noEmit -p tsconfig.app.json   # the check to run before claiming done
@@ -65,7 +66,8 @@ src/data/
   types.ts        domain model
   adapter.ts      DataAdapter — the ONLY interface pages talk to
   index.ts        swap point: mock ⇄ live
-  ulip/           catalogue.ts (generated), envelope.ts, client.ts
+  ulip/           catalogue.ts (generated), envelope.ts, client.ts,
+                  adapter.ts (live), map.ts (gateway → domain, + FIELD_GAPS)
   mock/           index.ts = MockAdapter (771 lines, the busiest file), generate.ts, seed.ts
   fusion.ts       cross-system signals — the core idea of the product
   quality.ts      detector precision from case outcomes — the feedback loop
@@ -127,6 +129,15 @@ sidebar, which looks exactly like a broken route.
 - **`config.ts` must stay dependency-free.** It used to live in `data/index.ts`, which also
   constructs the adapter — so anything the adapter imported could not read it, and the app
   died at load with *"Cannot access 'OSINT_BASE' before initialization"*.
+- **ULIP is a lookup API, not a list API.** Every endpoint is keyed by an identifier you
+  already hold — a vehicle number, an e-Way Bill number, an FNR. Nothing answers "what am
+  I shipping today". The live adapter is therefore an ENRICHMENT layer over a consignment
+  book that must come from a TMS or ERP, and everything needing that book throws
+  `NotWiredError` with the reason rather than returning an empty array.
+- **Never fail open on a restriction.** `ncrEligibility` used to default an unparseable
+  emission norm to BS-VI, so a real VAHAN record — which spells it `BHARAT STAGE II`, not
+  `BS-II` — was read as the cleanest possible vehicle and waved into Delhi at GRAP Stage
+  IV. Unknown now means restricted.
 - **The ULIP envelope lies.** A missing record returns **HTTP 200** with `error: "false"`
   and reports failure on the *inner* `responseStatus`. Use `unwrap()` / `isNotFound()`.
   `error` and `code` are strings, not a boolean and a number.

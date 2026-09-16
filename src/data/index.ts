@@ -1,5 +1,7 @@
 import type { DataAdapter } from './adapter'
 import { MockAdapter } from './mock'
+import { UlipAdapter } from './ulip/adapter'
+import { ULIP_MODE, ULIP_PROXY } from './config'
 
 /**
  * Single swap point for the entire application.
@@ -22,6 +24,25 @@ import { MockAdapter } from './mock'
 // without importing this file, which constructs the adapter.
 export { ULIP_MODE, ULIP_PROXY, OSINT_BASE, CASES_BASE } from './config'
 
-export const adapter: DataAdapter = new MockAdapter()
+/**
+ * Live mode must never dress the simulator up as the gateway.
+ *
+ * Until this line could choose a real adapter, `VITE_ULIP_MODE=live` did
+ * something worse than nothing: it dropped the "Simulated gateway" banner
+ * and turned the sidebar badge green while every figure on screen stayed
+ * seeded PRNG output. One env var was enough to break the invariant this
+ * project states twice and relies on for its credibility.
+ *
+ * So the flag now selects an adapter, and a live mode that cannot be
+ * satisfied fails loudly at load instead of quietly relabelling the mock.
+ * A blank screen with an explanation is recoverable; a confident green
+ * badge over invented data is not.
+ */
+function selectAdapter(): DataAdapter {
+  if (ULIP_MODE !== 'live') return new MockAdapter()
+  return new UlipAdapter({ baseUrl: ULIP_PROXY })
+}
+
+export const adapter: DataAdapter = selectAdapter()
 
 export type { DataAdapter }

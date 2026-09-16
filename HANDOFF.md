@@ -238,6 +238,62 @@ exists to prevent. The floor is a deliberate product decision about the platform
 visibility, not a FASTag leak. Reverted to the shared `onset`, and the real cause — the leg
 dates — was fixed separately, below. Ages now vary as they should.
 
+## The live path — and what building it revealed
+
+**The flag used to lie.** `src/data/index.ts` hardcoded `new MockAdapter()`, and `ULIP_MODE`
+was read in exactly three places: a banner and two badges. Setting the documented
+`VITE_ULIP_MODE=live` dropped the "Simulated gateway" warning and turned the sidebar badge
+green **over entirely seeded data**. One env var was enough to break the invariant this
+project states twice. The swap point now selects an adapter.
+
+**ULIP is a lookup API, not a list API.** This is the finding that should shape the product.
+Every endpoint is keyed by an identifier you must already hold: FASTAG/01 and VAHAN/01 want
+a vehicle number, EWAYBILL/01 a bill number, SARATHI/01 a licence *and* a date of birth,
+FOIS/01 an FNR. **Nothing answers "what am I shipping today."**
+
+So `UlipAdapter` is not a drop-in replacement for the simulator — it is an enrichment layer,
+and the consignment book has to come from the customer's TMS or ERP. That is a pitch
+sentence as much as an architecture one: *we are not your TMS; we enrich the consignments
+you already have with government data no single ministry can give you.* Everything needing
+that book throws `NotWiredError` carrying the reason, because an empty table is
+indistinguishable from a broken one.
+
+What genuinely works against a live gateway on day one: **vehicle lookup across VAHAN and
+FASTag, and the API console.** That is a real demo, and more than the simulator can ever prove.
+
+### What ULIP cannot supply at any price
+
+`FIELD_GAPS` in `map.ts` declares these rather than defaulting them: **permit validity and
+permit type** (no ULIP endpoint carries them — VAHAN/01 has registration, fitness, insurance
+and PUC only), **FASTag balance and issuing bank** (FASTAG/01 returns toll *reads*, not
+wallet state), **driver identity** (SARATHI needs a licence number and DOB, neither
+discoverable from a plate), and **utilisation** (a commercial metric, not a register).
+Note the Fleet compliance check counts permit expiry among its five expiries — on live data
+that dimension will simply be absent.
+
+Also worth knowing: VAHAN **masks PII**. The documented sample returns `"R***L K***R"` for
+owner name and `"ME4JF509AH70*****"` for chassis.
+
+### Three bugs the conformance check found before any credentials existed
+
+`npx tsx scripts/conformance.ts` runs the mappers against response samples copied verbatim
+from the integration documents. It found:
+
+1. **GRAP failed open.** `ncrEligibility` matched on a literal `"BS"`, but VAHAN writes
+   `"BHARAT STAGE II"`. No match fell back to `?? 6`, so an unreadable norm was treated as
+   BS-VI — the cleanest possible vehicle — and permitted at Stage IV. A BS-II diesel truck
+   would have been waved into Delhi. Unknown is now restricted.
+2. **`BS-II` and `PETROL` were not in the domain model at all**, though both appear in the
+   documented sample. Widened.
+3. **Expiry dates read a day early.** `Date.parse("25-Jan-2032")` succeeds as *local*
+   midnight, and `toISOString()` walks it back across the date line in any positive offset —
+   in IST the sample fitness expiry came out as `2032-01-24`. A statutory expiry that reads
+   a day early marks a compliant vehicle as lapsed on its last valid day. Documented forms
+   are now parsed as UTC calendar dates first.
+
+None of these could surface against the mock, which emits `"BS-IV"` and ISO dates. That is
+the argument for doing this work before the credentials arrive rather than after.
+
 ## Detector precision — closing the loop
 
 Researched the category before building this. The documented way control towers die is
