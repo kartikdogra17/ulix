@@ -27,8 +27,15 @@ interface Store {
 
 let pending: Promise<Store> | null = null
 
+/* Reached through globalThis rather than the bare global. Vercel compiles
+   api/ without node types, so `process.env` is an error in its check even
+   though it exists at runtime — and a build that reports errors and ships
+   anyway is precisely how the broken import got to production. */
+const env = (globalThis as unknown as
+  { process?: { env?: Record<string, string | undefined> } }).process?.env ?? {}
+
 export function store(): Promise<Store> {
-  const url = process.env.DATABASE_URL
+  const url = env.DATABASE_URL
   if (!url) {
     return Promise.reject(new Error(
       'DATABASE_URL is not set. The shared case queue needs a Postgres database; '

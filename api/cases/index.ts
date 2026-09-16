@@ -1,7 +1,7 @@
 /* GET /api/cases — every record with its version.
    Mirrors the proxy route of the same name exactly, because the client
    cannot tell which one it is talking to and must not need to. */
-import { send, store } from '../_store'
+import { send, store } from '../_store.js'
 
 export default async function handler(
   req: { method?: string },

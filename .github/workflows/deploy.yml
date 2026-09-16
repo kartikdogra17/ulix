@@ -58,6 +58,7 @@ jobs:
       # The same checks that gate a local "done".
       - run: npx tsc --noEmit -p tsconfig.app.json
       - run: npx tsc --noEmit -p tsconfig.api.json
+      - run: npx tsc --noEmit -p tsconfig.scripts.json
 
       - run: npx vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
       # Same-origin, so the browser does not block it the way it blocks the

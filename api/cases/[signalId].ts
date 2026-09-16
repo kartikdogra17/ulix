@@ -1,7 +1,7 @@
 /* PUT /api/cases/:signalId — a write pinned to the version you read.
    The compare-and-set happens inside the driver's transaction, not here,
    so this route cannot weaken it by accident. */
-import { send, store } from '../_store'
+import { send, store } from '../_store.js'
 
 export default async function handler(
   req: { method?: string; query?: Record<string, string | string[]>; body?: unknown },
@@ -19,10 +19,16 @@ export default async function handler(
 
   try {
     const db = await store()
-    const result = await db.put(signalId, body.record, body.ifVersion)
-    return result.ok
-      ? send(res, 200, { ok: true, version: result.version })
-      : send(res, 409, { error: 'version conflict', current: result.current })
+    /* Widened at the call site on purpose. The Store interface keeps the
+       precise discriminated union because that is the real contract, but
+       Vercel compiles api/ without strict, so `ok: true | false` widens to
+       boolean, the union stops discriminating, and neither a ternary nor an
+       if narrows it. Keeping the honest type in the interface and paying for
+       it in one line here beats loosening the contract everywhere. */
+    const result = await db.put(signalId, body.record, body.ifVersion) as
+      { ok: boolean; version?: number; current?: unknown }
+    if (result.ok) return send(res, 200, { ok: true, version: result.version })
+    return send(res, 409, { error: 'version conflict', current: result.current })
   } catch (err) {
     return send(res, 503, { error: (err as Error).message })
   }
