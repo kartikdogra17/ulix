@@ -7,7 +7,7 @@ function, and every trap paid for — read [knowledge-base.md](knowledge-base.md
 file is the short operational brief; that one is the reference underneath it.
 
 **What it is.** ULIX is a logistics control tower built **on top of** India's Unified
-Logistics Interface Platform. Ten modules over a simulated ULIP gateway, built against the
+Logistics Interface Platform. Eleven modules over a simulated ULIP gateway, built against the
 real published specification.
 
 **Brand.** Mark and wordmark live in `src/components/Logo.tsx`. The mark is three streams
@@ -72,7 +72,7 @@ src/data/
   index.ts        swap point: mock ⇄ live
   ulip/           catalogue.ts (generated), envelope.ts, client.ts,
                   adapter.ts (live), map.ts (gateway → domain, + FIELD_GAPS)
-  mock/           index.ts = MockAdapter (771 lines, the busiest file), generate.ts, seed.ts
+  mock/           index.ts = MockAdapter (805 lines, the busiest file), generate.ts, seed.ts
   fusion.ts       cross-system signals — the core idea of the product
   quality.ts      detector precision from case outcomes — the feedback loop
   cases.ts        case model; caseStore.ts = shared (proxy) or local storage
@@ -178,9 +178,16 @@ sidebar, which looks exactly like a broken route.
 
 ## Deployment
 
-Static SPA, hash-routed, no rewrite rules needed. `vercel.json`, `netlify.toml` and a
-Pages workflow are committed; `VITE_BASE=/sub/` handles subpath hosting and the manifest
-and service worker already use relative URLs. Full notes in `DEPLOYMENT.md`.
+Static SPA, hash-routed, no rewrite rules needed. `vercel.json` and `netlify.toml` are
+committed; `VITE_BASE=/sub/` handles subpath hosting and the manifest and service worker
+already use relative URLs. Full notes in `DEPLOYMENT.md`.
+
+`vercel --prod` deploys by hand. Pushes to `main` deploy through
+`.github/workflows/deploy.yml`, which builds on GitHub and hands the output to Vercel over
+the CLI. Vercel's own Git integration is **not** available: it needs a paid team plan and
+this project sits in a team scope, which the CLI reports as an unhelpful
+`POST /v9/projects/{id}/link → 400` blaming the repository. Do not spend time retrying
+`vercel git connect`.
 
 On a static deploy the live air-quality and weather feeds still work (Open-Meteo is
 HTTPS and CORS-open, fetched from the browser). GDELT, AIS and the shared case queue need

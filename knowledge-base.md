@@ -15,7 +15,7 @@ it — see [§9](#9-the-live-integration).
 ## 1. What ULIX is
 
 A logistics **control tower** built on top of India's Unified Logistics Interface
-Platform. It joins data that several government ministries hold separately, finds the
+Platform. Eleven modules. It joins data that several government ministries hold separately, finds the
 conflicts between them, and turns each conflict into a case somebody owns.
 
 It is **independent software**. It is not a government service and is not affiliated
