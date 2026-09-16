@@ -1,6 +1,7 @@
 # ULIX — Logistics Control Tower
 
-Ninety-five endpoints across thirty-six government systems, resolved into a single picture
+Ninety-five endpoints across thirty-five government systems and seventeen ministries,
+resolved into a single picture
 and turned into decisions someone can act on.
 
 One responsive web application that also installs as a mobile app: multimodal visibility,
@@ -163,7 +164,27 @@ same picture at entity level, including a per-system coverage table.
 | `/shipments` **Consignments** | Filterable register; drawer opens on risk score and data confidence, then cross-system signals with recommended actions, a per-system coverage table, leg-by-leg journey, event chain attributed to its source system, and documents |
 | `/fleet` **Fleet** | VAHAN registration and statutory validity, SARATHI licence checks, FASTag crossings and balance, utilisation and detention analytics |
 | `/compliance` **Documents** | e-Way Bills, GST invoices, customs filings and vehicle papers, triaged by mismatch / expired / expiring / pending, with the specific discrepancy named |
+| `/import` **Import book** | ULIP is a lookup platform — nothing in it answers *what am I shipping today*. Bring the book from the system that does: a CSV from your TMS, parsed in the browser, columns mapped by alias, each row checked against the same regexes the gateway enforces and matched to the endpoints that can enrich it |
 | `/apis` **API gateway console** | The full 95-endpoint catalogue with ministry, category, parameters and regex formats; subscription state; a try-it runner returning the real envelope; request log |
+
+### Every screen adapts to the role
+
+Four organisation types — Shipper, Transporter, Freight Forwarder, Regulator — and the
+same network reads differently to each. The tower leads with the number that role is
+accountable for, the queue re-ranks by remit, and the tables carry the columns that role
+reads. A regulator is never shown cargo value: they own none of it.
+
+It is a **lens, not access control**. Nothing is filtered, every route still resolves, and
+Settings says so in those words.
+
+### The signals report their own track record
+
+Every case closes with an outcome, and two of those are verdicts on the *detector* rather
+than the consignment. Precision per check is computed from them and shown on the case
+itself — *wrong 42 of 79 times*. Checks against a government register score high; anything
+inferred from absence or from open news scores lower, and should. Below twenty judged
+outcomes no figure is shown at all.
+
 
 ### One product detail worth calling out
 
@@ -510,3 +531,15 @@ from those documents verbatim.
   `MockAdapter.resolve()` as you need them.
 - Map node positions are true coordinates plotted on a graticule. It is a network
   schematic, deliberately not a boundary rendering.
+
+---
+
+## Licence
+
+**Apache-2.0** — see [LICENSE](LICENSE) and [NOTICE](NOTICE).
+
+Chosen over MIT for Section 6: it grants no trademark or trade-name rights. For a project
+whose name sits deliberately close to a government platform, that clause is doing real
+work. `NOTICE` carries the obligations that travel with any redistribution — the
+non-affiliation statement, the provenance of the generated catalogue, and the fact that
+ULIP, VAHAN, SARATHI, FASTag and the rest are other people's marks.
