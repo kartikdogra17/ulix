@@ -466,10 +466,15 @@ relative URLs.
 | Host | Vercel, static build, project named `ulip-platform` |
 | Licence | Apache-2.0, chosen for §6 (no trademark grant) given the name's proximity to ULIP |
 
-**Deploys are manual: `vercel --prod` from this directory.** `vercel git connect` fails
-with a misleading "check for typos" error; the cause is authorisation, not the repo, and
-fixing it is a browser step in the Vercel dashboard. A test push confirmed nothing
-auto-deploys yet.
+**Deploys.** `vercel --prod` by hand always works. Push-to-deploy runs through
+`.github/workflows/deploy.yml` once `VERCEL_TOKEN` is set as a repo secret.
+
+Vercel's own Git integration is **not** available here: it is gated behind a paid team
+plan and this project sits in a team scope. The CLI reports that as
+`POST /v9/projects/{id}/link → 400` with the message *"Failed to connect… make sure there
+aren't any typos"*, which blames the repository for what is a plan limit. Two test pushes
+confirmed nothing auto-deploys through it. Do not spend time re-trying `vercel git
+connect`; the workflow is the way in without changing plan.
 
 On the static host, GDELT, AIS and the shared case queue degrade to labelled fallbacks —
 the proxy is not there, and its `localhost:8787` calls are blocked as mixed content.

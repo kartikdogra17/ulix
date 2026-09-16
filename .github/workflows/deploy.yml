@@ -1,0 +1,63 @@
+# Push-to-deploy without Vercel's Git integration.
+#
+# Vercel's native Git connection is gated behind a paid team plan, and this
+# project sits in a team scope — which is what the CLI's misleading
+# "Failed to connect… check for typos" 400 was actually telling us.
+#
+# This does the same job from the other side: GitHub builds and hands the
+# finished output to Vercel over the CLI. Same host, same URL, no plan
+# change, and `vercel --prod` by hand still works exactly as before.
+#
+# ONE-TIME SETUP — a single secret:
+#   1. Create a token at https://vercel.com/account/tokens (scope it to
+#      "Kartik's projects", no expiry or a long one).
+#   2. Repo → Settings → Secrets and variables → Actions → New repository
+#      secret, named VERCEL_TOKEN.
+# The two IDs below are project identifiers, not credentials, so they are
+# committed to keep setup to that one secret.
+
+name: Deploy to Vercel
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# A later push should win rather than race an in-flight deploy.
+concurrency:
+  group: vercel-production
+  cancel-in-progress: true
+
+env:
+  VERCEL_ORG_ID: team_J2gzSNBQk9Ubz7aLOnz2PSBO
+  VERCEL_PROJECT_ID: prj_Q92vukdzVTNU8t9byHhqi9CT9WxH
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    # Without a token the job would fail on every push and paint the repo
+    # red, which is exactly what the old Pages workflow did. Skip instead.
+    if: github.repository == 'kartikdogra17/ulix'
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Fail clearly if the token is missing
+        run: |
+          if [ -z "${{ secrets.VERCEL_TOKEN }}" ]; then
+            echo "::error::VERCEL_TOKEN is not set. See the setup note at the top of this file."
+            exit 1
+          fi
+
+      - run: npm ci
+
+      # The same checks that gate a local "done".
+      - run: npx tsc --noEmit -p tsconfig.app.json
+
+      - run: npx vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
+      - run: npx vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
+      - run: npx vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }}

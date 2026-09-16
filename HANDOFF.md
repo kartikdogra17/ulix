@@ -164,8 +164,7 @@ at with a question already in hand, not worklists that can open on the wrong one
 2. **Role-aware mobile cards.** The desktop tables are lensed, the cards are not. They
    carry identity, lane, status and progress, which all four roles want. Lowest value on
    this list.
-3. **Connect the repo in Vercel** so a push deploys. Blocked on installing the Vercel
-   GitHub App for the team — a browser step, see Deployment below.
+3. **Add `VERCEL_TOKEN` as a repo secret** to switch on push-to-deploy. See Deployment.
 
 Everything else that was on this list is done: the role lens, per-role page defaults and
 column sets, the licence, the GatiShakti overlay, the `corridor_pinch` signal, the leg-date
