@@ -186,8 +186,15 @@ export function signalsForShipment(
     if (slack < 0) {
       mk('ewb_expires_before_eta', 'critical',
         'e-Way Bill expires before arrival',
-        `Part-A is valid to ${new Date(validUpto).toLocaleString('en-IN')}, but movement data puts arrival ${Math.abs(Math.round(slack))}h later. Moving on a lapsed e-Way Bill exposes the consignment to detention and penalty under s.129.`,
+        `Part-A is valid to ${new Date(validUpto).toLocaleString('en-IN')}, but movement data puts arrival ${Math.abs(Math.round(slack))}h later. Moving on a lapsed e-Way Bill invites interception and detention, and the goods sit while it is argued.`,
         ['EWAYBILL/01', 'FASTAG/01'], Math.max(0, hoursBetween(validUpto, now)),
+        /* Deliberately not "you will be penalised under s.129". The Supreme Court
+           and Allahabad HC have repeatedly held that expiry alone does not sustain
+           a s.129 penalty — it is an anti-evasion provision and the department must
+           show intent to evade, which a breakdown or a traffic delay is not. The
+           operational risk is real (the vehicle is stopped and the cargo waits);
+           the legal certainty is not, and asserting it would be the kind of
+           confident wrongness that loses a room of domain experts. */
         'Extend validity on the e-Way Bill portal before the vehicle crosses the next check post.')
     } else if (slack < 12) {
       mk('ewb_expires_before_eta', 'high',

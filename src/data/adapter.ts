@@ -15,6 +15,7 @@ import type { Counterparty } from './counterparty'
 import type { EximFile } from './exim'
 import type { Waterway } from './waterways'
 import type { GatiShaktiLayer } from './gatishakti'
+import type { DetectorQuality } from './quality'
 
 export interface Page<T> { rows: T[]; total: number }
 
@@ -155,6 +156,13 @@ export interface DataAdapter {
   dismissCase(signalId: string, note: string, actor: string): Promise<Case>
   reopenCase(signalId: string, actor: string): Promise<Case>
   addCaseNote(signalId: string, note: string, actor: string): Promise<Case>
+  /**
+   * How often each detector has turned out to be right, from the outcomes
+   * operators recorded when they closed cases. The point of the queue is
+   * that someone trusts it; this is the evidence for or against that.
+   */
+  signalQuality(): Promise<DetectorQuality[]>
+
   /** 'server' when the queue is shared across operators, 'local' when not. */
   caseStoreKind(): Promise<'server' | 'local'>
   /** Everything every subscribed system knows about one consignment. */

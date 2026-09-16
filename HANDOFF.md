@@ -238,6 +238,36 @@ exists to prevent. The floor is a deliberate product decision about the platform
 visibility, not a FASTag leak. Reverted to the shared `onset`, and the real cause — the leg
 dates — was fixed separately, below. Ages now vary as they should.
 
+## Detector precision — closing the loop
+
+Researched the category before building this. The documented way control towers die is
+alert fatigue: they flag everything, operators stop believing the screen, and — the part
+that matters — when an operator marks something a false positive, **nothing feeds back into
+the classification logic**. This codebase already had the `Resolution` taxonomy that
+captures the verdict (`false_positive` says the government record was wrong, not the cargo)
+and was doing nothing with it.
+
+`quality.ts` computes precision per signal kind from closed outcomes:
+`actioned / (actioned + false_positive)`. `no_longer_relevant` is excluded — a consignment
+delivered before anyone opened the case tells you nothing about whether the check was right.
+
+It shows up in two places: a panel under *What is driving risk* ranking every detector, and
+a mark on the case row itself when the check that raised it has a weak record — *"wrong 42
+of 79 times"*. The second one is the point. That is where it changes what an operator does.
+
+The spread is deliberate and matches how each check actually works. Lookups against a
+register score high (customs hold 93%, insurance lapsed 89%); things inferred from absence
+or from news score low (no toll reads 53%, corridor disruption 47%) **and should**. The
+corridor pinch sits at 70% because it is inferred geometry, not a fact about the route.
+
+**Two bugs the distribution check caught, again.** `MIN_SAMPLE` started at 8, which still
+admits noise — at n=8 the standard error is ~17 points, and a detector built to be right
+45% of the time was displaying **74%** and ranking above genuinely good checks. And the
+resolution draw folded the non-verdict into the same ladder as the verdict, so it ate a
+slice of the false-positive tail and every figure came out high. Fixed both: threshold 20,
+non-verdict drawn independently. Worst drift from intent is now 7pp, down from ~29pp, and
+4 of 17 detectors honestly report "not enough history to judge".
+
 ## Case store — a real table, and a path off the disk
 
 Case work was a JSON file beside the proxy. Two failure modes drove it off: a write

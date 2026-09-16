@@ -68,6 +68,7 @@ src/data/
   ulip/           catalogue.ts (generated), envelope.ts, client.ts
   mock/           index.ts = MockAdapter (771 lines, the busiest file), generate.ts, seed.ts
   fusion.ts       cross-system signals — the core idea of the product
+  quality.ts      detector precision from case outcomes — the feedback loop
   cases.ts        case model; caseStore.ts = shared (proxy) or local storage
   roles.ts        role lens — what each org type is shown first, and why
   gatishakti.ts   corridors, tolls, parks, warehousing — the map's under-layer
@@ -148,6 +149,11 @@ sidebar, which looks exactly like a broken route.
   transaction; a stale pin returns the current record rather than overwriting. That
   contract is the only reason a queue can be shared. `node:sqlite` prints an
   ExperimentalWarning on startup — the proxy explains it so it does not read as a fault.
+- **A detector's track record is a feature, not an afterthought.** `quality.ts` turns the
+  `Resolution` an operator picks into precision per signal kind, and a weak detector is
+  marked on the case row. The category's documented failure is alert fatigue: operators
+  mark things false-positive and nothing ever changes. Never add a detector without
+  asking how its precision will be measured.
 - **Calibrate generated data.** Three screens have shipped flagging *everything* — zero
   clear counterparties, one navigable month a year, overdue permanently zero. A screen that
   flags everyone trains people to ignore it. After generating, check the distribution.

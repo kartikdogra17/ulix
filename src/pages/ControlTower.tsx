@@ -22,6 +22,7 @@ import type { Case } from '../data/cases'
 import { SIGNAL_LABEL, type Severity, type SignalKind } from '../data/fusion'
 import { lensFor, ownership, rankForRole, type Role } from '../data/roles'
 import { GATISHAKTI_SOURCES, constrained } from '../data/gatishakti'
+import { MIN_SAMPLE, WEAK_PRECISION, weakDetectors } from '../data/quality'
 import { useApp } from '../state/app'
 import { cn } from '../lib/cn'
 
@@ -43,8 +44,14 @@ const HEADLINE_ICON: Record<Role, React.ComponentType<{ className?: string }>> =
 
 /* ── The hero: a worklist, not a list of charts ── */
 
-function CaseRow({ c, actor, onOpen, onChanged }: {
-  c: Case; actor: string; onOpen: () => void; onChanged: () => void
+function CaseRow({ c, actor, weakness, onOpen, onChanged }: {
+  c: Case; actor: string
+  /* Present only when this kind has enough history AND a poor record. The
+     operator is about to spend time on this; how often the same check has
+     been wrong is the most useful thing we can tell them, and it is the
+     half of the loop most control towers never close. */
+  weakness?: { falsePositive: number; judged: number }
+  onOpen: () => void; onChanged: () => void
 }) {
   const closed = c.status === 'resolved' || c.status === 'dismissed'
   return (
@@ -76,6 +83,13 @@ function CaseRow({ c, actor, onOpen, onChanged }: {
             <span className="text-[10px] text-faint">
               waiting {dur(ageHours(c) * 60)} · SLA {SLA_HOURS[c.signal.severity]}h
             </span>
+            {weakness && (
+              <span className="text-[10px] font-medium text-warn"
+                title="Precision of this check across closed cases. Verify at source before acting.">
+                <ShieldAlert className="mr-0.5 inline size-3" />
+                wrong {weakness.falsePositive} of {weakness.judged} times
+              </span>
+            )}
           </div>
         </button>
 
@@ -133,6 +147,7 @@ export function ControlTower() {
   const { data: feed } = useAsync(() => adapter.disruptions(), [])
   const { data: marine } = useAsync(() => adapter.vessels(), [])
   const { data: gs } = useAsync(() => adapter.gatiShakti(), [])
+  const { data: quality } = useAsync(() => adapter.signalQuality(), [version])
 
   /** Risk per consignment, so the map shows exposure rather than mere position. */
   const riskByEntity = useMemo(() => {
@@ -227,6 +242,22 @@ export function ControlTower() {
   }, [infra, gs])
 
   const pinched = useMemo(() => gs ? constrained(gs.corridors) : [], [gs])
+
+  /* Precision by kind, so a case row can say how often its own check has
+     been wrong. The queue is only worth reading if someone trusts it. */
+  const precisionByKind = useMemo(() => {
+    const m = new Map<string, { precision: number; falsePositive: number; judged: number }>()
+    for (const q of quality ?? []) {
+      if (q.precision === null) continue
+      m.set(q.kind, {
+        precision: q.precision,
+        falsePositive: q.falsePositive,
+        judged: q.actioned + q.falsePositive,
+      })
+    }
+    return m
+  }, [quality])
+  const weak = useMemo(() => weakDetectors(quality ?? []), [quality])
 
   const head = useMemo(() => lens.headline(allLive ?? [], data ?? null), [lens, allLive, data])
   /* The queue arrives sorted by severity; the lens re-sorts it by remit. */
@@ -344,7 +375,9 @@ export function ControlTower() {
         <Card className="overflow-hidden">
           <CardHead
             title="Decisions queue"
-            sub={lens.queueSub}
+            sub={weak.length
+              ? `${lens.queueSub} · ${weak.length} ${weak.length === 1 ? 'check has' : 'checks have'} a weak record, marked in the rows`
+              : lens.queueSub}
             right={
               <div className="flex items-center gap-1">
                 {storeKind && (
@@ -390,10 +423,15 @@ export function ControlTower() {
                 </p>
               </div>
             )}
-            {ranked.slice(0, 40).map((c) => (
-              <CaseRow key={c.signalId} c={c} actor={actor}
-                onOpen={() => setOpenCase(c.signalId)} onChanged={bump} />
-            ))}
+            {ranked.slice(0, 40).map((c) => {
+              const q = precisionByKind.get(c.signal.kind)
+              return (
+                <CaseRow key={c.signalId} c={c} actor={actor}
+                  weakness={q && q.precision <= WEAK_PRECISION
+                    ? { falsePositive: q.falsePositive, judged: q.judged } : undefined}
+                  onOpen={() => setOpenCase(c.signalId)} onChanged={bump} />
+              )
+            })}
           </div>
         </Card>
 
@@ -481,6 +519,43 @@ export function ControlTower() {
               {allLive && !mix.length && (
                 <p className="py-6 text-center text-[13px] text-muted">No signals firing.</p>
               )}
+            </div>
+          </Card>
+
+          {/* Whether any of that is worth believing */}
+          <Card>
+            <CardHead title="Do these checks earn their place"
+              sub="Precision from the outcomes operators recorded when closing cases" />
+            <div className="space-y-2 p-3">
+              {!quality && Array.from({ length: 5 }).map((_, i) => <Skeleton key={i} className="h-5" />)}
+              {(quality ?? []).slice(0, 8).map((q) => {
+                const pct = q.precision === null ? null : Math.round(q.precision * 100)
+                return (
+                  <div key={q.kind} className="flex items-center gap-3">
+                    <span className="w-[9.75rem] shrink-0 truncate text-[12px]">{q.label}</span>
+                    {pct === null ? (
+                      <span className="flex-1 text-[11px] text-faint">
+                        {q.actioned + q.falsePositive} of {MIN_SAMPLE} needed to judge
+                      </span>
+                    ) : (
+                      <Meter value={pct}
+                        tone={q.precision! <= WEAK_PRECISION ? 'bad' : q.precision! < 0.8 ? 'warn' : 'ok'}
+                        className="flex-1" />
+                    )}
+                    <span className={cn('tnum w-9 shrink-0 text-right text-[12px] font-medium',
+                      pct === null && 'text-faint')}>
+                      {pct === null ? '—' : `${pct}%`}
+                    </span>
+                  </div>
+                )
+              })}
+              <p className="border-t border-line-soft pt-2 text-[11px] leading-relaxed text-faint">
+                Share of closed cases where the signal was acted on rather than dismissed as
+                wrong. Checks against a government register score high; anything inferred from
+                absence or from open news scores lower, and should. Below {MIN_SAMPLE} judged
+                outcomes no figure is shown — a precision from three cases is noise with a
+                decimal point. History is simulated; outcomes you record are real.
+              </p>
             </div>
           </Card>
 

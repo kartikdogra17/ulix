@@ -27,6 +27,7 @@ import { makeCounterparties } from '../counterparty'
 import { makeEximFiles } from '../exim'
 import { makeWaterways } from '../waterways'
 import { makeGatiShakti } from '../gatishakti'
+import { detectorQuality, makeCaseOutcomes } from '../quality'
 
 const sleep = (ms: number) => new Promise((res) => setTimeout(res, ms))
 /** Simulated gateway latency so loading states are real, not theatre. */
@@ -550,6 +551,9 @@ export class MockAdapter implements DataAdapter {
 
   private nw = makeWaterways()
   private gs = makeGatiShakti()
+  /* A back catalogue so a fresh deployment can say something about its
+     own detectors on day one. Real closures accumulate on top. */
+  private outcomes = makeCaseOutcomes()
 
   async waterways() {
     await sleep(latency())
@@ -559,6 +563,11 @@ export class MockAdapter implements DataAdapter {
   async gatiShakti() {
     await sleep(latency())
     return this.gs
+  }
+
+  async signalQuality() {
+    await sleep(latency())
+    return detectorQuality(this.outcomes, await this.listCases({ scope: 'all' }))
   }
 
   /* ── EXIM ──────────────────────────────────────────────────── */
