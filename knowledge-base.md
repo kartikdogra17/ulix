@@ -5,10 +5,10 @@ before touching code. [CLAUDE.md](CLAUDE.md) is the short operational brief;
 [HANDOFF.md](HANDOFF.md) is where things currently stand; this is the reference
 underneath both.
 
-**Status at the time of writing:** 33 commits, ~15,500 lines across `src/`, `server/`
-and `scripts/`. Typecheck and build clean. Live at
-<https://ulip-platform.vercel.app>. No real government data has ever flowed through
-it — see [§9](#9-the-live-integration).
+**Status at the time of writing:** 39 commits, ~15,500 lines across `src/`, `server/`
+and `scripts/`. Eleven modules. Typecheck and build clean. Live at
+<https://ulip-platform.vercel.app>, and a push to `main` deploys itself. No real
+government data has ever flowed through it — see [§10](#10-the-live-integration).
 
 ---
 
@@ -466,8 +466,17 @@ relative URLs.
 | Host | Vercel, static build, project named `ulip-platform` |
 | Licence | Apache-2.0, chosen for §6 (no trademark grant) given the name's proximity to ULIP |
 
-**Deploys.** `vercel --prod` by hand always works. Push-to-deploy runs through
-`.github/workflows/deploy.yml` once `VERCEL_TOKEN` is set as a repo secret.
+**A push to `main` deploys.** `.github/workflows/deploy.yml` checks out, installs, runs
+the typecheck, builds, and hands the output to Vercel over the CLI. `vercel --prod` by
+hand still works and bypasses it. The one secret it needs, `VERCEL_TOKEN`, is in place;
+the org and project ids are committed in the workflow because they are identifiers, not
+credentials.
+
+Two deliberate behaviours, both learned from the GitHub Pages workflow this replaced —
+which failed on every push for days with a 404 nobody read. It **fails readably**: a
+missing token stops the run in 11 seconds with a message naming the fix. And it
+**typechecks before deploying**, so a push that would not build locally cannot reach
+production.
 
 Vercel's own Git integration is **not** available here: it is gated behind a paid team
 plan and this project sits in a team scope. The CLI reports that as
@@ -475,6 +484,11 @@ plan and this project sits in a team scope. The CLI reports that as
 aren't any typos"*, which blames the repository for what is a plan limit. Two test pushes
 confirmed nothing auto-deploys through it. Do not spend time re-trying `vercel git
 connect`; the workflow is the way in without changing plan.
+
+An earlier diagnosis in these notes — *"the Vercel GitHub App is not authorised for the
+team"* — was **wrong**, and cost a round of dashboard changes that could not have helped.
+The 400 was real and correctly located; the reading of it was not. It was never an
+authorisation problem.
 
 On the static host, GDELT, AIS and the shared case queue degrade to labelled fallbacks —
 the proxy is not there, and its `localhost:8787` calls are blocked as mixed content.
@@ -503,10 +517,11 @@ VAHAN lookups).
 1. Share the queue in production — the Postgres driver exists but has never run; needs a
    provisioned database and a serverless function in front of it.
 2. Role-aware mobile cards.
-3. Connect the repo in Vercel so pushes deploy.
 
-**Not code, and higher value than any of the above:** get the NDA signed, and talk to
-8–10 operators to test whether the statutory-conflict wedge is a real pain.
+**Not code, and higher value than either:** get the goulip.in NDA signed, and talk to
+8–10 operators to test whether the statutory-conflict wedge is a real pain. Every session
+so far has defaulted to building instead; neither answer changes because a feature was
+added while waiting.
 
 ---
 
@@ -520,7 +535,8 @@ npm run lint                            # oxlint
 node server/ulip-proxy.mjs              # optional; needs ULIP_USERNAME + ULIP_PASSWORD
                                         # cases persist to server/data/cases.db (SQLite)
 npx tsx scripts/conformance.ts          # mappers vs documented response samples
-vercel --prod                           # deploy (manual)
+git push origin main                    # deploys via .github/workflows/deploy.yml
+vercel --prod                           # deploy by hand, bypassing the workflow
 ```
 
 **Do not read:** `docs/ulip-api/pdf/` (24 MB), `docs/ulip-api/txt/` (1.3 MB),
