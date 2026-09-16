@@ -53,11 +53,33 @@ about it, so nobody greps 36 files.
   `AISSTREAM_API_KEY`; the service forbids browser connections, hence the proxy).
 - **Everything ULIP:** simulated, deterministic, seeded.
 
-## Deployment
+## Deployment — live
 
-Not deployed. No git remote, no `gh`, no deploy CLI on this machine — those need the
-owner's accounts. Everything is prepared: see [DEPLOYMENT.md](DEPLOYMENT.md).
-Decision taken: **static hosting, public repo.**
+| | |
+|---|---|
+| Site | **https://ulip-platform.vercel.app** |
+| Repo | **https://github.com/kartikdogra17/ulix** (public, `main`) |
+| Host | Vercel, static build, project still named `ulip-platform` |
+
+Deploys are currently **manual** — `vercel --prod` from this directory. The repo is not
+yet connected in Vercel's Git settings, so a push does not redeploy. Connecting it is a
+dashboard action the CLI cannot do.
+
+Two gotchas already paid for:
+
+- **`.vercelignore` matters.** The first deploy timed out uploading 23.6 MB, almost all of
+  it the vendored PDFs in `docs/`. Excluding `docs/`, `server/` and `dist/` took the
+  upload to 2.0 MB. Do not remove it.
+- **Deployment-specific URLs stay behind Vercel Authentication** even when production is
+  public. `ulip-platform.vercel.app` is public; `ulip-platform-<hash>-...vercel.app` is
+  not, and testing the wrong one looks exactly like a broken deploy.
+
+On this static host, GDELT, AIS and the shared case queue fall back to their labelled
+simulated state — no proxy. Live air quality and weather still work, fetched from the
+browser.
+
+Loose ends: `.github/workflows/deploy-pages.yml` is committed but dormant and now
+redundant against Vercel; the Vercel project could be renamed `ulix` to match.
 
 ## Open threads, in the order I would pick them up
 
