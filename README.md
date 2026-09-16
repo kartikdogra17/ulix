@@ -180,6 +180,21 @@ once, and the modal-shift panel puts the answer against road — on NW-1's Haldi
 stretch, 1,200 t over 405 km avoids ~35 t of CO₂e and saves ₹8.92L, for 50 hours more
 transit.
 
+The nine statistics endpoints answer the other half of the decision. Feasibility says
+whether a barge *can* run the stretch; `IWAI/03`, `/04`, `/05` and `/08` say whether
+anyone *does*. A technically navigable stretch nobody uses has no vessel availability, no
+backhaul and thin handling — you would be funding the ecosystem yourself. So each stretch
+carries a liquidity band (thin / developing / established), monthly tonnage this year
+against last, and terminal-level breakdowns.
+
+Monthly traffic is drawn with the navigable window behind it, so the two can be compared
+directly. A separate **traffic-vs-depth** score measures how closely reported tonnage
+tracks the depth curve — deliberately vessel-independent, because reported tonnage is the
+sum of every operator's movements. Scoring it against one selected barge collapsed the
+number whenever a large vessel was picked, which said nothing about whether the data and
+the model agreed. It now reads 46–85% across stretches, lowest on thin low-volume runs
+where the series is noisiest.
+
 Calibration note: the first cut left even the smallest barge with one clear month a year,
 because the simulated LAD sat below what NW-1 actually maintains. A screen where
 everything is blocked says nothing, so the depths were corrected — it now grades properly

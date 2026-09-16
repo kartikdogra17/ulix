@@ -42,6 +42,14 @@ export interface Structure {
   longitude: number
 }
 
+/** Monthly tonnage, current financial year against the previous (IWAI/05, /06). */
+export interface MonthlyTraffic {
+  month: number
+  /** Thousand tonnes. */
+  currentYear: number
+  previousYear: number
+}
+
 export interface Terminal {
   id: string
   terminalJetty: string
@@ -55,6 +63,8 @@ export interface Terminal {
   containerCapable: boolean
   /** Thousand tonnes handled in the last financial year (IWAI/03, /08). */
   throughputKt: number
+  /** Terminal-wise monthly series (IWAI/03, /08). */
+  monthly: MonthlyTraffic[]
 }
 
 export interface Stretch {
@@ -73,6 +83,8 @@ export interface Stretch {
   ladByMonth: number[]
   structures: Structure[]
   terminals: Terminal[]
+  /** Stretch-level monthly tonnage (IWAI/04). */
+  traffic: MonthlyTraffic[]
 }
 
 export interface Waterway {
@@ -88,6 +100,8 @@ export interface Waterway {
   stretches: Stretch[]
   /** Historical traffic, most recent last (IWAI/09). */
   trafficByYear: Array<{ fyear: string; traffic: number }>
+  /** Year-on-year change across the whole waterway (IWAI/05). */
+  yoyGrowthPct: number
 }
 
 /* ── The declared network ─────────────────────────────────────── */
@@ -191,6 +205,24 @@ export function makeWaterways(): Waterway[] {
         }
       })
 
+      /* Traffic follows the water. Generating it independently of the LAD curve
+         would let the page claim busy months on a stretch the model calls
+         unnavigable — so the shape is derived from the same seasonality, with
+         noise on top rather than instead. */
+      const trafficBase = navigable ? int(r, 14, 130) : int(r, 0, 6)
+      const monthly = (scale: number): MonthlyTraffic[] =>
+        LAD_SHAPE.map((f, m) => {
+          const seasonal = 0.35 + 0.65 * f
+          const cur = Math.max(0, trafficBase * scale * seasonal * (0.82 + r() * 0.36))
+          return {
+            month: m,
+            currentYear: +cur.toFixed(1),
+            previousYear: +(cur * (0.74 + r() * 0.42)).toFixed(1),
+          }
+        })
+
+      const stretchTraffic = monthly(1)
+
       const terminals: Terminal[] = [originName, destinationName].map((tName, k) => {
         const tk = k === 0 ? t0 : t1
         const container = r() < 0.45
@@ -205,6 +237,7 @@ export function makeWaterways(): Waterway[] {
           longitude: +lon(tk).toFixed(3),
           containerCapable: container,
           throughputKt: container ? int(r, 180, 1400) : int(r, 20, 260),
+          monthly: monthly(container ? 0.62 : 0.38),
         }
       })
 
@@ -221,6 +254,7 @@ export function makeWaterways(): Waterway[] {
         ladByMonth: LAD_SHAPE.map((f) => +(baseLad * f).toFixed(2)),
         structures,
         terminals,
+        traffic: stretchTraffic,
       }
     })
 
@@ -228,6 +262,11 @@ export function makeWaterways(): Waterway[] {
       fyear: `${2020 + i}-${String(21 + i).padStart(2, '0')}`,
       traffic: int(r, 400, 3200) + i * int(r, 60, 420),
     }))
+
+    const curTotal = stretches.reduce(
+      (a, st) => a + st.traffic.reduce((b, m) => b + m.currentYear, 0), 0)
+    const prevTotal = stretches.reduce(
+      (a, st) => a + st.traffic.reduce((b, m) => b + m.previousYear, 0), 0)
 
     return {
       id: w.code.toLowerCase(),
@@ -240,6 +279,7 @@ export function makeWaterways(): Waterway[] {
       utmZone: w.utmZone,
       stretches,
       trafficByYear,
+      yoyGrowthPct: prevTotal ? +(((curTotal - prevTotal) / prevTotal) * 100).toFixed(1) : 0,
     }
   })
 }
@@ -326,6 +366,65 @@ export function seasonProfile(stretch: Stretch, vessel: VesselSpec): Feasibility
 
 export const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
   'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+
+/* ── Liquidity ────────────────────────────────────────────────
+   Feasibility answers whether a barge CAN run the stretch. That is only
+   half a decision. A technically navigable stretch that nobody uses has
+   no vessel availability, no backhaul and thin handling — you would be
+   funding the ecosystem yourself. The statistics endpoints answer the
+   other half. */
+
+export type LiquidityBand = 'thin' | 'developing' | 'established'
+
+export interface Liquidity {
+  band: LiquidityBand
+  /** Thousand tonnes across the stretch this year. */
+  annualKt: number
+  yoyPct: number
+  containerTerminals: number
+  /**
+   * How closely reported traffic follows the DEPTH curve for the stretch.
+   *
+   * Deliberately vessel-independent: reported tonnage is the sum of every
+   * operator's movements, so scoring it against one selected barge's window
+   * would collapse the number whenever the user picked a large vessel — which
+   * says nothing about whether the data and the model agree.
+   */
+  seasonAlignment: number
+  note: string
+}
+
+export function liquidity(stretch: Stretch): Liquidity {
+  const annualKt = +stretch.traffic.reduce((a, m) => a + m.currentYear, 0).toFixed(1)
+  const prev = stretch.traffic.reduce((a, m) => a + m.previousYear, 0)
+  const yoyPct = prev ? +(((annualKt - prev) / prev) * 100).toFixed(1) : 0
+  const containerTerminals = stretch.terminals.filter((t) => t.containerCapable).length
+
+  // Compare the shape of traffic against the shape of available depth, both
+  // normalised to their own range so only the seasonality is compared.
+  const maxLad = Math.max(...stretch.ladByMonth)
+  const minLad = Math.min(...stretch.ladByMonth)
+  const ladNorm = stretch.ladByMonth.map((l) =>
+    stretch.navigable && maxLad > minLad ? (l - minLad) / (maxLad - minLad) : 0)
+  const maxTraffic = Math.max(...stretch.traffic.map((m) => m.currentYear))
+  const minTraffic = Math.min(...stretch.traffic.map((m) => m.currentYear))
+  const trafficNorm = stretch.traffic.map((m) =>
+    maxTraffic > minTraffic ? (m.currentYear - minTraffic) / (maxTraffic - minTraffic) : 0)
+  const agreement = trafficNorm.reduce((a, v, i) => a + (1 - Math.abs(v - ladNorm[i])), 0) / 12
+  const seasonAlignment = Math.round(agreement * 100)
+
+  const band: LiquidityBand =
+    annualKt < 120 ? 'thin' : annualKt < 600 ? 'developing' : 'established'
+
+  const note =
+    band === 'thin'
+      ? `Only ${annualKt.toFixed(0)} kt moved here last year. Expect to charter rather than book, and plan for an empty return leg.`
+      : band === 'developing'
+        ? `${annualKt.toFixed(0)} kt and ${yoyPct >= 0 ? 'growing' : 'shrinking'} ${Math.abs(yoyPct)}% year on year. Capacity exists but is not deep — confirm vessel availability before committing volume.`
+        : `${annualKt.toFixed(0)} kt a year across ${stretch.terminals.length} terminals. Established traffic, so vessels and handling are available on this stretch.`
+
+  return { band, annualKt, yoyPct, containerTerminals, seasonAlignment, note }
+}
 
 /* ── Modal comparison against road ────────────────────────────── */
 

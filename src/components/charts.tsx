@@ -194,3 +194,68 @@ export function DayBand({
     </div>
   )
 }
+
+/* ── Twelve-month comparison, two series ──────────────────────── */
+
+export function MonthBars({
+  months, current, previous, overlay, labels, height = 76, format = (n) => n.toFixed(0),
+}: {
+  months: string[]
+  current: number[]
+  previous?: number[]
+  /**
+   * Optional 0–1 band drawn behind the bars — used to show feasibility under
+   * traffic, so agreement or disagreement between them is visible at a glance.
+   */
+  overlay?: number[]
+  labels?: [string, string]
+  height?: number
+  format?: (n: number) => string
+}) {
+  const max = Math.max(1, ...current, ...(previous ?? []))
+  return (
+    <div>
+      <div className="flex items-end gap-[3px]" style={{ height }}>
+        {months.map((m, i) => (
+          <div key={m} className="relative flex h-full flex-1 items-end gap-[1px]"
+            title={`${m}: ${format(current[i])}${previous ? ` (prev ${format(previous[i])})` : ''}`}>
+            {overlay && (
+              <div className="absolute inset-x-0 bottom-0 rounded-[2px]"
+                style={{
+                  height: `${overlay[i] * 100}%`,
+                  background: 'color-mix(in srgb, var(--c-ok) 16%, transparent)',
+                }} />
+            )}
+            {previous && (
+              <div className="relative flex-1 rounded-t-[2px] bg-surface-3"
+                style={{ height: `${(previous[i] / max) * 100}%` }} />
+            )}
+            <div className="relative flex-1 rounded-t-[2px] bg-brand"
+              style={{ height: `${(current[i] / max) * 100}%` }} />
+          </div>
+        ))}
+      </div>
+      <div className="mt-1 flex gap-[3px]">
+        {months.map((m) => (
+          <span key={m} className="flex-1 text-center text-[9px] text-faint">{m[0]}</span>
+        ))}
+      </div>
+      {labels && (
+        <div className="mt-1.5 flex items-center gap-3 text-[10px] text-muted">
+          <span className="flex items-center gap-1">
+            <span className="size-2 rounded-sm bg-brand" />{labels[0]}
+          </span>
+          <span className="flex items-center gap-1">
+            <span className="size-2 rounded-sm bg-surface-3" />{labels[1]}
+          </span>
+          {overlay && (
+            <span className="flex items-center gap-1">
+              <span className="size-2 rounded-sm" style={{ background: 'color-mix(in srgb, var(--c-ok) 28%, transparent)' }} />
+              navigable
+            </span>
+          )}
+        </div>
+      )}
+    </div>
+  )
+}

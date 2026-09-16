@@ -1,15 +1,16 @@
 import { useEffect, useMemo, useState } from 'react'
 import {
-  Anchor, ArrowDownUp, Boxes, Droplets, Leaf, Ruler, Ship, TriangleAlert, Waves,
+  Activity, Anchor, ArrowDownUp, Boxes, Droplets, Leaf, Ruler, Ship,
+  TrendingDown, TrendingUp, TriangleAlert, Waves,
 } from 'lucide-react'
 import { adapter } from '../data'
 import { useAsync } from '../lib/useAsync'
 import { compact, inr, num } from '../lib/format'
 import {
-  MONTHS, VESSELS, assess, compareToRoad, seasonProfile,
+  MONTHS, VESSELS, assess, compareToRoad, liquidity, seasonProfile,
   type Feasibility, type Stretch,
 } from '../data/waterways'
-import { CompareBars, Sparkline } from '../components/charts'
+import { CompareBars, MonthBars, Sparkline } from '../components/charts'
 import {
   Badge, Card, CardHead, Field, Meter, Mono, Select, Skeleton,
 } from '../components/ui'
@@ -114,6 +115,8 @@ export function Waterways() {
   const current = profile[month]
   const shift = useMemo(
     () => (stretch ? compareToRoad(stretch.lengthKm, tonnes) : null), [stretch, tonnes])
+
+  const liq = useMemo(() => (stretch ? liquidity(stretch) : null), [stretch])
 
   const bestMonths = useMemo(
     () => profile.map((f, m) => ({ m, f })).filter((x) => x.f.verdict === 'clear').map((x) => MONTHS[x.m]),
@@ -261,6 +264,118 @@ export function Waterways() {
             </Card>
           </div>
 
+          {/* Is anyone actually using it — the other half of the decision */}
+          {liq && (
+            <Card>
+              <CardHead
+                title="Is the stretch actually used?"
+                sub="Feasibility says whether a barge can run it. Traffic says whether anyone does."
+                right={
+                  <div className="flex items-center gap-2">
+                    <Badge tone={liq.band === 'established' ? 'ok' : liq.band === 'developing' ? 'warn' : 'bad'} dot>
+                      {liq.band}
+                    </Badge>
+                    <Mono className="text-faint">IWAI/04 · /05 · /08</Mono>
+                  </div>
+                }
+              />
+              <div className="grid gap-3 p-3 lg:grid-cols-[1.4fr_1fr]">
+                <div>
+                  <MonthBars
+                    months={MONTHS}
+                    current={stretch.traffic.map((t) => t.currentYear)}
+                    previous={stretch.traffic.map((t) => t.previousYear)}
+                    overlay={profile.map((f) =>
+                      f.verdict === 'clear' ? 1 : f.verdict === 'restricted' ? 0.5 : 0)}
+                    labels={['This year', 'Last year']}
+                    format={(n) => `${n.toFixed(1)} kt`}
+                  />
+                  <p className="mt-2 text-[11px] leading-relaxed text-faint">
+                    {profile.every((f) => f.verdict === 'blocked') ? (
+                      <>
+                        No navigable band is drawn because the {vessel.name.toLowerCase()}{' '}
+                        cannot run this stretch in any month — yet the bars show real tonnage
+                        moving, so smaller craft are working it year round.
+                      </>
+                    ) : (
+                      <>
+                        The green band is the navigable window for the <em>selected</em> vessel;
+                        the bars are total reported tonnage across all operators. Traffic
+                        peaking outside the band means smaller craft are working months your
+                        chosen barge cannot.
+                      </>
+                    )}
+                  </p>
+                </div>
+
+                <div className="space-y-2">
+                  <div className="grid grid-cols-2 gap-2">
+                    <div className="rounded-lg border border-line bg-surface-2/60 p-2.5">
+                      <div className="flex items-center gap-1 text-[10px] uppercase tracking-wide text-faint">
+                        <Activity className="size-3" />Annual
+                      </div>
+                      <div className="tnum mt-0.5 text-[17px] font-semibold">
+                        {num(Math.round(liq.annualKt))}<span className="ml-1 text-[11px] font-normal text-faint">kt</span>
+                      </div>
+                    </div>
+                    <div className="rounded-lg border border-line bg-surface-2/60 p-2.5">
+                      <div className="flex items-center gap-1 text-[10px] uppercase tracking-wide text-faint">
+                        {liq.yoyPct >= 0 ? <TrendingUp className="size-3" /> : <TrendingDown className="size-3" />}
+                        Year on year
+                      </div>
+                      <div className={cn('tnum mt-0.5 text-[17px] font-semibold',
+                        liq.yoyPct >= 0 ? 'text-ok' : 'text-bad')}>
+                        {liq.yoyPct >= 0 ? '+' : ''}{liq.yoyPct}%
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="rounded-lg border border-line bg-surface-2/60 p-2.5">
+                    <div className="mb-1 flex items-center justify-between text-[10px] uppercase tracking-wide text-faint">
+                      <span>Traffic vs depth</span>
+                      <span className="tnum">{liq.seasonAlignment}%</span>
+                    </div>
+                    <Meter value={liq.seasonAlignment}
+                      tone={liq.seasonAlignment >= 70 ? 'ok' : liq.seasonAlignment >= 45 ? 'warn' : 'bad'} />
+                    <p className="mt-1 text-[10px] leading-snug text-faint">
+                      {liq.seasonAlignment >= 70
+                        ? 'Reported tonnage tracks the depth curve closely — the seasonality model holds.'
+                        : 'Tonnage and depth only partly track each other; traffic here is driven by something other than the season.'}
+                    </p>
+                  </div>
+
+                  <p className="text-[12px] leading-relaxed text-muted">{liq.note}</p>
+                </div>
+              </div>
+
+              {/* Terminal-level detail */}
+              <div className="border-t border-line-soft p-3">
+                <div className="mb-2 flex items-center justify-between">
+                  <span className="text-[11px] font-semibold uppercase tracking-wide text-faint">
+                    By terminal
+                  </span>
+                  <Mono className="text-faint">IWAI/03 · /08</Mono>
+                </div>
+                <div className="grid gap-3 sm:grid-cols-2">
+                  {stretch.terminals.map((t) => (
+                    <div key={t.id} className="rounded-lg border border-line p-2.5">
+                      <div className="mb-1.5 flex items-center justify-between gap-2">
+                        <span className="truncate text-[12px] font-medium">{t.terminalJetty}</span>
+                        <span className="tnum shrink-0 text-[11px] text-muted">
+                          {num(Math.round(t.monthly.reduce((a, m) => a + m.currentYear, 0)))} kt
+                        </span>
+                      </div>
+                      <MonthBars months={MONTHS} height={44}
+                        current={t.monthly.map((m) => m.currentYear)}
+                        previous={t.monthly.map((m) => m.previousYear)}
+                        format={(n) => `${n.toFixed(1)} kt`} />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </Card>
+          )}
+
           <div className="grid gap-3 lg:grid-cols-[1.1fr_1fr]">
             {/* Modal shift — the payoff */}
             {shift && (
@@ -349,6 +464,13 @@ export function Waterways() {
                 <div>
                   <div className="text-[10px] uppercase tracking-wide text-faint">Stretches</div>
                   <div className="tnum text-[18px] font-semibold">{way.stretches.length}</div>
+                </div>
+                <div>
+                  <div className="text-[10px] uppercase tracking-wide text-faint">YoY</div>
+                  <div className={cn('tnum text-[18px] font-semibold',
+                    way.yoyGrowthPct >= 0 ? 'text-ok' : 'text-bad')}>
+                    {way.yoyGrowthPct >= 0 ? '+' : ''}{way.yoyGrowthPct}%
+                  </div>
                 </div>
                 <div>
                   <div className="text-[10px] uppercase tracking-wide text-faint">Navigable now</div>
