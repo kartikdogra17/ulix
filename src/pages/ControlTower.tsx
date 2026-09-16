@@ -161,6 +161,7 @@ export function ControlTower() {
     [scope, sev, actor, version])
   // Unfiltered, for tab counts and the risk breakdown.
   const { data: allLive } = useAsync(() => adapter.listCases({ scope: 'live' }), [version])
+  const { data: storeKind } = useAsync(() => adapter.caseStoreKind(), [])
   const { data: feed } = useAsync(() => adapter.disruptions(), [])
   const { data: marine } = useAsync(() => adapter.vessels(), [])
 
@@ -281,7 +282,12 @@ export function ControlTower() {
             title="Decisions queue"
             sub="Cross-system signals no single ministry API can produce — assign, action, close"
             right={
-              <div className="flex gap-1">
+              <div className="flex items-center gap-1">
+                {storeKind && (
+                  <Badge tone={storeKind === 'server' ? 'ok' : 'warn'} dot className="mr-1">
+                    {storeKind === 'server' ? 'shared queue' : 'this browser only'}
+                  </Badge>
+                )}
                 {(['all', 'critical', 'high', 'medium'] as const).map((k) => (
                   <button key={k} onClick={() => setSev(k as Severity | 'all')}
                     className={cn('rounded-md px-2 py-1 text-[11px] font-medium transition-colors',

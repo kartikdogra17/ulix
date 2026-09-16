@@ -10,6 +10,10 @@ Built against the **official ULIP integration documents** published on
 
 ---
 
+> Working on this repo with an agent? Start from **[CLAUDE.md](CLAUDE.md)** — architecture
+> map, conventions, and the traps that have already cost time. It is written to save a
+> session from exploring, and it names the files that should *not* be read.
+
 ## What is real, and what is simulated
 
 > **Full breakdown: [docs/DATA-PROVENANCE.md](docs/DATA-PROVENANCE.md)** — every figure on
@@ -121,8 +125,15 @@ retention), so it never claims to have seen something before it had data.
 Resolving a case visibly moves **value at risk**: exposure counts each consignment once,
 and only while its case is still live.
 
-Case state is stored per-operator in `localStorage` and never leaves the browser. In a
-real deployment this is the one table you would move server-side first.
+Case state lives in the **shared store on the proxy** when it is running, so two
+controllers see the same queue; without the proxy it falls back to per-browser storage and
+the UI says which, with a `shared queue` or `this browser only` badge.
+
+Writes are optimistic. Each record carries a version, a write pins the version it was read
+at, and a stale pin is rejected with 409 plus the current record — the loser of a race
+reapplies its change on top rather than overwriting a colleague. Verified: a concurrent
+note from another operator survives a snooze written against a stale copy, and both land
+in the trail in order.
 
 The **control tower leads with a ranked decisions queue** — what needs action, the
 consignment value exposed, hours left to act, the contributing endpoints, and the

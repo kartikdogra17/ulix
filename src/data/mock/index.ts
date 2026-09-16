@@ -3,9 +3,9 @@ import type {
 } from '../adapter'
 import {
   type Case, type CaseRecord, type CaseStatus, type Resolution,
-  RESOLUTION_LABEL, appendActivity, blankCase, isLive, isOverdue,
-  loadCases, memberById, saveCases,
+  RESOLUTION_LABEL, appendActivity, blankCase, isLive, isOverdue, memberById,
 } from '../cases'
+import { type CaseStore, type StoredCase, caseStore } from '../caseStore'
 import {
   type Signal, confidence, coverageForShipment, riskScore, signalsForShipment,
 } from '../fusion'
@@ -55,14 +55,28 @@ export class MockAdapter implements DataAdapter {
   private airLoaded: Promise<void> | null = null
   private disruptionFeed: DisruptionFeed | null = null
   private disruptionsLoaded: Promise<void> | null = null
-  private cases: Record<string, CaseRecord> = loadCases()
+  /** signalId -> { record, version }, mirroring whichever store is in use. */
+  private cases: Record<string, StoredCase> = {}
+  private store: CaseStore | null = null
+  private casesLoaded: Promise<void> | null = null
 
   /* ── Case work ─────────────────────────────────────────────── */
 
+  /** Load the shared queue once per session, falling back to local storage. */
+  private async ensureCases() {
+    if (!this.casesLoaded) {
+      this.casesLoaded = (async () => {
+        this.store = await caseStore()
+        try { this.cases = await this.store.load() } catch { this.cases = {} }
+      })()
+    }
+    return this.casesLoaded
+  }
+
   /** Materialise a case for a signal, creating one lazily on first sight. */
   private caseFor(signal: Signal, now = Date.now()): Case {
-    const rec = this.cases[signal.id] ?? blankCase(signal.id, signal.detectedAt, now)
-    if (!this.cases[signal.id]) this.cases[signal.id] = rec
+    const rec = this.cases[signal.id]?.record
+      ?? blankCase(signal.id, signal.detectedAt, now)
     return {
       ...rec,
       signal,
@@ -77,13 +91,41 @@ export class MockAdapter implements DataAdapter {
     return this.allSignals().map((s) => this.caseFor(s, now))
   }
 
-  private mutate(signalId: string, fn: (rec: CaseRecord) => CaseRecord): Case {
+  /**
+   * Apply a change and push it to the store. On a version conflict the write
+   * is reapplied over whatever a colleague landed first, rather than
+   * overwriting their work — that is the point of a shared queue.
+   */
+  private async mutate(
+    signalId: string, fn: (rec: CaseRecord) => CaseRecord,
+  ): Promise<Case> {
+    await this.ensureCases()
     const signal = this.allSignals().find((s) => s.id === signalId)
     if (!signal) throw new Error(`Unknown signal ${signalId}`)
-    const current = this.cases[signalId] ?? blankCase(signalId, signal.detectedAt)
-    this.cases = { ...this.cases, [signalId]: fn(current) }
-    saveCases(this.cases)
-    return this.caseFor(signal)
+
+    const apply = async (base: StoredCase | undefined): Promise<Case> => {
+      const record = fn(base?.record ?? blankCase(signalId, signal.detectedAt))
+      const version = base?.version ?? 0
+      const result = await this.store!.save(signalId, record, version)
+
+      if (!result.ok && result.current) {
+        // Someone else wrote first. Reapply on top of theirs, once.
+        const merged = fn(result.current.record)
+        await this.store!.save(signalId, merged, result.current.version)
+        this.cases = { ...this.cases, [signalId]: { record: merged, version: result.current.version + 1 } }
+      } else {
+        this.cases = { ...this.cases, [signalId]: { record, version: version + 1 } }
+      }
+      return this.caseFor(signal)
+    }
+
+    return apply(this.cases[signalId])
+  }
+
+  /** Which store the session ended up on, for the UI to be honest about. */
+  async caseStoreKind() {
+    await this.ensureCases()
+    return this.store?.kind ?? 'local'
   }
 
   /** The vehicle currently under a consignment, via its active road leg. */
@@ -273,7 +315,9 @@ export class MockAdapter implements DataAdapter {
   }
 
   async listCases(q: CaseQuery = {}): Promise<Case[]> {
-    await Promise.all([sleep(latency()), this.ensureAir(), this.ensureDisruptions()])
+    await Promise.all([
+      sleep(latency()), this.ensureAir(), this.ensureDisruptions(), this.ensureCases(),
+    ])
     const scope = q.scope ?? 'live'
     const term = q.search?.trim().toLowerCase()
     return this.allCases().filter((c) => {
@@ -294,14 +338,14 @@ export class MockAdapter implements DataAdapter {
   }
 
   async getCase(signalId: string) {
-    await sleep(latency() / 2)
+    await Promise.all([sleep(latency() / 2), this.ensureCases()])
     const signal = this.allSignals().find((s) => s.id === signalId)
     return signal ? this.caseFor(signal) : null
   }
 
   async assignCase(signalId: string, memberId: string | null, actor: string) {
     await sleep(160)
-    return this.mutate(signalId, (rec) => {
+    return await this.mutate(signalId, (rec) => {
       const who = memberById(memberId)
       const next = appendActivity(
         { ...rec, assignee: memberId },
@@ -316,7 +360,7 @@ export class MockAdapter implements DataAdapter {
 
   async setCaseStatus(signalId: string, status: CaseStatus, actor: string) {
     await sleep(160)
-    return this.mutate(signalId, (rec) =>
+    return await this.mutate(signalId, (rec) =>
       appendActivity({ ...rec, status, snoozedUntil: null }, actor, 'status',
         `Status changed to ${status.replace('_', ' ')}`))
   }
@@ -324,14 +368,14 @@ export class MockAdapter implements DataAdapter {
   async snoozeCase(signalId: string, hours: number, actor: string) {
     await sleep(160)
     const until = new Date(Date.now() + hours * 3_600_000).toISOString()
-    return this.mutate(signalId, (rec) =>
+    return await this.mutate(signalId, (rec) =>
       appendActivity({ ...rec, status: 'snoozed', snoozedUntil: until }, actor, 'snoozed',
         `Snoozed for ${hours}h — back in the queue ${new Date(until).toLocaleString('en-IN')}`))
   }
 
   async resolveCase(signalId: string, resolution: Resolution, note: string, actor: string) {
     await sleep(200)
-    return this.mutate(signalId, (rec) =>
+    return await this.mutate(signalId, (rec) =>
       appendActivity(
         { ...rec, status: 'resolved', resolution, snoozedUntil: null }, actor, 'resolved',
         `${RESOLUTION_LABEL[resolution]}${note.trim() ? ` — ${note.trim()}` : ''}`))
@@ -339,7 +383,7 @@ export class MockAdapter implements DataAdapter {
 
   async dismissCase(signalId: string, note: string, actor: string) {
     await sleep(160)
-    return this.mutate(signalId, (rec) =>
+    return await this.mutate(signalId, (rec) =>
       appendActivity(
         { ...rec, status: 'dismissed', resolution: 'false_positive', snoozedUntil: null },
         actor, 'dismissed',
@@ -348,7 +392,7 @@ export class MockAdapter implements DataAdapter {
 
   async reopenCase(signalId: string, actor: string) {
     await sleep(160)
-    return this.mutate(signalId, (rec) =>
+    return await this.mutate(signalId, (rec) =>
       appendActivity(
         { ...rec, status: 'in_progress', resolution: null, snoozedUntil: null },
         actor, 'reopened', 'Reopened'))
@@ -356,7 +400,7 @@ export class MockAdapter implements DataAdapter {
 
   async addCaseNote(signalId: string, note: string, actor: string) {
     await sleep(140)
-    return this.mutate(signalId, (rec) =>
+    return await this.mutate(signalId, (rec) =>
       appendActivity(rec, actor, 'note', note.trim()))
   }
 
@@ -378,7 +422,9 @@ export class MockAdapter implements DataAdapter {
   /* ── Dashboard ─────────────────────────────────────────────── */
 
   async dashboard(): Promise<Dashboard> {
-    await Promise.all([sleep(latency()), this.ensureAir(), this.ensureDisruptions()])
+    await Promise.all([
+      sleep(latency()), this.ensureAir(), this.ensureDisruptions(), this.ensureCases(),
+    ])
     const active = this.shipments.filter((s) => s.status !== 'delivered' && s.status !== 'planned')
     const done = this.shipments.filter((s) => s.status === 'delivered')
     const onTime = done.filter((s) => s.delayMins <= 30).length

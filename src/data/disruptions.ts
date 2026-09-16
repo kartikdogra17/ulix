@@ -277,7 +277,7 @@ export const GDELT_QUERY =
 
 /* ── Fetch ────────────────────────────────────────────────────── */
 
-import { OSINT_BASE } from './index'
+import { OSINT_BASE } from './config'
 
 /** Headlines used when the proxy is not running. Marked `live: false`. */
 const SIMULATED: Array<Omit<RawArticle, 'seendate'> & { hoursAgo: number }> = [

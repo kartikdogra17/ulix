@@ -148,6 +148,8 @@ export interface DataAdapter {
   dismissCase(signalId: string, note: string, actor: string): Promise<Case>
   reopenCase(signalId: string, actor: string): Promise<Case>
   addCaseNote(signalId: string, note: string, actor: string): Promise<Case>
+  /** 'server' when the queue is shared across operators, 'local' when not. */
+  caseStoreKind(): Promise<'server' | 'local'>
   /** Everything every subscribed system knows about one consignment. */
   shipment360(id: string): Promise<Fused360 | null>
 

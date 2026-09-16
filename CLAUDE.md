@@ -1,0 +1,112 @@
+# ULIP platform — orientation
+
+Read this first. It exists so you do not have to explore the repo to find your bearings.
+
+**What it is.** A web + installable-mobile platform for India's Unified Logistics Interface
+Platform. Ten modules over a simulated ULIP gateway, built against the real published
+specification.
+
+```bash
+npm run dev            # app on :5173
+node server/ulip-proxy.mjs   # optional; needs ULIP_USERNAME + ULIP_PASSWORD
+npx tsc --noEmit -p tsconfig.app.json   # the check to run before claiming done
+npm run build
+```
+
+---
+
+## Do not read these
+
+| Path | Why not |
+|---|---|
+| `docs/ulip-api/pdf/` | 24 MB of source PDFs |
+| `docs/ulip-api/txt/` | 1.3 MB extracted text |
+| `src/data/ulip/catalogue.ts` | 918 generated lines — grep it, do not read it whole |
+
+Everything those files contain is already in the catalogue, and
+`docs/ulip-api/INDEX.md` maps each endpoint family to the one document that answers a
+question about it. Reach for a document only when adding a new endpoint family.
+
+---
+
+## Three kinds of data, never conflate them
+
+1. **Specification — real.** 95 endpoint codes, parameters, regexes, base URLs, auth flow,
+   response envelope. Extracted verbatim from the official documents.
+2. **ULIP data — simulated.** Consignments, fleet, documents, customs, waterways. Seeded
+   PRNG, deterministic, generated relative to the current clock.
+3. **Open-source feeds — genuinely live.** Air quality and weather from Open-Meteo.
+   GDELT and AIS are wired but need a non-throttled IP / an API key.
+
+The UI marks live panels with a `live` badge and nothing simulated is styled to look live.
+Full breakdown in `docs/DATA-PROVENANCE.md`. **Keep that invariant.**
+
+---
+
+## Where things live
+
+```
+src/data/
+  config.ts       env + proxy URLs. Dependency-free ON PURPOSE (see gotcha below)
+  types.ts        domain model
+  adapter.ts      DataAdapter — the ONLY interface pages talk to
+  index.ts        swap point: mock ⇄ live
+  ulip/           catalogue.ts (generated), envelope.ts, client.ts
+  mock/           index.ts = MockAdapter (771 lines, the busiest file), generate.ts, seed.ts
+  fusion.ts       cross-system signals — the core idea of the product
+  cases.ts        case model; caseStore.ts = shared (proxy) or local storage
+  osint.ts        live AQI → GRAP eligibility, corridor weather
+  disruptions.ts  GDELT filter pipeline    vessels.ts  AIS
+  routes.ts       lane planning    scenarios.ts  drill    exim.ts    waterways.ts
+  counterparty.ts due diligence
+src/pages/        one file per module, lazily routed in App.tsx
+src/components/   Shell (nav), NetworkMap, charts.tsx (inline SVG), cases.tsx, ui.tsx
+server/ulip-proxy.mjs   credentials, OSINT feeds, shared case store
+```
+
+**Adding a module:** data module in `src/data/` → method on `DataAdapter` → implement in
+`MockAdapter` → page in `src/pages/` → lazy route in `App.tsx` → nav entry in `Shell.tsx`.
+
+---
+
+## Conventions
+
+- **Pages never fetch.** Everything goes through `adapter`. That is what makes the live
+  swap a config change rather than a rewrite.
+- **Charts are inline SVG** in `components/charts.tsx`. A charting library was removed —
+  it shipped 370 kB to draw one illegible bar chart. Do not add one back.
+- **Styling** is Tailwind v4 with semantic tokens (`bg-surface`, `text-muted`, `border-line`)
+  defined in `index.css`. Never hard-code a colour; both themes resolve through the tokens.
+- **Comments explain why, not what.** Most existing comments record a decision or a trap.
+- Everything must work at 375 px. Sidebar on desktop, four tabs + a More sheet on mobile.
+
+---
+
+## Gotchas that have already cost time
+
+- **`config.ts` must stay dependency-free.** It used to live in `data/index.ts`, which also
+  constructs the adapter — so anything the adapter imported could not read it, and the app
+  died at load with *"Cannot access 'OSINT_BASE' before initialization"*.
+- **The ULIP envelope lies.** A missing record returns **HTTP 200** with `error: "false"`
+  and reports failure on the *inner* `responseStatus`. Use `unwrap()` / `isNotFound()`.
+  `error` and `code` are strings, not a boolean and a number.
+- **FASTag retains 72 hours only.** Anything longer is platform-stored history and must be
+  labelled as such.
+- **GRAP curbs entry, not delivery** — match consignments routing *through* the NCR.
+- **Bridge clearance is lowest in monsoon**, because it is measured to the water. The season
+  with the most depth has the least headroom.
+- **`dns.setDefaultResultOrder('ipv4first')`** in the proxy. GDELT publishes unreachable
+  AAAA records; without it you get a bare `UND_ERR_CONNECT_TIMEOUT` that looks like downtime.
+- **Calibrate generated data.** Three screens have shipped flagging *everything* — zero
+  clear counterparties, one navigable month a year, overdue permanently zero. A screen that
+  flags everyone trains people to ignore it. After generating, check the distribution.
+
+---
+
+## Known limitations
+
+- Case work is shared through the proxy when it is running, and per-browser otherwise.
+- GDELT and AIS fall back to labelled simulated sets.
+- 53 of 95 endpoints are wired. The rest are thin: GatiShakti ×5, India Post ×4, IWAI
+  statistics ×7, and near-duplicates (Telangana VAHAN/SARATHI, fuel-station *registration*
+  endpoints, chassis/engine VAHAN lookups).

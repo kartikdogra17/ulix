@@ -118,7 +118,7 @@ export function portTraffic(vessels: Vessel[], radiusKm = 80): PortTraffic[] {
 
 /* ── Fetch ────────────────────────────────────────────────────── */
 
-import { OSINT_BASE } from './index'
+import { OSINT_BASE } from './config'
 
 export interface VesselFeed {
   vessels: Vessel[]

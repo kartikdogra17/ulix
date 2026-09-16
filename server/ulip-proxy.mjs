@@ -15,6 +15,11 @@
  *   GET /api/osint/disruptions   filtered news, 10-minute cache
  *   GET /api/osint/vessels       AIS snapshot (needs AISSTREAM_API_KEY)
  *
+ * And it holds the shared case store, so two controllers see the same queue:
+ *
+ *   GET /api/cases               every case record, each with a version
+ *   PUT /api/cases/:signalId     write pinned to the version you read
+ *
  * Run:
  *   ULIP_USERNAME=… ULIP_PASSWORD=… ULIP_ENV=staging node server/ulip-proxy.mjs
  *
@@ -22,6 +27,9 @@
  */
 import { createServer } from 'node:http'
 import dns from 'node:dns'
+import { readFileSync, writeFileSync, mkdirSync } from 'node:fs'
+import { dirname, resolve } from 'node:path'
+import { fileURLToPath } from 'node:url'
 
 /* Some upstreams (GDELT among them) publish AAAA records that are not
    reachable from every network. curl falls back to IPv4 via happy eyeballs;
@@ -216,6 +224,44 @@ function vesselSnapshot() {
   return out
 }
 
+/* ── Shared case store ───────────────────────────────────────────
+   Case work is the one piece of genuinely shared state in the platform:
+   an assignment is worthless if a colleague cannot see it. Records live
+   in a JSON file beside the proxy — small, inspectable, and enough for a
+   control room. Swap this for a real table when the queue outgrows it.
+
+   Writes are optimistic: the client pins the version it read, and a
+   stale pin is rejected with 409 plus the current record, so the loser
+   of a race reapplies rather than overwriting. */
+
+const HERE = dirname(fileURLToPath(import.meta.url))
+const CASES_FILE = process.env.ULIP_CASES_FILE ?? resolve(HERE, 'data', 'cases.json')
+
+/** signalId -> { record, version } */
+let cases = {}
+try {
+  cases = JSON.parse(readFileSync(CASES_FILE, 'utf8'))
+  console.log(`→ case store loaded: ${Object.keys(cases).length} records`)
+} catch {
+  console.log('→ case store empty (no file yet)')
+}
+
+let flushTimer = null
+function persist() {
+  // Debounced: a controller clicking through a queue should not hit the
+  // disk on every keystroke-speed action.
+  if (flushTimer) return
+  flushTimer = setTimeout(() => {
+    flushTimer = null
+    try {
+      mkdirSync(dirname(CASES_FILE), { recursive: true })
+      writeFileSync(CASES_FILE, JSON.stringify(cases, null, 2))
+    } catch (err) {
+      console.error('✖ could not persist case store:', err.message)
+    }
+  }, 400)
+}
+
 /* ── Endpoint allow-list: only real ULIP codes, e.g. FASTAG/01 ──── */
 const ENDPOINT_RE = /^[A-Z]+\/\d{2}$/
 
@@ -225,7 +271,7 @@ const send = (res, status, payload) => {
     'Content-Type': 'application/json',
     'Access-Control-Allow-Origin': ORIGIN,
     'Access-Control-Allow-Headers': 'Content-Type',
-    'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+    'Access-Control-Allow-Methods': 'GET, POST, PUT, OPTIONS',
     'Content-Length': Buffer.byteLength(body),
   })
   res.end(body)
@@ -243,7 +289,37 @@ createServer(async (req, res) => {
         aisConfigured: !!AIS_KEY,
         aisVessels: vessels.size,
       },
+      cases: { records: Object.keys(cases).length, file: CASES_FILE },
     })
+  }
+
+  if (url.pathname === '/api/cases' && req.method === 'GET') {
+    return send(res, 200, { cases, serverTime: new Date().toISOString() })
+  }
+
+  if (url.pathname.startsWith('/api/cases/') && req.method === 'PUT') {
+    const signalId = decodeURIComponent(url.pathname.slice('/api/cases/'.length))
+    if (!signalId) return send(res, 400, { error: 'missing signal id' })
+
+    let body
+    try {
+      const chunks = []
+      for await (const c of req) chunks.push(c)
+      body = JSON.parse(Buffer.concat(chunks).toString('utf8'))
+    } catch {
+      return send(res, 400, { error: 'invalid JSON body' })
+    }
+
+    const existing = cases[signalId]
+    const expected = existing?.version ?? 0
+    // A first write pins 0; anything else must match what the client read.
+    if (body.ifVersion !== undefined && body.ifVersion !== expected) {
+      return send(res, 409, { error: 'version conflict', current: existing ?? null })
+    }
+
+    cases[signalId] = { record: body.record, version: expected + 1 }
+    persist()
+    return send(res, 200, { ok: true, version: cases[signalId].version })
   }
 
   if (url.pathname === '/api/osint/disruptions' && req.method === 'GET') {
