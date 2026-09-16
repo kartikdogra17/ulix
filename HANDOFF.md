@@ -151,12 +151,18 @@ at with a question already in hand, not worklists that can open on the wrong one
 
 ## Open threads, in the order I would pick them up
 
-1. **GatiShakti ×5** as a corridor overlay on the existing map, rather than a new screen.
-3. **Case store on a real datastore** if it ever outgrows a JSON file, or if it needs to
-   run serverless.
-4. **Column sets per role**, if it ever seems worth it. Defaults changed which *rows* you
-   land on; which *columns* matter also differs, but that is a much larger change to
-   every table for a smaller return, so I stopped at rows.
+1. **Share the queue in production.** The deployed site still keeps cases per browser,
+   which is the last limitation a user can actually feel. The Postgres driver is written;
+   it needs a database you provision and a serverless function in front of it.
+2. **Role-aware mobile cards.** The desktop tables are lensed, the cards are not. They
+   carry identity, lane, status and progress, which all four roles want. Lowest value on
+   this list.
+3. **Connect the repo in Vercel** so a push deploys. Blocked on installing the Vercel
+   GitHub App for the team — a browser step, see Deployment below.
+
+Everything else that was on this list is done: the role lens, per-role page defaults and
+column sets, the licence, the GatiShakti overlay, the `corridor_pinch` signal, the leg-date
+fix, and the case store.
 
 ## GatiShakti — the map's under-layer
 
@@ -231,6 +237,44 @@ weeks old and present as 21-day-old cases — precisely what the horizon comment
 exists to prevent. The floor is a deliberate product decision about the platform's own
 visibility, not a FASTag leak. Reverted to the shared `onset`, and the real cause — the leg
 dates — was fixed separately, below. Ages now vary as they should.
+
+## Case store — a real table, and a path off the disk
+
+Case work was a JSON file beside the proxy. Two failure modes drove it off: a write
+interrupted mid-flush leaves a truncated file that parses as nothing, and every change
+rewrote the whole document. Both are transaction-shaped.
+
+`server/store/` is one interface with two drivers, chosen by environment:
+
+| | | |
+|---|---|---|
+| **SQLite** | default | `node:sqlite`, built into Node — **no dependency added** |
+| **Postgres** | `DATABASE_URL` set | `pg`, imported dynamically, **never exercised** |
+
+The contract both honour: `put(signalId, record, ifVersion)` compares and writes inside a
+single transaction, and a stale pin comes back with the record as it now stands instead of
+overwriting. That is the only reason a queue can be shared at all, so a third driver that
+loses it is not a case store.
+
+**Verified end to end on SQLite**, over HTTP and then through the UI: a correct pin took a
+record v3 → v4; a stale pin was refused 409 with the current record and the newer status
+intact; a first write pinned at 0 created v1; a restart kept all three and did **not**
+re-import the old JSON over them; and clicking *Assign* in the queue landed in the table as
+`in_progress / u-fatima` with its two activity entries. The old `cases.json` is imported
+once, only when the table is empty, so an upgrade cannot lose a live queue and a stale file
+cannot claw back a newer record.
+
+**The Postgres driver has never run.** There is no provisioned database behind it. It is
+written to be obvious rather than clever — the same `SELECT … FOR UPDATE` shape as the
+SQLite one, so the two can be checked against each other by reading them side by side — but
+the first person to point `DATABASE_URL` at a real instance is also the first person to test
+it. `pg` is deliberately **not** a dependency: a default `npm install` stays at zero server
+dependencies, and the driver tells you to `npm install pg` if you choose that path.
+
+This still does not make the **deployed** site share a queue. Vercel serves a static SPA
+with no proxy, so production remains per-browser. Closing that needs a serverless function
+in front of the Postgres driver plus a database you provision — the driver is the half that
+can be written without an account.
 
 ## Columns, by the role that reads them
 

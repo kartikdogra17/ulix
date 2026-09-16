@@ -27,7 +27,7 @@
  */
 import { createServer } from 'node:http'
 import dns from 'node:dns'
-import { readFileSync, writeFileSync, mkdirSync } from 'node:fs'
+import { openStore } from './store/index.mjs'
 import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
@@ -226,40 +226,32 @@ function vesselSnapshot() {
 
 /* ── Shared case store ───────────────────────────────────────────
    Case work is the one piece of genuinely shared state in the platform:
-   an assignment is worthless if a colleague cannot see it. Records live
-   in a JSON file beside the proxy — small, inspectable, and enough for a
-   control room. Swap this for a real table when the queue outgrows it.
+   an assignment is worthless if a colleague cannot see it.
 
-   Writes are optimistic: the client pins the version it read, and a
-   stale pin is rejected with 409 plus the current record, so the loser
-   of a race reapplies rather than overwriting. */
+   Records live in a real table now, not a JSON file. Two failure modes
+   drove that: a write interrupted mid-flush left a truncated file that
+   parses as nothing, and every change rewrote the whole document. Both
+   are transaction-shaped problems.
+
+   The driver is chosen by environment in server/store — SQLite by
+   default (built into Node, no dependency), Postgres when DATABASE_URL
+   is set, for running this somewhere without a disk. Writes stay
+   optimistic: the client pins the version it read, and a stale pin is
+   refused with 409 plus the current record, so the loser of a race
+   reapplies rather than overwriting. */
 
 const HERE = dirname(fileURLToPath(import.meta.url))
+const CASES_DB = process.env.ULIP_CASES_DB ?? resolve(HERE, 'data', 'cases.db')
+/* Kept only as a migration source: the old JSON file is imported once,
+   if the table is empty, so an upgrade does not lose a live queue. */
 const CASES_FILE = process.env.ULIP_CASES_FILE ?? resolve(HERE, 'data', 'cases.json')
 
-/** signalId -> { record, version } */
-let cases = {}
-try {
-  cases = JSON.parse(readFileSync(CASES_FILE, 'utf8'))
-  console.log(`→ case store loaded: ${Object.keys(cases).length} records`)
-} catch {
-  console.log('→ case store empty (no file yet)')
-}
-
-let flushTimer = null
-function persist() {
-  // Debounced: a controller clicking through a queue should not hit the
-  // disk on every keystroke-speed action.
-  if (flushTimer) return
-  flushTimer = setTimeout(() => {
-    flushTimer = null
-    try {
-      mkdirSync(dirname(CASES_FILE), { recursive: true })
-      writeFileSync(CASES_FILE, JSON.stringify(cases, null, 2))
-    } catch (err) {
-      console.error('✖ could not persist case store:', err.message)
-    }
-  }, 400)
+const store = await openStore({ sqliteFile: CASES_DB, migrateFrom: CASES_FILE })
+console.log(`→ case store: ${store.kind} (${store.label}) — ${await store.count()} records`
+  + (store.imported ? `, ${store.imported} imported from ${CASES_FILE}` : ''))
+if (store.kind === 'sqlite') {
+  console.log('  node:sqlite prints an ExperimentalWarning on startup. That is the runtime,')
+  console.log('  not a fault here — the API is stable enough for a single-table store.')
 }
 
 /* ── Endpoint allow-list: only real ULIP codes, e.g. FASTAG/01 ──── */
@@ -289,12 +281,12 @@ createServer(async (req, res) => {
         aisConfigured: !!AIS_KEY,
         aisVessels: vessels.size,
       },
-      cases: { records: Object.keys(cases).length, file: CASES_FILE },
+      cases: { records: await store.count(), driver: store.kind, at: store.label },
     })
   }
 
   if (url.pathname === '/api/cases' && req.method === 'GET') {
-    return send(res, 200, { cases, serverTime: new Date().toISOString() })
+    return send(res, 200, { cases: await store.all(), serverTime: new Date().toISOString() })
   }
 
   if (url.pathname.startsWith('/api/cases/') && req.method === 'PUT') {
@@ -310,16 +302,20 @@ createServer(async (req, res) => {
       return send(res, 400, { error: 'invalid JSON body' })
     }
 
-    const existing = cases[signalId]
-    const expected = existing?.version ?? 0
     // A first write pins 0; anything else must match what the client read.
-    if (body.ifVersion !== undefined && body.ifVersion !== expected) {
-      return send(res, 409, { error: 'version conflict', current: existing ?? null })
+    // The compare and the write happen inside one transaction in the store,
+    // so two controllers racing cannot both think they won.
+    let result
+    try {
+      result = await store.put(signalId, body.record, body.ifVersion)
+    } catch (err) {
+      console.error('\u2716 case write failed:', err.message)
+      return send(res, 500, { error: 'case store write failed' })
     }
-
-    cases[signalId] = { record: body.record, version: expected + 1 }
-    persist()
-    return send(res, 200, { ok: true, version: cases[signalId].version })
+    if (!result.ok) {
+      return send(res, 409, { error: 'version conflict', current: result.current })
+    }
+    return send(res, 200, { ok: true, version: result.version })
   }
 
   if (url.pathname === '/api/osint/disruptions' && req.method === 'GET') {

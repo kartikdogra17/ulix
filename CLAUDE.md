@@ -22,6 +22,7 @@ from the copyright line.
 ```bash
 npm run dev            # app on :5173
 node server/ulip-proxy.mjs   # optional; needs ULIP_USERNAME + ULIP_PASSWORD
+                             # cases persist to server/data/cases.db (SQLite)
 npx tsc --noEmit -p tsconfig.app.json   # the check to run before claiming done
 npm run build
 ```
@@ -77,6 +78,8 @@ src/data/
 src/pages/        one file per module, lazily routed in App.tsx
 src/components/   Shell (nav), NetworkMap, charts.tsx (inline SVG), cases.tsx, ui.tsx
 server/ulip-proxy.mjs   credentials, OSINT feeds, shared case store
+server/store/           case persistence: sqlite.mjs (default), postgres.mjs,
+                        index.mjs picks by DATABASE_URL
 ```
 
 **Adding a module:** data module in `src/data/` → method on `DataAdapter` → implement in
@@ -140,6 +143,11 @@ sidebar, which looks exactly like a broken route.
   `planned` with a departure weeks in the past, and ETAs behind the clock on most of the
   book. Anything comparing a date against `eta` was then comparing against nothing. The
   schedule is re-anchored to the clock after progress is known; keep it that way.
+- **The case store is compare-and-set, and a driver that loses that is not a case
+  store.** `put(signalId, record, ifVersion)` compares and writes inside one
+  transaction; a stale pin returns the current record rather than overwriting. That
+  contract is the only reason a queue can be shared. `node:sqlite` prints an
+  ExperimentalWarning on startup — the proxy explains it so it does not read as a fault.
 - **Calibrate generated data.** Three screens have shipped flagging *everything* — zero
   clear counterparties, one navigable month a year, overdue permanently zero. A screen that
   flags everyone trains people to ignore it. After generating, check the distribution.
@@ -159,6 +167,8 @@ the proxy and degrade to their labelled fallbacks.
 ## Known limitations
 
 - Case work is shared through the proxy when it is running, and per-browser otherwise.
+  The proxy persists to SQLite (`server/data/cases.db`); a Postgres driver exists for
+  running without a disk but has never been pointed at a real database.
 - GDELT and AIS fall back to labelled simulated sets.
 - 58 of 95 endpoints are wired. The rest are thin: India Post ×4, IWAI statistics ×7,
   and near-duplicates (Telangana VAHAN/SARATHI, fuel-station *registration* endpoints,
