@@ -232,6 +232,42 @@ exists to prevent. The floor is a deliberate product decision about the platform
 visibility, not a FASTag leak. Reverted to the shared `onset`, and the real cause — the leg
 dates — was fixed separately, below. Ages now vary as they should.
 
+## Columns, by the role that reads them
+
+Both tables now render from a column registry that the lens picks a list from, so adding
+a column is one registry entry rather than an edit in four places.
+
+| | Consignments | Fleet |
+|---|---|---|
+| Shipper | consignment · lane · modes · status · **value** · eta · progress | vehicle · state · compliance |
+| Transporter | consignment · lane · **conveyance** · status · **load** · eta · progress | all six |
+| Freight Forwarder | same as Shipper | vehicle · state · compliance |
+| Regulator | consignment · lane · **conveyance** · **e-Way Bill** · status · eta · progress | vehicle · driver · compliance · fastag · state |
+
+Two of these follow decisions already made higher up. The **Regulator has no Value column**
+for the same reason their tower headline counts movements rather than rupees: the cargo is
+not theirs. And they lose **Utilisation** on Fleet, which is a commercial metric, not a
+compliance one. The Transporter trades Value for the **plate and the load** — the truck is
+theirs, the invoice is not.
+
+Forwarder and Shipper share a set, deliberately. Not every role needs a different table and
+inventing a difference to fill the matrix would be worse than admitting there isn't one.
+
+**The honesty rule is weaker here than for rows, and that is on purpose.** A hidden row
+looks like missing data, so it gets a banner; a column another role leads with is still in
+the record, because opening a row shows every field regardless of who is signed in. Settings
+lists all four sets and says so.
+
+Writing that claim exposed a real gap: **the e-Way Bill number was not in the consignment
+drawer at all**, so it was the one column a role could lose and never find again. It is now
+in the drawer — where it should always have been, being the reference anyone ringing about
+a road consignment will quote.
+
+Not done: the **mobile cards are one compact layout for every role**. They show identity,
+lane, status and progress, which all four roles want, and cramming a role-specific field
+into a 375px card would cost more than it returns. If that changes, the registry is the
+place to hang it off.
+
 ## The timetable now agrees with the status
 
 `makeShipments` drew `status` from one distribution and `createdAt` from another, then

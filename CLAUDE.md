@@ -100,6 +100,12 @@ sidebar, which looks exactly like a broken route.
   single number leads the tower, and what each module opens on. It filters no records:
   every route still resolves by URL and every signal stays in the queue. Say so wherever
   it shows.
+- **Tables render from a column registry.** `SHIPMENT_COLUMNS` and `FLEET_COLUMNS` define
+  one entry per column and the lens picks the list, so a new column is a registry entry,
+  not an edit to a `<thead>` and three `<Td>` runs. Columns are a weaker lens than rows —
+  a column left out is still in the record drawer — so they get no banner, but every
+  field one role leads with MUST be reachable in the drawer. Check that before dropping
+  one from a set.
 - **A lensed default must be visible and reversible.** If the filter has a visible
   control (a tab, a Select), that control *is* the disclosure — set it and stop. If it
   does not, render `<LensDefault>` with a one-click way out. A silently pre-filtered

@@ -5,7 +5,7 @@ import {
 } from 'lucide-react'
 import { adapter } from '../data'
 import { useApp } from '../state/app'
-import { lensFor } from '../data/roles'
+import { lensFor, type FleetCol } from '../data/roles'
 import { useAsync, useDebounced } from '../lib/useAsync'
 import { d, daysTo, dt, inr, num } from '../lib/format'
 import { FASTAG_RETENTION_HOURS } from '../data/ulip/catalogue'
@@ -198,11 +198,75 @@ function VehicleDetail({ regNo, onClose }: { regNo: string | null; onClose: () =
   )
 }
 
+/* Same pattern as the consignment table: one definition per column, and the
+   lens picks the list. Nothing here is unreachable — the vehicle drawer shows
+   every field whatever columns the role leads with. */
+interface FleetColumn {
+  head: string
+  right?: boolean
+  cell: (v: Vehicle) => React.ReactNode
+}
+
+const FLEET_COLUMNS: Record<FleetCol, FleetColumn> = {
+  vehicle: {
+    head: 'Vehicle',
+    cell: (v) => (
+      <>
+        <div className="font-mono text-[12px] font-medium">{v.regNo}</div>
+        <div className="truncate text-[11px] text-faint">{v.makeModel}</div>
+      </>
+    ),
+  },
+  driver: {
+    head: 'Driver',
+    cell: (v) => (
+      <>
+        <div className="text-[12px]">{v.driverName}</div>
+        <div className="text-[10px] text-faint">Score {v.driverScore}</div>
+      </>
+    ),
+  },
+  state: {
+    head: 'State',
+    cell: (v) => <Badge tone={VEHICLE_TONE[v.status]} dot>{v.status}</Badge>,
+  },
+  compliance: {
+    head: 'Compliance',
+    cell: (v) => {
+      const expiries = [v.fitnessUpto, v.insuranceUpto, v.pucUpto, v.permitUpto, v.dlValidUpto]
+      const expired = expiries.filter((x) => daysTo(x) < 0).length
+      const soon = expiries.filter((x) => daysTo(x) >= 0 && daysTo(x) < 21).length
+      return expired ? <Badge tone="bad"><ShieldAlert className="size-3" />{expired} expired</Badge>
+        : soon ? <Badge tone="warn">{soon} expiring</Badge>
+        : <Badge tone="ok"><BadgeCheck className="size-3" />Clear</Badge>
+    },
+  },
+  fastag: {
+    head: 'FASTag', right: true,
+    cell: (v) => (
+      <>
+        <div className="tnum text-[12px]">{inr(v.tagBalance, false)}</div>
+        <div className="text-[10px] text-faint">{v.tagStatus.replace('_', ' ').toLowerCase()}</div>
+      </>
+    ),
+  },
+  utilisation: {
+    head: 'Utilisation', right: true,
+    cell: (v) => (
+      <div className="flex items-center justify-end gap-2">
+        <Meter value={v.utilisationPct} tone={v.utilisationPct >= 75 ? 'ok' : 'warn'} className="w-14" />
+        <span className="tnum w-8 text-right text-[11px] text-muted">{v.utilisationPct}%</span>
+      </div>
+    ),
+  },
+}
+
 export function Fleet() {
   const { session } = useApp()
   /* No banner here: the compliance Select below already shows the filter
      and clears it in one click, which is the whole point of the rule. */
   const opens = lensFor(session?.org.role ?? 'Shipper').pageDefaults.fleet
+  const cols = opens.columns
 
   const [search, setSearch] = useState('')
   const [status, setStatus] = useState<Vehicle['status'] | 'all'>('all')
@@ -248,48 +312,29 @@ export function Fleet() {
       </Card>
 
       <Card className="overflow-hidden">
-        {loading && !data ? <TableSkeleton rows={9} cols={6} /> : !data?.rows.length ? (
+        {loading && !data ? <TableSkeleton rows={9} cols={cols.length} /> : !data?.rows.length ? (
           <Empty icon={Truck} title="No vehicles match" sub="Widen the filters to see the rest of the fleet." />
         ) : (
           <>
             <div className="hidden overflow-x-auto md:block">
               <table className="w-full">
                 <thead className="border-b border-line-soft bg-surface-2/50"><tr>
-                  <Th>Vehicle</Th><Th>Driver</Th><Th>State</Th><Th>Compliance</Th>
-                  <Th className="text-right">FASTag</Th><Th className="text-right">Utilisation</Th>
+                  {cols.map((c) => (
+                    <Th key={c} className={FLEET_COLUMNS[c].right ? 'text-right' : undefined}>
+                      {FLEET_COLUMNS[c].head}
+                    </Th>
+                  ))}
                 </tr></thead>
                 <tbody className="divide-y divide-line-soft">
                   {data.rows.map((v) => {
-                    const expiries = [v.fitnessUpto, v.insuranceUpto, v.pucUpto, v.permitUpto, v.dlValidUpto]
-                    const expired = expiries.filter((x) => daysTo(x) < 0).length
-                    const soon = expiries.filter((x) => daysTo(x) >= 0 && daysTo(x) < 21).length
                     return (
                       <tr key={v.regNo} onClick={() => setOpenReg(v.regNo)}
                         className="cursor-pointer transition-colors hover:bg-surface-2/60">
-                        <Td>
-                          <div className="font-mono text-[12px] font-medium">{v.regNo}</div>
-                          <div className="truncate text-[11px] text-faint">{v.makeModel}</div>
-                        </Td>
-                        <Td>
-                          <div className="text-[12px]">{v.driverName}</div>
-                          <div className="text-[10px] text-faint">Score {v.driverScore}</div>
-                        </Td>
-                        <Td><Badge tone={VEHICLE_TONE[v.status]} dot>{v.status}</Badge></Td>
-                        <Td>
-                          {expired ? <Badge tone="bad"><ShieldAlert className="size-3" />{expired} expired</Badge>
-                            : soon ? <Badge tone="warn">{soon} expiring</Badge>
-                            : <Badge tone="ok"><BadgeCheck className="size-3" />Clear</Badge>}
-                        </Td>
-                        <Td className="text-right">
-                          <div className="tnum text-[12px]">{inr(v.tagBalance, false)}</div>
-                          <div className="text-[10px] text-faint">{v.tagStatus.replace('_', ' ').toLowerCase()}</div>
-                        </Td>
-                        <Td>
-                          <div className="flex items-center justify-end gap-2">
-                            <Meter value={v.utilisationPct} tone={v.utilisationPct >= 75 ? 'ok' : 'warn'} className="w-14" />
-                            <span className="tnum w-8 text-right text-[11px] text-muted">{v.utilisationPct}%</span>
-                          </div>
-                        </Td>
+                        {cols.map((c) => (
+                          <Td key={c} className={FLEET_COLUMNS[c].right ? 'text-right' : undefined}>
+                            {FLEET_COLUMNS[c].cell(v)}
+                          </Td>
+                        ))}
                       </tr>
                     )
                   })}

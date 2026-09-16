@@ -21,6 +21,10 @@ export function SettingsPage() {
     ['Compliance', pd.compliance.note],
     ['Counterparties', pd.parties.note],
   ] as Array<[string, string | undefined]>).filter((r): r is [string, string] => Boolean(r[1]))
+  const columnSets: Array<[string, readonly string[]]> = [
+    ['Consignments', pd.shipments.columns],
+    ['Fleet', pd.fleet.columns],
+  ]
 
   return (
     <div className="mx-auto max-w-3xl space-y-3 p-3 sm:p-4">
@@ -87,6 +91,22 @@ export function SettingsPage() {
               </p>
             </div>
           )}
+
+          <div>
+            <Label>Table columns</Label>
+            <ul className="space-y-1">
+              {columnSets.map(([mod, cs]) => (
+                <li key={mod} className="flex flex-wrap gap-x-2 text-[12px] leading-relaxed">
+                  <span className="w-28 shrink-0 font-medium">{mod}</span>
+                  <span className="min-w-0 text-muted">{cs.join(' · ')}</span>
+                </li>
+              ))}
+            </ul>
+            <p className="mt-1.5 text-[11px] leading-relaxed text-faint">
+              A column another role leads with is still in the record itself — opening a row
+              shows every field regardless of who is signed in.
+            </p>
+          </div>
 
           <div>
             <Label>Sorted to the top of the queue</Label>

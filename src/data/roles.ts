@@ -51,15 +51,30 @@ export interface Headline {
  * this project has already paid for screens that looked broken when they
  * were merely opinionated.
  */
+/**
+ * Table columns, by the role that reads them.
+ *
+ * Narrower than hiding rows: a column left out is still one click away in
+ * the record drawer, which shows everything regardless of role. So this
+ * changes what a table leads with, never what can be found.
+ */
+export type ShipmentCol =
+  | 'consignment' | 'lane' | 'modes' | 'vehicle' | 'eway'
+  | 'status' | 'weight' | 'value' | 'eta' | 'progress'
+
+export type FleetCol =
+  | 'vehicle' | 'driver' | 'state' | 'compliance' | 'fastag' | 'utilisation'
+
 export interface PageDefaults {
   shipments: {
     /** Empty means no signal filter: open on the whole book. */
     signalKinds: readonly SignalKind[]
     /** Sort hides nothing, so it never needs a note. */
     sort: 'created' | 'eta' | 'delay' | 'value'
+    columns: readonly ShipmentCol[]
     note?: string
   }
-  fleet: { compliance: 'all' | 'issues'; note?: string }
+  fleet: { compliance: 'all' | 'issues'; columns: readonly FleetCol[]; note?: string }
   compliance: { status: DocStatus | 'all'; note?: string }
   parties: { risk: 'all' | Counterparty['risk']; note?: string }
 }
@@ -171,8 +186,11 @@ const SHIPPER: RoleLens = {
   pageDefaults: {
     // Their own book, newest first — no filter. The paperwork clock is the
     // one question a shipper opens Compliance to ask.
-    shipments: { signalKinds: [], sort: 'created' },
-    fleet: { compliance: 'all' },
+    shipments: {
+      signalKinds: [], sort: 'created',
+      columns: ['consignment', 'lane', 'modes', 'status', 'value', 'eta', 'progress'],
+    },
+    fleet: { compliance: 'all', columns: ['vehicle', 'state', 'compliance'] },
     compliance: { status: 'expiring', note: 'documents inside their expiry window' },
     parties: { risk: 'all' },
   },
@@ -208,9 +226,16 @@ const TRANSPORTER: RoleLens = {
   contextBadge: (d) => `${d.fleetActive}/${d.fleetTotal} active · ${num(d.activeShipments)} loads`,
   pageDefaults: {
     // Opens on the loads riding on an asset that cannot legally move.
-    shipments: { signalKinds: ASSET_BLOCKING, sort: 'created',
-      note: 'loads riding on a vehicle or driver that cannot legally move' },
-    fleet: { compliance: 'issues', note: 'vehicles with an open compliance problem' },
+    shipments: {
+      signalKinds: ASSET_BLOCKING, sort: 'created',
+      columns: ['consignment', 'lane', 'vehicle', 'status', 'weight', 'eta', 'progress'],
+      note: 'loads riding on a vehicle or driver that cannot legally move',
+    },
+    fleet: {
+      compliance: 'issues',
+      columns: ['vehicle', 'driver', 'state', 'compliance', 'fastag', 'utilisation'],
+      note: 'vehicles with an open compliance problem',
+    },
     compliance: { status: 'expiring', note: 'documents inside their expiry window' },
     parties: { risk: 'all' },
   },
@@ -245,9 +270,12 @@ const FORWARDER: RoleLens = {
   pageDefaults: {
     // Opens on what is stopped rather than what is moving, because a
     // forwarder is paid on the clock and demurrage runs regardless.
-    shipments: { signalKinds: ['customs_hold', 'hazmat_no_clearance', 'detention'], sort: 'eta',
-      note: 'cargo held by customs, a missing clearance or detention' },
-    fleet: { compliance: 'all' },
+    shipments: {
+      signalKinds: ['customs_hold', 'hazmat_no_clearance', 'detention'], sort: 'eta',
+      columns: ['consignment', 'lane', 'modes', 'status', 'value', 'eta', 'progress'],
+      note: 'cargo held by customs, a missing clearance or detention',
+    },
+    fleet: { compliance: 'all', columns: ['vehicle', 'state', 'compliance'] },
     compliance: { status: 'all' },
     parties: { risk: 'all' },
   },
@@ -286,9 +314,16 @@ const REGULATOR: RoleLens = {
   pageDefaults: {
     // The point of the thread: a regulator opening Consignments lands on
     // the ones in breach, not on the whole moving book.
-    shipments: { signalKinds: ENFORCEABLE, sort: 'created',
-      note: 'movements in breach of VAHAN, SARATHI or FASTag status' },
-    fleet: { compliance: 'issues', note: 'vehicles with an open compliance problem' },
+    shipments: {
+      signalKinds: ENFORCEABLE, sort: 'created',
+      columns: ['consignment', 'lane', 'vehicle', 'eway', 'status', 'eta', 'progress'],
+      note: 'movements in breach of VAHAN, SARATHI or FASTag status',
+    },
+    fleet: {
+      compliance: 'issues',
+      columns: ['vehicle', 'driver', 'compliance', 'fastag', 'state'],
+      note: 'vehicles with an open compliance problem',
+    },
     compliance: { status: 'expired', note: 'documents that have already lapsed' },
     parties: { risk: 'blocked', note: 'counterparties currently blocked' },
   },

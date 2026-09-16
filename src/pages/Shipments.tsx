@@ -5,7 +5,7 @@ import {
   ThermometerSnowflake, Train, Truck, TriangleAlert,
 } from 'lucide-react'
 import { adapter } from '../data'
-import { lensFor } from '../data/roles'
+import { lensFor, type ShipmentCol } from '../data/roles'
 import { LensDefault } from '../components/lens'
 import type { Coverage, SignalKind } from '../data/fusion'
 import {
@@ -22,7 +22,7 @@ import {
 } from '../components/ui'
 import { NetworkMap } from '../components/NetworkMap'
 import { DOC_TONE } from '../lib/status'
-import type { Mode, ShipmentStatus } from '../data/types'
+import type { Mode, Shipment, ShipmentStatus } from '../data/types'
 import { cn } from '../lib/cn'
 
 const MODE_ICON: Record<Mode, React.ComponentType<{ className?: string }>> = {
@@ -129,6 +129,13 @@ function ShipmentDetail({ id, onClose }: { id: string | null; onClose: () => voi
                 <div><div className="text-faint">Weight</div><div className="tnum font-medium">{kg(s.weightKg)}</div></div>
                 <div><div className="text-faint">Packages</div><div className="tnum font-medium">{num(s.packages)}</div></div>
                 <div><div className="text-faint">Value</div><div className="tnum font-medium">{inr(s.invoiceValue)}</div></div>
+              </div>
+              {/* The e-Way Bill number was missing here, which made it the one
+                  column a role could lose and not find again. It is also the
+                  reference anyone ringing about this consignment will quote. */}
+              <div className="mt-2 border-t border-line-soft pt-2 text-[12px]">
+                <div className="text-faint">e-Way Bill</div>
+                <Mono>{s.ewayBill}</Mono>
               </div>
             </Card>
           </div>
@@ -318,10 +325,104 @@ function ShipmentDetail({ id, onClose }: { id: string | null; onClose: () => voi
 
 /* ── Page ─────────────────────────────────────────────────────── */
 
+/* One definition per column, selected by the lens. The table below renders
+   whatever list it is handed, so adding a column is a registry entry rather
+   than an edit in four places. */
+interface ShipmentColumn {
+  head: string
+  right?: boolean
+  cell: (s: Shipment) => React.ReactNode
+}
+
+/** The conveyance actually under the consignment right now. */
+const liveLeg = (s: Shipment) =>
+  s.legs.find((l) => l.status === 'active' || l.status === 'delayed')
+  ?? s.legs.find((l) => l.status === 'pending')
+  ?? s.legs[s.legs.length - 1]
+
+const SHIPMENT_COLUMNS: Record<ShipmentCol, ShipmentColumn> = {
+  consignment: {
+    head: 'Consignment',
+    cell: (s) => (
+      <>
+        <div className="font-medium">{s.id}</div>
+        <div className="truncate text-[11px] text-faint">{s.commodity}</div>
+      </>
+    ),
+  },
+  lane: {
+    head: 'Lane',
+    cell: (s) => (
+      <span className="text-[12px]">
+        {nodeName(s.origin)}<span className="mx-1 text-faint">→</span>{nodeName(s.destination)}
+      </span>
+    ),
+  },
+  modes: {
+    head: 'Modes',
+    cell: (s) => (
+      <div className="flex gap-1">
+        {[...new Set(s.legs.map((l) => l.mode))].map((m) => {
+          const Icon = MODE_ICON[m]
+          return <Icon key={m} className="size-3.5 text-muted" />
+        })}
+      </div>
+    ),
+  },
+  vehicle: {
+    head: 'Conveyance',
+    cell: (s) => {
+      const leg = liveLeg(s)
+      return leg ? (
+        <>
+          <div className="font-mono text-[12px]">{leg.conveyance}</div>
+          <div className="text-[10px] text-faint">{MODE_LABEL[leg.mode]} · {leg.carrier}</div>
+        </>
+      ) : <span className="text-faint">—</span>
+    },
+  },
+  eway: {
+    head: 'e-Way Bill',
+    cell: (s) => <span className="font-mono text-[12px]">{s.ewayBill}</span>,
+  },
+  status: {
+    head: 'Status',
+    cell: (s) => <Badge tone={SHIPMENT_TONE[s.status]} dot>{SHIPMENT_LABEL[s.status]}</Badge>,
+  },
+  weight: {
+    head: 'Load', right: true,
+    cell: (s) => <span className="tnum">{kg(s.weightKg)}</span>,
+  },
+  value: {
+    head: 'Value', right: true,
+    cell: (s) => <span className="tnum">{inr(s.invoiceValue)}</span>,
+  },
+  eta: {
+    head: 'ETA', right: true,
+    cell: (s) => (
+      <>
+        <div className="tnum text-[12px]">{dt(s.eta)}</div>
+        {s.delayMins > 30 && <div className="text-[10px] text-bad">{dur(s.delayMins)} late</div>}
+      </>
+    ),
+  },
+  progress: {
+    head: 'Progress', right: true,
+    cell: (s) => (
+      <div className="flex items-center justify-end gap-2">
+        <Meter value={s.progress * 100}
+          tone={s.status === 'delivered' ? 'ok' : s.delayMins > 180 ? 'bad' : 'brand'} className="w-14" />
+        <span className="tnum w-8 text-right text-[11px] text-muted">{Math.round(s.progress * 100)}%</span>
+      </div>
+    ),
+  },
+}
+
 export function Shipments() {
   const { session } = useApp()
   const lens = lensFor(session?.org.role ?? 'Shipper')
   const opens = lens.pageDefaults.shipments
+  const cols = opens.columns
 
   const [sp, setSp] = useSearchParams()
   const [search, setSearch] = useState(sp.get('q') ?? '')
@@ -401,7 +502,7 @@ export function Shipments() {
         {signalKinds.length > 0 && opens.note && (
           <LensDefault role={lens.role} what={opens.note} onClear={() => setSignalKinds([])} />
         )}
-        {loading && !data ? <TableSkeleton rows={9} cols={7} /> : !data?.rows.length ? (
+        {loading && !data ? <TableSkeleton rows={9} cols={cols.length} /> : !data?.rows.length ? (
           <Empty icon={Package} title="Nothing matches those filters"
             sub="Try clearing the search box or widening the status and mode filters."
             action={<Button size="sm" onClick={() => { setSearch(''); setStatus('all'); setMode('all'); setOrigin('all'); setOnlyDelayed(false); setSignalKinds([]) }}>Reset filters</Button>} />
@@ -411,42 +512,21 @@ export function Shipments() {
             <div className="hidden overflow-x-auto md:block">
               <table className="w-full">
                 <thead className="border-b border-line-soft bg-surface-2/50"><tr>
-                  <Th>Consignment</Th><Th>Lane</Th><Th>Modes</Th><Th>Status</Th>
-                  <Th className="text-right">Value</Th><Th className="text-right">ETA</Th><Th className="text-right">Progress</Th>
+                  {cols.map((c) => (
+                    <Th key={c} className={SHIPMENT_COLUMNS[c].right ? 'text-right' : undefined}>
+                      {SHIPMENT_COLUMNS[c].head}
+                    </Th>
+                  ))}
                 </tr></thead>
                 <tbody className="divide-y divide-line-soft">
                   {data.rows.map((s) => (
                     <tr key={s.id} onClick={() => setOpenId(s.id)}
                       className="cursor-pointer transition-colors hover:bg-surface-2/60">
-                      <Td>
-                        <div className="font-medium">{s.id}</div>
-                        <div className="truncate text-[11px] text-faint">{s.commodity}</div>
-                      </Td>
-                      <Td className="text-[12px]">
-                        {nodeName(s.origin)}<span className="mx-1 text-faint">→</span>{nodeName(s.destination)}
-                      </Td>
-                      <Td>
-                        <div className="flex gap-1">
-                          {[...new Set(s.legs.map((l) => l.mode))].map((m) => {
-                            const Icon = MODE_ICON[m]
-                            return <Icon key={m} className="size-3.5 text-muted" />
-                          })}
-                        </div>
-                      </Td>
-                      <Td>
-                        <Badge tone={SHIPMENT_TONE[s.status]} dot>{SHIPMENT_LABEL[s.status]}</Badge>
-                      </Td>
-                      <Td className="tnum text-right">{inr(s.invoiceValue)}</Td>
-                      <Td className="text-right">
-                        <div className="tnum text-[12px]">{dt(s.eta)}</div>
-                        {s.delayMins > 30 && <div className="text-[10px] text-bad">{dur(s.delayMins)} late</div>}
-                      </Td>
-                      <Td>
-                        <div className="flex items-center justify-end gap-2">
-                          <Meter value={s.progress * 100} tone={s.status === 'delivered' ? 'ok' : s.delayMins > 180 ? 'bad' : 'brand'} className="w-14" />
-                          <span className="tnum w-8 text-right text-[11px] text-muted">{Math.round(s.progress * 100)}%</span>
-                        </div>
-                      </Td>
+                      {cols.map((c) => (
+                        <Td key={c} className={SHIPMENT_COLUMNS[c].right ? 'text-right' : undefined}>
+                          {SHIPMENT_COLUMNS[c].cell(s)}
+                        </Td>
+                      ))}
                     </tr>
                   ))}
                 </tbody>
