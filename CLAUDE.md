@@ -2,6 +2,10 @@
 
 Read this first. It exists so you do not have to explore the repo to find your bearings.
 
+**For the full picture — terminology, how the domain concepts join, every module's
+function, and every trap paid for — read [knowledge-base.md](knowledge-base.md).** This
+file is the short operational brief; that one is the reference underneath it.
+
 **What it is.** ULIX is a logistics control tower built **on top of** India's Unified
 Logistics Interface Platform. Ten modules over a simulated ULIP gateway, built against the
 real published specification.

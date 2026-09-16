@@ -1,7 +1,9 @@
 # Handoff — state of play
 
 Written so a new session can continue without re-deriving anything. Start with
-[CLAUDE.md](CLAUDE.md) for architecture; this file is *where things stand*.
+[CLAUDE.md](CLAUDE.md) for the operational brief and [knowledge-base.md](knowledge-base.md)
+for the full reference — domain terminology, how the concepts join, every module, every
+trap. This file is *where things stand*.
 
 ## What this is
 
@@ -64,13 +66,18 @@ about it, so nobody greps 36 files.
 Deploys are currently **manual** — `vercel --prod` from this directory. The repo is not
 connected in Vercel's Git settings, so a push does not redeploy.
 
-`vercel git connect --yes` **does** exist and was tried on 16 September 2026. It fails
-with *"Failed to connect kartikdogra17/ulix to project"* even though the repo is public,
-spelled right and reachable via `gh`. The CLI cannot grant itself GitHub access: the
-Vercel GitHub App has to be installed and authorised for the `kartiks-projects-3e44c9bb`
-team first, and that is a browser step. Do that once in the dashboard, then the CLI
-command works — until then the error message is misleading, because it blames the
-repository for what is an authorisation gap.
+`vercel git connect --yes` **does** exist and fails with *"Failed to connect
+kartikdogra17/ulix to project"* even though the repo is public, spelled right, and
+reachable via `gh` with admin rights. The CLI cannot grant itself GitHub access.
+
+Verified by test push on 16 September 2026: a real commit to `main` produced **no**
+deployment (count stayed at 12 over three minutes) and `vercel git connect` still failed,
+so whatever was connected did not take on this project. `vercel project inspect` shows no
+Git section. Three things to check, and they are different: the **account-level** GitHub
+login (Settings → Authentication — the Vercel username is `kartikdogra17-6159` rather than
+the GitHub handle, which suggests an email signup with no GitHub link), the
+**project-level** repo link (a project created by CLI upload is not linked automatically),
+and whether the Vercel GitHub App is scoped to selected repositories with `ulix` excluded.
 
 Two gotchas already paid for:
 
