@@ -29,6 +29,8 @@ npx tsx scripts/conformance.ts   # mappers vs the documented response samples
 node server/ulip-proxy.mjs   # optional; needs ULIP_USERNAME + ULIP_PASSWORD
                              # cases persist to server/data/cases.db (SQLite)
 npx tsc --noEmit -p tsconfig.app.json   # the check to run before claiming done
+npx tsc --noEmit -p tsconfig.api.json   # api/ — and tsconfig.scripts.json for scripts/
+vercel build --prod          # REQUIRED after touching api/; tsc does not see what Vercel does
 npm run build
 ```
 
@@ -170,6 +172,12 @@ sidebar, which looks exactly like a broken route.
   marked on the case row. The category's documented failure is alert fatigue: operators
   mark things false-positive and nothing ever changes. Never add a detector without
   asking how its precision will be measured.
+- **Vercel compiles `api/` with its own settings, reports errors, and ships anyway.** It
+  resolves as nodenext (so relative imports need explicit `.js` extensions), has no node
+  types (`process.env` errors — reach it through `globalThis`), and compiles without
+  strict (discriminated unions stop narrowing). Ignoring that deployed a function that
+  500'd on every request while the workflow stayed green. Run `vercel build --prod`
+  locally after touching `api/`; a passing `tsc` does not mean the function runs.
 - **Calibrate generated data.** Three screens have shipped flagging *everything* — zero
   clear counterparties, one navigable month a year, overdue permanently zero. A screen that
   flags everyone trains people to ignore it. After generating, check the distribution.

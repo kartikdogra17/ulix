@@ -205,6 +205,14 @@ api/
   cases/[signalId].ts  PUT  /api/cases/:id — pinned to the version you read
 scripts/
   conformance.ts  mappers vs the documented response samples
+
+Four TypeScript projects, because three runtimes disagree:
+  tsconfig.app.json      src/      — Vite, bundler resolution
+  tsconfig.api.json      api/      — nodenext, to match what Vercel does anyway
+  tsconfig.scripts.json  scripts/  — bundler, because these import src/
+  tsconfig.node.json     vite.config.ts
+`api/` and `scripts/` used to sit outside every project, so the deploy's typecheck never
+looked at them. Switching that on found five errors in code written minutes earlier.
 docs/
   DATA-PROVENANCE.md   what is live and what is generated
   ulip-api/INDEX.md    endpoint family → the one document that answers about it
@@ -344,6 +352,21 @@ two-track freight corridor is not "worse" than a four-lane highway.
 **Do not assert legal certainty.** The e-Way Bill signal once claimed expiry "exposes the
 consignment to detention and penalty under s.129". Courts have repeatedly held otherwise
 (see §2). The operational risk is real; the legal conclusion was not ours to assert.
+
+**Vercel compiles `api/` with its own settings, reports errors, and ships anyway.**
+This deployed a function that 500'd on every request while the workflow stayed green. Three
+separate ways it differs from the repo's own check, none visible to `tsc -p
+tsconfig.api.json`:
+
+- It resolves as **nodenext**, and `package.json` is `"type": "module"`, so relative
+  imports need explicit `.js` extensions. `'../_store'` emitted a module the runtime could
+  not find — that was the crash.
+- It has **no node types**, so `process.env` is an error. Reached through `globalThis` now.
+- It compiles **without `strict`**, so `ok: true | false` widens to `boolean`, the
+  discriminated union stops discriminating, and neither a ternary nor an `if` narrows it.
+
+**Run `vercel build --prod` locally after touching `api/`.** It is the only check that sees
+what production will. A passing `tsc` does not mean the function runs.
 
 **Vercel deploy gotchas.** `.vercelignore` matters — the first deploy timed out uploading
 23.6 MB of vendored PDFs; excluding `docs/`, `server/` and `dist/` took it to 2.0 MB.
@@ -537,7 +560,10 @@ added while waiting.
 
 ```bash
 npm run dev                             # app on :5173
-npx tsc --noEmit -p tsconfig.app.json   # the check to run before claiming done
+npx tsc --noEmit -p tsconfig.app.json     # the app
+npx tsc --noEmit -p tsconfig.api.json     # serverless functions
+npx tsc --noEmit -p tsconfig.scripts.json # repo scripts
+vercel build --prod                       # REQUIRED after touching api/ — see §8
 npm run build
 npm run lint                            # oxlint
 node server/ulip-proxy.mjs              # optional; needs ULIP_USERNAME + ULIP_PASSWORD

@@ -176,7 +176,17 @@ at with a question already in hand, not worklists that can open on the wrong one
    **Nothing in this path has run against a real database.** The handlers are covered for
    method, argument and no-database cases; the compare-and-set underneath them is the same
    driver the local proxy uses, but that driver has only ever been exercised on SQLite.
-   Test the conflict case first when a database exists.
+   Test the 409 conflict case first when a database exists — it is the one that matters
+   and the likeliest to differ.
+
+   Verified live as far as it can be: `GET /api/cases` returns **503** with its intended
+   message rather than a crash.
+
+   **Getting there cost a deploy that 500'd on every request while the workflow stayed
+   green.** Vercel compiles `api/` with its own settings — nodenext resolution, no node
+   types, no `strict` — reports the errors, and builds anyway. `tsc` passing locally means
+   nothing for a function. Run `vercel build --prod` after touching `api/`; full detail in
+   the knowledge base's traps section.
 2. **Role-aware mobile cards.** The desktop tables are lensed, the cards are not. They
    carry identity, lane, status and progress, which all four roles want. Lowest value on
    this list.
