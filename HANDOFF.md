@@ -187,7 +187,10 @@ at with a question already in hand, not worklists that can open on the wrong one
    types, no `strict` — reports the errors, and builds anyway. `tsc` passing locally means
    nothing for a function. Run `vercel build --prod` after touching `api/`; full detail in
    the knowledge base's traps section.
-2. **Role-aware mobile cards.** The desktop tables are lensed, the cards are not. They
+2. **A scheduler for delivery.** The delivery path exists but sending is a deliberate
+   action from Settings, so a conflict raised while nobody is looking waits for somebody to
+   press the button. A cron hitting the proxy closes it. Until then it is half a path.
+3. **Role-aware mobile cards.** The desktop tables are lensed, the cards are not. They
    carry identity, lane, status and progress, which all four roles want. Lowest value on
    this list.
 

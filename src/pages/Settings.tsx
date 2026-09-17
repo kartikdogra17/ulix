@@ -1,6 +1,10 @@
-import { KeyRound, Moon, Smartphone, Sun } from 'lucide-react'
+import { useState } from 'react'
+import { KeyRound, Moon, Send, Smartphone, Sun } from 'lucide-react'
 import { ULIP_MODE, ULIP_PROXY } from '../data'
 import { ULIP_BASE, ULIP_ENDPOINTS, ULIP_SYSTEMS } from '../data/ulip/catalogue'
+import { adapter } from '../data'
+import { useAsync } from '../lib/useAsync'
+import { DEFAULT_RULE } from '../data/notify'
 import { useApp } from '../state/app'
 import { MODULE_LABEL, lensFor } from '../data/roles'
 import { SIGNAL_LABEL } from '../data/fusion'
@@ -11,6 +15,21 @@ export function SettingsPage() {
   if (!session) return null
 
   const lens = lensFor(session.org.role)
+  const { data: target } = useAsync(() => adapter.deliveryTarget(), [])
+  const [sending, setSending] = useState(false)
+  const [result, setResult] = useState<string | null>(null)
+
+  const deliverNow = async () => {
+    setSending(true); setResult(null)
+    try {
+      const r = await adapter.deliverCases(DEFAULT_RULE, window.location.origin)
+      setResult(r.error ? r.error
+        : r.delivered === 0 ? 'Nothing qualified — everything matching the rule has already been sent.'
+        : `Sent ${r.delivered}${r.omitted ? `, ${r.omitted} more counted but not listed` : ''}.`)
+    } catch (err) {
+      setResult((err as Error).message)
+    } finally { setSending(false) }
+  }
   // label and basis do not depend on the data, only on the lens.
   const head = lens.headline([], null)
   const hidden = Object.keys(MODULE_LABEL).filter((to) => !lens.nav.includes(to))
@@ -136,6 +155,54 @@ export function SettingsPage() {
             URL and every signal stays in the queue. What an organisation is actually
             entitled to see is decided by the datasets approved against its ULIP
             account, not by anything held in this browser.
+          </p>
+        </div>
+      </Card>
+
+      <Card>
+        <CardHead title="Delivery"
+          sub="Getting a conflict off the screen and to someone who can act on it"
+          right={<Badge tone={target?.configured ? 'ok' : 'warn'} dot>
+            {target?.configured ? target.label : 'not configured'}
+          </Badge>} />
+        <div className="space-y-3 p-4">
+          <p className="text-[13px] leading-relaxed text-muted">
+            A conflict that exists only on a screen nobody has open is still invisible. Set{' '}
+            <Mono>ULIP_WEBHOOK_URL</Mono> on the proxy to any endpoint that accepts a JSON
+            POST — a Slack or Teams incoming webhook renders it as-is.
+          </p>
+
+          <div className="rounded-lg border border-line bg-surface-2 p-3">
+            <div className="mb-1.5 text-[11px] font-semibold uppercase tracking-wide text-faint">
+              What gets sent
+            </div>
+            <ul className="ml-4 list-disc space-y-1 text-[12px] leading-relaxed text-muted">
+              <li>Anything <strong className="text-fg">critical</strong>.</li>
+              <li>Anything past its SLA that still has <strong className="text-fg">no owner</strong> —
+                that is the queue failing, not a case.</li>
+              <li>At most {DEFAULT_RULE.max} per message; the rest are counted, not listed.</li>
+              <li><strong className="text-fg">Never the same case twice.</strong> Signals are
+                recomputed on every read, so without that a poll would re-send the same
+                conflict forever. Each send is recorded on the case, next to who assigned
+                it and who closed it.</li>
+            </ul>
+            <p className="mt-2 text-[11px] leading-relaxed text-faint">
+              Every line carries the recommended action. An alert that says what is wrong
+              without saying what to do is the kind people learn to scroll past.
+            </p>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-2">
+            <Button size="sm" variant={target?.configured ? 'primary' : 'outline'}
+              disabled={!target?.configured || sending} onClick={deliverNow}>
+              <Send className="size-3.5" /> {sending ? 'Sending…' : 'Send what qualifies now'}
+            </Button>
+            {result && <span className="min-w-0 text-[12px] text-muted">{result}</span>}
+          </div>
+          <p className="text-[11px] leading-relaxed text-faint">
+            {target?.configured
+              ? 'Sending is a deliberate action — there is no scheduler yet, so a conflict raised while nobody is looking waits until somebody presses this. Wiring it to a cron is the obvious next step.'
+              : 'Nothing is listening, so the button is disabled rather than pretending to send.'}
           </p>
         </div>
       </Card>

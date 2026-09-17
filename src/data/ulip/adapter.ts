@@ -201,6 +201,11 @@ export class UlipAdapter implements DataAdapter {
   async reopenCase() { return notWired('Reopening a case') }
   async addCaseNote() { return notWired('Adding a case note') }
   async caseStoreKind(): Promise<'server' | 'local'> { return 'server' }
+  async deliveryTarget() { return { configured: false, label: null } }
+  async deliverCases() {
+    return notWired('Delivery',
+      'It sends cases, and cases need signals, which need the consignment book.') as never
+  }
 
   /* ── Open-source context is not ULIP and is unaffected ─────── */
 

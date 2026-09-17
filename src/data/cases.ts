@@ -41,6 +41,9 @@ export const RESOLUTION_HINT: Record<Resolution, string> = {
 export type ActivityKind =
   | 'created' | 'assigned' | 'unassigned' | 'status' | 'note'
   | 'snoozed' | 'resolved' | 'dismissed' | 'reopened'
+  /* Somebody outside the app was told. Recorded here so it is both
+     de-duplicated and auditable next to who assigned and who closed. */
+  | 'notified'
 
 export interface Activity {
   id: string

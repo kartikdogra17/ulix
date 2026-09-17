@@ -28,6 +28,8 @@ import { makeEximFiles } from '../exim'
 import { makeWaterways } from '../waterways'
 import { makeGatiShakti } from '../gatishakti'
 import { detectorQuality, makeCaseOutcomes } from '../quality'
+import { buildPayload, selectForDelivery, type DeliveryRule } from '../notify'
+import { NOTIFY_BASE } from '../config'
 
 const sleep = (ms: number) => new Promise((res) => setTimeout(res, ms))
 /** Simulated gateway latency so loading states are real, not theatre. */
@@ -563,6 +565,54 @@ export class MockAdapter implements DataAdapter {
   async gatiShakti() {
     await sleep(latency())
     return this.gs
+  }
+
+  async deliveryTarget() {
+    try {
+      const res = await fetch(NOTIFY_BASE, { headers: { Accept: 'application/json' } })
+      if (!res.ok) return { configured: false, label: null }
+      const body = await res.json() as { configured?: boolean; label?: string }
+      return { configured: !!body.configured, label: body.label ?? null }
+    } catch {
+      // No proxy. Not an error — delivery simply has nowhere to go.
+      return { configured: false, label: null }
+    }
+  }
+
+  async deliverCases(rule: DeliveryRule, appUrl?: string) {
+    const live = await this.listCases({ scope: 'all' })
+    const selected = selectForDelivery(live, rule)
+    if (!selected.length) return { delivered: 0, omitted: 0, configured: true }
+
+    const payload = buildPayload(selected, rule, appUrl)
+    let res: Response
+    try {
+      res = await fetch(NOTIFY_BASE, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      })
+    } catch {
+      return { delivered: 0, omitted: 0, configured: false,
+        error: 'Nothing is listening. Delivery needs the proxy running with ULIP_WEBHOOK_URL set.' }
+    }
+    if (res.status === 501) {
+      return { delivered: 0, omitted: 0, configured: false,
+        error: 'The proxy is up but ULIP_WEBHOOK_URL is not set, so there is nowhere to send.' }
+    }
+    if (!res.ok) {
+      return { delivered: 0, omitted: 0, configured: true,
+        error: `Delivery failed (${res.status}).` }
+    }
+
+    /* Mark only what was actually listed. A case counted as "omitted" was
+       never sent, so marking it would silence a conflict nobody saw. */
+    for (const c of payload.cases) {
+      await this.mutate(c.signalId, (rec) =>
+        appendActivity(rec, 'system', 'notified',
+          `Sent to ${'the configured webhook'} — ${c.title}`))
+    }
+    return { delivered: payload.cases.length, omitted: payload.omitted, configured: true }
   }
 
   async signalQuality() {

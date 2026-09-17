@@ -21,3 +21,6 @@ export const OSINT_BASE = `${API_ROOT}/osint`
 
 /** Shared case store, so two controllers see the same queue. */
 export const CASES_BASE = `${API_ROOT}/cases`
+
+/** Outbound delivery. The webhook URL stays server-side, never in the browser. */
+export const NOTIFY_BASE = `${API_ROOT}/notify`

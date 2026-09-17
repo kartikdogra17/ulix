@@ -17,6 +17,8 @@
  *
  * And it holds the shared case store, so two controllers see the same queue:
  *
+ *   GET /api/notify              whether a delivery target is configured
+ *   POST /api/notify             forward a delivery to ULIP_WEBHOOK_URL
  *   GET /api/cases               every case record, each with a version
  *   PUT /api/cases/:signalId     write pinned to the version you read
  *
@@ -241,6 +243,10 @@ function vesselSnapshot() {
    reapplies rather than overwriting. */
 
 const HERE = dirname(fileURLToPath(import.meta.url))
+/* Where deliveries go. Any endpoint that accepts a JSON POST — Slack and
+   Teams incoming webhooks both render the `text` key as-is. */
+const WEBHOOK_URL = process.env.ULIP_WEBHOOK_URL ?? ''
+
 const CASES_DB = process.env.ULIP_CASES_DB ?? resolve(HERE, 'data', 'cases.db')
 /* Kept only as a migration source: the old JSON file is imported once,
    if the table is empty, so an upgrade does not lose a live queue. */
@@ -283,6 +289,51 @@ createServer(async (req, res) => {
       },
       cases: { records: await store.count(), driver: store.kind, at: store.label },
     })
+  }
+
+  /* ── Outbound delivery ────────────────────────────────────────
+     The webhook URL lives here and never reaches the browser: it is a
+     capability to post into somebody's Slack, and a URL the client holds
+     is a URL anyone with the client holds. The proxy also means no CORS
+     negotiation with a third party that never agreed to one. */
+  if (url.pathname === '/api/notify' && req.method === 'GET') {
+    return send(res, 200, {
+      configured: !!WEBHOOK_URL,
+      // Host only. Enough to confirm the right place, not enough to reuse.
+      label: WEBHOOK_URL ? new URL(WEBHOOK_URL).host : null,
+    })
+  }
+
+  if (url.pathname === '/api/notify' && req.method === 'POST') {
+    if (!WEBHOOK_URL) {
+      return send(res, 501, { error: 'ULIP_WEBHOOK_URL is not set; there is nowhere to send.' })
+    }
+    let payload
+    try {
+      const chunks = []
+      for await (const c of req) chunks.push(c)
+      payload = JSON.parse(Buffer.concat(chunks).toString('utf8'))
+    } catch {
+      return send(res, 400, { error: 'invalid JSON body' })
+    }
+    if (!payload?.text) return send(res, 400, { error: 'body must carry text' })
+
+    try {
+      const out = await fetch(WEBHOOK_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      })
+      if (!out.ok) {
+        console.error(`\u2716 webhook rejected the delivery: ${out.status}`)
+        return send(res, 502, { error: `webhook returned ${out.status}` })
+      }
+      console.log(`\u2192 delivered ${payload.cases?.length ?? 0} case(s) to ${new URL(WEBHOOK_URL).host}`)
+      return send(res, 200, { ok: true, delivered: payload.cases?.length ?? 0 })
+    } catch (err) {
+      console.error('\u2716 delivery failed:', err.message)
+      return send(res, 502, { error: 'could not reach the webhook' })
+    }
   }
 
   if (url.pathname === '/api/cases' && req.method === 'GET') {

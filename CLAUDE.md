@@ -85,6 +85,7 @@ src/data/
   routes.ts       lane planning    scenarios.ts  drill    exim.ts    waterways.ts
   counterparty.ts due diligence
   importer.ts     CSV → the consignment book ULIP cannot supply
+  notify.ts       delivery — which cases leave the browser, and as what
 src/pages/        one file per module, lazily routed in App.tsx
 src/components/   Shell (nav), NetworkMap, charts.tsx (inline SVG), cases.tsx, ui.tsx
 server/ulip-proxy.mjs   credentials, OSINT feeds, shared case store
@@ -167,6 +168,13 @@ sidebar, which looks exactly like a broken route.
   transaction; a stale pin returns the current record rather than overwriting. That
   contract is the only reason a queue can be shared. `node:sqlite` prints an
   ExperimentalWarning on startup — the proxy explains it so it does not read as a fault.
+- **Delivery sends little enough, or it is another thing to ignore.** `notify.ts` sends
+  criticals and cases past SLA with no owner, at most ten per message, and **never the
+  same case twice** — signals are recomputed on every read, so without that guard a poll
+  would re-send the same conflict forever. The mark rides on the case activity trail, so
+  it is de-duplicated and auditable in one move. Only cases actually LISTED are marked;
+  marking an omitted one would silence a conflict nobody saw. The webhook URL lives on
+  the proxy and never reaches the browser.
 - **A detector's track record is a feature, not an afterthought.** `quality.ts` turns the
   `Resolution` an operator picks into precision per signal kind, and a weak detector is
   marked on the case row. The category's documented failure is alert fatigue: operators

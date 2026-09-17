@@ -16,6 +16,7 @@ import type { EximFile } from './exim'
 import type { Waterway } from './waterways'
 import type { GatiShaktiLayer } from './gatishakti'
 import type { DetectorQuality } from './quality'
+import type { DeliveryRule } from './notify'
 
 export interface Page<T> { rows: T[]; total: number }
 
@@ -162,6 +163,20 @@ export interface DataAdapter {
    * that someone trusts it; this is the evidence for or against that.
    */
   signalQuality(): Promise<DetectorQuality[]>
+
+  /**
+   * Whether anything is wired to receive a delivery, and what. The webhook
+   * URL itself never reaches the browser — only whether one exists.
+   */
+  deliveryTarget(): Promise<{ configured: boolean; label: string | null }>
+
+  /**
+   * Send the cases that warrant it, and record on each that somebody was
+   * told. Returns what actually went, not what qualified.
+   */
+  deliverCases(rule: DeliveryRule, appUrl?: string): Promise<{
+    delivered: number; omitted: number; configured: boolean; error?: string
+  }>
 
   /** 'server' when the queue is shared across operators, 'local' when not. */
   caseStoreKind(): Promise<'server' | 'local'>

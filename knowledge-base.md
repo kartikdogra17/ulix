@@ -167,6 +167,7 @@ src/data/
   quality.ts       detector precision from closed outcomes — the feedback loop
   roles.ts         the role lens: nav, headline, queue ranking, page defaults, columns
   importer.ts      CSV → the consignment book ULIP cannot supply
+  notify.ts        delivery — selection rule and payload, pure and testable
   osint.ts         live AQI → GRAP stage → per-vehicle entry eligibility; weather
   disruptions.ts   GDELT filter pipeline
   vessels.ts       AIS positions and port congestion
@@ -458,6 +459,36 @@ does. `selectAdapter()` in `src/data/index.ts` chooses the adapter; live mode mu
 relabel the mock.
 
 ---
+
+### Delivery
+
+A conflict that exists only on a screen nobody has open is still invisible, which is the
+problem this product sells against. `notify.ts` decides what leaves the browser; the proxy
+route `POST /api/notify` forwards it to `ULIP_WEBHOOK_URL`, which **never reaches the
+client** — it is a capability to post into somebody's Slack, and a URL the client holds is
+a URL anyone with the client holds.
+
+The hard part is sending **little enough**. Four guards, in order of how much they matter:
+
+1. **Severity** — critical only, by default.
+2. **Or** past SLA with no owner: that is the queue failing, not a case.
+3. **Never twice.** Signals are recomputed on every read, so without this a poll loop
+   would re-send the same conflict forever. The mark rides on the case activity trail, so
+   it is both de-duplicated and auditable beside who assigned and who closed.
+4. **Ten per message**, the rest counted. Only LISTED cases are marked — marking an
+   omitted one would silence a conflict nobody ever saw.
+
+Verified end to end against a local receiver: 15 checks on selection and payload, then two
+real sends through the proxy. The second delivered a different ten, omitted fell 43 → 33,
+and twenty marks landed across twenty cases with none twice. A backlog drains rather than
+repeating.
+
+Every line carries the recommended action, because an alert that says what is wrong
+without saying what to do is the kind people learn to scroll past.
+
+**Not built: a scheduler.** Sending is a deliberate action from Settings, so a conflict
+raised while nobody is looking waits until somebody presses the button. A cron against the
+proxy is the obvious next step and the reason this is only half a delivery path.
 
 ## 11. Market context
 
