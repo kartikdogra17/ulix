@@ -486,6 +486,12 @@ repeating.
 Every line carries the recommended action, because an alert that says what is wrong
 without saying what to do is the kind people learn to scroll past.
 
+**A 200 is not proof of delivery.** The static host answers an unknown path with the
+SPA shell and a 200, so `res.ok` proves nothing. The first cut read that as success and
+marked every listed case notified — nothing sent, and those conflicts silenced for good,
+which is the worst failure this feature has available to it. Both calls now require a
+body of the documented shape before believing anything happened.
+
 **Not built: a scheduler.** Sending is a deliberate action from Settings, so a conflict
 raised while nobody is looking waits until somebody presses the button. A cron against the
 proxy is the obvious next step and the reason this is only half a delivery path.

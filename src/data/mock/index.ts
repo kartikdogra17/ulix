@@ -571,8 +571,12 @@ export class MockAdapter implements DataAdapter {
     try {
       const res = await fetch(NOTIFY_BASE, { headers: { Accept: 'application/json' } })
       if (!res.ok) return { configured: false, label: null }
-      const body = await res.json() as { configured?: boolean; label?: string }
-      return { configured: !!body.configured, label: body.label ?? null }
+      /* A static host answers an unknown path with the SPA shell and a 200,
+         so "it replied" proves nothing. Only a body of the documented shape
+         counts as a delivery target. */
+      const body = await res.json().catch(() => null) as { configured?: boolean; label?: string } | null
+      if (typeof body?.configured !== 'boolean') return { configured: false, label: null }
+      return { configured: body.configured, label: body.label ?? null }
     } catch {
       // No proxy. Not an error — delivery simply has nowhere to go.
       return { configured: false, label: null }
@@ -603,6 +607,17 @@ export class MockAdapter implements DataAdapter {
     if (!res.ok) {
       return { delivered: 0, omitted: 0, configured: true,
         error: `Delivery failed (${res.status}).` }
+    }
+
+    /* A 200 is not proof of delivery. This app deploys as a static SPA with
+       a catch-all, so POSTing to a route with no function behind it returns
+       200 and the HTML shell — and the old code read that as success and
+       marked every case notified. Nothing had been sent, and those conflicts
+       would never be delivered again. Require the documented body. */
+    const ack = await res.json().catch(() => null) as { ok?: boolean } | null
+    if (ack?.ok !== true) {
+      return { delivered: 0, omitted: 0, configured: false,
+        error: 'Nothing is listening at that address — it answered, but not as the delivery route. Nothing was sent and no case was marked.' }
     }
 
     /* Mark only what was actually listed. A case counted as "omitted" was

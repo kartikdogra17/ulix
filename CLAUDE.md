@@ -175,6 +175,11 @@ sidebar, which looks exactly like a broken route.
   it is de-duplicated and auditable in one move. Only cases actually LISTED are marked;
   marking an omitted one would silence a conflict nobody saw. The webhook URL lives on
   the proxy and never reaches the browser.
+- **A 200 is not proof of delivery.** This app deploys as a static SPA with a catch-all,
+  so POSTing to a route with no function behind it returns 200 and the HTML shell.
+  Reading that as success marked every case notified with nothing sent — conflicts that
+  would then never be delivered. Require the documented acknowledgement body before
+  recording that anyone was told.
 - **A detector's track record is a feature, not an afterthought.** `quality.ts` turns the
   `Resolution` an operator picks into precision per signal kind, and a weak detector is
   marked on the case row. The category's documented failure is alert fatigue: operators
