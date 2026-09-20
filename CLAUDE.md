@@ -26,6 +26,8 @@ from the copyright line.
 ```bash
 npm run dev            # app on :5173
 npx tsx scripts/conformance.ts   # mappers vs the documented response samples
+npm run deliver:dry              # what delivery WOULD send, sending nothing
+npm run deliver                  # send it; schedule with scripts/deliver.cron.example
 node server/ulip-proxy.mjs   # optional; needs ULIP_USERNAME + ULIP_PASSWORD
                              # cases persist to server/data/cases.db (SQLite)
 npx tsc --noEmit -p tsconfig.app.json   # the check to run before claiming done
@@ -175,6 +177,11 @@ sidebar, which looks exactly like a broken route.
   it is de-duplicated and auditable in one move. Only cases actually LISTED are marked;
   marking an omitted one would silence a conflict nobody saw. The webhook URL lives on
   the proxy and never reaches the browser.
+- **The scheduler must see exactly what the screen sees.** `scripts/deliver.ts` builds the
+  same world from the same seed and fetches the same context — corridors, the node table,
+  the NCR air reading, the disruption feed. Without all four it saw 90 signals where the
+  browser saw 109, and silently skipped whole kinds including critical GRAP bans. If you
+  add a signal that needs context, give it to the job too.
 - **A 200 is not proof of delivery.** This app deploys as a static SPA with a catch-all,
   so POSTing to a route with no function behind it returns 200 and the HTML shell.
   Reading that as success marked every case notified with nothing sent — conflicts that

@@ -492,9 +492,30 @@ marked every listed case notified — nothing sent, and those conflicts silenced
 which is the worst failure this feature has available to it. Both calls now require a
 body of the documented shape before believing anything happened.
 
-**Not built: a scheduler.** Sending is a deliberate action from Settings, so a conflict
-raised while nobody is looking waits until somebody presses the button. A cron against the
-proxy is the obvious next step and the reason this is only half a delivery path.
+**The scheduler** is `scripts/deliver.ts` — headless, idempotent, and run by cron
+(`scripts/deliver.cron.example`, fifteen minutes; the tightest SLA here is four hours, so
+faster is noise). It never re-sends, so overlapping or missed runs cost nothing but latency.
+`npm run deliver:dry` decides and prints without sending or marking anything.
+
+It does **not** import `MockAdapter`. It builds the same deterministic world from the same
+seed and talks to the proxy over the same HTTP contract the client uses, so the marks it
+writes are the marks the client reads and neither can send what the other already sent.
+Writes are pinned to the version read: a human touching the case between read and write
+means skip, not clobber, and the next run picks it up.
+
+**It must see exactly what the screen sees.** First cut passed no fusion context and found
+**90 signals where the browser found 109** — silently skipping whole kinds, including GRAP
+entry bans that can be critical. With corridors, the node table, a live NCR air reading and
+the disruption feed it lands on 109 exactly. Any new signal that needs context needs it
+here too.
+
+Verified: two consecutive runs delivered a different ten each, 53 → 43 qualifying, and
+twenty marks across twenty cases with none twice.
+
+Making this possible needed one fix elsewhere — `config.ts` read `import.meta.env`
+unguarded, which threw under Node and made the whole data layer unimportable outside a
+browser. It now defaults to an empty object, which costs nothing in the bundle (verified:
+Vite still substitutes the value) and is also what makes real tests possible.
 
 ## 11. Market context
 

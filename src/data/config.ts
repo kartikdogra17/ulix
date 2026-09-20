@@ -8,11 +8,21 @@
    Keeping configuration in a leaf module makes that impossible.
    ──────────────────────────────────────────────────────────────── */
 
-export const ULIP_MODE = import.meta.env.VITE_ULIP_MODE === 'live' ? 'live' : 'mock'
+/**
+ * Vite substitutes `import.meta.env` at build time. Node does not have it,
+ * and reading a property off the resulting `undefined` threw — which made
+ * the whole data layer unimportable outside a browser, and so untestable
+ * and unschedulable. Defaulting to an empty object costs nothing in the
+ * bundle and makes fusion, cases and notify run under plain Node.
+ */
+const ENV: Record<string, string | undefined> =
+  (import.meta as unknown as { env?: Record<string, string | undefined> }).env ?? {}
+
+export const ULIP_MODE = ENV.VITE_ULIP_MODE === 'live' ? 'live' : 'mock'
 
 /** Your own proxy, never the ULIP host directly — it holds the credentials. */
 export const ULIP_PROXY =
-  import.meta.env.VITE_ULIP_PROXY ?? 'http://localhost:8787/api/ulip'
+  ENV.VITE_ULIP_PROXY ?? 'http://localhost:8787/api/ulip'
 
 const API_ROOT = ULIP_PROXY.replace(/\/ulip\/?$/, '')
 

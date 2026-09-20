@@ -1,0 +1,16 @@
+# Delivery, every fifteen minutes.
+#
+# The tightest SLA in the product is four hours (critical), so anything
+# faster than this is noise — and the job is idempotent, so a missed run
+# costs nothing but latency. It never re-sends, so overlapping runs are
+# safe too.
+#
+#   crontab -e   and paste, with the paths corrected:
+#
+*/15 * * * * cd /path/to/ulip-platform && ULIP_PROXY_URL=http://localhost:8787 ULIP_APP_URL=https://ulip-platform.vercel.app /usr/local/bin/npx tsx scripts/deliver.ts >> /tmp/ulix-deliver.log 2>&1
+
+# Check it is working:
+#   tail -f /tmp/ulix-deliver.log
+#
+# Decide without sending, any time:
+#   npm run deliver:dry
