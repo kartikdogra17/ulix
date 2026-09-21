@@ -5,8 +5,8 @@ before touching code. [CLAUDE.md](CLAUDE.md) is the short operational brief;
 [HANDOFF.md](HANDOFF.md) is where things currently stand; this is the reference
 underneath both.
 
-**Status at the time of writing:** 39 commits, ~15,500 lines across `src/`, `server/`
-and `scripts/`. Eleven modules. Typecheck and build clean. Live at
+**Status at the time of writing:** 46 commits, ~16,000 lines across `src/`, `server/`,
+`api/` and `scripts/`. Eleven modules. Typecheck and build clean. Live at
 <https://ulip-platform.vercel.app>, and a push to `main` deploys itself. No real
 government data has ever flowed through it — see [§10](#10-the-live-integration).
 
@@ -206,6 +206,8 @@ api/
   cases/[signalId].ts  PUT  /api/cases/:id — pinned to the version you read
 scripts/
   conformance.ts  mappers vs the documented response samples
+  deliver.ts      the delivery job — headless, idempotent, cron-driven
+  deliver.cron.example
 
 Four TypeScript projects, because three runtimes disagree:
   tsconfig.app.json      src/      — Vite, bundler resolution

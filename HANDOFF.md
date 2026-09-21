@@ -8,9 +8,9 @@ trap. This file is *where things stand*.
 ## What this is
 
 **ULIX** — a logistics control tower built on India's Unified Logistics Interface
-Platform. Independent software, not a government service. Eleven modules, ~15.5k lines
-across `src/`, `server/` and `scripts/`, 38 commits. Typecheck and build clean, and
-pushes to `main` deploy themselves.
+Platform. Independent software, not a government service. Eleven modules, ~16k lines
+across `src/`, `server/`, `api/` and `scripts/`, 46 commits. Typecheck and build clean,
+and pushes to `main` deploy themselves.
 
 ## How it got here
 
@@ -356,6 +356,64 @@ from the integration documents. It found:
 
 None of these could surface against the mock, which emits `"BS-IV"` and ISO dates. That is
 the argument for doing this work before the credentials arrive rather than after.
+
+## Delivery — a conflict can now leave the browser
+
+The product computed what needs doing, who owns it and how long until the window shuts,
+and none of it ever left the page. A conflict that exists only on a screen nobody has open
+is still invisible, which is the problem this thing sells against.
+
+`notify.ts` decides what goes. The proxy forwards it to `ULIP_WEBHOOK_URL`, which **never
+reaches the client** — it is a capability to post into somebody's Slack, and a URL the
+client holds is a URL anyone with the client holds. Slack and Teams both render the `text`
+key as-is, so any endpoint taking a JSON POST works.
+
+**The hard part is sending little enough.** A webhook firing on all 109 live cases would
+reproduce alert fatigue faster than any screen. Four guards: critical only by default; or
+past SLA with no owner, which is the queue failing rather than a case; **never the same
+case twice**; and ten per message with the rest counted. Every line carries the recommended
+action.
+
+The third guard matters most and is easiest to miss. Signals are recomputed on every read,
+so without it a poll would re-send the same conflict forever. The mark rides on the case
+activity trail, which de-duplicates and makes it auditable in one move — who was told sits
+beside who assigned and who closed. Only cases actually **listed** get marked; marking an
+omitted one would silence a conflict nobody saw.
+
+### The scheduler
+
+`scripts/deliver.ts`, run by cron (`scripts/deliver.cron.example`). `npm run deliver:dry`
+decides and prints without sending or marking. Fifteen minutes is the suggested cadence:
+the tightest SLA here is four hours, so faster is noise, and the job is idempotent, so a
+missed or overlapping run costs latency and nothing else.
+
+It does **not** import `MockAdapter`. It builds the same deterministic world from the same
+seed and talks to the proxy over the same HTTP contract the client uses, so its marks are
+the client's marks. Writes are pinned to the version read — a human touching a case between
+read and write means skip, not clobber.
+
+**A scheduler must see exactly what the screen sees.** The first cut passed no fusion
+context and found **90 signals where the browser found 109**, silently skipping whole kinds
+including GRAP entry bans that can be critical. That is worse than having no scheduler,
+because you stop watching the screen while it quietly ignores a class of signal. With
+corridors, the node table, a live NCR air reading and the disruption feed it lands on 109
+exactly. **Any new signal needing context needs it here too.**
+
+### Two traps this cost
+
+**A 200 is not proof of delivery.** The site is a static SPA with a catch-all, so POSTing
+to `/api/notify` in production returns 200 and the HTML shell. The first cut read that as
+success and marked every listed case notified — nothing sent, and because the mark is what
+prevents re-sending, those conflicts would never have been delivered again. Both calls now
+require a body of the documented shape.
+
+**`config.ts` read `import.meta.env` unguarded**, which threw under Node and made the whole
+data layer unimportable outside a browser — so no scheduler, and no real tests either. It
+defaults to an empty object now; Vite still substitutes the value, verified in the bundle.
+
+Verified end to end against a real receiver: 15 checks on selection and payload, two sends
+from the running app, then two headless runs. Each sent a different ten, qualifying fell
+53 → 43, and twenty marks landed across twenty cases with none twice.
 
 ## Detector precision — closing the loop
 
