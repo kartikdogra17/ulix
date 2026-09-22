@@ -30,6 +30,7 @@ npm run deliver:dry              # what delivery WOULD send, sending nothing
 npm run deliver                  # send it; schedule with scripts/deliver.cron.example
 node server/ulip-proxy.mjs   # optional; needs ULIP_USERNAME + ULIP_PASSWORD
                              # cases persist to server/data/cases.db (SQLite)
+npm test                               # 71 tests, node:test via tsx — no runner dependency
 npx tsc --noEmit -p tsconfig.app.json   # the check to run before claiming done
 npx tsc --noEmit -p tsconfig.api.json   # api/ — and tsconfig.scripts.json for scripts/
 vercel build --prod          # REQUIRED after touching api/; tsc does not see what Vercel does
@@ -198,6 +199,11 @@ sidebar, which looks exactly like a broken route.
   strict (discriminated unions stop narrowing). Ignoring that deployed a function that
   500'd on every request while the workflow stayed green. Run `vercel build --prod`
   locally after touching `api/`; a passing `tsc` does not mean the function runs.
+- **Most tests here are regressions for bugs that actually shipped.** `tests/` runs on
+  `node:test` through tsx — no test-runner dependency. When you fix something that a
+  typecheck could not have caught, add the case; when you add a test, break the code on
+  purpose once and confirm it fails, because a test that passes without catching its bug
+  is worse than no test.
 - **Calibrate generated data.** Three screens have shipped flagging *everything* — zero
   clear counterparties, one navigable month a year, overdue permanently zero. A screen that
   flags everyone trains people to ignore it. After generating, check the distribution.

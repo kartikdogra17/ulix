@@ -400,6 +400,18 @@ caught a real bug every single time it was run:
 A screen that flags everyone trains people to ignore it. A screen that shows almost
 nothing looks broken. Check the numbers, not the intuition.
 
+**`npm test`** — 71 tests over 16 suites, on `node:test` through tsx, so no test-runner
+dependency. Most of them are regressions for bugs that actually shipped: the GRAP
+fail-open, the day-early date parse, rail judged against a road standard, a six-lane
+corridor reporting every segment as a pinch, `MIN_SAMPLE` admitting noise, and the
+timetable that disagreed with its own status. Several assert a *distribution* rather than
+a value — that a layer flags some corridors but not all of them, that both the scored and
+the abstaining branch of the precision panel are reachable.
+
+Each was checked by mutation: reintroducing the GRAP fail-open fails 2 tests, reintroducing
+the timetable bug fails 3. **Do that when you add one.** A test that passes without
+catching its bug is worse than no test, because it buys confidence it has not earned.
+
 **Current healthy distribution** (mock, 160 consignments): queue 109 cases —
 critical 20 / high 41 / medium 48. Top kind is schedule slip at 31. Corridor pinch fires
 4 times. Detector precision spans 47% (corridor disruption) to 93% (customs hold), with
@@ -596,7 +608,8 @@ VAHAN lookups).
 - No real ULIP data has ever flowed. Access is in progress; expect up to a month.
 - Case work is shared through the proxy when running, per-browser otherwise. The
   **deployed** site is always per-browser.
-- No tests beyond `scripts/conformance.ts` and ad-hoc distribution checks. No test runner.
+- 71 tests (`npm test`), mostly regressions for bugs that shipped. Nothing covers the
+  React layer — everything tested is pure logic.
 - Demo sign-in only; no real auth or multi-tenancy.
 - Mobile cards are one layout for every role.
 

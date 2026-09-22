@@ -60,6 +60,11 @@ jobs:
       - run: npx tsc --noEmit -p tsconfig.api.json
       - run: npx tsc --noEmit -p tsconfig.scripts.json
 
+      # A push that breaks a regression does not reach production. Most of
+      # these exist because the bug they cover actually shipped once.
+      - run: npm test
+      - run: npm run conformance
+
       - run: npx vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
       # Same-origin, so the browser does not block it the way it blocks the
       # local proxy's http://localhost:8787 from an https page.
