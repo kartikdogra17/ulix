@@ -9,9 +9,12 @@
  * the "BHARAT STAGE II" spelling that broke the GRAP check.
  */
 import {
-  boeFound, toBoe, toEwayBill, toRake, toVehicle, FIELD_GAPS,
-  type BoeRecord, type EwayBillRecord, type FastagRecord, type FoisRecord, type VahanRecord,
+  boeFound, ldbTrail, pcsFound, pcsMiss, toBoe, toEwayBill, toLdb, toPcs, toRake, toVehicle,
+  FIELD_GAPS,
+  type BoeRecord, type EwayBillRecord, type FastagRecord, type FoisRecord,
+  type LdbRecord, type PcsRecord, type VahanRecord,
 } from '../src/data/ulip/map'
+import { isNotFound } from '../src/data/ulip/envelope'
 import { ncrEligibility } from '../src/data/osint'
 
 /** VAHAN/01, from ULIP_VAHAN_Integration_Requirement. */
@@ -122,6 +125,119 @@ check('separator-free date parsed', boe.known.igmDate?.slice(0, 10), '2011-07-04
 check('containers are a list', boe.known.containers, ['MSCU7786602'])
 check('cargo nature decoded', boe.known.natureLabel, 'Containerised')
 check('empty boeDetails is a MISS, despite SUCCESS', boeFound([]), false)
+
+/** PCS/01 hit, from ULIP_PCS_Integration_Requirement. */
+const PCS_HIT: PcsRecord = {
+  voyage_no: '909E', bill_date: '30012023', port_of_arrival: 'INMUN1',
+  goods_description: 'P*A*T*C*R*G*I*D*H* *O*E*3*0*1*9* *5*(*I*T* *I*E* *A*K*G*S*O*L* *E* * *A*F*7*2*L*5* *A*K*G*S',
+  port_of_loading: 'JPYOK', bill_no: '010DW06169', total_no_of_packages: '29',
+  mode_of_transport: null, sub_line_number: '0', container_seal_no: 'WHLU045961',
+  line_number: '40', container_no: 'WHSU6942383', number_of_packages: '55',
+  container_weight: 25.65, terminal_operator_code: 'INMUN1MCT1', nature_of_cargo: 'C',
+  responseMsg: 'SUCCESS', shipping_line_code: 'AAFCT5861J', port_of_destination: 'INMUN1',
+  line_no: '40', custom_house_code: 'INMUN1', grossWeight: 50847,
+  expected_date_and_time_of_arrival: '02032023:21:18', sub_line_no: '0',
+  igm_date: '27022023', shipping_agent_code: 'AAFCT5861J', cargo_imo_code: 'ZZZ',
+  igm_no: '2336612', iso_code: '4410', port_of_discharge: 'INMUN1SMS1',
+}
+
+/** PCS/01 MISS — every documented field, all null, under SUCCESS. */
+const PCS_MISS: PcsRecord = {
+  custom_house_code: null, igm_no: null, igm_date: null, voyage_no: null,
+  shipping_line_code: null, shipping_agent_code: null, port_of_arrival: null,
+  expected_date_and_time_of_arrival: null, terminal_operator_code: null,
+  cargo_imo_code: null, line_no: null, sub_line_no: null, bill_no: null, bill_date: null,
+  port_of_loading: null, port_of_destination: null, nature_of_cargo: null,
+  port_of_discharge: null, grossWeight: null, number_of_packages: null,
+  goods_description: null, mode_of_transport: null, container_no: null, line_number: null,
+  sub_line_number: null, container_seal_no: null, total_no_of_packages: null,
+  container_weight: null, iso_code: null, responseMsg: 'not found',
+}
+
+console.log('\nPCS/01 → manifest')
+const pcs = toPcs(PCS_HIT)
+check('ddMMyyyy:HH:mm ETA parsed', pcs.known.eta, '2023-03-02T21:18:00.000Z')
+check('bare ddMMyyyy igm_date parsed', pcs.known.igmDate?.slice(0, 10), '2023-02-27')
+check('cargo nature decoded', pcs.known.natureLabel, 'Containerised')
+check('cargo_imo_code ZZZ is NOT a hazard class', pcs.known.imdgClass, undefined)
+check('  and says so', /not an IMDG class/.test(pcs.warnings.join(' ')), true)
+check('masked description is not shown', pcs.known.goodsDescription, undefined)
+check('duplicate line_no/line_number read once', pcs.known.lineNo, '40')
+check('string package counts become numbers', [pcs.known.packages, pcs.known.totalPackages], [55, 29])
+check('THE TRAP: a miss is a null record under SUCCESS', pcsMiss(PCS_MISS), true)
+check('  a hit is not', pcsMiss(PCS_HIT), false)
+check('  and a length check cannot tell them apart', pcsFound([PCS_MISS]), false)
+
+/** LDB/01, from ULIP_LDB_Integration_Requirement. */
+const LDB: LdbRecord = {
+  eximContainerTrail: {
+    cntrDetail: { cntrno: 'NSST1234570', refflg: 'Yes', cntrsize: 40, isocode: '22G3', containertype: null },
+    dpd_dpe: { c_import: { dpd: 'N', destination: null }, c_export: null },
+    last_event: [{
+      serialno: 1, eventname: 'PORT OUT',
+      currentlocation: 'Raigad/Nhava Sheva Freeport Terminal (NSFT)', division: null,
+      timestamptimezone: '2023-03-29 11:00:09', timezoneabvr: 'IST',
+      latitude: 18.950149, longitude: 72.95123, containernumber: 'NSST1234570',
+      timeinms: 1680067809000, transportmode: 'TRUCK', type: 'I', isempty: 'Y',
+    }],
+    res_Message: 'Success',
+    trackLog: [
+      {
+        serialno: 1, eventname: 'PORT OUT',
+        currentlocation: 'Raigad/Nhava Sheva Freeport Terminal (NSFT)', division: null,
+        timestamptimezone: '2023-03-29 11:00:09', timezoneabvr: 'IST',
+        latitude: 18.950149, longitude: 72.95123, containernumber: 'NSST1234570',
+        timeinms: 1680067809000, transportmode: 'TRUCK', type: 'I', isempty: 'Y',
+      },
+      {
+        serialno: 2, eventname: 'PORT IN',
+        currentlocation: 'Raigad/Nhava Sheva Freeport Terminal (NSFT)', division: null,
+        timestamptimezone: '2023-03-28 09:00:08', timezoneabvr: 'IST',
+        latitude: 18.950149, longitude: 72.95123, containernumber: 'NSST1234570',
+        timeinms: 1679974208000, transportmode: 'VESSEL', type: 'I', isempty: 'Y',
+      },
+    ],
+    vessel_ata: null, vessel_atd: null,
+    vessel_eta: [{
+      eventid: 24, infotime: 1680659629000, eventname: 'EXPECTED VESSEL ARRIVAL',
+      orgname: 'Nhava Sheva Freeport Terminal (NSFT)', timeinms: 1679978002000,
+      timetimestamp: '2023-03-28 10:03:22', latitude: null, longitude: null,
+      vesselname: 'APR EXPRESSS', vesselimo: null, cntrcycleid: 1,
+      shippingline: 'TRANSPORT CORPORATION OF INDIA LTD',
+    }],
+    vessel_etd: null, vessel_gate_cutoff: null,
+  },
+  domesticContainerTrail: {
+    cntrDetail: null, dpd_dpe: null, last_event: null, res_Message: 'NO RECORD FOUND',
+    trackLog: null, vessel_ata: null, vessel_atd: null, vessel_eta: null,
+    vessel_etd: null, vessel_gate_cutoff: null,
+  },
+}
+
+console.log('\nLDB/01 → container')
+check('picks the populated trail, not the first one', ldbTrail(LDB)?.kind, 'exim')
+const ldb = toLdb(LDB)
+check('container number', ldb.known.containerNo, 'NSST1234570')
+check('refflg "Yes" is a reefer', ldb.known.reefer, true)
+check('two events', ldb.known.events.length, 2)
+check('newest first despite serialno ascending', ldb.known.lastEvent?.name, 'PORT OUT')
+check('event time from timeinms, not the local string', ldb.known.events[0].at, '2023-03-29T05:30:09.000Z')
+check('  which is NOT what Date.parse gives on a UTC box',
+  ldb.known.events[0].at === '2023-03-29T11:00:09.000Z', false)
+check('vessel ETA from timeinms, not infotime', ldb.known.vesselEta?.at, '2023-03-28T04:33:22.000Z')
+check('  infotime is a week later and is not the ETA',
+  ldb.known.vesselEta?.at !== new Date(1680659629000).toISOString(), true)
+check('vessel name', ldb.known.vesselEta?.vessel, 'APR EXPRESSS')
+
+console.log('\nThe envelope has a third responseStatus')
+check('LDB reports a miss as FAILURE, and isNotFound must catch it',
+  isNotFound({
+    response: [{
+      responseStatus: 'FAILURE',
+      response: { message: { text: 'Container details not found for the given container number: TCLU8538800' } },
+    }],
+    error: 'false', code: '200', message: 'Success',
+  }), true)
 
 console.log('\nDeclared gaps — fields no ULIP endpoint carries')
 for (const k of Object.keys(FIELD_GAPS)) console.log(`  • ${k}`)

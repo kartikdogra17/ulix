@@ -30,7 +30,7 @@ npm run deliver:dry              # what delivery WOULD send, sending nothing
 npm run deliver                  # send it; schedule with scripts/deliver.cron.example
 node server/ulip-proxy.mjs   # optional; needs ULIP_USERNAME + ULIP_PASSWORD
                              # cases persist to server/data/cases.db (SQLite)
-npm test                               # 71 tests, node:test via tsx — no runner dependency
+npm test                               # 130 tests, node:test via tsx — no runner dependency
 npx tsc --noEmit -p tsconfig.app.json   # the check to run before claiming done
 npx tsc --noEmit -p tsconfig.api.json   # api/ — and tsconfig.scripts.json for scripts/
 vercel build --prod          # REQUIRED after touching api/; tsc does not see what Vercel does
@@ -145,16 +145,39 @@ sidebar, which looks exactly like a broken route.
   I shipping today". The live adapter is therefore an ENRICHMENT layer over a consignment
   book that must come from a TMS or ERP, and everything needing that book throws
   `NotWiredError` with the reason rather than returning an empty array.
-- **There is no common date format in ULIP.** Four endpoints, four formats: VAHAN
+- **There is no common date format in ULIP.** Seven endpoints, six formats: VAHAN
   `dd-MMM-yyyy`, e-Way Bill `dd/MM/yyyy hh:mm:ss a`, FOIS `HH:mm dd-MM-yyyy` (time first),
-  ICEGATE `ddMMyyyy` (no separators). Each has its own parser in `map.ts`. **Never let
-  `Date.parse` near any of them** — on FOIS it fails, which is the kind outcome; on e-Way
-  Bill it succeeds and is wrong.
-- **ICEGATE reports a miss as a success.** An unknown bill of entry returns
-  `boeDetails: []` with `responseStatus: "SUCCESS"`, so `isNotFound()` does not catch it.
-  Check `boeFound()` as well, or a lookup that found nothing reads as one that worked.
+  ICEGATE `ddMMyyyy` (no separators), PCS `ddMMyyyy` **and** `ddMMyyyy:HH:mm` on the same
+  record, LDB `yyyy-MM-dd HH:mm:ss` with the zone in a *different field*. Each has its own
+  parser in `map.ts`. **Never let `Date.parse` near any of them** — on FOIS and PCS it
+  fails, which is the kind outcome; on e-Way Bill and LDB it succeeds and is wrong.
+- **There are four ways ULIP reports a miss, and three of them slip past the envelope.**
+  Most endpoints say inner `responseStatus: "ERROR"`. ICEGATE returns `boeDetails: []`
+  under `SUCCESS` — check `boeFound()`. **LDB says `FAILURE`**, which is why `isNotFound()`
+  tests for the absence of `SUCCESS` and never for the presence of `ERROR`. **PCS is the
+  worst: one fully-shaped record with every field null**, under `SUCCESS`, marked only by
+  `responseMsg: "not found"` — neither the envelope nor a length check sees it, so a miss
+  arrives looking like a manifest the gateway answered thinly for. Check `pcsFound()`.
 - **FOIS lists longitude before latitude**, both as strings. Reading them in the order
-  they appear puts the rake in the Indian Ocean.
+  they appear puts the rake in the Indian Ocean. LDB lists latitude first, as numbers —
+  the order is per-endpoint and cannot be assumed.
+- **An LDB timestamp is correct on an Indian laptop and 5½ hours early on the server.**
+  Each event carries `timeinms` (epoch) and `timestamptimezone` (local wall-clock) with
+  the zone in a *separate* field. `Date.parse` on the string reads it in the runtime's
+  zone, which in IST coincides — so the bug is invisible where the code is written and
+  appears on the UTC box that runs delivery. Prefer the epoch; refuse an unknown zone.
+  **A test pinned to one zone proves nothing here**; `ldbEventTime` is tested under four.
+- **LDB returns both `eximContainerTrail` and `domesticContainerTrail` every time**, and
+  fills in one. The sample populates the EXIM side, which invites reading it
+  unconditionally — and then every domestic container comes back empty. Use `ldbTrail()`.
+  Its `trackLog` counts *up* while running newest-first, so sorting by `serialno` reports
+  a container as inbound after it has left. And `vessel_eta` carries `infotime` alongside
+  `timeinms`: the publication time, a week later than the arrival in the sample.
+- **`cargo_imo_code` (PCS) is not `imoCode` (ICEGATE).** The second is the ship's
+  identifier; the first is a cargo hazard code, and the sample's `"ZZZ"` is not an IMDG
+  class. Passed through, a non-hazardous box files itself as hazmat. PCS also masks
+  `goods_description` with asterisks — present, non-empty, useless — and documents no unit
+  for either of its two weights.
 - **e-Way Bill dates are `dd/MM/yyyy`, and `validUpto` may carry no date at all.**
   `Date.parse('05/11/2017')` says 5 May; the field means 5 November — wrong only for the
   first twelve days of each month, which is the worst pattern to notice. Parsed by hand in

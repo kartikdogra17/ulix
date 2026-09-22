@@ -320,6 +320,18 @@ the app died at load with *"Cannot access 'OSINT_BASE' before initialization"*.
 and reports failure on the *inner* `responseStatus`. `error` and `code` are **strings**,
 not a boolean and a number. Use `unwrap()` / `isNotFound()`.
 
+**And the inner `responseStatus` has three values, not two.** LDB/01 reports a miss as
+`FAILURE` — once, in 201 documented samples. `isNotFound()` tests for the **absence of
+`SUCCESS`**, never for the presence of `ERROR`, because the second reads that miss as a
+hit.
+
+**A timestamp that agrees with itself in IST.** LDB/01 gives each event as both
+`timeinms` and a local wall-clock string whose zone lives in a different field.
+`Date.parse` on the string is correct on an Indian laptop and **5½ hours early** on the
+UTC box that runs the delivery job — invisible exactly where the code is written. Prefer
+the epoch; read the string against its declared zone; refuse an unrecognised one. Test it
+under several zones or the test proves nothing.
+
 **FASTag retains 72 hours only.** Anything longer is platform-stored history and must be
 labelled as such. `onset()` in `fusion.ts` floors every signal's age at that horizon **on
 purpose** — it is the platform's own visibility window. Unfloored, cases present as weeks
@@ -482,7 +494,8 @@ and `VehiclListDetails` → Part-B, which is the join behind the vehicle-mismatc
 
 Mapped the same way, and between them they produced the finding that generalises:
 
-**There is no common date format in ULIP.** Four endpoints, four formats.
+**There is no common date format in ULIP.** Seven endpoints, six formats — and PCS/01
+carries two of them on the same record.
 
 | Endpoint | Format | Sample |
 |---|---|---|
@@ -490,9 +503,11 @@ Mapped the same way, and between them they produced the finding that generalises
 | EWAYBILL/01 | `dd/MM/yyyy hh:mm:ss a` | `29/11/2017 04:30:00 PM` |
 | FOIS/01 | `HH:mm dd-MM-yyyy` — **time first** | `22:10 20-09-2023` |
 | ICEGATE/02 | `ddMMyyyy` — **no separators** | `04072011` |
+| PCS/01 | `ddMMyyyy` *and* `ddMMyyyy:HH:mm` | `27022023`, `02032023:21:18` |
+| LDB/01 | `yyyy-MM-dd HH:mm:ss` + zone in **another field** | `2023-03-29 11:00:09`, `IST` |
 
-Each has its own parser. `Date.parse` fails on FOIS, which is the kind outcome, and
-*succeeds while being wrong* on e-Way Bill, which is not.
+Each has its own parser. `Date.parse` fails on FOIS and PCS, which is the kind outcome;
+*succeeds while being wrong* on e-Way Bill and on LDB, which is not.
 
 **ICEGATE reports a miss as a success.** An unknown bill of entry comes back as
 `boeDetails: []` with `responseStatus: "SUCCESS"` — the error envelope is not used at all,
@@ -504,6 +519,83 @@ they appear puts the rake several hundred kilometres into the Indian Ocean. Also
 names carry their code in brackets — `NEW KUSMUNDA COLLIERY SIDING,  KORBA(NKCR)` — with
 a double space that has to be tidied, and `newFnr` is empty in the sample so `fnrNo` is
 the fallback.
+
+### PCS/01 and LDB/01
+
+The next pair, mapped from their documented samples. Between them they broke an
+assumption that had held across the first five endpoints.
+
+**There are three different ways ULIP reports a miss, and this is the third.**
+
+| Endpoint | A miss looks like | What catches it |
+|---|---|---|
+| Most | inner `responseStatus: "ERROR"` | `isNotFound()` |
+| ICEGATE/02 | `boeDetails: []` under `SUCCESS` | `boeFound()` |
+| LDB/01 | inner `responseStatus: **"FAILURE"**` | `isNotFound()`, now |
+| PCS/01 | **one record, every field null**, under `SUCCESS` | `pcsMiss()` / `pcsFound()` |
+
+PCS is the worst of the four. It returns a fully-shaped record with `igm_no: null`,
+`port_of_arrival: null` and every other field null, with `responseStatus: "SUCCESS"` and
+`responseMsg: "not found"` as the only marker. Neither the envelope check nor a length
+check sees it, and what comes out the other side is indistinguishable from a manifest the
+gateway answered thinly for.
+
+**`FAILURE` is a third `responseStatus`, and it appears once.** One occurrence in 201
+documented samples across all 36 documents — LDB/01's "container not found" — against 167
+`SUCCESS` and 31 `ERROR`. `isNotFound()` tested `responseStatus === 'ERROR'`, so an
+unknown container read as a hit. It now tests for the **absence of `SUCCESS`**, and the
+`UlipRecord` union carries all three values.
+
+**LDB timestamps are only right in India.** Each event carries the same instant twice:
+`timeinms` as epoch milliseconds, and `timestamptimezone` as `"2023-03-29 11:00:09"` —
+local wall-clock, with the zone in a *separate* field, `timezoneabvr: "IST"`.
+`Date.parse` on that string reads it in the **runtime's** zone. On a laptop set to
+Asia/Kolkata the two agree exactly, so the bug cannot be seen where the code is written;
+on the UTC box that runs the delivery job and the serverless functions, every LDB event
+lands **5½ hours early** — enough to move a port-out across a shift boundary and to age a
+signal past an SLA it has not breached. `timeinms` wins whenever it is present; the string
+is read by hand against its own declared zone otherwise, and an unrecognised zone is
+refused rather than assumed to be UTC. The test pins four zones for this reason: pinned to
+UTC alone it would pass with the bug still in.
+
+**LDB returns two trails and fills in one.** `eximContainerTrail` *and*
+`domesticContainerTrail` come back every time; the one that does not apply has every field
+null and `res_Message: "NO RECORD FOUND"`. The sample populates the EXIM side, which
+invites reading it unconditionally — and then every domestic container comes back empty.
+`ldbTrail()` picks whichever is populated.
+
+**`trackLog` counts up and runs newest-first.** `serialno: 1` is PORT OUT on the 29th;
+`serialno: 2` is PORT IN on the 28th. Sorting by `serialno`, or taking the last element as
+the latest, reports a container as still inbound after it has left the port. Sorted by
+resolved instant instead, so it does not depend on the gateway keeping its own convention.
+
+**`vessel_eta` carries two epochs.** `timeinms` is the arrival; `infotime` is when the
+notice was published, and in the documented sample it is a **week later** than the arrival
+it describes. Reading the first number on the record puts the berthing eight days out.
+
+**`cargo_imo_code` is not ICEGATE's `imoCode`.** ICEGATE's document defines `imoCode` as
+the identifier of the *ship* (`"1000000"`, seven digits). PCS's `cargo_imo_code` is a
+*cargo* hazard code and the sample carries `"ZZZ"`, which is not an IMDG class — IMDG
+classes are 1–9. Passed through, a non-hazardous container files itself as classified
+hazmat, and joining the two fields files a vessel number as a hazard class. Only a real
+class is kept; anything else is reported.
+
+**`goods_description` comes back masked.** Every other character is replaced:
+`"P*A*T*C*R*G*I*D*H* *O*E*3*0*1*9*…"`. The field is present and non-empty and useless, so
+it is withheld rather than rendered — a screen of asterisks reads as corruption, not as
+privacy.
+
+**Two weights, two package counts, no units.** `grossWeight: 50847` and
+`container_weight: 25.65` are three orders of magnitude apart, so they are certainly not
+the same unit, and the document gives a unit for neither. They are kept apart and flagged
+as unitless. `number_of_packages: "55"` and `total_no_of_packages: "29"` are both strings
+and the "total" is the smaller. `line_no`/`line_number` and `sub_line_no`/`sub_line_number`
+are duplicate pairs. `container_seal_no: "WHLU045961"` looks exactly like a container
+number and is not one.
+
+**LDB/01's own document disagrees with itself about the container format.** The parameter
+table says `^[a-zA-Z0-9]{8,11}$`; the 400 error message in the same document says
+`[A-Z]{4}[0-9]{4,7}`. The catalogue's extracted example, `TU679`, satisfies neither.
 
 ### Conformance
 

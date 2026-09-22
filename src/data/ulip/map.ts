@@ -344,6 +344,479 @@ export function toBoe(r: BoeRecord): LiveBoe {
   }
 }
 
+/* ── PCS/01 — port community system, by IGM number ───────────── */
+
+/**
+ * PCS/01 response record, as documented.
+ *
+ * Every field is nullable because the MISS carries all of them as null —
+ * see `pcsFound`. The numbers are inconsistent in the way ULIP always is:
+ * `grossWeight` and `container_weight` come back as numbers, while the two
+ * package counts come back as strings.
+ */
+export interface PcsRecord {
+  custom_house_code?: string | null
+  igm_no?: string | null
+  igm_date?: string | null
+  voyage_no?: string | null
+  shipping_line_code?: string | null
+  shipping_agent_code?: string | null
+  port_of_arrival?: string | null
+  expected_date_and_time_of_arrival?: string | null
+  terminal_operator_code?: string | null
+  cargo_imo_code?: string | null
+  line_no?: string | null
+  sub_line_no?: string | null
+  bill_no?: string | null
+  bill_date?: string | null
+  port_of_loading?: string | null
+  port_of_destination?: string | null
+  nature_of_cargo?: string | null
+  port_of_discharge?: string | null
+  grossWeight?: number | string | null
+  number_of_packages?: number | string | null
+  goods_description?: string | null
+  mode_of_transport?: string | null
+  container_no?: string | null
+  line_number?: string | null
+  sub_line_number?: string | null
+  container_seal_no?: string | null
+  total_no_of_packages?: number | string | null
+  container_weight?: number | string | null
+  iso_code?: string | null
+  responseMsg?: string | null
+}
+
+/**
+ * PCS writes the ETA as `ddMMyyyy:HH:mm` — ICEGATE's separator-free date
+ * with a time bolted on after a colon.
+ *
+ * That is the fifth distinct date format across six endpoints, and PCS/01
+ * carries two of them at once: this one, and bare `ddMMyyyy` on `igm_date`
+ * and `bill_date`. Date.parse returns NaN here, which is the kind outcome.
+ *
+ * Read day-first, and the sample settles that rather than convention: the
+ * document's other two dates are `27022023` and `30012023`, whose leading
+ * pair cannot be a month. On the ETA `02032023` alone both readings parse,
+ * and the wrong one dates the vessel's arrival 24 days BEFORE the manifest
+ * that declares it.
+ */
+export function pcsEtaDate(raw: string | null | undefined): string | null {
+  if (!raw) return null
+  const m = /^\s*(\d{2})(\d{2})(\d{4}):(\d{1,2}):(\d{2})(?::(\d{2}))?\s*$/.exec(raw)
+  if (!m) return null
+  const [, dd, mm, yyyy, hh, mi, ss] = m
+  const d = new Date(Date.UTC(+yyyy, +mm - 1, +dd, +hh, +mi, ss ? +ss : 0))
+  if (d.getUTCDate() !== +dd || d.getUTCMonth() !== +mm - 1) return null
+  return d.toISOString()
+}
+
+/**
+ * True when a field masked for privacy, not a field with a value.
+ *
+ * PCS returns `goods_description` with every other character replaced:
+ * `"P*A*T*C*R*G*I*D*H* *O*E*3*0*1*9*…"`. It is present, non-empty and
+ * useless, so anything that renders a description to an operator has to
+ * know the difference — a screen full of asterisks reads as corruption.
+ */
+export function isMasked(raw: string | null | undefined): boolean {
+  if (!raw) return false
+  const stars = (raw.match(/\*/g) ?? []).length
+  return stars > 0 && stars / raw.length >= 0.3
+}
+
+/** The substantive fields — the ones that are all null on a miss. */
+const PCS_SUBSTANTIVE: Array<keyof PcsRecord> = [
+  'igm_no', 'igm_date', 'voyage_no', 'bill_no', 'container_no',
+  'port_of_arrival', 'port_of_loading', 'port_of_discharge',
+]
+
+/**
+ * IMPORTANT: a PCS/01 miss is the most dangerous of the three shapes ULIP
+ * uses to report one.
+ *
+ * ICEGATE returns an EMPTY list under `responseStatus: "SUCCESS"`; LDB
+ * returns `responseStatus: "FAILURE"`. PCS returns **one fully-populated
+ * record whose every field is null**, under `responseStatus: "SUCCESS"`,
+ * with the only marker being `responseMsg: "not found"` where a hit says
+ * `"SUCCESS"`. Neither `isNotFound()` nor a length check catches it, and a
+ * mapper that does not look produces a consignment with no IGM number and
+ * no port — indistinguishable from a real record the gateway answered
+ * thinly for.
+ */
+export function pcsMiss(r: PcsRecord | undefined): boolean {
+  if (!r) return true
+  if (/not\s*found/i.test(r.responseMsg ?? '')) return true
+  return PCS_SUBSTANTIVE.every((k) => r[k] === null || r[k] === undefined || r[k] === '')
+}
+
+export const pcsFound = (rows: PcsRecord[] | undefined) => (rows ?? []).some((r) => !pcsMiss(r))
+
+export interface LivePcs {
+  known: {
+    igmNo?: string
+    igmDate?: string
+    /** Vessel arrival, from `expected_date_and_time_of_arrival`. */
+    eta?: string
+    voyageNo?: string
+    customHouse?: string
+    portOfArrival?: string
+    portOfLoading?: string
+    portOfDischarge?: string
+    portOfDestination?: string
+    terminalOperator?: string
+    shippingLineCode?: string
+    shippingAgentCode?: string
+    billNo?: string
+    billDate?: string
+    lineNo?: string
+    subLineNo?: string
+    containerNo?: string
+    containerSealNo?: string
+    isoCode?: string
+    natureOfCargo?: string
+    natureLabel?: string
+    /** Undocumented unit — see the warning this mapper raises. */
+    grossWeight?: number
+    containerWeight?: number
+    packages?: number
+    totalPackages?: number
+    goodsDescription?: string
+    /** Raw `cargo_imo_code`, only when it reads as an IMDG class. */
+    imdgClass?: string
+  }
+  missing: string[]
+  warnings: string[]
+}
+
+const num = (v: number | string | null | undefined): number | undefined => {
+  if (v === null || v === undefined || v === '') return undefined
+  const n = Number(v)
+  return Number.isFinite(n) ? n : undefined
+}
+
+const str = (v: string | null | undefined): string | undefined => v?.trim() || undefined
+
+export function toPcs(r: PcsRecord): LivePcs {
+  const missing: string[] = []
+  const warnings: string[] = []
+
+  if (pcsMiss(r)) {
+    warnings.push(
+      'PCS/01 answered with a null record — this IGM number is not in the port '
+      + 'community system. The envelope reports SUCCESS regardless.')
+    return { known: {}, missing: ['record'], warnings }
+  }
+
+  const eta = pcsEtaDate(r.expected_date_and_time_of_arrival)
+  if (r.expected_date_and_time_of_arrival && !eta) {
+    missing.push('eta')
+    warnings.push(
+      `Could not read the vessel ETA "${r.expected_date_and_time_of_arrival}" as `
+      + 'ddMMyyyy:HH:mm, so no arrival can be compared against a berth window.')
+  } else if (!r.expected_date_and_time_of_arrival) missing.push('eta')
+
+  const igmDate = icegateDate(r.igm_date ?? undefined)
+  if (r.igm_date && !igmDate) missing.push('igmDate')
+
+  /* `cargo_imo_code` is a CARGO hazard code, not ICEGATE's `imoCode`, which
+     the ICEGATE document defines as the identifier of the SHIP. Two fields,
+     near-identical names, different namespaces — joining them would file a
+     vessel number as a hazard class. IMDG classes are 1-9; the documented
+     sample carries "ZZZ", which is not one, so it is reported rather than
+     passed through as though the cargo were classified. */
+  const imo = str(r.cargo_imo_code)
+  const imdgClass = imo && /^[1-9](\.[1-9])?$/.test(imo) ? imo : undefined
+  if (imo && !imdgClass) {
+    warnings.push(
+      `cargo_imo_code is "${imo}", which is not an IMDG class (1-9). Treated as `
+      + 'no declared hazard class rather than as a classification.')
+  }
+
+  const description = str(r.goods_description)
+  if (isMasked(description)) {
+    warnings.push('goods_description is masked by the gateway and carries no readable text.')
+  }
+
+  const nature = r.nature_of_cargo?.trim().toUpperCase()
+
+  /* Two weights, two package counts, and the document gives a unit for
+     none of them. In the sample `grossWeight` is 50847 and
+     `container_weight` is 25.65 — three orders of magnitude apart, so they
+     are certainly not the same unit. Adding them, or showing either
+     without a unit, invents a fact. */
+  const grossWeight = num(r.grossWeight)
+  const containerWeight = num(r.container_weight)
+  if (grossWeight !== undefined && containerWeight !== undefined) {
+    warnings.push(
+      'PCS/01 documents no unit for grossWeight or container_weight; they are not '
+      + 'comparable to each other and must be labelled as unitless.')
+  }
+
+  return {
+    known: {
+      igmNo: str(r.igm_no),
+      igmDate: igmDate ?? undefined,
+      eta: eta ?? undefined,
+      voyageNo: str(r.voyage_no),
+      customHouse: str(r.custom_house_code)?.toUpperCase(),
+      portOfArrival: str(r.port_of_arrival)?.toUpperCase(),
+      portOfLoading: str(r.port_of_loading)?.toUpperCase(),
+      portOfDischarge: str(r.port_of_discharge)?.toUpperCase(),
+      portOfDestination: str(r.port_of_destination)?.toUpperCase(),
+      terminalOperator: str(r.terminal_operator_code)?.toUpperCase(),
+      shippingLineCode: str(r.shipping_line_code),
+      shippingAgentCode: str(r.shipping_agent_code),
+      billNo: str(r.bill_no),
+      billDate: icegateDate(r.bill_date ?? undefined) ?? undefined,
+      // line_no/line_number and sub_line_no/sub_line_number are duplicate
+      // pairs carrying the same value; one of each is read.
+      lineNo: str(r.line_no) ?? str(r.line_number),
+      subLineNo: str(r.sub_line_no) ?? str(r.sub_line_number),
+      containerNo: str(r.container_no)?.toUpperCase(),
+      // Looks exactly like a container number and is not one.
+      containerSealNo: str(r.container_seal_no)?.toUpperCase(),
+      isoCode: str(r.iso_code),
+      natureOfCargo: nature || undefined,
+      natureLabel: nature ? CARGO_NATURE[nature] ?? nature : undefined,
+      grossWeight,
+      containerWeight,
+      packages: num(r.number_of_packages),
+      totalPackages: num(r.total_no_of_packages),
+      goodsDescription: isMasked(description) ? undefined : description,
+      imdgClass,
+    },
+    missing,
+    warnings,
+  }
+}
+
+/* ── LDB/01 — container track, by container number ───────────── */
+
+/** A `trackLog` / `last_event` entry, as documented. */
+export interface LdbEvent {
+  serialno?: number | null
+  eventname?: string | null
+  currentlocation?: string | null
+  division?: string | null
+  /** Local wall-clock, `yyyy-MM-dd HH:mm:ss`, with the zone in a SEPARATE field. */
+  timestamptimezone?: string | null
+  timezoneabvr?: string | null
+  latitude?: number | null
+  longitude?: number | null
+  containernumber?: string | null
+  /** Epoch milliseconds. The only unambiguous time on the record. */
+  timeinms?: number | null
+  transportmode?: string | null
+  type?: string | null
+  isempty?: string | null
+}
+
+/** A `vessel_eta` / `vessel_etd` / `vessel_ata` entry, as documented. */
+export interface LdbVesselEvent {
+  eventid?: number | null
+  eventname?: string | null
+  orgname?: string | null
+  /** When the notice was PUBLISHED, not when the vessel arrives. */
+  infotime?: number | null
+  timeinms?: number | null
+  timetimestamp?: string | null
+  latitude?: number | null
+  longitude?: number | null
+  vesselname?: string | null
+  vesselimo?: string | null
+  cntrcycleid?: number | null
+  shippingline?: string | null
+}
+
+export interface LdbTrail {
+  cntrDetail?: {
+    cntrno?: string | null
+    refflg?: string | null
+    cntrsize?: number | string | null
+    isocode?: string | null
+    containertype?: string | null
+  } | null
+  dpd_dpe?: unknown
+  last_event?: LdbEvent[] | null
+  res_Message?: string | null
+  trackLog?: LdbEvent[] | null
+  vessel_ata?: LdbVesselEvent[] | null
+  vessel_atd?: LdbVesselEvent[] | null
+  vessel_eta?: LdbVesselEvent[] | null
+  vessel_etd?: LdbVesselEvent[] | null
+  vessel_gate_cutoff?: LdbVesselEvent[] | null
+}
+
+/** LDB/01 returns BOTH trails every time; one of them is empty. */
+export interface LdbRecord {
+  eximContainerTrail?: LdbTrail | null
+  domesticContainerTrail?: LdbTrail | null
+}
+
+/** Zone abbreviations LDB is documented to use, in minutes east of UTC. */
+const LDB_ZONES: Record<string, number> = { IST: 330, UTC: 0, GMT: 0 }
+
+/**
+ * When an LDB event actually happened.
+ *
+ * The record carries the same instant twice: `timeinms` as epoch
+ * milliseconds, and `timestamptimezone` as `"2023-03-29 11:00:09"` with
+ * the zone in a DIFFERENT field, `timezoneabvr: "IST"`.
+ *
+ * `Date.parse` on that string reads it in the RUNTIME's zone. On a laptop
+ * set to Asia/Kolkata the two agree exactly, so the bug is invisible while
+ * you are writing it; on the UTC box that runs the delivery job and the
+ * serverless functions, every LDB timestamp lands 5½ hours early — early
+ * enough to move a port-out across a shift boundary and to age a signal
+ * past an SLA it has not breached.
+ *
+ * So `timeinms` wins whenever it is there, and the string is read by hand
+ * against its own declared zone when it is not. An unrecognised zone is
+ * refused rather than assumed to be UTC.
+ */
+export function ldbEventTime(ev: { timeinms?: number | null; timestamptimezone?: string | null; timezoneabvr?: string | null }): string | null {
+  if (typeof ev.timeinms === 'number' && Number.isFinite(ev.timeinms) && ev.timeinms > 0) {
+    return new Date(ev.timeinms).toISOString()
+  }
+  const raw = ev.timestamptimezone?.trim()
+  if (!raw) return null
+  const m = /^(\d{4})-(\d{2})-(\d{2})[T ](\d{1,2}):(\d{2})(?::(\d{2}))?$/.exec(raw)
+  if (!m) return null
+  const zone = ev.timezoneabvr?.trim().toUpperCase()
+  const offset = zone ? LDB_ZONES[zone] : undefined
+  if (offset === undefined) return null
+  const [, yyyy, mm, dd, hh, mi, ss] = m
+  return new Date(
+    Date.UTC(+yyyy, +mm - 1, +dd, +hh, +mi, ss ? +ss : 0) - offset * 60_000,
+  ).toISOString()
+}
+
+/**
+ * Which of the two trails this container is actually on.
+ *
+ * LDB/01 always returns `eximContainerTrail` AND `domesticContainerTrail`.
+ * The one that does not apply comes back with every field null and
+ * `res_Message: "NO RECORD FOUND"`. Reading `eximContainerTrail`
+ * unconditionally — the obvious thing, and the one the sample invites
+ * because the EXIM trail is the populated one there — returns nothing at
+ * all for every domestic container.
+ */
+export function ldbTrail(r: LdbRecord | undefined): { kind: 'exim' | 'domestic'; trail: LdbTrail } | null {
+  const has = (t: LdbTrail | null | undefined) =>
+    !!t && !/no\s*record\s*found/i.test(t.res_Message ?? '')
+    && (!!t.cntrDetail || !!t.trackLog?.length || !!t.last_event?.length)
+  if (has(r?.eximContainerTrail)) return { kind: 'exim', trail: r!.eximContainerTrail! }
+  if (has(r?.domesticContainerTrail)) return { kind: 'domestic', trail: r!.domesticContainerTrail! }
+  return null
+}
+
+export interface LiveContainer {
+  known: {
+    containerNo?: string
+    kind?: 'exim' | 'domestic'
+    sizeFt?: number
+    isoCode?: string
+    reefer?: boolean
+    /** Newest first, like every other event list in this codebase. */
+    events: Array<{
+      seq: number | null
+      name: string
+      at: string
+      location: string | null
+      mode: string | null
+      empty: boolean | null
+      lat: number | null
+      lon: number | null
+    }>
+    lastEvent?: { name: string; at: string; location: string | null }
+    vesselEta?: { at: string; vessel: string | null; line: string | null; terminal: string | null }
+  }
+  missing: string[]
+  warnings: string[]
+}
+
+export function toLdb(r: LdbRecord): LiveContainer {
+  const missing: string[] = []
+  const warnings: string[] = []
+
+  const picked = ldbTrail(r)
+  if (!picked) {
+    warnings.push(
+      'LDB/01 returned no populated trail — neither the EXIM nor the domestic side '
+      + 'has this container.')
+    return { known: { events: [] }, missing: ['trail'], warnings }
+  }
+  const { kind, trail } = picked
+
+  /* `trackLog` is numbered ascending and ordered NEWEST first: serialno 1 is
+     PORT OUT on the 29th, serialno 2 is PORT IN on the 28th. Taking the last
+     element as "latest" — or sorting by serialno — gives the oldest event.
+     Sorted by resolved instant instead, so the ordering does not depend on
+     the gateway keeping its own convention. */
+  const raw = trail.trackLog?.length ? trail.trackLog : trail.last_event ?? []
+  const events = raw
+    .map((ev) => {
+      const at = ldbEventTime(ev)
+      if (!at && (ev.timeinms || ev.timestamptimezone)) {
+        warnings.push(
+          `Dropped a "${ev.eventname ?? 'unnamed'}" event: its timestamp `
+          + `("${ev.timestamptimezone ?? ev.timeinms}", zone `
+          + `"${ev.timezoneabvr ?? 'absent'}") could not be placed on a clock.`)
+      }
+      return at ? {
+        seq: typeof ev.serialno === 'number' ? ev.serialno : null,
+        name: str(ev.eventname) ?? 'Unknown event',
+        at,
+        location: str(ev.currentlocation) ?? null,
+        mode: str(ev.transportmode)?.toLowerCase() ?? null,
+        // "Y"/"N", and an absent flag is unknown rather than laden.
+        empty: ev.isempty ? /^Y/i.test(ev.isempty) : null,
+        lat: typeof ev.latitude === 'number' ? ev.latitude : null,
+        lon: typeof ev.longitude === 'number' ? ev.longitude : null,
+      } : null
+    })
+    .filter((e): e is NonNullable<typeof e> => e !== null)
+    .sort((a, b) => Date.parse(b.at) - Date.parse(a.at))
+
+  if (!events.length) missing.push('events')
+
+  /* `vessel_eta` carries TWO epochs. `timeinms` is the arrival;
+     `infotime` is when the notice was published, and in the documented
+     sample it is a WEEK LATER than the arrival it describes. Reading the
+     first number on the record puts the vessel eight days out. */
+  const etaRow = trail.vessel_eta?.find((v) => v.timeinms || v.timetimestamp)
+  const etaAt = etaRow ? ldbEventTime(etaRow) : null
+  if (trail.vessel_eta?.length && !etaAt) missing.push('vesselEta')
+
+  const size = num(trail.cntrDetail?.cntrsize)
+  const iso = str(trail.cntrDetail?.isocode)
+
+  return {
+    known: {
+      containerNo: (str(trail.cntrDetail?.cntrno)
+        ?? str(raw.find((e) => e.containernumber)?.containernumber))?.toUpperCase(),
+      kind,
+      sizeFt: size,
+      isoCode: iso,
+      // `refflg` is "Yes"/"No", not a boolean, and not every record has it.
+      reefer: trail.cntrDetail?.refflg ? /^Y/i.test(trail.cntrDetail.refflg) : undefined,
+      events,
+      lastEvent: events[0]
+        ? { name: events[0].name, at: events[0].at, location: events[0].location }
+        : undefined,
+      vesselEta: etaAt ? {
+        at: etaAt,
+        vessel: str(etaRow?.vesselname) ?? null,
+        line: str(etaRow?.shippingline) ?? null,
+        terminal: str(etaRow?.orgname) ?? null,
+      } : undefined,
+    },
+    missing,
+    warnings,
+  }
+}
+
 /**
  * What ULIP simply does not carry, against a domain model built from the
  * whole picture rather than from one gateway.

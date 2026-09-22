@@ -9,7 +9,7 @@ trap. This file is *where things stand*.
 
 **ULIX** — a logistics control tower built on India's Unified Logistics Interface
 Platform. Independent software, not a government service. Eleven modules, ~17k lines
-across `src/`, `server/`, `api/`, `scripts/` and `tests/`. 51 commits, 100 tests.
+across `src/`, `server/`, `api/`, `scripts/` and `tests/`. 52 commits, 130 tests.
 Typecheck and build clean, and a push to `main` deploys itself.
 
 **Starting a fresh session?** Read [CLAUDE.md](CLAUDE.md) first — it is short and it names
@@ -188,12 +188,31 @@ with penalties attached.
 
 **This is the first thing to check the day credentials arrive.** One live call answers it.
 
-FOIS/01 and ICEGATE/02 are mapped and covered too. Five endpoint families now have
-fixtures, and every one of them found something. The pattern that generalises: **there is
-no common date format in ULIP** — four endpoints, four formats, including one that puts
-the time first and one with no separators at all. And **ICEGATE reports a miss as a
-success**, with an empty `boeDetails` under `responseStatus: "SUCCESS"`, so `isNotFound()`
-alone reads a failed lookup as a good one.
+FOIS/01, ICEGATE/02, PCS/01 and LDB/01 are mapped and covered too. **Seven endpoint
+families now have fixtures, and every single one of them found something a typecheck could
+not.** Two patterns generalise, and both got worse with the last pair:
+
+**There is no common date format in ULIP** — seven endpoints, six formats, including one
+that puts the time first, one with no separators at all, one endpoint carrying two formats
+on the same record, and one that puts the timezone in a *different field* from the
+timestamp.
+
+**There are four ways a miss is reported**, and three slip past the envelope check.
+Most say inner `responseStatus: "ERROR"`. ICEGATE returns an empty list under `SUCCESS`.
+LDB says **`FAILURE`** — one occurrence in 201 documented samples, and `isNotFound()` was
+testing `=== 'ERROR'`, so an unknown container read as a hit. PCS returns **one
+fully-shaped record with every field null** under `SUCCESS`, marked only by
+`responseMsg: "not found"`, which neither the envelope nor a length check can see.
+
+The one worth singling out, because it is the only bug here that is invisible on the
+machine it was written on: **LDB timestamps are correct in IST and 5½ hours early
+everywhere else.** Each event carries the instant twice — `timeinms` as epoch
+milliseconds, and a local wall-clock string with the zone in a separate field.
+`Date.parse` on the string reads the *runtime's* zone, which in Asia/Kolkata coincides
+exactly. On the UTC box that runs the delivery job and the serverless functions, every
+port event lands 5½ hours early — enough to move a port-out across a shift boundary and
+to age a signal past an SLA it has not breached. The test pins four zones; pinned to UTC
+alone it would have passed with the bug still in.
 
 ## Open threads, in the order I would pick them up
 
@@ -217,14 +236,15 @@ alone reads a failed lookup as a good one.
    types, no `strict` — reports the errors, and builds anyway. `tsc` passing locally means
    nothing for a function. Run `vercel build --prod` after touching `api/`; full detail in
    the knowledge base's traps section.
-2. **Map `PCS/01` and `LDB/01` from their documented samples**, the way the other five
-   were. Five for five have turned up something a typecheck could not — a fail-open
-   restriction, a day-early expiry, a swapped lat/lon, a miss reported as a success, and
-   four mutually incompatible date formats. These two are cited by `fusion.ts` and are the
-   obvious next pair. An hour each now, versus finding it during a live demo.
-
-3. **Real auth.** Sign-in is a demo picker. Nobody can pilot on it, and it is the shortest
+2. **Real auth.** Sign-in is a demo picker. Nobody can pilot on it, and it is the shortest
    item here that actually blocks a customer.
+
+3. **Map another endpoint family from its sample.** Seven for seven have turned up
+   something a typecheck could not, so the expected value of the eighth is still high.
+   `NOENTRY/01` (state no-entry windows, which the GRAP and corridor signals both want)
+   and `PESO/01` (cited by `hazmat_no_clearance`, the only detector with no live source
+   behind it at all) are the two the signal set actually leans on. An hour each now,
+   versus finding it during a live demo.
 
 4. **Role-aware mobile cards.** The desktop tables are lensed, the cards are not. They
    carry identity, lane, status and progress, which all four roles want. Lowest value on
@@ -232,7 +252,8 @@ alone reads a failed lookup as a good one.
 
 Everything else that was on this list is done: the role lens, per-role page defaults and
 column sets, the licence, the GatiShakti overlay, the `corridor_pinch` signal, the leg-date
-fix, the case store, the CSV import, the live adapter, and push-to-deploy.
+fix, the case store, the CSV import, the live adapter, push-to-deploy, and the PCS/01 and
+LDB/01 mappings.
 
 **Still the two highest-value things, and neither is code:** get the goulip.in NDA signed
 (in progress, up to a month), and talk to eight to ten operators to find out whether the

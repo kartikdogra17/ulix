@@ -29,9 +29,10 @@ import { ULIP_ENDPOINTS } from './catalogue'
 import { UlipClient } from './client'
 import { UlipError, type UlipEnvelope, isNotFound } from './envelope'
 import {
-  boeFound, toBoe, toEwayBill, toRake, toVehicle,
+  boeFound, pcsFound, pcsMiss, toBoe, toEwayBill, toLdb, toPcs, toRake, toVehicle,
   type BoeRecord, type EwayBillRecord, type FastagRecord, type FoisRecord,
-  type LiveBoe, type LiveEwayBill, type LiveRake, type VahanRecord,
+  type LdbRecord, type LiveBoe, type LiveContainer, type LiveEwayBill, type LivePcs,
+  type LiveRake, type PcsRecord, type VahanRecord,
 } from './map'
 
 /**
@@ -189,6 +190,55 @@ export class UlipAdapter implements DataAdapter {
       return boeFound(details) ? toBoe(details[0]) : null
     } catch (err) {
       this.record('ICEGATE/02', err instanceof UlipError ? err.code : 502, started, 0, false)
+      throw err
+    }
+  }
+
+  /**
+   * One import general manifest, by IGM number.
+   *
+   * `pcsFound` is doing the same job `boeFound` does for ICEGATE, against
+   * a worse shape: PCS reports an unknown IGM as ONE record with every
+   * field null under `responseStatus: "SUCCESS"`. Neither isNotFound nor a
+   * length check sees it, so without this the caller gets a manifest with
+   * no IGM number and no port and no way to tell it from a thin answer.
+   */
+  async manifest(igmNumber: string): Promise<LivePcs | null> {
+    const started = performance.now()
+    try {
+      const env = await this.client.callRaw<PcsRecord[]>(
+        'PCS/01', { interfaceName: 'CHPOI03', igmNumber })
+      if (isNotFound(env)) { this.record('PCS/01', 200, started, 0, false); return null }
+      // PCS nests a LIST inside each envelope record, unlike the endpoints
+      // that put one object there.
+      const rows = flatten(env).flat()
+      this.record('PCS/01', 200, started, JSON.stringify(env).length, pcsFound(rows))
+      const hit = rows.find((r) => !pcsMiss(r))
+      return hit ? toPcs(hit) : null
+    } catch (err) {
+      this.record('PCS/01', err instanceof UlipError ? err.code : 502, started, 0, false)
+      throw err
+    }
+  }
+
+  /**
+   * One container's track at the port.
+   *
+   * LDB is the only endpoint that reports a miss as `FAILURE` rather than
+   * `ERROR`, which is why isNotFound tests for the absence of SUCCESS.
+   */
+  async container(containerNumber: string): Promise<LiveContainer | null> {
+    const started = performance.now()
+    try {
+      const env = await this.client.callRaw<LdbRecord>('LDB/01', { containerNumber })
+      if (isNotFound(env)) { this.record('LDB/01', 200, started, 0, false); return null }
+      const rows = flatten(env)
+      const mapped = rows.length ? toLdb(rows[0]) : null
+      this.record('LDB/01', 200, started, JSON.stringify(env).length,
+        !!mapped && !mapped.missing.includes('trail'))
+      return mapped
+    } catch (err) {
+      this.record('LDB/01', err instanceof UlipError ? err.code : 502, started, 0, false)
       throw err
     }
   }

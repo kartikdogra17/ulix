@@ -25,7 +25,13 @@
 
 export interface UlipRecord<T = unknown> {
   response: T
-  responseStatus: 'SUCCESS' | 'ERROR'
+  /**
+   * `ERROR` is what 31 of the documented samples use for a miss. LDB/01
+   * uses `FAILURE` — once, in 201 samples across all 36 documents, and
+   * nowhere else. A union of the two obvious values compiles fine and
+   * then reads a real LDB miss as neither a hit nor a miss.
+   */
+  responseStatus: 'SUCCESS' | 'ERROR' | 'FAILURE'
 }
 
 export interface UlipEnvelope<T = unknown> {
@@ -61,11 +67,18 @@ export function unwrap<T>(env: UlipEnvelope<T>, endpoint?: string): T[] {
   return records.filter((r) => r.responseStatus === 'SUCCESS').map((r) => r.response)
 }
 
-/** True when ULIP answered but the source system had no matching record. */
+/**
+ * True when ULIP answered but the source system had no matching record.
+ *
+ * Tested for the ABSENCE of SUCCESS rather than the presence of ERROR:
+ * LDB/01 says `FAILURE`, and an equality check against `ERROR` reports
+ * that miss as a hit — an unknown container then reads as a container the
+ * gateway answered for with nothing to say.
+ */
 export function isNotFound<T>(env: UlipEnvelope<T>): boolean {
   if (env.error === 'true') return false
   const records = env.response ?? []
-  return records.length > 0 && records.every((r) => r.responseStatus === 'ERROR')
+  return records.length > 0 && records.every((r) => r.responseStatus !== 'SUCCESS')
 }
 
 /** Build the same envelope locally so mock and live paths are indistinguishable. */
