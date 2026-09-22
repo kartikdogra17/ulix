@@ -28,7 +28,7 @@ import type { CatalogueEntry } from '../mock/gateway'
 import { ULIP_ENDPOINTS } from './catalogue'
 import { UlipClient } from './client'
 import { UlipError, type UlipEnvelope, isNotFound } from './envelope'
-import { toVehicle, type FastagRecord, type VahanRecord } from './map'
+import { toEwayBill, toVehicle, type EwayBillRecord, type FastagRecord, type LiveEwayBill, type VahanRecord } from './map'
 
 /**
  * Thrown by everything ULIP structurally cannot answer.
@@ -129,6 +129,28 @@ export class UlipAdapter implements DataAdapter {
 
     const { known } = toVehicle(regNo, vahan[0], tolls)
     return known as Vehicle
+  }
+
+  /**
+   * One e-Way Bill, as the gateway has it.
+   *
+   * Not on DataAdapter: the interface deals in consignments, and a bill is
+   * a lookup by a number you already hold. `/import` gives you those
+   * numbers; this resolves them. Returns null when the bill is unknown —
+   * which the envelope reports as a 200, hence isNotFound.
+   */
+  async ewayBill(ewbNo: string): Promise<LiveEwayBill | null> {
+    const started = performance.now()
+    try {
+      const env = await this.client.callRaw<EwayBillRecord>('EWAYBILL/01', { ewbNo })
+      if (isNotFound(env)) { this.record('EWAYBILL/01', 200, started, 0, false); return null }
+      const records = flatten(env)
+      this.record('EWAYBILL/01', 200, started, JSON.stringify(env).length, true)
+      return records.length ? toEwayBill(records[0]) : null
+    } catch (err) {
+      this.record('EWAYBILL/01', err instanceof UlipError ? err.code : 502, started, 0, false)
+      throw err
+    }
   }
 
   async apiCatalogue(): Promise<CatalogueEntry[]> {

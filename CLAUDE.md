@@ -145,6 +145,13 @@ sidebar, which looks exactly like a broken route.
   I shipping today". The live adapter is therefore an ENRICHMENT layer over a consignment
   book that must come from a TMS or ERP, and everything needing that book throws
   `NotWiredError` with the reason rather than returning an empty array.
+- **e-Way Bill dates are `dd/MM/yyyy`, and `validUpto` may carry no date at all.**
+  `Date.parse('05/11/2017')` says 5 May; the field means 5 November — wrong only for the
+  first twelve days of each month, which is the worst pattern to notice. Parsed by hand in
+  `ewbDate`. And in the documented sample `validUpto` is `" 11:59:00 PM"`, a time with no
+  date, so **the flagship expiry signal cannot fire on that record**. The mapper reports it
+  rather than inferring the date from the issue date — guessing a statutory expiry is the
+  VAHAN day-early bug again, with penalties attached.
 - **Never fail open on a restriction.** `ncrEligibility` used to default an unparseable
   emission norm to BS-VI, so a real VAHAN record — which spells it `BHARAT STAGE II`, not
   `BS-II` — was read as the cleanest possible vehicle and waved into Delhi at GRAP Stage

@@ -46,6 +46,126 @@ export interface FastagRecord {
 }
 
 /**
+ * EWAYBILL/01 response record, as documented.
+ *
+ * Note the types: `ewbNo` is a STRING in the request and a NUMBER in the
+ * response, and the pincodes are numbers too. The gateway is not
+ * self-consistent and the mapper absorbs that rather than the caller.
+ */
+export interface EwayBillRecord {
+  ewbNo?: string | number
+  ewayBillDate?: string
+  validUpto?: string
+  fromPincode?: string | number
+  toPincode?: string | number
+  hsnCode?: string
+  status?: string
+  VehiclListDetails?: Array<{
+    vehicleNo?: string
+    enteredDate?: string
+    transMode?: string | number
+  }>
+}
+
+/** e-Way Bill transport modes, per the GST spec. */
+const TRANS_MODE: Record<string, 'road' | 'rail' | 'air' | 'sea'> = {
+  '1': 'road', '2': 'rail', '3': 'air', '4': 'sea',
+}
+
+/** `ACT` and `CNL` in the documented sample, not the words. */
+const EWB_STATUS: Record<string, 'active' | 'cancelled'> = {
+  ACT: 'active', CNL: 'cancelled',
+}
+
+/**
+ * e-Way Bill timestamps are `dd/MM/yyyy hh:mm:ss a`.
+ *
+ * Parsed by hand, never through Date.parse, which reads `05/11/2017` as
+ * 5 May rather than 5 November — silently wrong for the first twelve days
+ * of every month, and right the rest of the time, which is the worst
+ * possible failure pattern to debug.
+ */
+export function ewbDate(raw: string | undefined): string | null {
+  if (!raw) return null
+  const m = /^\s*(\d{1,2})\/(\d{1,2})\/(\d{4})(?:\s+(\d{1,2}):(\d{2})(?::(\d{2}))?\s*([AP]M)?)?\s*$/i
+    .exec(raw)
+  if (!m) return null
+  const [, dd, mm, yyyy, hh, mi, ss, ap] = m
+  let hour = hh ? +hh : 0
+  if (ap && /PM/i.test(ap) && hour < 12) hour += 12
+  if (ap && /AM/i.test(ap) && hour === 12) hour = 0
+  return new Date(Date.UTC(+yyyy, +mm - 1, +dd, hour, mi ? +mi : 0, ss ? +ss : 0)).toISOString()
+}
+
+export interface LiveEwayBill {
+  known: {
+    ewbNo?: string
+    issuedAt?: string
+    validUpto?: string
+    fromPincode?: string
+    toPincode?: string
+    hsnCode?: string
+    status?: 'active' | 'cancelled'
+    /** Part-B: the vehicle the bill actually declares. */
+    partB: Array<{ vehicleNo: string; enteredAt: string | null; mode: string | null }>
+  }
+  missing: string[]
+  /** Problems with the data itself, not with our reading of it. */
+  warnings: string[]
+}
+
+/**
+ * The join the whole product leads with — an e-Way Bill's validity against
+ * a movement-derived ETA — depends on `validUpto` being a moment in time.
+ *
+ * In the documented sample it is `" 11:59:00 PM"`: a time, with a leading
+ * space where a date should be, and no date anywhere in it. Either the
+ * gateway returns end-of-day without the day, or the published sample lost
+ * it. We do not guess. Inferring the date from `ewayBillDate` would
+ * fabricate a statutory expiry, and being a day out on one of those is the
+ * exact bug already paid for once on VAHAN dates.
+ */
+export function toEwayBill(r: EwayBillRecord): LiveEwayBill {
+  const missing: string[] = []
+  const warnings: string[] = []
+
+  const validUpto = ewbDate(r.validUpto)
+  if (r.validUpto && !validUpto) {
+    missing.push('validUpto')
+    warnings.push(
+      `validUpto carried no date ("${r.validUpto.trim()}"), so expiry cannot be compared `
+      + 'against an ETA. The e-Way Bill expiry signal cannot fire on this record.')
+  } else if (!r.validUpto) missing.push('validUpto')
+
+  const issuedAt = ewbDate(r.ewayBillDate)
+  if (!issuedAt) missing.push('issuedAt')
+
+  const status = r.status ? EWB_STATUS[r.status.trim().toUpperCase()] : undefined
+  if (r.status && !status) warnings.push(`Unknown e-Way Bill status "${r.status}".`)
+
+  return {
+    known: {
+      ewbNo: r.ewbNo === undefined ? undefined : String(r.ewbNo),
+      issuedAt: issuedAt ?? undefined,
+      validUpto: validUpto ?? undefined,
+      fromPincode: r.fromPincode === undefined ? undefined : String(r.fromPincode),
+      toPincode: r.toPincode === undefined ? undefined : String(r.toPincode),
+      hsnCode: r.hsnCode?.trim() || undefined,
+      status,
+      partB: (r.VehiclListDetails ?? [])
+        .filter((v) => v.vehicleNo)
+        .map((v) => ({
+          vehicleNo: String(v.vehicleNo).toUpperCase().replace(/[\s-]/g, ''),
+          enteredAt: ewbDate(v.enteredDate),
+          mode: v.transMode === undefined ? null : TRANS_MODE[String(v.transMode)] ?? null,
+        })),
+    },
+    missing,
+    warnings,
+  }
+}
+
+/**
  * What ULIP simply does not carry, against a domain model built from the
  * whole picture rather than from one gateway.
  *

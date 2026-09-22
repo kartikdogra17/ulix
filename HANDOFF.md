@@ -165,6 +165,23 @@ that sees it wants both directions — and a default for it was removed rather t
 dead config. Lane planner, Waterways, Scenario drill and API gateway are tools you arrive
 at with a question already in hand, not worklists that can open on the wrong one.
 
+## The flagship signal rests on a field that may not exist
+
+`EWAYBILL/01` is mapped and covered by fixtures now, and doing it surfaced something that
+matters more than the mapping: in the documented response, **`validUpto` is
+`" 11:59:00 PM"`** — a time, with a leading space where a date should be.
+
+The signal this product leads with compares that validity against a movement-derived ETA.
+If the gateway really returns end-of-day without the day, **that comparison cannot be made
+from EWAYBILL/01 alone**, and the flagship join needs a second source or a different shape.
+If instead the published sample simply lost the date in extraction, everything is fine.
+
+The mapper refuses to guess: it reports the gap rather than inferring the date from
+`ewayBillDate`, because fabricating a statutory expiry is the VAHAN day-early bug again
+with penalties attached.
+
+**This is the first thing to check the day credentials arrive.** One live call answers it.
+
 ## Open threads, in the order I would pick them up
 
 1. **Share the queue in production.** The function now exists (`api/cases/`) and the

@@ -455,6 +455,29 @@ Declared in `FIELD_GAPS` (`src/data/ulip/map.ts`) rather than defaulted:
 **VAHAN masks PII.** The documented sample returns `"R***L K***R"` for owner name and
 `"ME4JF509AH70*****"` for chassis.
 
+### What EWAYBILL/01 actually returns
+
+The flagship signal — an e-Way Bill expiring before a FASTag-derived ETA — rests on this
+endpoint, so its real shape matters more than any other. Mapping it against the documented
+sample found three things:
+
+1. **`validUpto` carries no date.** The sample reads `" 11:59:00 PM"` — a time, with a
+   leading space where a date should be. Either the gateway returns end-of-day without the
+   day, or the published sample lost it. **Either way the expiry comparison cannot be made
+   from that record**, and the mapper says so instead of inferring the date from
+   `ewayBillDate`. Inventing a statutory expiry is the VAHAN day-early bug again with
+   penalties attached. **Confirm this against a live response the day credentials land** —
+   it is the single most important unknown in the product.
+2. **Dates are `dd/MM/yyyy`.** `Date.parse('05/11/2017')` reads 5 May; the field means
+   5 November. Wrong only for the first twelve days of each month, which is the worst
+   possible pattern to debug. `ewbDate` parses by hand.
+3. **The gateway disagrees with itself on types.** `ewbNo` is a string in the request and
+   a number in the response; the pincodes are numbers too. The mapper absorbs that so no
+   caller has to.
+
+Also decoded rather than passed through: `status: "ACT"` → active, `transMode: "1"` → road,
+and `VehiclListDetails` → Part-B, which is the join behind the vehicle-mismatch signal.
+
 ### Conformance
 
 `npx tsx scripts/conformance.ts` runs the mappers against response samples copied

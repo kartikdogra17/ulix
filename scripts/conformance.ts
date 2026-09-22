@@ -8,7 +8,7 @@
  * document, not invented — including the masking, the empty strings and
  * the "BHARAT STAGE II" spelling that broke the GRAP check.
  */
-import { toVehicle, FIELD_GAPS, type FastagRecord, type VahanRecord } from '../src/data/ulip/map'
+import { toEwayBill, toVehicle, FIELD_GAPS, type EwayBillRecord, type FastagRecord, type VahanRecord } from '../src/data/ulip/map'
 import { ncrEligibility } from '../src/data/osint'
 
 /** VAHAN/01, from ULIP_VAHAN_Integration_Requirement. */
@@ -72,6 +72,30 @@ const raw = ncrEligibility(4, 'BHARAT STAGE II', 'Diesel')
 check('BS-II diesel barred at Stage IV', raw.status, 'barred')
 const unreadable = ncrEligibility(4, 'SOMETHING ELSE', 'Diesel')
 check('unreadable norm fails safe (not allowed)', unreadable.status, 'barred')
+
+/** EWAYBILL/01, from ULIP_EWAYBILL_Integration_Requirement. */
+const EWB: EwayBillRecord = {
+  fromPincode: 301404,
+  hsnCode: '',
+  ewayBillDate: '29/11/2017 04:30:00 PM',
+  validUpto: ' 11:59:00 PM',
+  ewbNo: 101000609218,
+  toPincode: 302014,
+  VehiclListDetails: [
+    { vehicleNo: 'RJ14CG4508', enteredDate: '29/11/2017 04:30:00 PM', transMode: '1' },
+  ],
+  status: 'ACT',
+}
+
+console.log('\nEWAYBILL/01 → e-Way Bill')
+const ewb = toEwayBill(EWB)
+check('ewbNo survives being a number in the response', ewb.known.ewbNo, '101000609218')
+check('dd/MM/yyyy is not read as MM/dd', ewb.known.issuedAt?.slice(0, 10), '2017-11-29')
+check('status ACT decoded', ewb.known.status, 'active')
+check('Part-B vehicle read', ewb.known.partB[0]?.vehicleNo, 'RJ14CG4508')
+check('transMode 1 is road', ewb.known.partB[0]?.mode, 'road')
+check('validUpto has NO date in the sample', ewb.known.validUpto, undefined)
+check('  and says so rather than guessing', /cannot be compared against an ETA/.test(ewb.warnings[0] ?? ''), true)
 
 console.log('\nDeclared gaps — fields no ULIP endpoint carries')
 for (const k of Object.keys(FIELD_GAPS)) console.log(`  • ${k}`)
