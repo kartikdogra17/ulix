@@ -1,8 +1,10 @@
 # ULIX — Logistics Control Tower
 
 Ninety-five endpoints across thirty-five government systems and seventeen ministries,
-resolved into a single picture
-and turned into decisions someone can act on.
+resolved into a single picture and turned into decisions someone can act on.
+
+**Live: [ulip-platform.vercel.app](https://ulip-platform.vercel.app)** — pick any of the
+four organisations on the sign-in screen; each one reads the same network differently.
 
 One responsive web application that also installs as a mobile app: multimodal visibility,
 fleet intelligence, compliance, EXIM clearance, inland waterways, lane planning, scenario
@@ -21,9 +23,14 @@ Built against the **official ULIP integration documents** published on
 > **New here?** [HANDOFF.md](HANDOFF.md) is where things stand and what is worth doing
 > next. [DEPLOYMENT.md](DEPLOYMENT.md) covers pushing and hosting.
 >
-> Working on this repo with an agent? Start from **[CLAUDE.md](CLAUDE.md)** — architecture
-> map, conventions, and the traps that have already cost time. It is written to save a
-> session from exploring, and it names the files that should *not* be read.
+> Working on this repo with an agent? Start from **[CLAUDE.md](CLAUDE.md)** for the short
+> operational brief, then **[knowledge-base.md](knowledge-base.md)** for the full
+> reference — terminology, how the domain concepts join, every module's function, and
+> every trap that has already cost time. Both name the files that should *not* be read.
+
+A push to `main` builds, typechecks and deploys itself through GitHub Actions. Vercel's own
+Git integration is not used: it needs a paid team plan, and reports that as a `400` blaming
+the repository.
 
 ## What is real, and what is simulated
 
@@ -96,13 +103,14 @@ government system to challenge if it looks wrong:
 
 | Signal | The join |
 |---|---|
-| **e-Way Bill expires before arrival** | `EWAYBILL/01` validity × `FASTAG/01`-derived ETA — the consignment will be moving on a lapsed bill, exposed under s.129 |
+| **e-Way Bill expires before arrival** | `EWAYBILL/01` validity × `FASTAG/01`-derived ETA — the consignment will be moving on a lapsed bill, which invites interception while the goods sit. Deliberately *not* stated as a certain s.129 penalty: that section is anti-evasion, and the courts have repeatedly held expiry alone does not sustain one |
 | **Declared vehicle ≠ moving vehicle** | e-Way Bill Part-B × the registration actually generating toll reads × `VAHAN/01` — an un-updated Part-B, or an undeclared vehicle |
 | **Carrying vehicle is not road legal** | `VAHAN/01` fitness/insurance × the consignment under load — an enforcement stop detains the cargo, not just the truck |
 | **No toll read for N hours** | `FASTAG/01` silence on an active leg, bounded by the 72-hour retention window |
 | **Licence expired under load** | `SARATHI/01` × the active road leg |
 | **Hazmat without clearance** | cargo classification × `PESO/01` |
 | **Customs hold** | `ICEGATE/02` × `PCS/01` demurrage exposure |
+| **Corridor capacity pinch** | `GATISHAKTI/01` lane status × the leg that runs over it — the corridor record does not know your tonnage, and the consignment book does not know the stretch is still two-lane |
 
 Two derived measures sit on top:
 
@@ -185,6 +193,29 @@ itself — *wrong 42 of 79 times*. Checks against a government register score hi
 inferred from absence or from open news scores lower, and should. Below twenty judged
 outcomes no figure is shown at all.
 
+
+### A conflict can leave the browser
+
+A conflict that exists only on a screen nobody has open is still invisible, which is the
+problem this sells against. Deliveries go to any endpoint that accepts a JSON POST — a
+Slack or Teams incoming webhook renders them as-is — and the webhook URL lives on the
+proxy, never in the client.
+
+The hard part is sending **little enough**. Firing on all 109 live cases would reproduce
+alert fatigue faster than any dashboard. So: criticals, plus anything past its SLA that
+still has no owner — that last one is the queue failing rather than a case. Ten per
+message, the rest counted. Every line carries the recommended action, because an alert
+that says what is wrong without saying what to do is the kind people learn to scroll past.
+
+**Never the same case twice.** Signals are recomputed on every read, so without that guard
+a poll would re-send the same conflict forever. Each send is recorded on the case itself,
+which de-duplicates and makes it auditable in one move — who was told sits beside who
+assigned and who closed it.
+
+`scripts/deliver.ts` runs the whole thing headless on a cron, so it does not need anyone
+watching. It builds the same deterministic world from the same seed and writes through the
+same shared store the app uses, so the two can never double-send. `npm run deliver:dry`
+shows what would go without sending anything.
 
 ### One product detail worth calling out
 
@@ -476,7 +507,11 @@ live implementation changes no component code.
 
 ```bash
 npm install
-npm run dev
+npm run dev                              # the app on :5173
+
+npx tsc --noEmit -p tsconfig.app.json    # before claiming anything is done
+npx tsx scripts/conformance.ts           # mappers vs the documented response samples
+npm run deliver:dry                      # what delivery would send, sending nothing
 ```
 
 ### Going live
@@ -493,7 +528,14 @@ VITE_ULIP_MODE=live VITE_ULIP_PROXY=http://localhost:8787/api/ulip npm run dev
 ```
 
 The proxy caches and refreshes the token, retries once on a mid-session 401/403,
-and allow-lists request paths to real `SYSTEM/NN` endpoint codes.
+and allow-lists request paths to real `SYSTEM/NN` endpoint codes. It also holds the shared
+case queue (SQLite, or Postgres via `DATABASE_URL`) and the delivery webhook.
+
+One thing worth knowing before you plan an integration: **ULIP is a lookup API, not a list
+API.** Every endpoint is keyed by an identifier you already hold — a vehicle number, an
+e-Way Bill number, an FNR — and nothing answers *what am I shipping today*. The consignment
+book has to come from your own TMS or ERP, which is what `/import` is for. This enriches
+the consignments you already have; it does not replace the system that knows about them.
 
 To get credentials: register on goulip.in → sign the NDA → submit a use case →
 get datasets approved → staging first, then production after an integration demo.
