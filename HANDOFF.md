@@ -8,9 +8,15 @@ trap. This file is *where things stand*.
 ## What this is
 
 **ULIX** — a logistics control tower built on India's Unified Logistics Interface
-Platform. Independent software, not a government service. Eleven modules, ~16k lines
-across `src/`, `server/`, `api/` and `scripts/`, 46 commits. Typecheck and build clean,
-and pushes to `main` deploy themselves.
+Platform. Independent software, not a government service. Eleven modules, ~17k lines
+across `src/`, `server/`, `api/`, `scripts/` and `tests/`. 51 commits, 100 tests.
+Typecheck and build clean, and a push to `main` deploys itself.
+
+**Starting a fresh session?** Read [CLAUDE.md](CLAUDE.md) first — it is short and it names
+the files that must *not* be read. Then [knowledge-base.md](knowledge-base.md) for
+terminology, how the domain concepts join, every module's function and every trap paid for.
+Then this file for where things stand. Before claiming anything is done:
+`npm test && npx tsc --noEmit -p tsconfig.app.json && npm run build`.
 
 ## How it got here
 
@@ -211,7 +217,16 @@ alone reads a failed lookup as a good one.
    types, no `strict` — reports the errors, and builds anyway. `tsc` passing locally means
    nothing for a function. Run `vercel build --prod` after touching `api/`; full detail in
    the knowledge base's traps section.
-2. **Role-aware mobile cards.** The desktop tables are lensed, the cards are not. They
+2. **Map `PCS/01` and `LDB/01` from their documented samples**, the way the other five
+   were. Five for five have turned up something a typecheck could not — a fail-open
+   restriction, a day-early expiry, a swapped lat/lon, a miss reported as a success, and
+   four mutually incompatible date formats. These two are cited by `fusion.ts` and are the
+   obvious next pair. An hour each now, versus finding it during a live demo.
+
+3. **Real auth.** Sign-in is a demo picker. Nobody can pilot on it, and it is the shortest
+   item here that actually blocks a customer.
+
+4. **Role-aware mobile cards.** The desktop tables are lensed, the cards are not. They
    carry identity, lane, status and progress, which all four roles want. Lowest value on
    this list.
 
