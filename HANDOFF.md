@@ -182,6 +182,13 @@ with penalties attached.
 
 **This is the first thing to check the day credentials arrive.** One live call answers it.
 
+FOIS/01 and ICEGATE/02 are mapped and covered too. Five endpoint families now have
+fixtures, and every one of them found something. The pattern that generalises: **there is
+no common date format in ULIP** — four endpoints, four formats, including one that puts
+the time first and one with no separators at all. And **ICEGATE reports a miss as a
+success**, with an empty `boeDetails` under `responseStatus: "SUCCESS"`, so `isNotFound()`
+alone reads a failed lookup as a good one.
+
 ## Open threads, in the order I would pick them up
 
 1. **Share the queue in production.** The function now exists (`api/cases/`) and the

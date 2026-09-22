@@ -165,6 +165,185 @@ export function toEwayBill(r: EwayBillRecord): LiveEwayBill {
   }
 }
 
+/* ── FOIS/01 — rail ──────────────────────────────────────────── */
+
+export interface FoisRecord {
+  fnrNo?: string
+  newFnr?: string
+  cmdt?: string
+  currentStatus?: string
+  lastRepStts?: string
+  lastRepLocn?: string
+  locoNumb?: string
+  etaDstn?: string
+  /** Longitude and latitude, as STRINGS, and longitude is listed first. */
+  lgtd?: string
+  lttd?: string
+  stationFrom?: string
+  stationTo?: string
+}
+
+/** `lastRepStts` codes seen in the documented sample and the FOIS glossary. */
+const FOIS_STATUS: Record<string, string> = {
+  AR: 'Arrived', DP: 'Departed', RD: 'Ready', LD: 'Loading', UL: 'Unloading',
+  IN: 'In transit', TR: 'In transit',
+}
+
+/**
+ * FOIS writes `HH:mm dd-MM-yyyy` — the TIME first.
+ *
+ * That is the third distinct date format across four endpoints, and the
+ * only thing they agree on is that `Date.parse` must not be let near any
+ * of them. On this one it simply fails, which is the kind outcome; e-Way
+ * Bill's dd/MM is the unkind one, because it succeeds and is wrong.
+ */
+export function foisDate(raw: string | undefined): string | null {
+  if (!raw) return null
+  const m = /^\s*(\d{1,2}):(\d{2})\s+(\d{1,2})-(\d{1,2})-(\d{4})\s*$/.exec(raw)
+  if (!m) return null
+  const [, hh, mi, dd, mm, yyyy] = m
+  return new Date(Date.UTC(+yyyy, +mm - 1, +dd, +hh, +mi)).toISOString()
+}
+
+/** `NEW KUSMUNDA COLLIERY SIDING,  KORBA(NKCR)` → name and station code. */
+export function splitStation(raw: string | undefined): { name: string; code: string | null } | null {
+  if (!raw?.trim()) return null
+  const m = /^(.*?)\(([A-Z0-9]{2,6})\)\s*$/.exec(raw.trim())
+  return m
+    ? { name: m[1].replace(/\s+/g, ' ').trim().replace(/,$/, ''), code: m[2] }
+    : { name: raw.replace(/\s+/g, ' ').trim(), code: null }
+}
+
+export interface LiveRake {
+  known: {
+    fnr?: string
+    commodity?: string
+    status?: string
+    statusLabel?: string
+    eta?: string
+    from?: { name: string; code: string | null }
+    to?: { name: string; code: string | null }
+    lastSeen?: { name: string; code: string | null }
+    position?: { lat: number; lon: number }
+  }
+  missing: string[]
+}
+
+export function toRake(r: FoisRecord): LiveRake {
+  const missing: string[] = []
+  const need = <T>(field: string, v: T | null | undefined): T | undefined => {
+    if (v === null || v === undefined) { missing.push(field); return undefined }
+    return v
+  }
+
+  /* Both arrive as strings, and the gateway lists longitude first — a
+     tempting place to read them out in the order they appear and end up
+     with a rake in the Indian Ocean. */
+  const lat = r.lttd === undefined ? NaN : Number(r.lttd)
+  const lon = r.lgtd === undefined ? NaN : Number(r.lgtd)
+  const position = Number.isFinite(lat) && Number.isFinite(lon) ? { lat, lon } : undefined
+  if (!position) missing.push('position')
+
+  const code = r.lastRepStts?.trim().toUpperCase()
+  return {
+    known: {
+      fnr: (r.newFnr?.trim() || r.fnrNo?.trim()) ?? undefined,
+      commodity: need('commodity', r.cmdt?.trim() || null),
+      status: code || undefined,
+      statusLabel: code ? FOIS_STATUS[code] ?? code : undefined,
+      eta: need('eta', foisDate(r.etaDstn)),
+      from: need('from', splitStation(r.stationFrom)),
+      to: need('to', splitStation(r.stationTo)),
+      lastSeen: splitStation(r.lastRepLocn) ?? undefined,
+      position,
+    },
+    missing,
+  }
+}
+
+/* ── ICEGATE/02 — bill of entry ──────────────────────────────── */
+
+export interface BoeRecord {
+  imoCode?: string
+  containerNo?: string[]
+  unitOfQt?: string
+  igmDt?: string
+  natureOfCargo?: string
+  countryOrig?: string
+  grossWt?: number
+  totNoPkg?: number
+}
+
+/** `natureOfCargo` codes. */
+const CARGO_NATURE: Record<string, string> = {
+  C: 'Containerised', B: 'Break bulk', L: 'Liquid bulk', D: 'Dry bulk',
+}
+
+/**
+ * ICEGATE writes dates as `ddMMyyyy` with no separators at all.
+ *
+ * The fourth format in four endpoints. `Date.parse("04072011")` does not
+ * fail — it produces something, which is why this is parsed by position
+ * rather than trusted to a general parser.
+ */
+export function icegateDate(raw: string | undefined): string | null {
+  if (!raw) return null
+  const m = /^(\d{2})(\d{2})(\d{4})$/.exec(raw.trim())
+  if (!m) return null
+  const [, dd, mm, yyyy] = m
+  const d = new Date(Date.UTC(+yyyy, +mm - 1, +dd))
+  // Reject 31-02 and friends rather than letting them roll into March.
+  if (d.getUTCDate() !== +dd || d.getUTCMonth() !== +mm - 1) return null
+  return d.toISOString()
+}
+
+export interface LiveBoe {
+  known: {
+    containers: string[]
+    imoCode?: string
+    igmDate?: string
+    natureOfCargo?: string
+    natureLabel?: string
+    countryOfOrigin?: string
+    grossWeight?: number
+    unit?: string
+    packages?: number
+  }
+  missing: string[]
+}
+
+/**
+ * IMPORTANT: an unknown bill of entry comes back as `boeDetails: []` with
+ * `responseStatus: "SUCCESS"`, NOT as the error envelope. `isNotFound()`
+ * will not catch it, so a caller checking only that reads "no such BE" as
+ * a successful lookup. Callers must check the array is non-empty too —
+ * see `boeFound`.
+ */
+export const boeFound = (details: BoeRecord[] | undefined) => (details?.length ?? 0) > 0
+
+export function toBoe(r: BoeRecord): LiveBoe {
+  const missing: string[] = []
+  const nature = r.natureOfCargo?.trim().toUpperCase()
+  const igmDate = icegateDate(r.igmDt)
+  if (r.igmDt && !igmDate) missing.push('igmDate')
+
+  return {
+    known: {
+      // Always an array in the documented response, even for one box.
+      containers: (r.containerNo ?? []).map((c) => c.trim().toUpperCase()).filter(Boolean),
+      imoCode: r.imoCode?.trim() || undefined,
+      igmDate: igmDate ?? undefined,
+      natureOfCargo: nature || undefined,
+      natureLabel: nature ? CARGO_NATURE[nature] ?? nature : undefined,
+      countryOfOrigin: r.countryOrig?.trim().toUpperCase() || undefined,
+      grossWeight: typeof r.grossWt === 'number' ? r.grossWt : undefined,
+      unit: r.unitOfQt?.trim() || undefined,
+      packages: typeof r.totNoPkg === 'number' ? r.totNoPkg : undefined,
+    },
+    missing,
+  }
+}
+
 /**
  * What ULIP simply does not carry, against a domain model built from the
  * whole picture rather than from one gateway.

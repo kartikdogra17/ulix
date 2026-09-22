@@ -478,6 +478,33 @@ sample found three things:
 Also decoded rather than passed through: `status: "ACT"` → active, `transMode: "1"` → road,
 and `VehiclListDetails` → Part-B, which is the join behind the vehicle-mismatch signal.
 
+### FOIS/01 and ICEGATE/02
+
+Mapped the same way, and between them they produced the finding that generalises:
+
+**There is no common date format in ULIP.** Four endpoints, four formats.
+
+| Endpoint | Format | Sample |
+|---|---|---|
+| VAHAN/01 | `dd-MMM-yyyy` | `25-Jan-2032` |
+| EWAYBILL/01 | `dd/MM/yyyy hh:mm:ss a` | `29/11/2017 04:30:00 PM` |
+| FOIS/01 | `HH:mm dd-MM-yyyy` — **time first** | `22:10 20-09-2023` |
+| ICEGATE/02 | `ddMMyyyy` — **no separators** | `04072011` |
+
+Each has its own parser. `Date.parse` fails on FOIS, which is the kind outcome, and
+*succeeds while being wrong* on e-Way Bill, which is not.
+
+**ICEGATE reports a miss as a success.** An unknown bill of entry comes back as
+`boeDetails: []` with `responseStatus: "SUCCESS"` — the error envelope is not used at all,
+so `isNotFound()` returns false and a caller checking only that reads "no such BE" as a
+good lookup. `boeFound()` exists for exactly this and is not optional.
+
+**FOIS lists longitude before latitude**, both as strings. Reading them out in the order
+they appear puts the rake several hundred kilometres into the Indian Ocean. Also: station
+names carry their code in brackets — `NEW KUSMUNDA COLLIERY SIDING,  KORBA(NKCR)` — with
+a double space that has to be tidied, and `newFnr` is empty in the sample so `fnrNo` is
+the fallback.
+
 ### Conformance
 
 `npx tsx scripts/conformance.ts` runs the mappers against response samples copied

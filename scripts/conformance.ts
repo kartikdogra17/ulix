@@ -8,7 +8,10 @@
  * document, not invented — including the masking, the empty strings and
  * the "BHARAT STAGE II" spelling that broke the GRAP check.
  */
-import { toEwayBill, toVehicle, FIELD_GAPS, type EwayBillRecord, type FastagRecord, type VahanRecord } from '../src/data/ulip/map'
+import {
+  boeFound, toBoe, toEwayBill, toRake, toVehicle, FIELD_GAPS,
+  type BoeRecord, type EwayBillRecord, type FastagRecord, type FoisRecord, type VahanRecord,
+} from '../src/data/ulip/map'
 import { ncrEligibility } from '../src/data/osint'
 
 /** VAHAN/01, from ULIP_VAHAN_Integration_Requirement. */
@@ -96,6 +99,29 @@ check('Part-B vehicle read', ewb.known.partB[0]?.vehicleNo, 'RJ14CG4508')
 check('transMode 1 is road', ewb.known.partB[0]?.mode, 'road')
 check('validUpto has NO date in the sample', ewb.known.validUpto, undefined)
 check('  and says so rather than guessing', /cannot be compared against an ETA/.test(ewb.warnings[0] ?? ''), true)
+
+console.log('\nFOIS/01 → rake')
+const rake = toRake({
+  newFnr: '', etaDstn: '22:10 20-09-2023', cmdt: 'PHC', lastRepStts: 'AR',
+  lastRepLocn: 'M/S NABHA POWER LTD.SIDING(NPSB)', lgtd: '76.515312',
+  fnrNo: '23091420258', lttd: '30.538016',
+  stationFrom: 'NEW KUSMUNDA COLLIERY SIDING,  KORBA(NKCR)',
+  stationTo: 'M/S NABHA POWER LTD.SIDING(NPSB)',
+} as FoisRecord)
+check('time-first date parsed', rake.known.eta?.slice(0, 10), '2023-09-20')
+check('lat/lon not swapped', [rake.known.position?.lat, rake.known.position?.lon], [30.538016, 76.515312])
+check('station code extracted', rake.known.from?.code, 'NKCR')
+check('status abbreviation decoded', rake.known.statusLabel, 'Arrived')
+
+console.log('\nICEGATE/02 → bill of entry')
+const boe = toBoe({
+  imoCode: '1000000', containerNo: ['MSCU7786602'], unitOfQt: 'MTS',
+  igmDt: '04072011', natureOfCargo: 'C', countryOrig: 'BR', grossWt: 25.99, totNoPkg: 56,
+} as BoeRecord)
+check('separator-free date parsed', boe.known.igmDate?.slice(0, 10), '2011-07-04')
+check('containers are a list', boe.known.containers, ['MSCU7786602'])
+check('cargo nature decoded', boe.known.natureLabel, 'Containerised')
+check('empty boeDetails is a MISS, despite SUCCESS', boeFound([]), false)
 
 console.log('\nDeclared gaps — fields no ULIP endpoint carries')
 for (const k of Object.keys(FIELD_GAPS)) console.log(`  • ${k}`)

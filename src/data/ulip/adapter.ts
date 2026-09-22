@@ -28,7 +28,11 @@ import type { CatalogueEntry } from '../mock/gateway'
 import { ULIP_ENDPOINTS } from './catalogue'
 import { UlipClient } from './client'
 import { UlipError, type UlipEnvelope, isNotFound } from './envelope'
-import { toEwayBill, toVehicle, type EwayBillRecord, type FastagRecord, type LiveEwayBill, type VahanRecord } from './map'
+import {
+  boeFound, toBoe, toEwayBill, toRake, toVehicle,
+  type BoeRecord, type EwayBillRecord, type FastagRecord, type FoisRecord,
+  type LiveBoe, type LiveEwayBill, type LiveRake, type VahanRecord,
+} from './map'
 
 /**
  * Thrown by everything ULIP structurally cannot answer.
@@ -149,6 +153,42 @@ export class UlipAdapter implements DataAdapter {
       return records.length ? toEwayBill(records[0]) : null
     } catch (err) {
       this.record('EWAYBILL/01', err instanceof UlipError ? err.code : 502, started, 0, false)
+      throw err
+    }
+  }
+
+  /** One rake, by FNR. */
+  async rake(fnrnumber: string): Promise<LiveRake | null> {
+    const started = performance.now()
+    try {
+      const env = await this.client.callRaw<FoisRecord>('FOIS/01', { fnrnumber })
+      if (isNotFound(env)) { this.record('FOIS/01', 200, started, 0, false); return null }
+      const rows = flatten(env)
+      this.record('FOIS/01', 200, started, JSON.stringify(env).length, rows.length > 0)
+      return rows.length ? toRake(rows[0]) : null
+    } catch (err) {
+      this.record('FOIS/01', err instanceof UlipError ? err.code : 502, started, 0, false)
+      throw err
+    }
+  }
+
+  /**
+   * One bill of entry.
+   *
+   * `boeFound` is not optional: an unknown BE comes back as an empty
+   * `boeDetails` with `responseStatus: "SUCCESS"`, so isNotFound alone
+   * would report a miss as a hit.
+   */
+  async billOfEntry(beNo: string, beDt: string): Promise<LiveBoe | null> {
+    const started = performance.now()
+    try {
+      const env = await this.client.callRaw<{ boeDetails?: BoeRecord[] }>('ICEGATE/02', { beNo, beDt })
+      if (isNotFound(env)) { this.record('ICEGATE/02', 200, started, 0, false); return null }
+      const details = flatten(env).flatMap((r) => r.boeDetails ?? [])
+      this.record('ICEGATE/02', 200, started, JSON.stringify(env).length, boeFound(details))
+      return boeFound(details) ? toBoe(details[0]) : null
+    } catch (err) {
+      this.record('ICEGATE/02', err instanceof UlipError ? err.code : 502, started, 0, false)
       throw err
     }
   }

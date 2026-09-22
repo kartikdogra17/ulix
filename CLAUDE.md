@@ -145,6 +145,16 @@ sidebar, which looks exactly like a broken route.
   I shipping today". The live adapter is therefore an ENRICHMENT layer over a consignment
   book that must come from a TMS or ERP, and everything needing that book throws
   `NotWiredError` with the reason rather than returning an empty array.
+- **There is no common date format in ULIP.** Four endpoints, four formats: VAHAN
+  `dd-MMM-yyyy`, e-Way Bill `dd/MM/yyyy hh:mm:ss a`, FOIS `HH:mm dd-MM-yyyy` (time first),
+  ICEGATE `ddMMyyyy` (no separators). Each has its own parser in `map.ts`. **Never let
+  `Date.parse` near any of them** — on FOIS it fails, which is the kind outcome; on e-Way
+  Bill it succeeds and is wrong.
+- **ICEGATE reports a miss as a success.** An unknown bill of entry returns
+  `boeDetails: []` with `responseStatus: "SUCCESS"`, so `isNotFound()` does not catch it.
+  Check `boeFound()` as well, or a lookup that found nothing reads as one that worked.
+- **FOIS lists longitude before latitude**, both as strings. Reading them in the order
+  they appear puts the rake in the Indian Ocean.
 - **e-Way Bill dates are `dd/MM/yyyy`, and `validUpto` may carry no date at all.**
   `Date.parse('05/11/2017')` says 5 May; the field means 5 November — wrong only for the
   first twelve days of each month, which is the worst pattern to notice. Parsed by hand in
