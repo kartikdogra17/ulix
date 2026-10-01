@@ -29,10 +29,12 @@ import { ULIP_ENDPOINTS } from './catalogue'
 import { UlipClient } from './client'
 import { UlipError, type UlipEnvelope, isNotFound } from './envelope'
 import {
-  boeFound, pcsFound, pcsMiss, toBoe, toEwayBill, toLdb, toPcs, toRake, toVehicle,
+  boeFound, pcsFound, pcsMiss, toBoe, toEwayBill, toLdb, toNoEntry, toPcs,
+  toPesoCylinders, toRake, toVehicle,
   type BoeRecord, type EwayBillRecord, type FastagRecord, type FoisRecord,
-  type LdbRecord, type LiveBoe, type LiveContainer, type LiveEwayBill, type LivePcs,
-  type LiveRake, type PcsRecord, type VahanRecord,
+  type LdbRecord, type LiveBoe, type LiveContainer, type LiveCylinders, type LiveEwayBill,
+  type LiveNoEntry, type LivePcs, type LiveRake, type NoEntryRecord, type PcsRecord,
+  type PesoRecord, type VahanRecord,
 } from './map'
 
 /**
@@ -239,6 +241,58 @@ export class UlipAdapter implements DataAdapter {
       return mapped
     } catch (err) {
       this.record('LDB/01', err instanceof UlipError ? err.code : 502, started, 0, false)
+      throw err
+    }
+  }
+
+  /**
+   * No-entry windows for one state.
+   *
+   * `stateCode` here is NUMERIC — `"7"` is Delhi, `"21"` Odisha — and is
+   * NOT the letter code the fuel-station endpoints take under the same
+   * parameter name. See SPEC_CORRECTIONS in the catalogue.
+   *
+   * An empty answer is returned as a zone list of length zero WITH its
+   * warning, never as "no restrictions": ULIP having no data for a state
+   * is not the state being open.
+   */
+  async noEntryZones(stateCode: string): Promise<LiveNoEntry | null> {
+    const started = performance.now()
+    try {
+      const env = await this.client.callRaw<NoEntryRecord[]>('NOENTRY/01', { stateCode })
+      if (isNotFound(env)) { this.record('NOENTRY/01', 200, started, 0, false); return null }
+      const rows = flatten(env).flat()
+      this.record('NOENTRY/01', 200, started, JSON.stringify(env).length, rows.length > 0)
+      return toNoEntry(rows)
+    } catch (err) {
+      this.record('NOENTRY/01', err instanceof UlipError ? err.code : 502, started, 0, false)
+      throw err
+    }
+  }
+
+  /**
+   * CNG cylinder certification for one vehicle.
+   *
+   * NOT a hazmat clearance. PESO is the Petroleum & Explosives Safety
+   * Organisation, but PESO/01 returns cylinder hydro-test certificates and
+   * nothing else — no licence number, no validity, no class. What it is
+   * good for is the hydro-test expiry on a CNG vehicle, which VAHAN's
+   * `rcFuelDesc` tells you to go looking for. See
+   * FIELD_GAPS.hazmatClearance.
+   */
+  async cylinders(regNo: string): Promise<LiveCylinders | null> {
+    const started = performance.now()
+    try {
+      const env = await this.client.callRaw<PesoRecord[]>(
+        'PESO/01', { VehicleRegistrationNumber: regNo })
+      if (isNotFound(env)) { this.record('PESO/01', 200, started, 0, false); return null }
+      const rows = flatten(env).flat()
+      const mapped = toPesoCylinders(rows)
+      this.record('PESO/01', 200, started, JSON.stringify(env).length,
+        mapped.known.cylinderCount > 0)
+      return mapped
+    } catch (err) {
+      this.record('PESO/01', err instanceof UlipError ? err.code : 502, started, 0, false)
       throw err
     }
   }

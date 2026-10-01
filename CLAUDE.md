@@ -30,7 +30,7 @@ npm run deliver:dry              # what delivery WOULD send, sending nothing
 npm run deliver                  # send it; schedule with scripts/deliver.cron.example
 node server/ulip-proxy.mjs   # optional; needs ULIP_USERNAME + ULIP_PASSWORD
                              # cases persist to server/data/cases.db (SQLite)
-npm test                               # 130 tests, node:test via tsx — no runner dependency
+npm test                               # 156 tests, node:test via tsx — no runner dependency
 npx tsc --noEmit -p tsconfig.app.json   # the check to run before claiming done
 npx tsc --noEmit -p tsconfig.api.json   # api/ — and tsconfig.scripts.json for scripts/
 vercel build --prod          # REQUIRED after touching api/; tsc does not see what Vercel does
@@ -145,19 +145,51 @@ sidebar, which looks exactly like a broken route.
   I shipping today". The live adapter is therefore an ENRICHMENT layer over a consignment
   book that must come from a TMS or ERP, and everything needing that book throws
   `NotWiredError` with the reason rather than returning an empty array.
-- **There is no common date format in ULIP.** Seven endpoints, six formats: VAHAN
-  `dd-MMM-yyyy`, e-Way Bill `dd/MM/yyyy hh:mm:ss a`, FOIS `HH:mm dd-MM-yyyy` (time first),
-  ICEGATE `ddMMyyyy` (no separators), PCS `ddMMyyyy` **and** `ddMMyyyy:HH:mm` on the same
-  record, LDB `yyyy-MM-dd HH:mm:ss` with the zone in a *different field*. Each has its own
-  parser in `map.ts`. **Never let `Date.parse` near any of them** — on FOIS and PCS it
-  fails, which is the kind outcome; on e-Way Bill and LDB it succeeds and is wrong.
-- **There are four ways ULIP reports a miss, and three of them slip past the envelope.**
+- **There is no common date format in ULIP.** Nine endpoints, seven formats: VAHAN
+  `dd-MMM-yyyy`, e-Way Bill **and PESO** `dd/MM/yyyy`, FOIS `HH:mm dd-MM-yyyy` (time
+  first), ICEGATE `ddMMyyyy` (no separators), PCS `ddMMyyyy` **and** `ddMMyyyy:HH:mm` on
+  the same record, LDB `yyyy-MM-dd HH:mm:ss` with the zone in a *different field*, and
+  NOENTRY a free-text clock written with **dots** — `8.00 AM to 10.00 PM`. Each has its
+  own parser in `map.ts`. **Never let `Date.parse` near any of them** — on FOIS and PCS it
+  fails, which is the kind outcome; on e-Way Bill, PESO and LDB it succeeds and is wrong.
+- **There are five ways ULIP reports a miss, and four slip past the envelope.**
   Most endpoints say inner `responseStatus: "ERROR"`. ICEGATE returns `boeDetails: []`
   under `SUCCESS` — check `boeFound()`. **LDB says `FAILURE`**, which is why `isNotFound()`
   tests for the absence of `SUCCESS` and never for the presence of `ERROR`. **PCS is the
   worst: one fully-shaped record with every field null**, under `SUCCESS`, marked only by
-  `responseMsg: "not found"` — neither the envelope nor a length check sees it, so a miss
-  arrives looking like a manifest the gateway answered thinly for. Check `pcsFound()`.
+  `responseMsg: "not found"` — check `pcsFound()`. **PESO sends one row carrying only
+  `ErrorMsg: "No Record found"`** — check `pesoFound()`. And PESO has a sixth variant one
+  level down: a missing FIELD is the prose `"Not Available at PESO"` *inside* the typed
+  field, so a count becomes `NaN` and a date parser is handed a sentence.
+- **Never read an empty restriction list as "no restrictions".** NOENTRY/01 publishes no
+  not-found sample at all, so the empty case is undocumented — and ULIP having no
+  no-entry data for a state is not the state being open. `toNoEntry` returns the empty
+  list *with* a warning and never a clear-to-enter.
+- **No-entry windows wrap midnight, and they are IST.** A city-centre ban is typically
+  `10.00 PM to 6.00 AM`, where `toMin < fromMin`; a naive `from <= t && t <= to` is false
+  at every minute of such a window, so the ban never fires and a truck is waved in at 2am
+  — `ncrEligibility`'s fail-open with a clock instead of an emission norm. Equal bounds
+  read as all day, not zero length. And the hours are local civil time against a UTC
+  server, so `istMinutesOfDay` uses a fixed +05:30 (India has had no DST since 1945).
+- **`PESO/01` cannot answer the hazmat signal, and nothing else can either.** PESO is the
+  Petroleum & Explosives Safety Organisation, but the one endpoint ULIP exposes from it
+  returns **CNG cylinder hydro-test certificates** — no licence number, no validity, no
+  class. The word "explosive" appears in none of the 36 documents. `hazmat_no_clearance`
+  no longer cites it; see `FIELD_GAPS.hazmatClearance`. What PESO/01 *is* good for is
+  cylinder expiry on a CNG vehicle, where the **earliest** due date across cylinders
+  governs — one lapsed cylinder takes the vehicle off the road.
+- **One parameter name, two incompatible formats.** Six endpoints take `stateCode`:
+  NOENTRY/01 and BLACKSPOT/01 want a **number** (`^\d{1,5}$`, `21`), while IOCL/02,
+  BPCL/02, HPCL/02 and JIOBP/01 want **letters** (`^[A-Z]{1,6}$`, `WB`). Passing one to
+  the other earns a 400.
+- **The generated catalogue is not automatically verbatim.** 42 of 109 documented formats
+  came out of extraction double-escaped (`\\d`, which as a regex matches a literal
+  backslash), five were truncated mid-expression at a PDF line break, and six carried an
+  example their own format rejects. Corrections live in `SPEC_CORRECTIONS` *beside* the
+  generated array, each citing its document, so regeneration cannot silently drop them;
+  what no document resolves is declared in `SPEC_CONFLICTS` instead of being guessed.
+  The conformance check now asserts **every documented example satisfies its own
+  documented format**, which is what would have caught all three.
 - **FOIS lists longitude before latitude**, both as strings. Reading them in the order
   they appear puts the rake in the Indian Ocean. LDB lists latitude first, as numbers —
   the order is per-endpoint and cannot be assumed.

@@ -339,6 +339,27 @@ old. Do not "fix" it.
 
 **GRAP curbs entry, not delivery** — match consignments routing *through* the NCR.
 
+**A time window that wraps midnight is a restriction that fails open.** NOENTRY/01 states
+bans as `"10.00 PM to 6.00 AM"`, where the end is numerically *before* the start. A naive
+`from <= t && t <= to` is false at every minute inside such a window, so the ban never
+fires. Same shape as the GRAP fail-open, and the same rule applies: the restrictive reading
+wins, including for `from == to`, which means all day.
+
+**An empty restriction list is missing data, not permission.** NOENTRY/01 publishes no
+not-found sample, so an empty answer is undocumented — and ULIP having no data for a state
+is not the state being open.
+
+**A signal can cite an endpoint that cannot answer it.** `hazmat_no_clearance` cited
+`PESO/01` because PESO is the Petroleum & Explosives *Safety* Organisation. The endpoint
+returns CNG cylinder test certificates and no licence of any kind, and no document in the
+set declares a licence field. Check what an endpoint actually returns before citing it.
+
+**Generated is not the same as verbatim.** 47 of 109 catalogue parameter formats were
+damaged by extraction — doubled backslashes, truncation at PDF line breaks, and examples
+their own format rejects. Corrections live in `SPEC_CORRECTIONS` beside the generated
+array, each citing a document; the conformance check now asserts every example satisfies
+its own format.
+
 **GRAP failed open.** `ncrEligibility` matched a literal `"BS"`, but VAHAN writes
 `"BHARAT STAGE II"`. No match fell through to `?? 6`, so an unreadable norm was treated
 as the cleanest possible vehicle and permitted at Stage IV — a BS-II diesel truck waved
@@ -505,9 +526,11 @@ carries two of them on the same record.
 | ICEGATE/02 | `ddMMyyyy` — **no separators** | `04072011` |
 | PCS/01 | `ddMMyyyy` *and* `ddMMyyyy:HH:mm` | `27022023`, `02032023:21:18` |
 | LDB/01 | `yyyy-MM-dd HH:mm:ss` + zone in **another field** | `2023-03-29 11:00:09`, `IST` |
+| PESO/01 | `dd/MM/yyyy` — e-Way Bill's trap again | `01/10/2021` |
+| NOENTRY/01 | free-text clock, **dots not colons** | `8.00 AM to 10.00 PM` |
 
 Each has its own parser. `Date.parse` fails on FOIS and PCS, which is the kind outcome;
-*succeeds while being wrong* on e-Way Bill and on LDB, which is not.
+*succeeds while being wrong* on e-Way Bill, PESO and LDB, which is not.
 
 **ICEGATE reports a miss as a success.** An unknown bill of entry comes back as
 `boeDetails: []` with `responseStatus: "SUCCESS"` — the error envelope is not used at all,
@@ -533,6 +556,9 @@ assumption that had held across the first five endpoints.
 | ICEGATE/02 | `boeDetails: []` under `SUCCESS` | `boeFound()` |
 | LDB/01 | inner `responseStatus: **"FAILURE"**` | `isNotFound()`, now |
 | PCS/01 | **one record, every field null**, under `SUCCESS` | `pcsMiss()` / `pcsFound()` |
+| PESO/01 | one row carrying **only** `ErrorMsg: "No Record found"` | `pesoMiss()` / `pesoFound()` |
+| PESO/01, per field | the prose `"Not Available at PESO"` **inside** a typed field | `PESO_UNAVAILABLE` |
+| NOENTRY/01 | **undocumented** — no not-found sample exists | treated as missing, never as open |
 
 PCS is the worst of the four. It returns a fully-shaped record with `igm_no: null`,
 `port_of_arrival: null` and every other field null, with `responseStatus: "SUCCESS"` and
@@ -597,11 +623,114 @@ number and is not one.
 table says `^[a-zA-Z0-9]{8,11}$`; the 400 error message in the same document says
 `[A-Z]{4}[0-9]{4,7}`. The catalogue's extracted example, `TU679`, satisfies neither.
 
+### NOENTRY/01 and PESO/01
+
+The pair the signal set leans on, and the pair that found the worst thing in the set so far.
+
+**`PESO/01` cannot answer the signal that cited it.** `hazmat_no_clearance` — "Hazardous
+cargo with no PESO clearance on file" — cited `PESO/01` and `EWAYBILL/01`. PESO is the
+*Petroleum & Explosives Safety Organisation*, so the citation reads as obviously right. But
+the one endpoint ULIP exposes from PESO returns **CNG cylinder hydro-test certificates**:
+cylinder serial, make, water capacity, test date, due date, result, testing company,
+certificate number. No licence number. No validity. No class. The document says so in its
+own technical approach — *"CNG certificate details of vehicles"*.
+
+Worse, nothing else can answer it either. The word **"explosive" appears in none of the 36
+integration documents**, and not one of them declares a licence field of any kind. So a
+hazmat clearance is a *document you attach*, not a register you query. The detector now
+says that, cites only `EWAYBILL/01` (which is what establishes the commodity), and the gap
+is declared in `FIELD_GAPS.hazmatClearance`. This is the `EWAYBILL/01` `validUpto` finding
+again: the flagship-adjacent signal resting on something the gateway does not have.
+
+**What PESO/01 is actually good for** is a real statutory signal nobody had asked for: CNG
+cylinder hydro-test expiry, reachable from VAHAN's `rcFuelDesc: CNG`. One vehicle returns
+many rows, one per cylinder, and **the earliest due date governs** — a vehicle is out of
+certification the moment one cylinder lapses, so taking the first row's date or the latest
+certifies a vehicle that is not certified.
+
+**PESO encodes a missing field as human prose inside the typed field.**
+`"Number of cylinders": "Not Available at PESO"` where a number belongs, and the same
+string in a date field. `Number(...)` yields `NaN`; a date parser is handed a sentence. The
+count therefore comes from the **row count**, which is a floor rather than a total, and
+that is said rather than hidden. Note the inconsistency within one endpoint: a hit sets
+`ErrorMsg` to `""`, a record-level miss puts prose in `ErrorMsg`, and a field-level miss
+puts different prose in the field.
+
+PESO's keys are human column headings used verbatim as JSON keys — spaces, inconsistent
+capitalisation (`Number of cylinders`), and a stray space inside
+`Cylinder ID/ Serial Number`. There is no camelCase form to fall back on.
+
+**NOENTRY/01 is a restriction endpoint, so every ambiguity resolves the restrictive way.**
+Three of them:
+
+- **An empty answer is not "no restrictions".** The document publishes no not-found sample
+  at all — only an invalid format and a hit — so the empty case is undocumented. ULIP
+  having no no-entry data for a state is not the state being open, and `toNoEntry` returns
+  the empty list *with* a warning saying exactly that.
+- **Windows wrap midnight.** A city-centre ban is typically `10.00 PM to 6.00 AM`, where
+  `toMin < fromMin`. A naive `from <= t && t <= to` is false at every minute of such a
+  window, so the ban silently never applies and a truck is waved in at 2am. This is
+  `ncrEligibility`'s fail-open with a clock instead of an emission norm.
+- **`from == to` reads as all day**, not as zero length.
+
+And the hours are **IST** — local civil time, against a UTC delivery box. `istMinutesOfDay`
+uses a fixed +05:30 rather than a zone lookup, because India has not observed daylight
+saving since 1945. Tested across four zones, for the same reason LDB is.
+
+Smaller things NOENTRY turned up: `noEntryTime` writes the clock with **dots**
+(`8.00 AM`), which nothing else in ULIP does; `stateCode` is a number in the response and a
+string in the request; `areaName` carries **embedded newlines** that break a table row;
+`districtCode` is `1` for every documented row and is not unique across states, so a
+district key must carry the state; and the document's own state table calls 21 `ORISSA`
+while the response calls it `Odisha` — join on the code, never the name.
+
+### The generated catalogue was not verbatim
+
+Mapping NOENTRY/01 turned up a defect in the part of this app that claims to be real
+specification. `src/data/ulip/catalogue.ts` is generated and its header says so; what it
+did not say is that extraction had damaged 47 of the 109 documented parameter formats:
+
+| Damage | Count | Effect |
+|---|---|---|
+| Doubled backslashes — `\\d` for `\d` | 42 | As a regex, matches a literal backslash. Matches nothing a ULIP parameter can contain. |
+| Truncated mid-expression at a PDF line break | 5 | `^([L|U]{}` for MCA's CIN; an unbalanced fragment for SARATHI's licence number. |
+| An example its own format rejects | 6 | All six `stateCode` parameters (see below). |
+
+**`stateCode` is one parameter name with two incompatible meanings.** NOENTRY/01 and
+BLACKSPOT/01 document a **number** (`^\d{1,5}$`, example `21`, against their own numeric
+state tables — `7 DELHI`, `21 ORISSA`). IOCL/02, BPCL/02, HPCL/02 and JIOBP/01 document
+**letters** (`^[A-Z]{1,6}$`, examples `WB`, `UP`, `DEL`). The extractor crossed them in
+*both* directions — the letter regex onto the numeric endpoints, the numeric example onto
+the letter ones — so all six shipped a regex and an example that contradict each other.
+Passing `21` to IOCL/02 earns a 400; passing `WB` to NOENTRY/01 earns another.
+
+Three decisions worth keeping:
+
+- **Corrections live beside the generated array, not inside it.** `SPEC_CORRECTIONS` in
+  `catalogue.ts` is a table of `{endpoint, param, format?, example?, why}` applied at load,
+  every entry citing the document that settles it. A correction edited into generated
+  output is lost the next time it is generated, silently.
+- **The truncated regexes were restored from the same document, not reconstructed.** Each
+  of those documents repeats its format whole inside the 400-response message it publishes,
+  so MCA's CIN and SARATHI's licence pattern came back verbatim and both validate their own
+  documented examples.
+- **What no document resolves is declared, not guessed.** `SPEC_CONFLICTS` holds
+  `AUTHAPI/01 iecnumber`: ULIP publishes no integration document for AUTHAPI at all, so
+  neither its example `AFAPT19500` (a PAN) nor its format `[0-9]{10}` can be checked
+  against a source. Picking a side would be inventing specification.
+
+The check that closes this: **every documented example must satisfy its own documented
+format.** It runs in both `scripts/conformance.ts` and the test suite, and it would have
+caught all three kinds of damage on the day the catalogue was generated.
+
 ### Conformance
 
 `npx tsx scripts/conformance.ts` runs the mappers against response samples copied
-verbatim from the integration documents. It found three bugs before any credentials
-existed (see §8). **Extend it whenever you map a new endpoint.**
+verbatim from the integration documents, and asserts the catalogue agrees with itself.
+Nine endpoint families are covered and **every one of them found something** — the first
+three are in §8; the rest are in the per-endpoint sections above. **Extend it whenever you
+map a new endpoint**, and extend the suite too: the conformance script proves a mapper
+reads the documented sample, the tests prove the trap stays fixed.
 
 ### Going live
 

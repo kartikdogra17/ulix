@@ -275,12 +275,20 @@ export function signalsForShipment(
     }
   }
 
-  /* ── Hazardous cargo without an explosives/hazmat clearance (PESO) ── */
+  /* ── Hazardous cargo without a hazmat clearance attached ──────
+     This detector used to cite PESO/01, which cannot answer it. PESO is
+     the Petroleum & Explosives Safety Organisation, but the one endpoint
+     ULIP exposes from it returns CNG cylinder test certificates — no
+     licence number, no validity, no class — and no other document in the
+     set declares a licence field either (see FIELD_GAPS.hazmatClearance).
+     So the clearance is a DOCUMENT the operator attaches, and the signal
+     now says that rather than implying a register will confirm it. The
+     e-Way Bill citation stands: it is what establishes the commodity. */
   if (s.hazardous && !done) {
     mk('hazmat_no_clearance', 'high',
-      'Hazardous cargo with no PESO clearance on file',
-      `${s.commodity} is flagged hazardous but no valid PESO licence is linked to this consignment or its carrying vehicle.`,
-      ['PESO/01', 'EWAYBILL/01'], null,
+      'Hazardous cargo with no clearance attached',
+      `${s.commodity} is flagged hazardous and no hazmat clearance is attached to this consignment or its carrying vehicle. No ULIP endpoint carries an explosives licence, so this cannot be confirmed against a register — the document has to be on file.`,
+      ['EWAYBILL/01'], null,
       'Attach the PESO licence, or re-book on a licensed hazmat carrier.')
   }
 

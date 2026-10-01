@@ -9,12 +9,14 @@
  * the "BHARAT STAGE II" spelling that broke the GRAP check.
  */
 import {
-  boeFound, ldbTrail, pcsFound, pcsMiss, toBoe, toEwayBill, toLdb, toPcs, toRake, toVehicle,
+  boeFound, inNoEntryWindow, ldbTrail, noEntryWindow, pcsFound, pcsMiss, pesoFound,
+  toBoe, toEwayBill, toLdb, toNoEntry, toPcs, toPesoCylinders, toRake, toVehicle,
   FIELD_GAPS,
   type BoeRecord, type EwayBillRecord, type FastagRecord, type FoisRecord,
-  type LdbRecord, type PcsRecord, type VahanRecord,
+  type LdbRecord, type NoEntryRecord, type PcsRecord, type PesoRecord, type VahanRecord,
 } from '../src/data/ulip/map'
 import { isNotFound } from '../src/data/ulip/envelope'
+import { ULIP_ENDPOINTS, SPEC_CONFLICTS } from '../src/data/ulip/catalogue'
 import { ncrEligibility } from '../src/data/osint'
 
 /** VAHAN/01, from ULIP_VAHAN_Integration_Requirement. */
@@ -238,6 +240,125 @@ check('LDB reports a miss as FAILURE, and isNotFound must catch it',
     }],
     error: 'false', code: '200', message: 'Success',
   }), true)
+
+/** NOENTRY/01, from ULIP_No_Entry_Integration_Requirement. Note the
+    embedded newlines in areaName and the number-typed stateCode. */
+const NOENTRY: NoEntryRecord[] = [
+  {
+    noEntryTime: '8.00 AM to 10.00 PM', districtCode: 1, districtName: 'UPD- BBSR',
+    stateName: 'Odisha', areaName: 'NH-203 Bypass Pandara Chowk to Rasulgarh VIa\nGGP Colony',
+    stateCode: 21,
+  },
+  {
+    noEntryTime: '8.00 AM to 10.00 PM', districtCode: 1, districtName: 'UPD- BBSR',
+    stateName: 'Odisha', areaName: 'NH-203 Bypass Kesura Square to Jharpada', stateCode: 21,
+  },
+]
+
+console.log('\nNOENTRY/01 → no-entry zones')
+const ne = toNoEntry(NOENTRY)
+check('dotted clock parsed', ne.known.zones[0].window?.label, '08:00–22:00 IST')
+check('embedded newline in areaName flattened',
+  /\n/.test(ne.known.zones[0].area), false)
+check('number stateCode becomes a string', ne.known.zones[0].stateCode, '21')
+const night = noEntryWindow('10.00 PM to 6.00 AM')
+check('a night window is recognised as wrapping midnight', night?.wraps, true)
+// 02:00 IST on 1 Jan 2026 = 20:30 UTC on 31 Dec 2025.
+const twoAmIst = Date.UTC(2025, 11, 31, 20, 30)
+check('THE TRAP: 02:00 IST is inside a 22:00–06:00 ban', inNoEntryWindow(night!, twoAmIst), true)
+check('  a non-wrapping check would say false',
+  night!.fromMin <= 120 && 120 < night!.toMin, false)
+const noonIst = Date.UTC(2026, 0, 1, 6, 30)
+check('12:00 IST is outside it', inNoEntryWindow(night!, noonIst), false)
+check('12:00 IST is inside an 08:00–22:00 ban',
+  inNoEntryWindow(noEntryWindow('8.00 AM to 10.00 PM')!, noonIst), true)
+check('equal bounds read as all day, not zero length',
+  inNoEntryWindow(noEntryWindow('6.00 AM to 6.00 AM')!, noonIst), true)
+check('an empty answer is NOT "no restrictions"', toNoEntry([]).missing.includes('zones'), true)
+check('  and says so', /NOT the same as the state having no restrictions/
+  .test(toNoEntry([]).warnings.join(' ')), true)
+
+/** PESO/01, from ULIP_PESO_Integration_Requirement. Keys are the human
+    column headings the gateway actually uses, verbatim. */
+const PESO: PesoRecord[] = [
+  {
+    ErrorMsg: '',
+    'Cylinder Manufacturing Date': '01/10/2021',
+    'Cylinder Make': 'M/s. Zhejiang Jindun Pressure Vessel Co. Ltd., China',
+    'Cylinder capacity in water litre': 150.0,
+    'Number of cylinders': 'Not Available at PESO',
+    'Cylinder ID/ Serial Number': 'K-6834833',
+    'Hydro Test Date': '26/12/2025',
+    'Hydro Test Due Date': '25/12/2028',
+    'Test Result': 'Pass',
+    'Cylinder Age valid till Date': 'Not Available at PESO',
+    'Testing Company Name': 'MAHADEV CNG CYLINDER TESTING COMPANY',
+    'Certificate No': 'G145658/2025/2579',
+    'Vehicle Registration Number': 'HR38AC7120',
+  },
+  {
+    ErrorMsg: '',
+    'Cylinder Manufacturing Date': '01/10/2021',
+    'Cylinder Make': 'M/s. Zhejiang Jindun Pressure Vessel Co. Ltd., China',
+    'Cylinder capacity in water litre': 150.0,
+    'Number of cylinders': 'Not Available at PESO',
+    'Cylinder ID/ Serial Number': 'K-6834166',
+    'Hydro Test Date': '26/12/2025',
+    'Hydro Test Due Date': '25/12/2028',
+    'Test Result': 'Pass',
+    'Cylinder Age valid till Date': 'Not Available at PESO',
+    'Testing Company Name': 'MAHADEV CNG CYLINDER TESTING COMPANY',
+    'Certificate No': 'G145658/2025/2580',
+    'Vehicle Registration Number': 'HR38AC7120',
+  },
+]
+
+console.log('\nPESO/01 → CNG cylinders (NOT a hazmat clearance)')
+const peso = toPesoCylinders(PESO)
+check('two certificates, two cylinders', peso.known.cylinderCount, 2)
+check('dd/MM/yyyy is not read as MM/dd', peso.known.cylinders[0].manufacturedOn?.slice(0, 10), '2021-10-01')
+check('hydro-test due date read', peso.known.cylinders[0].dueOn?.slice(0, 10), '2028-12-25')
+check('"Not Available at PESO" is absent, not a value',
+  peso.known.cylinders[0].ageValidUpto, undefined)
+check('  and the count comes from the rows instead', peso.known.cylinderCount, 2)
+check('capacity in water litres', peso.known.cylinders[0].capacityL, 150)
+check('Pass decoded', peso.known.cylinders[0].testPassed, true)
+check('earliest due date governs the vehicle', peso.known.earliestDueOn?.slice(0, 10), '2028-12-25')
+const mixed = toPesoCylinders([
+  PESO[0], { ...PESO[1], 'Hydro Test Due Date': '01/02/2026', 'Test Result': 'Fail' },
+])
+check('THE TRAP: one lapsed cylinder governs, not the first row',
+  mixed.known.earliestDueOn?.slice(0, 10), '2026-02-01')
+check('a failed test is surfaced', mixed.known.anyTestFailed, true)
+check('an unreadable result is NOT a pass',
+  toPesoCylinders([{ ...PESO[0], 'Test Result': 'Not Available at PESO' }])
+    .known.cylinders[0].testPassed, undefined)
+check('THE TRAP: a miss is one row of only ErrorMsg, under SUCCESS',
+  pesoFound([{ ErrorMsg: 'No Record found' }]), false)
+check('  a hit is not', pesoFound(PESO), true)
+
+console.log('\nThe catalogue must agree with itself')
+/* This is the check that would have caught 42 double-escaped regexes and
+   six stateCode parameters whose example and format contradicted each
+   other. Every documented example must satisfy its own documented format. */
+let specFailures = 0
+for (const ep of ULIP_ENDPOINTS) {
+  for (const param of ep.params) {
+    if (!param.format || !param.example) continue
+    if (`${ep.id} ${param.name}` in SPEC_CONFLICTS) continue
+    let ok = false
+    try { ok = new RegExp(param.format).test(param.example) } catch { ok = false }
+    if (!ok) {
+      specFailures++
+      console.log(`FAIL  ${ep.id} ${param.name}`.padEnd(48)
+        + ` example ${JSON.stringify(param.example)} fails ${JSON.stringify(param.format)}`)
+    }
+  }
+}
+check('every documented example satisfies its documented format', specFailures, 0)
+for (const [k, why] of Object.entries(SPEC_CONFLICTS)) {
+  console.log(`  note  ${k} — declared unverifiable: ${why.slice(0, 60)}…`)
+}
 
 console.log('\nDeclared gaps — fields no ULIP endpoint carries')
 for (const k of Object.keys(FIELD_GAPS)) console.log(`  • ${k}`)

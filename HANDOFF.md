@@ -9,7 +9,7 @@ trap. This file is *where things stand*.
 
 **ULIX** — a logistics control tower built on India's Unified Logistics Interface
 Platform. Independent software, not a government service. Eleven modules, ~17k lines
-across `src/`, `server/`, `api/`, `scripts/` and `tests/`. 52 commits, 130 tests.
+across `src/`, `server/`, `api/`, `scripts/` and `tests/`. 53 commits, 156 tests.
 Typecheck and build clean, and a push to `main` deploys itself.
 
 **Starting a fresh session?** Read [CLAUDE.md](CLAUDE.md) first — it is short and it names
@@ -188,9 +188,9 @@ with penalties attached.
 
 **This is the first thing to check the day credentials arrive.** One live call answers it.
 
-FOIS/01, ICEGATE/02, PCS/01 and LDB/01 are mapped and covered too. **Seven endpoint
-families now have fixtures, and every single one of them found something a typecheck could
-not.** Two patterns generalise, and both got worse with the last pair:
+FOIS/01, ICEGATE/02, PCS/01, LDB/01, NOENTRY/01 and PESO/01 are mapped and covered too.
+**Nine endpoint families now have fixtures, and every single one of them found something a
+typecheck could not.** Two patterns generalise, and both got worse with the last pair:
 
 **There is no common date format in ULIP** — seven endpoints, six formats, including one
 that puts the time first, one with no separators at all, one endpoint carrying two formats
@@ -213,6 +213,54 @@ exactly. On the UTC box that runs the delivery job and the serverless functions,
 port event lands 5½ hours early — enough to move a port-out across a shift boundary and
 to age a signal past an SLA it has not breached. The test pins four zones; pinned to UTC
 alone it would have passed with the bug still in.
+
+## A second signal rested on an endpoint that cannot answer it
+
+`hazmat_no_clearance` — "Hazardous cargo with no PESO clearance on file" — cited
+`PESO/01`. PESO is the *Petroleum & Explosives Safety Organisation*, so that reads as
+obviously correct.
+
+**It is not.** The one endpoint ULIP exposes from PESO returns **CNG cylinder hydro-test
+certificates** and nothing else: cylinder serial, make, water capacity, test date, due
+date, result, testing company, certificate number. No licence number, no validity, no
+class. The document says as much in its own technical approach — *"CNG certificate details
+of vehicles"*.
+
+And nothing else in ULIP can answer it either: **the word "explosive" appears in none of
+the 36 integration documents**, and not one declares a licence field of any kind. A hazmat
+clearance is therefore a document an operator attaches, not a register you query. The
+detector now says that, cites only `EWAYBILL/01`, and the gap is declared in
+`FIELD_GAPS.hazmatClearance`.
+
+This is the `EWAYBILL/01` `validUpto` discovery a second time, and the generalisation is
+worth stating plainly: **a plausible system name is not evidence that the endpoint carries
+the field.** Nine for nine, reading the document has changed something.
+
+What PESO/01 *is* good for is a real signal nobody had asked for: CNG cylinder hydro-test
+expiry, reachable from VAHAN's `rcFuelDesc: CNG`. One vehicle, many cylinders, and the
+**earliest** due date governs — one lapsed cylinder takes the vehicle off the road. That
+detector is not built yet; see thread 3.
+
+## The catalogue was not as verbatim as it claimed
+
+Mapping NOENTRY/01 found a defect in the part of this app that claims to be real
+specification. 47 of the 109 documented parameter formats in `catalogue.ts` had been
+damaged by extraction: **42 double-escaped** (`\\d`, which as a regex matches a literal
+backslash and so matches nothing), **5 truncated** mid-expression at a PDF line break, and
+**6 carrying an example their own format rejects** — all six `stateCode` parameters, whose
+regex and example the extractor crossed in both directions between the numeric endpoints
+(NOENTRY, BLACKSPOT) and the letter ones (IOCL, BPCL, HPCL, JIOBP).
+
+Fixed in `SPEC_CORRECTIONS`, a table *beside* the generated array rather than edits inside
+it, each entry citing the document that settles it — a correction edited into generated
+output is lost the next time it is generated. The five truncated regexes were restored
+verbatim from the same documents, which repeat them whole inside the 400-response message.
+`AUTHAPI/01 iecnumber` is declared in `SPEC_CONFLICTS` instead: ULIP publishes no document
+for AUTHAPI, so neither its example nor its format can be checked against a source.
+
+**The check that closes it:** every documented example must satisfy its own documented
+format. It runs in conformance and in the suite, and would have caught all three kinds on
+day one.
 
 ## Open threads, in the order I would pick them up
 
@@ -239,21 +287,35 @@ alone it would have passed with the bug still in.
 2. **Real auth.** Sign-in is a demo picker. Nobody can pilot on it, and it is the shortest
    item here that actually blocks a customer.
 
-3. **Map another endpoint family from its sample.** Seven for seven have turned up
-   something a typecheck could not, so the expected value of the eighth is still high.
-   `NOENTRY/01` (state no-entry windows, which the GRAP and corridor signals both want)
-   and `PESO/01` (cited by `hazmat_no_clearance`, the only detector with no live source
-   behind it at all) are the two the signal set actually leans on. An hour each now,
-   versus finding it during a live demo.
+3. **Build the two detectors the new mappers make possible.** Both are mapped, tested
+   and wired into the live adapter, but no signal reads them yet:
 
-4. **Role-aware mobile cards.** The desktop tables are lensed, the cards are not. They
+   - **`cng_cylinder_lapsed`** — `PESO/01`'s earliest hydro-test due date against the
+     clock, for vehicles VAHAN reports as CNG. A statutory conflict with the same shape as
+     `fitness_lapsed`, and the honest replacement for what `hazmat_no_clearance` was
+     pretending PESO could do.
+   - **`no_entry_window`** — `NOENTRY/01` zones against a consignment's arrival time in
+     the destination city. This is the one with product value: the existing GRAP signal
+     covers *entry eligibility by vehicle*, and this covers *entry eligibility by clock*,
+     which is the constraint city deliveries actually plan around.
+
+   Both need `quality.ts` precision tracking from the start, per the convention. Note the
+   `MockAdapter` has to generate plausible no-entry data for them to show on the screen,
+   and that generation needs calibrating — a city where everything is banned trains people
+   to ignore the screen.
+
+4. **Map another endpoint family from its sample.** Nine for nine have turned up something
+   a typecheck could not, so the expected value of the tenth is still high. `MCA/03`
+   (counterparty due diligence already has a page and no live source) is the obvious one.
+
+5. **Role-aware mobile cards.** The desktop tables are lensed, the cards are not. They
    carry identity, lane, status and progress, which all four roles want. Lowest value on
    this list.
 
 Everything else that was on this list is done: the role lens, per-role page defaults and
 column sets, the licence, the GatiShakti overlay, the `corridor_pinch` signal, the leg-date
-fix, the case store, the CSV import, the live adapter, push-to-deploy, and the PCS/01 and
-LDB/01 mappings.
+fix, the case store, the CSV import, the live adapter, push-to-deploy, the PCS/01, LDB/01,
+NOENTRY/01 and PESO/01 mappings, and the catalogue spec corrections.
 
 **Still the two highest-value things, and neither is code:** get the goulip.in NDA signed
 (in progress, up to a month), and talk to eight to ten operators to find out whether the
@@ -397,10 +459,11 @@ that dimension will simply be absent.
 Also worth knowing: VAHAN **masks PII**. The documented sample returns `"R***L K***R"` for
 owner name and `"ME4JF509AH70*****"` for chassis.
 
-### Three bugs the conformance check found before any credentials existed
+### The first three bugs the conformance check found, before any credentials existed
 
 `npx tsx scripts/conformance.ts` runs the mappers against response samples copied verbatim
-from the integration documents. It found:
+from the integration documents. Nine families are covered now and every one found
+something; these were the first three:
 
 1. **GRAP failed open.** `ncrEligibility` matched on a literal `"BS"`, but VAHAN writes
    `"BHARAT STAGE II"`. No match fell back to `?? 6`, so an unreadable norm was treated as
@@ -415,7 +478,8 @@ from the integration documents. It found:
    are now parsed as UTC calendar dates first.
 
 None of these could surface against the mock, which emits `"BS-IV"` and ISO dates. That is
-the argument for doing this work before the credentials arrive rather than after.
+the argument for doing this work before the credentials arrive rather than after — and the
+six families mapped since have not broken the streak.
 
 ## Delivery — a conflict can now leave the browser
 

@@ -899,6 +899,153 @@ export const ULIP_ENDPOINTS: UlipEndpoint[] = [
   },
 ]
 
+/**
+ * Corrections to the EXTRACTED catalogue, applied at load.
+ *
+ * The array above is generated and says so, which is why these live here
+ * rather than being edited into it: a correction inside generated output is
+ * lost the next time it is generated, and silently.
+ *
+ * `stateCode` is the trap. Six endpoints take a parameter by that name and
+ * they do NOT agree on what it is. IOCL/02 and the other fuel-station
+ * lookups document `^[A-Z]{1,6}$` — a letter code, 1-6 characters.
+ * NOENTRY/01 documents `^\d{1,5}$` and its own state table is numeric
+ * (`7 DELHI`, `21 ORISSA`). The extractor applied the letter form to all
+ * six, so NOENTRY/01 shipped a regex its own documented example, `21`,
+ * cannot satisfy. The format is displayed in the gateway console as
+ * specification, so a wrong one teaches the reader a value that earns a
+ * 400.
+ */
+interface SpecCorrection {
+  endpoint: string
+  param: string
+  /** The documented validation regex, where extraction got it wrong. */
+  format?: string
+  /** The documented example value, where extraction got it wrong. */
+  example?: string
+  /** Which document says so. Every entry here cites one. */
+  why: string
+}
+
+/**
+ * `stateCode` is the trap underneath most of these.
+ *
+ * Six endpoints take a parameter by that name and they do NOT agree on
+ * what it is. The fuel-station and black-spot family splits two ways:
+ * IOCL/02, BPCL/02, HPCL/02 and JIOBP/01 document a LETTER code
+ * (`^[A-Z]{1,6}$`, examples `WB`, `UP`, `DEL`), while NOENTRY/01 and
+ * BLACKSPOT/01 document a NUMBER (`^\d{1,5}$`, example `21`, against their
+ * own state tables — `7 DELHI`, `21 ORISSA`).
+ *
+ * The extractor crossed them in BOTH directions: the letter regex went
+ * onto the numeric endpoints, and the numeric example went onto the letter
+ * ones. Every one of the six shipped a regex and an example that
+ * contradict each other. Passing `21` to IOCL/02 earns a 400; passing
+ * `WB` to NOENTRY/01 earns another.
+ */
+const SPEC_CORRECTIONS: SpecCorrection[] = [
+  {
+    endpoint: 'NOENTRY/01', param: 'stateCode', format: '^\\d{1,5}$',
+    why: 'ULIP_No_Entry §1.3 — numeric, max 5 digits, with a numeric state table. '
+      + 'Extraction carried over the fuel-station endpoints\' `^[A-Z]{1,6}$`.',
+  },
+  {
+    endpoint: 'BLACKSPOT/01', param: 'stateCode', format: '^\\d{1,5}$',
+    why: 'ULIP_BLACK_SPOT §1.3 — same numeric form as NOENTRY/01, same mix-up.',
+  },
+  {
+    endpoint: 'IOCL/02', param: 'stateCode', example: 'WB',
+    why: 'ULIP_IOCL §1.4 request sample is "WB". The regex `^[A-Z]{1,6}$` is correct '
+      + 'here; the example `21` came from NOENTRY/01.',
+  },
+  {
+    endpoint: 'BPCL/02', param: 'stateCode', example: 'WB',
+    why: 'ULIP_BPCL request samples are "WB" and "DEL".',
+  },
+  {
+    endpoint: 'HPCL/02', param: 'stateCode', example: 'UP',
+    why: 'ULIP_HPCL request sample is "UP".',
+  },
+  {
+    endpoint: 'JIOBP/01', param: 'stateCode', example: 'WB',
+    why: 'ULIP_JIOBP request samples are "WB" and "UP".',
+  },
+  {
+    endpoint: 'DGFT/01', param: 'iecnumber', example: '0515920797',
+    why: 'ULIP_DGFT §1.3 request samples are "0515920797" and "0388197021". The regex '
+      + '`[0-9]{10}` is correct; the example `AFAPT19500` is a PAN and matches nothing.',
+  },
+  {
+    endpoint: 'MCA/03', param: 'cin',
+    format: '^([L|U]{1})([0-9]{5})([A-Za-z]{2})([0-9]{4})([A-Za-z]{3})([0-9]{6})$',
+    why: 'ULIP_MCA — extraction truncated this to `^([L|U]{}` at a PDF line break. '
+      + 'Restored from the same document\'s 400-response message, which repeats it whole.',
+  },
+  {
+    endpoint: 'MCA/04', param: 'cin',
+    format: '^([L|U]{1})([0-9]{5})([A-Za-z]{2})([0-9]{4})([A-Za-z]{3})([0-9]{6})$',
+    why: 'As MCA/03 — same parameter, same truncation.',
+  },
+  {
+    endpoint: 'SARATHI/01', param: 'dlnumber',
+    format: '(([A-Z]{2}(-)[0-9]{2})|([A-Z]{2}[0-9]{2} ))((19|20)[0-9][0-9])[0-9]{7}$',
+    why: 'ULIP_SARATHI — truncated to an unbalanced fragment at a line break. Restored '
+      + 'from the 400-response message. Note the literal SPACE inside the second '
+      + 'alternative, which is why "GJ04 20120005008" validates.',
+  },
+  {
+    endpoint: 'SARATHI/02', param: 'dlnumber',
+    format: '(([A-Z]{2}(-)[0-9]{2})|([A-Z]{2}[0-9]{2} ))((19|20)[0-9][0-9])[0-9]{7}$',
+    why: 'As SARATHI/01.',
+  },
+  {
+    endpoint: 'TGSARATHI/01', param: 'dlnumber',
+    format: '(([A-Z]{2}(-)[0-9]{2})|([A-Z]{2}[0-9]{2} ))((19|20)[0-9][0-9])[0-9]{7}$',
+    why: 'As SARATHI/01 — Telangana near-duplicate of the same endpoint.',
+  },
+]
+
+/**
+ * Parameters whose example and documented format contradict each other in
+ * a way NO document resolves. Declared rather than corrected, because
+ * picking a side would be inventing specification.
+ */
+export const SPEC_CONFLICTS: Record<string, string> = {
+  'AUTHAPI/01 iecnumber': 'ULIP publishes no integration document for AUTHAPI '
+    + '(docs/ulip-api/INDEX.md lists none), so neither the example `AFAPT19500` nor the '
+    + 'format `[0-9]{10}` can be checked against a source. The example is a PAN and fails '
+    + 'the format; DGFT/01, which documents the same parameter, uses a 10-digit number. '
+    + 'Treat AUTHAPI\'s parameter spec as unverified.',
+}
+
+for (const fix of SPEC_CORRECTIONS) {
+  const param = ULIP_ENDPOINTS.find((e) => e.id === fix.endpoint)
+    ?.params.find((p) => p.name === fix.param)
+  if (!param) continue
+  if (fix.format !== undefined) param.format = fix.format
+  if (fix.example !== undefined) param.example = fix.example
+}
+
+/**
+ * Un-double the backslashes extraction doubled.
+ *
+ * 42 of the 109 documented formats came out with `\\d`, `\\.`, `\\s` and
+ * `\\b` where the document has `\d`, `\.`, `\s` and `\b`. As a regex the
+ * doubled form means "a literal backslash, then d" — it matches nothing a
+ * ULIP parameter can contain, and the gateway console displays it as the
+ * specification, which is the one part of this app that claims to be
+ * verbatim. No ULIP parameter format contains a literal backslash, so
+ * collapsing the pair is unambiguous.
+ *
+ * `scripts/conformance.ts` now asserts every documented example satisfies
+ * its own documented format, which is what would have caught this.
+ */
+for (const ep of ULIP_ENDPOINTS) {
+  for (const param of ep.params) {
+    if (param.format?.includes('\\\\')) param.format = param.format.replace(/\\\\/g, '\\')
+  }
+}
+
 export const ULIP_SYSTEMS = [...new Set(ULIP_ENDPOINTS.map((e) => e.system))].sort()
 export const ULIP_CATEGORIES = [...new Set(ULIP_ENDPOINTS.map((e) => e.category))].sort()
 export const endpointById = (id: string) => ULIP_ENDPOINTS.find((e) => e.id === id)

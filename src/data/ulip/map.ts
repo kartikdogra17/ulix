@@ -817,6 +817,347 @@ export function toLdb(r: LdbRecord): LiveContainer {
   }
 }
 
+/* ── NOENTRY/01 — state and city no-entry windows ────────────── */
+
+/**
+ * NOENTRY/01 response record, as documented.
+ *
+ * `stateCode` is a STRING in the request and a NUMBER in the response,
+ * the same inconsistency e-Way Bill has on `ewbNo`.
+ */
+export interface NoEntryRecord {
+  stateCode?: number | string | null
+  stateName?: string | null
+  districtCode?: number | string | null
+  districtName?: string | null
+  areaName?: string | null
+  noEntryTime?: string | null
+}
+
+/**
+ * India has not observed daylight saving since 1945 and IST is a fixed
+ * +05:30, so the offset is a constant rather than a zone lookup. That
+ * matters here: no-entry windows are stated in local civil time and the
+ * delivery job runs on a UTC box, where "is it 8am yet" is 5½ hours out.
+ */
+const IST_OFFSET_MIN = 330
+
+/** Minutes since midnight IST for an instant. */
+export function istMinutesOfDay(at: Date | number): number {
+  const ms = typeof at === 'number' ? at : at.getTime()
+  const shifted = new Date(ms + IST_OFFSET_MIN * 60_000)
+  return shifted.getUTCHours() * 60 + shifted.getUTCMinutes()
+}
+
+export interface NoEntryWindow {
+  /** Minutes since midnight IST. */
+  fromMin: number
+  toMin: number
+  /** True when the window runs through midnight — `toMin <= fromMin`. */
+  wraps: boolean
+  /** Tidied for display: "08:00–22:00 IST". */
+  label: string
+}
+
+/** `8.00 AM`, `8:00 AM`, `8 AM`, `08.30 PM` → minutes since midnight. */
+function clockToMinutes(raw: string): number | null {
+  const m = /^(\d{1,2})(?:[.:](\d{2}))?\s*([AP])\.?M\.?$/i.exec(raw.trim())
+  if (!m) return null
+  let hour = +m[1]
+  const min = m[2] ? +m[2] : 0
+  if (hour < 1 || hour > 12 || min > 59) return null
+  const pm = m[3].toUpperCase() === 'P'
+  if (hour === 12) hour = 0
+  return (hour + (pm ? 12 : 0)) * 60 + min
+}
+
+/**
+ * `noEntryTime` is free text, and it writes the clock with DOTS:
+ * `"8.00 AM to 10.00 PM"`. Nothing else in ULIP does that.
+ *
+ * Two things here are restriction logic, not formatting, and getting
+ * either wrong fails OPEN:
+ *
+ *  - **Windows wrap midnight.** A city-centre ban is typically
+ *    `"10.00 PM to 6.00 AM"`, where `toMin < fromMin`. A naive
+ *    `from <= t && t <= to` is false at every minute of such a window, so
+ *    the ban silently never applies and a truck is waved in at 2am.
+ *  - **`from == to` is read as all day, not as zero length.** The field is
+ *    a restriction; the safe reading of an ambiguous one is the
+ *    restrictive one.
+ */
+export function noEntryWindow(raw: string | null | undefined): NoEntryWindow | null {
+  if (!raw?.trim()) return null
+  const m = /^\s*(.+?)\s+(?:to|-|–|—|till|until)\s+(.+?)\s*$/i.exec(raw)
+  if (!m) return null
+  const fromMin = clockToMinutes(m[1])
+  const toMin = clockToMinutes(m[2])
+  if (fromMin === null || toMin === null) return null
+  const hhmm = (v: number) => `${String(Math.floor(v / 60)).padStart(2, '0')}:${String(v % 60).padStart(2, '0')}`
+  return {
+    fromMin,
+    toMin,
+    wraps: toMin <= fromMin,
+    label: `${hhmm(fromMin)}–${hhmm(toMin)} IST`,
+  }
+}
+
+/** True when an instant falls inside a no-entry window. */
+export function inNoEntryWindow(w: NoEntryWindow, at: Date | number): boolean {
+  const t = istMinutesOfDay(at)
+  // Equal bounds mean the whole day; see noEntryWindow.
+  if (w.fromMin === w.toMin) return true
+  return w.wraps ? t >= w.fromMin || t < w.toMin : t >= w.fromMin && t < w.toMin
+}
+
+export interface NoEntryZone {
+  stateCode?: string
+  stateName?: string
+  districtCode?: string
+  districtName?: string
+  area: string
+  window: NoEntryWindow | null
+  /** The field verbatim, because the parse is lossy and operators argue with it. */
+  rawWindow?: string
+}
+
+export interface LiveNoEntry {
+  known: { zones: NoEntryZone[] }
+  missing: string[]
+  warnings: string[]
+}
+
+/**
+ * IMPORTANT: an EMPTY NOENTRY/01 response means ULIP has no no-entry data
+ * for that state, NOT that the state has no restrictions.
+ *
+ * The document publishes no "not found" sample at all — only an invalid
+ * format and a hit — so the empty case is undocumented, and the only safe
+ * reading of a missing restriction list is that it is missing. Anything
+ * that turns this into "clear to enter" is the `ncrEligibility` fail-open
+ * bug a second time.
+ */
+export function toNoEntry(rows: NoEntryRecord[] | undefined): LiveNoEntry {
+  const warnings: string[] = []
+  const missing: string[] = []
+  const list = rows ?? []
+
+  if (!list.length) {
+    missing.push('zones')
+    warnings.push(
+      'NOENTRY/01 returned no zones. ULIP has no no-entry data for this state code — '
+      + 'that is NOT the same as the state having no restrictions, and must not be '
+      + 'presented as clear to enter.')
+  }
+
+  const zones: NoEntryZone[] = []
+  const seen = new Set<string>()
+  for (const r of list) {
+    // areaName carries embedded newlines in the documented sample, which
+    // break a table row wherever they land.
+    const area = r.areaName?.replace(/\s+/g, ' ').trim()
+    if (!area) continue
+    const window = noEntryWindow(r.noEntryTime)
+    if (r.noEntryTime && !window) {
+      warnings.push(
+        `Could not read the no-entry window "${r.noEntryTime.trim()}" for ${area}. `
+        + 'The restriction stands; only its hours are unknown.')
+    }
+    // districtCode is 1 for every row in the sample and is NOT unique
+    // across states, so the key has to carry the state too.
+    const key = `${r.stateCode ?? ''}/${r.districtCode ?? ''}/${area}/${r.noEntryTime ?? ''}`
+    if (seen.has(key)) continue
+    seen.add(key)
+    zones.push({
+      stateCode: r.stateCode === null || r.stateCode === undefined ? undefined : String(r.stateCode),
+      // The document's own state-code table calls 21 "ORISSA" while the
+      // response calls it "Odisha". Join on the code; never on the name.
+      stateName: r.stateName?.trim() || undefined,
+      districtCode: r.districtCode === null || r.districtCode === undefined
+        ? undefined : String(r.districtCode),
+      districtName: r.districtName?.replace(/\s+/g, ' ').trim() || undefined,
+      area,
+      window,
+      rawWindow: r.noEntryTime?.trim() || undefined,
+    })
+  }
+
+  return { known: { zones }, missing, warnings }
+}
+
+/* ── PESO/01 — CNG cylinder certification ────────────────────── */
+
+/**
+ * PESO/01 response record, as documented.
+ *
+ * The keys are human column headings used verbatim as JSON keys — with
+ * spaces, inconsistent capitalisation (`Number of cylinders`), and a stray
+ * space inside `Cylinder ID/ Serial Number`. They have to be quoted
+ * exactly; there is no camelCase form to fall back on.
+ */
+export interface PesoRecord {
+  ErrorMsg?: string | null
+  'Cylinder Manufacturing Date'?: string | null
+  'Cylinder Make'?: string | null
+  'Cylinder capacity in water litre'?: number | string | null
+  'Number of cylinders'?: number | string | null
+  'Cylinder ID/ Serial Number'?: string | null
+  'Hydro Test Date'?: string | null
+  'Hydro Test Due Date'?: string | null
+  'Test Result'?: string | null
+  'Cylinder Age valid till Date'?: string | null
+  'Testing Company Name'?: string | null
+  'Certificate No'?: string | null
+  'Vehicle Registration Number'?: string | null
+}
+
+/**
+ * PESO encodes a missing FIELD as human prose inside the typed field:
+ * `"Number of cylinders": "Not Available at PESO"` where a number belongs,
+ * and the same string in a date field.
+ *
+ * So `Number(...)` yields NaN and a date parser is handed a sentence. Both
+ * have to be detected as absent before anything tries to read them — a
+ * count that silently becomes NaN propagates into arithmetic, and a date
+ * that fails to parse is indistinguishable from one the mapper got wrong.
+ */
+export const PESO_UNAVAILABLE = /not\s*available\s*at\s*peso/i
+
+const pesoValue = (v: string | null | undefined): string | undefined => {
+  const s = v?.trim()
+  if (!s || PESO_UNAVAILABLE.test(s)) return undefined
+  return s
+}
+
+/**
+ * IMPORTANT: a PESO/01 miss is the fifth shape ULIP uses for one — a
+ * single row carrying ONLY `ErrorMsg: "No Record found"`, under
+ * `responseStatus: "SUCCESS"`.
+ *
+ * It is PCS's trap with a different marker, and note the inconsistency
+ * inside one endpoint: a hit sets `ErrorMsg` to the empty string, a
+ * record-level miss puts prose in it, and a FIELD-level miss puts
+ * different prose in the field itself.
+ */
+export function pesoMiss(r: PesoRecord | undefined): boolean {
+  if (!r) return true
+  if (/no\s*record\s*found/i.test(r.ErrorMsg ?? '')) return true
+  return !r['Cylinder ID/ Serial Number'] && !r['Certificate No']
+    && !r['Hydro Test Due Date']
+}
+
+export const pesoFound = (rows: PesoRecord[] | undefined) => (rows ?? []).some((r) => !pesoMiss(r))
+
+export interface PesoCylinder {
+  serialNo?: string
+  certificateNo?: string
+  make?: string
+  /** Water capacity in litres, the standard measure for a gas cylinder. */
+  capacityL?: number
+  manufacturedOn?: string
+  testedOn?: string
+  /** Hydro-test expiry. The field that decides whether the vehicle may run. */
+  dueOn?: string
+  testPassed?: boolean
+  testResult?: string
+  testedBy?: string
+  /** Separate from the hydro test, and usually absent. */
+  ageValidUpto?: string
+}
+
+export interface LiveCylinders {
+  known: {
+    regNo?: string
+    cylinders: PesoCylinder[]
+    /** Derived from the ROW COUNT, because the field never carries it. */
+    cylinderCount: number
+    /**
+     * The earliest hydro-test expiry across every cylinder. A vehicle is
+     * out of certification as soon as ONE cylinder lapses, so the worst
+     * date governs — taking the first row's, or the latest, certifies a
+     * vehicle that is not certified.
+     */
+    earliestDueOn?: string
+    anyTestFailed: boolean
+  }
+  missing: string[]
+  warnings: string[]
+}
+
+export function toPesoCylinders(rows: PesoRecord[] | undefined): LiveCylinders {
+  const missing: string[] = []
+  const warnings: string[] = []
+  const list = (rows ?? []).filter((r) => !pesoMiss(r))
+
+  if (!list.length) {
+    warnings.push(
+      'PESO/01 has no CNG cylinder record for this vehicle. For a CNG vehicle that is a '
+      + 'finding; for a diesel or petrol vehicle it is expected, because PESO/01 only '
+      + 'covers CNG cylinder testing.')
+    return {
+      known: { cylinders: [], cylinderCount: 0, anyTestFailed: false },
+      missing: ['cylinders'],
+      warnings,
+    }
+  }
+
+  const cylinders: PesoCylinder[] = list.map((r) => {
+    const result = pesoValue(r['Test Result'])
+    const dueOn = ewbDate(pesoValue(r['Hydro Test Due Date']))
+    if (pesoValue(r['Hydro Test Due Date']) && !dueOn) {
+      warnings.push(
+        `Could not read the hydro-test due date "${r['Hydro Test Due Date']}" for cylinder `
+        + `${pesoValue(r['Cylinder ID/ Serial Number']) ?? 'unknown'}.`)
+    }
+    const cap = pesoValue(
+      typeof r['Cylinder capacity in water litre'] === 'number'
+        ? String(r['Cylinder capacity in water litre'])
+        : r['Cylinder capacity in water litre'] as string | null | undefined)
+    const capacityL = cap === undefined ? undefined : num(cap)
+    return {
+      serialNo: pesoValue(r['Cylinder ID/ Serial Number']),
+      certificateNo: pesoValue(r['Certificate No']),
+      make: pesoValue(r['Cylinder Make']),
+      capacityL,
+      // dd/MM/yyyy — e-Way Bill's trap again, so e-Way Bill's parser.
+      manufacturedOn: ewbDate(pesoValue(r['Cylinder Manufacturing Date'])) ?? undefined,
+      testedOn: ewbDate(pesoValue(r['Hydro Test Date'])) ?? undefined,
+      dueOn: dueOn ?? undefined,
+      // An unreadable result is NOT a pass.
+      testPassed: result === undefined ? undefined : /^pass/i.test(result),
+      testResult: result,
+      testedBy: pesoValue(r['Testing Company Name']),
+      ageValidUpto: ewbDate(pesoValue(r['Cylinder Age valid till Date'])) ?? undefined,
+    }
+  })
+
+  const due = cylinders.map((c) => c.dueOn).filter((d): d is string => !!d)
+  if (due.length !== cylinders.length) missing.push('earliestDueOn')
+
+  /* The field says "Not Available at PESO" on every documented row, so the
+     count comes from how many certificates came back. */
+  if (list.some((r) => PESO_UNAVAILABLE.test(String(r['Number of cylinders'] ?? '')))) {
+    warnings.push(
+      '"Number of cylinders" reads "Not Available at PESO"; the count is the number of '
+      + 'certificates returned, which is a floor rather than a total.')
+  }
+
+  return {
+    known: {
+      regNo: pesoValue(list.find((r) => r['Vehicle Registration Number'])?.['Vehicle Registration Number'])
+        ?.toUpperCase().replace(/[\s-]/g, ''),
+      cylinders,
+      cylinderCount: cylinders.length,
+      earliestDueOn: due.length
+        ? due.reduce((a, b) => (Date.parse(a) <= Date.parse(b) ? a : b))
+        : undefined,
+      anyTestFailed: cylinders.some((c) => c.testPassed === false),
+    },
+    missing,
+    warnings,
+  }
+}
+
 /**
  * What ULIP simply does not carry, against a domain model built from the
  * whole picture rather than from one gateway.
@@ -835,6 +1176,13 @@ export const FIELD_GAPS = {
   driverName: 'SARATHI/01 needs a licence number AND date of birth. Neither is discoverable '
     + 'from a vehicle number, so a driver cannot be resolved from a plate alone.',
   utilisationPct: 'A commercial metric, not a government record. Comes from your own TMS.',
+  hazmatClearance: 'NO ULIP endpoint carries a hazardous-goods or explosives licence. '
+    + 'PESO is the Petroleum & Explosives Safety Organisation, but PESO/01 — the one '
+    + 'endpoint ULIP exposes from it — returns CNG CYLINDER TEST CERTIFICATES and nothing '
+    + 'else: no licence number, no validity, no class. The word "explosive" does not '
+    + 'appear in any of the 36 integration documents, and no document declares a licence '
+    + 'field of any kind. A hazmat clearance has to be held as a document you attach, '
+    + 'the way a PESO licence PDF is attached today.',
 } as const
 
 export type FieldGap = keyof typeof FIELD_GAPS
